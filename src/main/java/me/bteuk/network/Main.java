@@ -2,6 +2,8 @@ package me.bteuk.network;
 
 import com.mysql.cj.jdbc.MysqlConnectionPoolDataSource;
 import com.mysql.cj.jdbc.MysqlDataSource;
+import me.bteuk.network.gui.Navigator;
+import me.bteuk.network.listeners.GuiListener;
 import me.bteuk.network.listeners.JoinServer;
 import me.bteuk.network.listeners.LeaveServer;
 import me.bteuk.network.sql.GlobalSQL;
@@ -14,6 +16,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.checkerframework.checker.units.qual.N;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -31,6 +34,9 @@ public final class Main extends JavaPlugin {
 
     //User List
     private ArrayList<User> users;
+
+    //Guis
+    public Navigator navigator;
 
     @Override
     public void onEnable() {
@@ -116,6 +122,11 @@ public final class Main extends JavaPlugin {
         //Register events.
         new JoinServer(this);
         new LeaveServer(this);
+
+        new GuiListener(this);
+
+        //Create Guis.
+        navigator = new Navigator();
 
     }
 

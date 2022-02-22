@@ -18,7 +18,7 @@ public class Utils {
         return ChatColor.translateAlternateColorCodes('&', s);
     }
 
-    public static ItemStack createItem(Inventory inv, Material material, int amount, int invSlot, String displayName, String... loreString) {
+    public static ItemStack createItem(Material material, int amount, String displayName, String... loreString) {
 
         ItemStack item;
 
@@ -33,8 +33,6 @@ public class Utils {
         }
         meta.setLore(lore);
         item.setItemMeta(meta);
-
-        inv.setItem(invSlot - 1, item);
 
         return item;
 
