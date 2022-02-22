@@ -2,44 +2,35 @@ package me.bteuk.network;
 
 import com.mysql.cj.jdbc.MysqlConnectionPoolDataSource;
 import com.mysql.cj.jdbc.MysqlDataSource;
+import me.bteuk.network.listeners.JoinServer;
+import me.bteuk.network.listeners.LeaveServer;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.NavigationSQL;
 import me.bteuk.network.sql.PlotSQL;
+import me.bteuk.network.utils.ServerType;
+import me.bteuk.network.utils.User;
 import me.bteuk.network.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public final class Main extends JavaPlugin {
 
-    //MySQL
-    private String host, username, password;
-    private int port;
-
-    //Global Database
-    private String global_database;
-    private GlobalSQL globalSQL;
-    private DataSource global_dataSource;
-
-    //Plot Database
-    private String plot_database;
-    private PlotSQL plotSQL;
-    private DataSource plot_dataSource;
-
-    //Navigation Database
-    private String navigation_database;
-    private NavigationSQL navigationSQL;
-    private DataSource navigation_dataSource;
-
     //Server Name
     public static String SERVER_NAME;
+    public static ServerType SERVER_TYPE;
 
     private static Main instance;
     private static FileConfiguration config;
+
+    //User List
+    private ArrayList<User> users;
 
     @Override
     public void onEnable() {
@@ -58,6 +49,21 @@ public final class Main extends JavaPlugin {
 
         }
 
+        //Global Database
+        String global_database;
+        GlobalSQL globalSQL;
+        DataSource global_dataSource;
+
+        //Plot Database
+        String plot_database;
+        PlotSQL plotSQL;
+        DataSource plot_dataSource;
+
+        //Navigation Database
+        String navigation_database;
+        NavigationSQL navigationSQL;
+        DataSource navigation_dataSource;
+
         //Setup MySQL
         try {
 
@@ -73,14 +79,43 @@ public final class Main extends JavaPlugin {
             plot_dataSource = mysqlSetup(plot_database);
             plotSQL = new PlotSQL(plot_dataSource);
 
-        } catch (SQLException /*| IOException*/ e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             Bukkit.getLogger().severe(Utils.chat("&cFailed to connect to the database, please check that you have set the config values correctly."));
             return;
         }
 
-        //Set the server name from config.
+        //Set the server name and type from config.
         SERVER_NAME = config.getString("server_name");
+
+        if (!navigationSQL.hasRow("SELECT name FROM server_data WHERE name=" + SERVER_NAME + ";")) {
+
+            //If the server is not in the database, shut down plugin.
+            Bukkit.getLogger().severe(Utils.chat("&cServer not in database, disabling plugin!"));
+            return;
+
+        } else {
+
+            //Try to get the server type.
+            try {
+
+                SERVER_TYPE = ServerType.valueOf(
+                        navigationSQL.getString("SELECT type FROM server_data WHERE name=" + SERVER_NAME + ";").toUpperCase());
+
+            } catch (NullPointerException | IllegalArgumentException e) {
+
+                Bukkit.getLogger().severe(Utils.chat("&cServer type in database is not valid!"));
+                Bukkit.getLogger().severe(Utils.chat("&cPlease make sure the server is configured correctly."));
+
+            }
+        }
+
+        //Create user list.
+        users = new ArrayList<>();
+
+        //Register events.
+        new JoinServer(this);
+        new LeaveServer(this);
 
     }
 
@@ -92,11 +127,10 @@ public final class Main extends JavaPlugin {
     //Creates the mysql connection.
     private DataSource mysqlSetup(String database) throws SQLException {
 
-        host = config.getString("host");
-        port = config.getInt("port");
-        database = config.getString("database");
-        username = config.getString("username");
-        password = config.getString("password");
+        String host = config.getString("host");
+        int port = config.getInt("port");
+        String username = config.getString("username");
+        String password = config.getString("password");
 
         MysqlDataSource dataSource = new MysqlConnectionPoolDataSource();
 
@@ -122,5 +156,34 @@ public final class Main extends JavaPlugin {
     //Returns an instance of the plugin.
     public static Main getInstance() {
         return instance;
+    }
+
+    //Get user from player.
+    public User getUser(Player p) {
+
+        for (User u : users) {
+
+            if (u.player == p) {
+
+                return u;
+
+            }
+        }
+
+        return null;
+    }
+
+    //Add user to list.
+    public void addUser(User u) {
+
+        users.add(u);
+
+    }
+
+    //Get user from player.
+    public void removeUser(User u) {
+
+        users.remove(u);
+
     }
 }
