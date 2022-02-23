@@ -36,5 +36,12 @@ public class LeaveServer implements Listener {
         //If they are currently in an inventory, remove them from the list of open inventories.
         Gui.openInventories.remove(playerUUID);
 
+        //Remove the unique gui, if it exists.
+        if (u.uniqueGui != null) {
+
+            u.uniqueGui.delete();
+
+        }
+
     }
 }

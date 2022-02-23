@@ -56,7 +56,6 @@ public abstract class Gui {
     public void open(User u) {
 
         u.player.openInventory(inv);
-        u.currentGui = getUuid();
         openInventories.put(u.player.getUniqueId(), getUuid());
 
     }

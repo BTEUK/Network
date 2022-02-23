@@ -10,8 +10,7 @@ public class User {
     //Player instance.
     public Player player;
 
-    public UUID previousGui;
-    public UUID currentGui;
+    public String previousGui;
 
     //Unique gui for this user.
     public UniqueGui uniqueGui;

@@ -2,6 +2,7 @@ package me.bteuk.network;
 
 import com.mysql.cj.jdbc.MysqlConnectionPoolDataSource;
 import com.mysql.cj.jdbc.MysqlDataSource;
+import me.bteuk.network.gui.BuildGui;
 import me.bteuk.network.gui.Navigator;
 import me.bteuk.network.listeners.GuiListener;
 import me.bteuk.network.listeners.JoinServer;
@@ -38,6 +39,11 @@ public final class Main extends JavaPlugin {
     //Guis
     public Navigator navigator;
 
+    //SQL
+    public NavigationSQL navigationSQL;
+    public PlotSQL plotSQL;
+    public GlobalSQL globalSQL;
+
     @Override
     public void onEnable() {
 
@@ -57,17 +63,14 @@ public final class Main extends JavaPlugin {
 
         //Global Database
         String global_database;
-        GlobalSQL globalSQL;
         DataSource global_dataSource;
 
         //Plot Database
         String plot_database;
-        PlotSQL plotSQL;
         DataSource plot_dataSource;
 
         //Navigation Database
         String navigation_database;
-        NavigationSQL navigationSQL;
         DataSource navigation_dataSource;
 
         //Setup MySQL
@@ -128,11 +131,17 @@ public final class Main extends JavaPlugin {
         //Create Guis.
         navigator = new Navigator();
 
+        //Create bungeecord channel
+        this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+
     }
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+
+        //Disable bungeecord channel.
+        this.getServer().getMessenger().unregisterOutgoingPluginChannel(this);
+
     }
 
     //Creates the mysql connection.

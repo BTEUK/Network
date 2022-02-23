@@ -1,5 +1,6 @@
 package me.bteuk.network.gui;
 
+import me.bteuk.network.Main;
 import me.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
