@@ -1,10 +1,9 @@
 package me.bteuk.network.listeners;
 
-import me.bteuk.network.Main;
+import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
-import me.bteuk.network.utils.User;
+import me.bteuk.network.utils.NetworkUser;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -13,9 +12,9 @@ import java.util.UUID;
 
 public class LeaveServer implements Listener {
 
-    Main instance;
+    Network instance;
 
-    public LeaveServer(Main instance) {
+    public LeaveServer(Network instance) {
 
         this.instance = instance;
         Bukkit.getServer().getPluginManager().registerEvents(this, instance);
@@ -25,7 +24,7 @@ public class LeaveServer implements Listener {
     @EventHandler
     public void leaveServerEvent(PlayerQuitEvent e) {
 
-        User u = instance.getUser(e.getPlayer());
+        NetworkUser u = instance.getUser(e.getPlayer());
 
         //Remove user from list.
         instance.removeUser(u);

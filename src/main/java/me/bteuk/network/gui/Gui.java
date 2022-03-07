@@ -1,6 +1,6 @@
 package me.bteuk.network.gui;
 
-import me.bteuk.network.utils.User;
+import me.bteuk.network.utils.NetworkUser;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -35,7 +35,7 @@ public abstract class Gui {
     }
 
     public interface guiAction {
-        void click(User u);
+        void click(NetworkUser u);
     }
 
     public void setItem(int slot, ItemStack stack, guiAction action) {
@@ -53,7 +53,7 @@ public abstract class Gui {
 
     }
 
-    public void open(User u) {
+    public void open(NetworkUser u) {
 
         u.player.openInventory(inv);
         openInventories.put(u.player.getUniqueId(), getUuid());

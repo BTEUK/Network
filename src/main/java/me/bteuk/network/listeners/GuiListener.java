@@ -1,8 +1,8 @@
 package me.bteuk.network.listeners;
 
-import me.bteuk.network.Main;
+import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
-import me.bteuk.network.utils.User;
+import me.bteuk.network.utils.NetworkUser;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,9 +14,9 @@ import java.util.UUID;
 
 public class GuiListener implements Listener {
 
-    Main instance;
+    Network instance;
 
-    public GuiListener(Main instance) {
+    public GuiListener(Network instance) {
 
         this.instance = instance;
         Bukkit.getServer().getPluginManager().registerEvents(this, instance);
@@ -32,7 +32,7 @@ public class GuiListener implements Listener {
 
         }
 
-        User u = instance.getUser((Player) e.getWhoClicked());
+        NetworkUser u = instance.getUser((Player) e.getWhoClicked());
         UUID playerUUID = u.player.getUniqueId();
 
         UUID inventoryUUID = Gui.openInventories.get(playerUUID);
@@ -54,7 +54,7 @@ public class GuiListener implements Listener {
     @EventHandler
     public void onClose(InventoryCloseEvent e) {
 
-        User u = instance.getUser((Player) e.getPlayer());
+        NetworkUser u = instance.getUser((Player) e.getPlayer());
         UUID playerUUID = u.player.getUniqueId();
 
         //Remove the player from the list of open inventories.

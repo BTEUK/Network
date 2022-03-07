@@ -2,7 +2,6 @@ package me.bteuk.network;
 
 import com.mysql.cj.jdbc.MysqlConnectionPoolDataSource;
 import com.mysql.cj.jdbc.MysqlDataSource;
-import me.bteuk.network.gui.BuildGui;
 import me.bteuk.network.gui.Navigator;
 import me.bteuk.network.listeners.GuiListener;
 import me.bteuk.network.listeners.JoinServer;
@@ -11,30 +10,29 @@ import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.NavigationSQL;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.ServerType;
-import me.bteuk.network.utils.User;
+import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.checkerframework.checker.units.qual.N;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public final class Main extends JavaPlugin {
+public final class Network extends JavaPlugin {
 
     //Server Name
     public static String SERVER_NAME;
     public static ServerType SERVER_TYPE;
 
-    private static Main instance;
+    private static Network instance;
     private static FileConfiguration config;
 
     //User List
-    private ArrayList<User> users;
+    private ArrayList<NetworkUser> networkUsers;
 
     //Guis
     public Navigator navigator;
@@ -48,8 +46,8 @@ public final class Main extends JavaPlugin {
     public void onEnable() {
 
         //Config Setup
-        Main.instance = this;
-        Main.config = this.getConfig();
+        Network.instance = this;
+        Network.config = this.getConfig();
 
         saveDefaultConfig();
 
@@ -120,7 +118,7 @@ public final class Main extends JavaPlugin {
         }
 
         //Create user list.
-        users = new ArrayList<>();
+        networkUsers = new ArrayList<>();
 
         //Register events.
         new JoinServer(this);
@@ -174,14 +172,14 @@ public final class Main extends JavaPlugin {
     }
 
     //Returns an instance of the plugin.
-    public static Main getInstance() {
+    public static Network getInstance() {
         return instance;
     }
 
     //Get user from player.
-    public User getUser(Player p) {
+    public NetworkUser getUser(Player p) {
 
-        for (User u : users) {
+        for (NetworkUser u : networkUsers) {
 
             if (u.player == p) {
 
@@ -194,16 +192,16 @@ public final class Main extends JavaPlugin {
     }
 
     //Add user to list.
-    public void addUser(User u) {
+    public void addUser(NetworkUser u) {
 
-        users.add(u);
+        networkUsers.add(u);
 
     }
 
     //Get user from player.
-    public void removeUser(User u) {
+    public void removeUser(NetworkUser u) {
 
-        users.remove(u);
+        networkUsers.remove(u);
 
     }
 }

@@ -1,18 +1,17 @@
 package me.bteuk.network.listeners;
 
-import me.bteuk.network.Main;
-import me.bteuk.network.utils.User;
+import me.bteuk.network.Network;
+import me.bteuk.network.utils.NetworkUser;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 public class PlayerInteract implements Listener {
 
-    Main instance;
+    Network instance;
 
-    public PlayerInteract(Main instance) {
+    public PlayerInteract(Network instance) {
 
         this.instance = instance;
         Bukkit.getServer().getPluginManager().registerEvents(this, instance);
@@ -22,7 +21,7 @@ public class PlayerInteract implements Listener {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent e) {
 
-        User u = instance.getUser(e.getPlayer());
+        NetworkUser u = instance.getUser(e.getPlayer());
 
         //Open navigator.
         instance.navigator.open(u);

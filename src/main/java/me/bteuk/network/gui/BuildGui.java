@@ -2,20 +2,18 @@ package me.bteuk.network.gui;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
-import me.bteuk.network.Main;
+import me.bteuk.network.Network;
 import me.bteuk.network.utils.ServerType;
-import me.bteuk.network.utils.User;
+import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 
 public class BuildGui {
 
-    public static UniqueGui createBuildGui(User user) {
+    public static UniqueGui createBuildGui(NetworkUser user) {
 
         UniqueGui gui = new UniqueGui(27, Component.text("Building Menu", NamedTextColor.AQUA, TextDecoration.BOLD));
 
@@ -25,51 +23,51 @@ public class BuildGui {
                         Utils.chat("&fClick teleport to a random claimable plot.")),
                 u -> {
 
-                    int id = 0;
+                    int id;
 
                     if (u.player.hasPermission("group.jrbuilder")) {
 
                         //Select a random plot of any difficulty.
-                        id = Main.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE status='unclaimed' ORDER BY RAND() LIMIT 1;");
+                        id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE status='unclaimed' ORDER BY RAND() LIMIT 1;");
 
                     } else if (u.player.hasPermission("group.apprentice")) {
 
                         //Select a random plot of difficulty easy and normal.
-                        id = Main.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE status='unclaimed' AND (difficulty=1 OR difficulty=2) ORDER BY RAND() LIMIT 1;");
+                        id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE status='unclaimed' AND (difficulty=1 OR difficulty=2) ORDER BY RAND() LIMIT 1;");
 
                     } else {
 
                         //Select a random plot of difficulty easy.
-                        id = Main.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE status='unclaimed' AND difficulty=1 ORDER BY RAND() LIMIT 1;");
+                        id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE status='unclaimed' AND difficulty=1 ORDER BY RAND() LIMIT 1;");
 
                     }
 
                     if (id == 0) {
 
-                        u.player.sendMessage(Utils.chat("&cThere are no plots available, please wait new plots to be added."));
+                        u.player.sendMessage(Utils.chat("&cThere are no plots available, please wait for new plots to be added."));
                         u.player.closeInventory();
 
                     } else {
 
                         //Get the server of the plot.
-                        String server = Main.getInstance().plotSQL.getString("SELECT server FROM location_data WHERE name="
-                                + Main.getInstance().plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";")
+                        String server = Network.getInstance().plotSQL.getString("SELECT server FROM location_data WHERE name="
+                                + Network.getInstance().plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";")
                                 + ";");
 
                         //If the plot is on the current server teleport them directly.
                         //Else teleport them to the correct server and them teleport them to the plot.
-                        if (server == Main.SERVER_NAME) {
+                        if (server.equals(Network.SERVER_NAME)) {
 
                             u.player.closeInventory();
-                            Main.getInstance().globalSQL.insert("INSERT INTO server_events(uuid,server,event) VALUES("
+                            Network.getInstance().globalSQL.insert("INSERT INTO server_events(uuid,server,event) VALUES("
                                     + u.player.getUniqueId()
-                                    + "," + Main.SERVER_NAME
+                                    + "," + Network.SERVER_NAME
                                     + ",teleport plot " + id + ");");
 
                         } else {
 
                             //Set the server join event.
-                            Main.getInstance().globalSQL.insert("INSERT INTO join_events(uuid,event) VALUES("
+                            Network.getInstance().globalSQL.insert("INSERT INTO join_events(uuid,event) VALUES("
                                     + u.player.getUniqueId()
                                     + "," + "teleport plot " + id + ");");
 
@@ -90,13 +88,13 @@ public class BuildGui {
                 u -> {
 
                     //If server type is plot, then send a plot claim event to the database.
-                    if (Main.SERVER_TYPE == ServerType.PLOT) {
+                    if (Network.SERVER_TYPE == ServerType.PLOT) {
 
                         //Set the claim event.
                         u.player.closeInventory();
-                        Main.getInstance().globalSQL.insert("INSERT INTO server_events(uuid,server,event) VALUES("
+                        Network.getInstance().globalSQL.insert("INSERT INTO server_events(uuid,server,event) VALUES("
                                 + u.player.getUniqueId()
-                                + "," + Main.SERVER_NAME
+                                + "," + Network.SERVER_NAME
                                 + ",claim plot);");
 
                     } else {
@@ -128,7 +126,7 @@ public class BuildGui {
                         Utils.chat("&fClick to choose a location to build a plot.")),
                 u -> {
 
-                    if (Main.SERVER_TYPE == ServerType.EARTH) {
+                    if (Network.SERVER_TYPE == ServerType.EARTH) {
 
                         //If the user is Jr.Builder+ go through the region joining process.
                         if (u.player.hasPermission("group.jrbuilder")) {
@@ -185,7 +183,7 @@ public class BuildGui {
                     u.player.closeInventory();
                     ByteArrayDataOutput out = ByteStreams.newDataOutput();
                     out.writeUTF("Connect");
-                    out.writeUTF(Main.getInstance().navigationSQL.getString("SELECT FROM server_data WHERE type='lobby';"));
+                    out.writeUTF(Network.getInstance().navigationSQL.getString("SELECT FROM server_data WHERE type='lobby';"));
 
                 });
 
@@ -199,7 +197,7 @@ public class BuildGui {
 
                     //Open the navigator.
                     u.player.closeInventory();
-                    Main.getInstance().navigator.open(u);
+                    Network.getInstance().navigator.open(u);
 
                 });
 
