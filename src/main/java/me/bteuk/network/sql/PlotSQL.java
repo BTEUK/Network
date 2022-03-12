@@ -1,13 +1,11 @@
 package me.bteuk.network.sql;
 
-import com.mysql.cj.jdbc.CallableStatement;
-
 import javax.sql.DataSource;
-import javax.xml.transform.Result;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class PlotSQL {
 
@@ -27,7 +25,7 @@ public class PlotSQL {
 
         try (Connection conn = conn();
              PreparedStatement statement = conn.prepareStatement(sql);
-             ResultSet results = statement.executeQuery();) {
+             ResultSet results = statement.executeQuery()) {
 
             if (results.next()) {
 
@@ -49,7 +47,7 @@ public class PlotSQL {
 
         try (Connection conn = conn();
              PreparedStatement statement = conn.prepareStatement(sql);
-             ResultSet results = statement.executeQuery();) {
+             ResultSet results = statement.executeQuery()) {
 
             if (results.next()) {
 
@@ -65,5 +63,27 @@ public class PlotSQL {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public ArrayList<Integer> getIntList(String sql) {
+
+        ArrayList<Integer> list = new ArrayList<>();
+
+        try (Connection conn = conn();
+             PreparedStatement statement = conn.prepareStatement(sql);
+             ResultSet results = statement.executeQuery()) {
+
+            while (results.next()) {
+
+                list.add(results.getInt(1));
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        return list;
     }
 }

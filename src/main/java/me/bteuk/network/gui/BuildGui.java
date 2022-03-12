@@ -160,7 +160,7 @@ public class BuildGui {
                     u.player.closeInventory();
 
                     //Open the plot menu.
-                    u.uniqueGui = PlotMenu.getPlotMenu(u);
+                    u.uniqueGui = PlotMenu.createPlotMenu(u);
                     u.uniqueGui.open(u);
 
                 });
@@ -188,7 +188,7 @@ public class BuildGui {
                 });
 
         //Return
-        gui.setItem(12, Utils.createItem(Material.DIAMOND_PICKAXE, 1,
+        gui.setItem(12, Utils.createItem(Material.SPRUCE_DOOR, 1,
                         Utils.chat("&b&lReturn"),
                         Utils.chat("&fOpen the navigator main menu.")),
                 u ->
