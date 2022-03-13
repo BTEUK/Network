@@ -43,7 +43,7 @@ public class PlotMenu {
         }
 
         //Return
-        gui.setItem(12, Utils.createItem(Material.SPRUCE_DOOR, 1,
+        gui.setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
                         Utils.chat("&b&lReturn"),
                         Utils.chat("&fOpen the building menu.")),
                 u -> {
