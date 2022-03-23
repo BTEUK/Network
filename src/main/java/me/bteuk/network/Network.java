@@ -42,6 +42,11 @@ public final class Network extends JavaPlugin {
     public PlotSQL plotSQL;
     public GlobalSQL globalSQL;
 
+    //Chat
+    private CustomChat chat;
+    public String socketIP;
+    public int socketPort;
+
     @Override
     public void onEnable() {
 
@@ -132,6 +137,11 @@ public final class Network extends JavaPlugin {
         //Create bungeecord channel
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 
+        //Setup custom chat.
+        chat = new CustomChat(this);
+        socketIP = config.getString("socket.IP");
+        socketPort = config.getInt("socket.port");
+
     }
 
     @Override
@@ -139,6 +149,8 @@ public final class Network extends JavaPlugin {
 
         //Disable bungeecord channel.
         this.getServer().getMessenger().unregisterOutgoingPluginChannel(this);
+
+        chat.onDisable();
 
     }
 

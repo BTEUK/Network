@@ -77,13 +77,16 @@ public class PlotInfo {
                             u.player.closeInventory();
 
                             //Add server event to retract plot submission.
-                            globalSQL.insert("INSERT INTO server_events(uuid,server,event) VALUES(" + u.player.getUniqueId() + "," + Network.SERVER_NAME + ",'retract plot" + plotID + "');");
+                            globalSQL.insert("INSERT INTO server_events(uuid,server,event) VALUES(" + u.player.getUniqueId() + "," +
+                                    Network.SERVER_NAME + ",'retract plot" + plotID + "');");
 
                         });
             }
 
             //If plot is not under review allow it to be removed.
             if (plotSQL.hasRow("SELECT id FROM plot_data WHERE id=" + plotID + " AND (status='claimed' OR status='submitted');")) {
+
+                //TODO: Add confirmation gui for confirming the removal of the plot.
 
                 gui.setItem(12, Utils.createItem(Material.SPRUCE_DOOR, 1,
                                 Utils.chat("&b&lPlot Members"),
@@ -151,8 +154,9 @@ public class PlotInfo {
                         u.player.closeInventory();
 
                         //Add server event to leave plot.
-                        globalSQL.insert("INSERT INTO server_events(uuid,server,event) VALUES(" + u.player.getUniqueId() + "," + plotSQL.getString("SELECT server FROM location_data WHERE name=" +
-                                plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + ";") +
+                        globalSQL.insert("INSERT INTO server_events(uuid,server,event) VALUES(" + u.player.getUniqueId() + "," +
+                                plotSQL.getString("SELECT server FROM location_data WHERE name=" +
+                                        plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + ";") +
                                 ",'leave plot" + plotID + "');");
 
                     });
