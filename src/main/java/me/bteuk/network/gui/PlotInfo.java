@@ -89,8 +89,8 @@ public class PlotInfo {
                 //TODO: Add confirmation gui for confirming the removal of the plot.
 
                 gui.setItem(12, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                                Utils.chat("&b&lPlot Members"),
-                                Utils.chat("&fManage the members of your plot.")),
+                                Utils.chat("&b&lDelete Plot"),
+                                Utils.chat("&fDelete the plot and all its contents.")),
                         u -> {
 
                             //Delete this inventory.
