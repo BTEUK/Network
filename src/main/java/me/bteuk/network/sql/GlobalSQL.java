@@ -24,8 +24,8 @@ public class GlobalSQL {
         return dataSource.getConnection();
     }
 
-    //Generic insert statement, return true is successful.
-    public boolean insert(String sql) {
+    //Generic update statement, return true if successful.
+    public boolean update(String sql) {
 
         try (Connection conn = conn();
              PreparedStatement statement = conn.prepareStatement(sql)) {
@@ -37,7 +37,7 @@ public class GlobalSQL {
                 return true;
             } else {
 
-                Bukkit.getLogger().warning("SQL insert " + sql + " failed!");
+                Bukkit.getLogger().warning("SQL update " + sql + " failed!");
                 return false;
 
             }

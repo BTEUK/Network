@@ -57,7 +57,7 @@ public class PlotInfo {
                             u.player.closeInventory();
 
                             //Add server event to delete plot.
-                            globalSQL.insert("INSERT INTO server_events(uuid,server,event) VALUES(" + u.player.getUniqueId() + "," +
+                            globalSQL.update("INSERT INTO server_events(uuid,server,event) VALUES(" + u.player.getUniqueId() + "," +
                                     Network.SERVER_NAME + ",'submit plot" + plotID + "');");
 
                         });
@@ -77,7 +77,7 @@ public class PlotInfo {
                             u.player.closeInventory();
 
                             //Add server event to retract plot submission.
-                            globalSQL.insert("INSERT INTO server_events(uuid,server,event) VALUES(" + u.player.getUniqueId() + "," +
+                            globalSQL.update("INSERT INTO server_events(uuid,server,event) VALUES(" + u.player.getUniqueId() + "," +
                                     Network.SERVER_NAME + ",'retract plot" + plotID + "');");
 
                         });
@@ -98,7 +98,7 @@ public class PlotInfo {
                             u.player.closeInventory();
 
                             //Add server event to delete plot.
-                            globalSQL.insert("INSERT INTO server_events(uuid,server,event) VALUES(" + u.player.getUniqueId() + "," +
+                            globalSQL.update("INSERT INTO server_events(uuid,server,event) VALUES(" + u.player.getUniqueId() + "," +
                                     plotSQL.getString("SELECT server FROM location_data WHERE name=" +
                                             plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + ";") +
                                     ",'delete plot" + plotID + "');");
@@ -154,7 +154,7 @@ public class PlotInfo {
                         u.player.closeInventory();
 
                         //Add server event to leave plot.
-                        globalSQL.insert("INSERT INTO server_events(uuid,server,event) VALUES(" + u.player.getUniqueId() + "," +
+                        globalSQL.update("INSERT INTO server_events(uuid,server,event) VALUES(" + u.player.getUniqueId() + "," +
                                 plotSQL.getString("SELECT server FROM location_data WHERE name=" +
                                         plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + ";") +
                                 ",'leave plot" + plotID + "');");
