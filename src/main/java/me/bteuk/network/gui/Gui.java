@@ -60,6 +60,12 @@ public abstract class Gui {
 
     }
 
+    public void update(NetworkUser u) {
+
+        openInventories.put(u.player.getUniqueId(), getUuid());
+
+    }
+
     public void delete(){
         for (Player p : Bukkit.getOnlinePlayers()){
             UUID u = openInventories.get(p.getUniqueId());

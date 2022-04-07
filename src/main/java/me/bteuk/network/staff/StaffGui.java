@@ -95,7 +95,7 @@ public class StaffGui {
                                     for (int nPlot : nPlots) {
 
                                         //If you are not owner or member of the plot select it for the next review.
-                                        if (plotSQL.hasRow("SELECT id FROM plot_members WHERE uuid=" + u.player.getUniqueId() + " AND id=" + nPlot + ";")) {
+                                        if (!plotSQL.hasRow("SELECT id FROM plot_members WHERE uuid=" + u.player.getUniqueId() + " AND id=" + nPlot + ";")) {
 
                                             //Set plot as under review.
                                             plotSQL.update("UPDATE plot_data SET status='reviewing' WHERE id=" + nPlot + ";");
