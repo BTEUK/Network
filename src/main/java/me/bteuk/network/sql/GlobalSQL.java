@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class GlobalSQL {
 
@@ -22,6 +23,20 @@ public class GlobalSQL {
 
     private Connection conn() throws SQLException {
         return dataSource.getConnection();
+    }
+
+    public boolean hasRow(String sql) {
+
+        try (Connection conn = conn();
+             PreparedStatement statement = conn.prepareStatement(sql);
+             ResultSet results = statement.executeQuery()) {
+
+            return results.next();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     //Generic update statement, return true if successful.
@@ -104,5 +119,27 @@ public class GlobalSQL {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public ArrayList<String> getStringList(String sql) {
+
+        ArrayList<String> list = new ArrayList<>();
+
+        try (Connection conn = conn();
+             PreparedStatement statement = conn.prepareStatement(sql);
+             ResultSet results = statement.executeQuery()) {
+
+            while (results.next()) {
+
+                list.add(results.getString(1));
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        return list;
     }
 }

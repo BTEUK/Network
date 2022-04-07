@@ -19,7 +19,7 @@ public class Leaderboard {
 
         GlobalSQL globalSQL = Network.getInstance().globalSQL;
 
-        String type;
+        String type = null;
         int points;
         int position;
         int counter;
@@ -35,10 +35,12 @@ public class Leaderboard {
         } else if (pType == PointsType.POINTS_WEEKLY) {
 
             type = "points_weekly";
+            Points.updateWeekly();
 
-        } else {
+        } else if (pType == PointsType.BUILDING_POINTS_MONTHLY) {
 
             type = "building_points_monthly";
+            Points.updateMonthly();
 
         }
 
@@ -109,7 +111,7 @@ public class Leaderboard {
                 e.printStackTrace();
             }
 
-        } else {
+        } else if (lType == LeaderboardType.TOP) {
 
             //Get the top 9 users.
             ResultSet results = globalSQL.getResultSet("SELECT " + type + ",uuid FROM points_data ORDER BY " + type + " DESC LIMIT 9;");
