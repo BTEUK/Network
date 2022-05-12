@@ -9,7 +9,7 @@ import me.bteuk.network.listeners.LeaveServer;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.NavigationSQL;
 import me.bteuk.network.sql.PlotSQL;
-import me.bteuk.network.utils.ServerType;
+import me.bteuk.network.utils.enums.ServerType;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
 import org.bukkit.Bukkit;

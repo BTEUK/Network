@@ -3,7 +3,7 @@ package me.bteuk.network.gui;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import me.bteuk.network.Network;
-import me.bteuk.network.utils.ServerType;
+import me.bteuk.network.utils.enums.ServerType;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
