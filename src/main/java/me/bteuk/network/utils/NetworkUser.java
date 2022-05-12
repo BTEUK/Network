@@ -1,8 +1,6 @@
 package me.bteuk.network.utils;
 
 import me.bteuk.network.gui.UniqueGui;
-import me.bteuk.network.utils.enums.PlotDifficulty;
-import me.bteuk.network.utils.enums.PlotSize;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -12,8 +10,8 @@ public class NetworkUser {
     public Player player;
 
     //Plot Categories.
-    public PlotSize plotSize = PlotSize.RANDOM;
-    public PlotDifficulty plotDifficulty = PlotDifficulty.RANDOM;
+    public int plotSize = 0;
+    public int plotDifficulty = 0;
 
     //Unique gui for this user.
     public UniqueGui uniqueGui;

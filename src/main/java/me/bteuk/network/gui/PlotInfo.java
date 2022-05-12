@@ -173,7 +173,7 @@ public class PlotInfo {
                     u.uniqueGui.delete();
                     u.player.closeInventory();
 
-                    //Open the navigator.
+                    //Open the plot menu.
                     u.uniqueGui = PlotMenu.createPlotMenu(u);
                     u.uniqueGui.open(u);
 
