@@ -1,6 +1,7 @@
-package me.bteuk.network.gui;
+package me.bteuk.network.gui.plotsystem;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.gui.*;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.NetworkUser;
@@ -26,8 +27,8 @@ public class PlotInfo {
         if (plotSQL.hasRow("SELECT id FROM deny_data WHERE id=" + plotID + ";")) {
 
             gui.setItem(12, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                            Utils.chat("&b&lPlot Members"),
-                            Utils.chat("&fManage the members of your plot.")),
+                            Utils.chat("&b&lPlot Feedback"),
+                            Utils.chat("&fClick to show feedback for this plot.")),
                     u -> {
 
                         //Delete this inventory.
@@ -166,7 +167,7 @@ public class PlotInfo {
         //Return
         gui.setItem(12, Utils.createItem(Material.SPRUCE_DOOR, 1,
                         Utils.chat("&b&lReturn"),
-                        Utils.chat("&fOpen the building menu.")),
+                        Utils.chat("&fOpen the plot menu.")),
                 u -> {
 
                     //Delete this inventory.

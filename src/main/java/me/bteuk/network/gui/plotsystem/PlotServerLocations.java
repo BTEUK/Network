@@ -1,8 +1,10 @@
-package me.bteuk.network.gui;
+package me.bteuk.network.gui.plotsystem;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import me.bteuk.network.Network;
+import me.bteuk.network.gui.BuildGui;
+import me.bteuk.network.gui.UniqueGui;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
@@ -276,7 +278,7 @@ public class PlotServerLocations {
             if (slot%9 == 7) {
                 //Increase row, basically add 3.
                 slot += 3;
-            } else if (slot == 43) {
+            } else if (slot == 34) {
                 //Last possible slot, end iteration.
                 break;
             } else {

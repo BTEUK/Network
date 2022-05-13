@@ -1,6 +1,9 @@
-package me.bteuk.network.gui;
+package me.bteuk.network.gui.plotsystem;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.gui.BuildGui;
+import me.bteuk.network.gui.UniqueGui;
+import me.bteuk.network.gui.plotsystem.PlotInfo;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;

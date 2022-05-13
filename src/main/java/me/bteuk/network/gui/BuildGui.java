@@ -3,6 +3,8 @@ package me.bteuk.network.gui;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import me.bteuk.network.Network;
+import me.bteuk.network.gui.plotsystem.PlotMenu;
+import me.bteuk.network.gui.plotsystem.PlotServerLocations;
 import me.bteuk.network.utils.enums.ServerType;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
@@ -122,8 +124,8 @@ public class BuildGui {
 
         //Join region (Jr.Builder+ only)
         gui.setItem(12, Utils.createItem(Material.DIAMOND_PICKAXE, 1,
-                        Utils.chat("&b&lPlot Locations"),
-                        Utils.chat("&fClick to choose a location to build a plot.")),
+                        Utils.chat("&b&lJoin Region"),
+                        Utils.chat("&fClick to join the region you are standing in.")),
                 u -> {
 
                     if (Network.SERVER_TYPE == ServerType.EARTH) {
