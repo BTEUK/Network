@@ -1,9 +1,8 @@
 package me.bteuk.network.sql;
 
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Bukkit;
 
-import javax.sql.DataSource;
-import javax.xml.transform.Result;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,10 +11,10 @@ import java.util.ArrayList;
 
 public class GlobalSQL {
 
-    private final DataSource dataSource;
+    private final BasicDataSource dataSource;
     private int success;
 
-    public GlobalSQL(DataSource datasource) {
+    public GlobalSQL(BasicDataSource datasource) {
 
         this.dataSource = datasource;
 
