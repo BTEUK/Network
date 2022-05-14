@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class GlobalSQL {
 
@@ -140,5 +141,39 @@ public class GlobalSQL {
         }
 
         return list;
+    }
+
+    //Get a hashmap of all events for this server for the Network plugin.
+    public HashMap<String, String> getEvents(String serverName, HashMap<String, String> map) {
+
+        //Try and get all events for this server.
+        try (Connection conn = conn();
+             PreparedStatement statement = conn.prepareStatement("SELECT uuid,event FROM server_events WHERE server=" + serverName + " AND type='network';");
+             ResultSet results = statement.executeQuery()) {
+
+            while (results.next()) {
+
+                map.put(results.getString(1), results.getString(2));
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return map;
+        }
+
+        //Try and delete all events for this server.
+        try (Connection conn = conn();
+             PreparedStatement statement = conn.prepareStatement("DELETE FROM server_events WHERE server=" + serverName + " AND type='plotsystem';")) {
+
+            statement.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return map;
+        }
+
+        //Return the map.
+        return map;
+
     }
 }

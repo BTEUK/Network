@@ -25,6 +25,8 @@ CREATE TABLE IF NOT EXISTS join_events
 CREATE TABLE IF NOT EXISTS server_events
 (
     uuid        CHAR(36)        NOT NULL,
+    type        ENUM('plotsystem',
+                'network')      NOT NULL,
     server      VARCHAR(64)     NOT NULL,
     event       TEXT            NOT NULL,
     PRIMARY KEY(uuid)

@@ -58,7 +58,7 @@ public class PlotInfo {
                             u.player.closeInventory();
 
                             //Add server event to delete plot.
-                            globalSQL.update("INSERT INTO server_events(uuid,server,event) VALUES(" + u.player.getUniqueId() + "," +
+                            globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES(" + u.player.getUniqueId() + ",'plotsystem'," +
                                     Network.SERVER_NAME + ",'submit plot" + plotID + "');");
 
                         });
@@ -78,7 +78,7 @@ public class PlotInfo {
                             u.player.closeInventory();
 
                             //Add server event to retract plot submission.
-                            globalSQL.update("INSERT INTO server_events(uuid,server,event) VALUES(" + u.player.getUniqueId() + "," +
+                            globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES(" + u.player.getUniqueId() + ",'plotsystem'," +
                                     Network.SERVER_NAME + ",'retract plot" + plotID + "');");
 
                         });
@@ -99,7 +99,7 @@ public class PlotInfo {
                             u.player.closeInventory();
 
                             //Add server event to delete plot.
-                            globalSQL.update("INSERT INTO server_events(uuid,server,event) VALUES(" + u.player.getUniqueId() + "," +
+                            globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES(" + u.player.getUniqueId() + ",'plotsystem'," +
                                     plotSQL.getString("SELECT server FROM location_data WHERE name=" +
                                             plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + ";") +
                                     ",'delete plot" + plotID + "');");
@@ -125,9 +125,11 @@ public class PlotInfo {
                     });
 
             //Invite new members to your plot.
+            //TODO: Block inviting for users that spam invite.
             gui.setItem(12, Utils.createItem(Material.SPRUCE_DOOR, 1,
                             Utils.chat("&b&lInvite Members"),
-                            Utils.chat("&fInvite a new member to your plot.")),
+                            Utils.chat("&fInvite a new member to your plot."),
+                            Utils.chat("&fYou can only invite online users.")),
                     u -> {
 
                         //Delete this inventory.
@@ -135,7 +137,7 @@ public class PlotInfo {
                         u.player.closeInventory();
 
                         //Open the invite members menu.
-                        u.uniqueGui = InviteMembers.createInviteMembers(u, plotID);
+                        u.uniqueGui = InviteMembers.createInviteMembers(u, plotID, 1);
                         u.uniqueGui.open(u);
 
                     });

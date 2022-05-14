@@ -61,9 +61,9 @@ public class BuildGui {
                         if (server.equals(Network.SERVER_NAME)) {
 
                             u.player.closeInventory();
-                            Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,server,event) VALUES("
+                            Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES("
                                     + u.player.getUniqueId()
-                                    + "," + Network.SERVER_NAME
+                                    + ",'plotsystem'," + Network.SERVER_NAME
                                     + ",teleport plot " + id + ");");
 
                         } else {
@@ -94,9 +94,9 @@ public class BuildGui {
 
                         //Set the claim event.
                         u.player.closeInventory();
-                        Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,server,event) VALUES("
+                        Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES("
                                 + u.player.getUniqueId()
-                                + "," + Network.SERVER_NAME
+                                + ",'plotsystem'," + Network.SERVER_NAME
                                 + ",claim plot);");
 
                     } else {

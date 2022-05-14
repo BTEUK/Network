@@ -1,6 +1,7 @@
 package me.bteuk.network;
 
 import me.bteuk.network.gui.Navigator;
+import me.bteuk.network.listeners.Connect;
 import me.bteuk.network.listeners.GuiListener;
 import me.bteuk.network.listeners.JoinServer;
 import me.bteuk.network.listeners.LeaveServer;
@@ -51,6 +52,12 @@ public final class Network extends JavaPlugin {
     private CustomChat chat;
     public String socketIP;
     public int socketPort;
+
+    //Timers
+    private Timers timers;
+
+    //Network connect
+    private Connect connect;
 
     @Override
     public void onEnable() {
@@ -138,10 +145,17 @@ public final class Network extends JavaPlugin {
         networkUsers = new ArrayList<>();
 
         //Register events.
-        new JoinServer(this);
+        new JoinServer(this, globalSQL, connect);
         new LeaveServer(this);
 
         new GuiListener(this);
+
+        //Setup connect.
+        connect = new Connect(globalSQL, plotSQL);
+
+        //Setup Timers
+        timers = new Timers(this, globalSQL, connect);
+        timers.startTimers();
 
         //Create Guis.
         navigator = new Navigator();
@@ -238,6 +252,11 @@ public final class Network extends JavaPlugin {
         }
 
         return null;
+    }
+
+    //Get users.
+    public ArrayList<NetworkUser> getUsers() {
+        return networkUsers;
     }
 
     //Add user to list.
