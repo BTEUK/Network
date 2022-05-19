@@ -30,6 +30,9 @@ public class LeaveServer implements Listener {
     @EventHandler
     public void leaveServerEvent(PlayerQuitEvent e) {
 
+        //Set default leave message to null.
+        e.setQuitMessage(null);
+
         NetworkUser u = instance.getUser(e.getPlayer());
 
         //Remove user from list.

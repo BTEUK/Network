@@ -45,18 +45,6 @@ public class CustomChat implements Listener, PluginMessageListener {
 
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerJoinEvent(PlayerJoinEvent event) {
-        event.setJoinMessage(null);
-        Bukkit.broadcastMessage(Utils.chat("&e" + event.getPlayer().getName() + " joined UKnet"));
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerLeaveEvent(PlayerQuitEvent event) {
-        event.setQuitMessage(null);
-        Bukkit.broadcastMessage(Utils.chat("&e" + event.getPlayer().getName() + " left UKnet"));
-    }
-
     @Override
     public void onPluginMessageReceived(String channel, Player player, byte[] message) {
 

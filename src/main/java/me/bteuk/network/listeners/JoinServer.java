@@ -28,6 +28,9 @@ public class JoinServer implements Listener {
     @EventHandler
     public void joinServerEvent(PlayerJoinEvent e) {
 
+        //Cancel default join message to null.
+        e.setJoinMessage(null);
+
         //If the player is not in the online_users table add them, and run a network connect.
         //If they are update the server.
         if (globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid=" + e.getPlayer().getUniqueId() + ";")) {

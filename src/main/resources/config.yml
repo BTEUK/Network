@@ -25,3 +25,7 @@ socket:
 chat:
   join: '&e%player% has joined UKnet'
   leave: '&e%player% has left UKnet'
+
+#Old database details
+#These are only necessary for UKnet1.0 to UKnet2.0 conversions.
+database_uknet: minecraft_uknet
