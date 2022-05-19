@@ -49,7 +49,7 @@ public final class Network extends JavaPlugin {
     public GlobalSQL globalSQL;
 
     //Chat
-    private CustomChat chat;
+    public CustomChat chat;
     public String socketIP;
     public int socketPort;
 
@@ -146,12 +146,12 @@ public final class Network extends JavaPlugin {
 
         //Register events.
         new JoinServer(this, globalSQL, connect);
-        new LeaveServer(this);
+        new LeaveServer(this, globalSQL, connect);
 
         new GuiListener(this);
 
         //Setup connect.
-        connect = new Connect(globalSQL, plotSQL);
+        connect = new Connect(this, globalSQL, plotSQL);
 
         //Setup Timers
         timers = new Timers(this, globalSQL, connect);

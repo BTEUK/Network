@@ -70,7 +70,7 @@ public class CustomChat implements Listener, PluginMessageListener {
 
         try {
 
-            Bukkit.broadcastMessage(in.readUTF());
+            Bukkit.broadcastMessage(Utils.chat(in.readUTF()));
 
         } catch (IOException ex) {
 
@@ -88,6 +88,23 @@ public class CustomChat implements Listener, PluginMessageListener {
 
                 // Send player message
                 objectOutput.writeObject(getFormattedMessage(player, message));
+                objectOutput.flush();
+
+                objectOutput.close();
+            } catch (IOException ex) {
+                instance.getLogger().log(Level.SEVERE, "Could not broadcast message to server socket!", ex);
+            }
+        });
+    }
+
+    public void broadcastMessage(String message) {
+        Bukkit.getScheduler().runTaskAsynchronously(instance, () -> {
+            try (Socket socket = new Socket(instance.socketIP, instance.socketPort)) {
+                OutputStream output = socket.getOutputStream();
+                ObjectOutputStream objectOutput = new ObjectOutputStream(output);
+
+                // Send player message
+                objectOutput.writeObject(message);
                 objectOutput.flush();
 
                 objectOutput.close();

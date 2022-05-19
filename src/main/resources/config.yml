@@ -19,3 +19,9 @@ server_name: server_name
 socket:
   IP:
   port:
+
+#Network messages
+#%player% is a placeholder for the player name.
+chat:
+  join: '&e%player% has joined UKnet'
+  leave: '&e%player% has left UKnet'

@@ -88,12 +88,30 @@ public class Timers {
 
             }
 
-            //Get any users with a last_ping greater than 2 seconds.
-            uuids = globalSQL.getStringList("SELECT uuid FROM online_users WHERE last_ping<" + (time-2000) + " AND server=" + SERVER_NAME + ";");
+            //Check for users switching to this server.
+            //If their switch time was greater than 10 seconds ago, disconnect them from the network, if not already.
+            uuids = globalSQL.getStringList("SELECT uuid FROM server_switch WHERE to=" + Network.SERVER_NAME + ";");
 
-            //Iterate through uuids and run a network disconnect.
+            //Iterate through uuids and check time.
             for (String uuid : uuids) {
 
+                //If it's more than 10 seconds ago.
+                if (globalSQL.getLong("SELECT time FROM server_switch WHERE uuid=" + uuid + ";") < time - (1000 * 10)) {
+
+                    //Run network disconnect and remove their entry.
+                    globalSQL.update("DELETE FROM server_switch WHERE uuid=" + uuid + ";");
+                    connect.leaveEvent(uuid);
+
+                }
+            }
+
+            //Check for users with a last ping greater than 10 seconds ago, disconnect them from the network.
+            uuids = globalSQL.getStringList("SELECT uuid FROM online_users WHERE last_ping<" + (time - (1000 * 10)) + ";");
+
+            //Iterate through uuids and check time.
+            for (String uuid : uuids) {
+
+                //Run network disconnect and remove their entry.
                 connect.leaveEvent(uuid);
 
             }

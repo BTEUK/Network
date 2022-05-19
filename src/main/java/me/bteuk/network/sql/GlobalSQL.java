@@ -85,6 +85,28 @@ public class GlobalSQL {
         }
     }
 
+    public long getLong(String sql) {
+
+        try (Connection conn = conn();
+             PreparedStatement statement = conn.prepareStatement(sql);
+             ResultSet results = statement.executeQuery()) {
+
+            if (results.next()) {
+
+                return results.getLong(1);
+
+            } else {
+
+                return 0;
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
     public ResultSet getResultSet(String sql) {
 
         try (Connection conn = conn();

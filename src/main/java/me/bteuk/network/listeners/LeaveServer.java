@@ -2,6 +2,7 @@ package me.bteuk.network.listeners;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
+import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.utils.NetworkUser;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -13,10 +14,15 @@ import java.util.UUID;
 public class LeaveServer implements Listener {
 
     Network instance;
+    Connect connect;
 
-    public LeaveServer(Network instance) {
+    GlobalSQL globalSQL;
+
+    public LeaveServer(Network instance, GlobalSQL globalSQL, Connect connect) {
 
         this.instance = instance;
+        this.connect = connect;
+        this.globalSQL = globalSQL;
         Bukkit.getServer().getPluginManager().registerEvents(this, instance);
 
     }
@@ -39,6 +45,15 @@ public class LeaveServer implements Listener {
         if (u.uniqueGui != null) {
 
             u.uniqueGui.delete();
+
+        }
+
+        //If the player is not in the server_switch table they have disconnected from the network.
+        if (!globalSQL.hasRow("SELECT uuid FROM server_switch WHERE uuid=" + e.getPlayer().getUniqueId()
+                + " AND from=" + instance.SERVER_NAME + ";")) {
+
+            //Run leave network sequence.
+            connect.leaveEvent(e.getPlayer().getUniqueId().toString());
 
         }
 

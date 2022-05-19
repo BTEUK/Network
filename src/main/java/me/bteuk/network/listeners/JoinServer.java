@@ -35,6 +35,9 @@ public class JoinServer implements Listener {
             //Update server.
             globalSQL.update("UPDATE online_users SET server=" + Network.SERVER_NAME + " WHERE uuid=" + e.getPlayer().getUniqueId() + ";");
 
+            //Remove their server_switch entry.
+            globalSQL.update("DELETE FROM server_switch WHERE uuid=" + e.getPlayer().getUniqueId() + ";");
+
         } else {
 
             //Add user to table and run network connect.
