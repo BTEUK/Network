@@ -10,6 +10,7 @@ database:
   global: uknet_global
   plot: uknet_plots
   navigation: uknet_navigation
+  region: uknet_regions
 
 #Server configuration
 enabled: false
@@ -25,6 +26,14 @@ socket:
 chat:
   join: '&e%player% has joined UKnet'
   leave: '&e%player% has left UKnet'
+
+#Tpll config.
+tpll:
+  enabled: true
+  requires_permission: false
+
+#Enable cross-server using region plugin.
+global_teleport: true
 
 #Old database details
 #These are only necessary for UKnet1.0 to UKnet2.0 conversions.

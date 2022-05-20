@@ -1,5 +1,6 @@
 package me.bteuk.network;
 
+import me.bteuk.network.commands.Tpll;
 import me.bteuk.network.gui.Navigator;
 import me.bteuk.network.listeners.Connect;
 import me.bteuk.network.listeners.GuiListener;
@@ -167,6 +168,11 @@ public final class Network extends JavaPlugin {
         chat = new CustomChat(this);
         socketIP = config.getString("socket.IP");
         socketPort = config.getInt("socket.port");
+
+        //Setup tpll if enabled in config.
+        if (config.getBoolean("tpll.enabled")) {
+            getCommand("tpll").setExecutor(new Tpll(config.getBoolean("requires_permission")));
+        }
 
     }
 
