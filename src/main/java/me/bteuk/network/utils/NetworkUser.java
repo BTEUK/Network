@@ -16,9 +16,14 @@ public class NetworkUser {
     //Unique gui for this user.
     public UniqueGui uniqueGui;
 
+    //Region information.
+    public Region region;
+
     public NetworkUser(Player player) {
 
         this.player = player;
+
+        region = new Region(player.getLocation());
 
     }
 

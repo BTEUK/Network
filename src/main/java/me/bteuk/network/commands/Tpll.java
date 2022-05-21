@@ -17,10 +17,10 @@ import java.util.List;
 
 public class Tpll implements CommandExecutor {
 
-    private boolean requires_permission;
+    private final boolean requires_permission;
     private static final DecimalFormat DECIMAL_FORMATTER = new DecimalFormat("##.#####");
 
-    private BTEDymaxionProjection projection = new BTEDymaxionProjection();
+    private final BTEDymaxionProjection projection = new BTEDymaxionProjection();
 
     public Tpll(boolean requires_permission) {
         this.requires_permission = requires_permission;
@@ -125,8 +125,7 @@ public class Tpll implements CommandExecutor {
             defaultCoords = possibleHeightCoords;
             try {
                 altitude = Double.parseDouble(args[args.length - 1]);
-            } catch (Exception e) {
-                altitude = Double.NaN;
+            } catch (Exception ignored) {
             }
         }
 
@@ -135,8 +134,7 @@ public class Tpll implements CommandExecutor {
             defaultCoords = possibleHeightNameCoords;
             try {
                 altitude = Double.parseDouble(this.selectArray(args, 1)[this.selectArray(args, 1).length - 1]);
-            } catch (Exception e) {
-                altitude = Double.NaN;
+            } catch (Exception ignored) {
             }
         }
 

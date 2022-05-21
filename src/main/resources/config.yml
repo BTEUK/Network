@@ -32,8 +32,14 @@ tpll:
   enabled: true
   requires_permission: false
 
-#Enable cross-server using region plugin.
+#Enable cross-server teleporting using region plugin.
 global_teleport: true
+earth_server: false
+earth_world: earth
+
+#Movement limits.
+max_y: 512
+min_y: -128
 
 #Old database details
 #These are only necessary for UKnet1.0 to UKnet2.0 conversions.
