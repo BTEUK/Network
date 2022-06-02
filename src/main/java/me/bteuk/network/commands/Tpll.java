@@ -1,9 +1,15 @@
 package me.bteuk.network.commands;
 
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
+import me.bteuk.network.Network;
+import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.coords.CoordinateParseUtils;
 import me.bteuk.network.utils.coords.LatLng;
+import me.bteuk.network.utils.coords.LocationUtil;
 import me.bteuk.network.utils.projection.BTEDymaxionProjection;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -159,10 +165,43 @@ public class Tpll implements CommandExecutor {
 
         }
 
-        //Teleport to coordinates.
-        LatLng finalDefaultCoords = defaultCoords;
-        p.sendMessage(Utils.chat("&7Teleporting to &9" + DECIMAL_FORMATTER.format(finalDefaultCoords.getLat()) + "&7, &9" + DECIMAL_FORMATTER.format(finalDefaultCoords.getLng())));
-        p.teleport(new Location(p.getWorld(), proj[0], altitude, proj[1]));
+        //Check if the region is on a plotserver.
+        NetworkUser u = Network.getInstance().getUser(p);
+        Location l = new Location(p.getWorld(), proj[0], altitude, proj[1]);
+        if (Network.getInstance().regionSQL.hasRow("SELECT region FROM regions WHERE region=" + u.region.getRegion(l) + " AND status='plot';")) {
+
+            //Get server and location of region.
+            String server = Network.getInstance().plotSQL.getString("SELECT server FROM regions WHERE region=" + u.region.getRegion(l) + ";");
+            String location = Network.getInstance().plotSQL.getString("SELECT location FROM regions WHERE region=" + u.region.getRegion(l) + ";");
+
+            //Get the coordinate transformations.
+            int xTransform = Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE location=" + location + ";");
+            int zTransform = Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE location=" + location + ";");
+
+            //If they are on the correct server, teleport them directly, else switch their server.
+            if (server.equals(Network.SERVER_NAME)) {
+
+                Location loc = new Location(Bukkit.getWorld(location), (proj[0] + xTransform), altitude, (proj[1] + zTransform), p.getLocation().getYaw(), p.getLocation().getPitch());
+                Location loc2 = LocationUtil.getSafeDestination(loc);
+                loc.setY(loc2.getY());
+
+                LatLng finalDefaultCoords = defaultCoords;
+                p.sendMessage(Utils.chat("&7Teleporting to &9" + DECIMAL_FORMATTER.format(finalDefaultCoords.getLat()) + "&7, &9" + DECIMAL_FORMATTER.format(finalDefaultCoords.getLng())));
+                p.teleport(loc);
+
+            } else {
+
+                //Set join event to teleport there.
+                Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES(" + p.getUniqueId() + ",'network'," + "tpll "
+                        + (proj[0] + xTransform) + " " + (proj[1] + zTransform) + " " + p.getLocation().getYaw() + " " + p.getLocation().getPitch());
+
+                //Switch server.
+                ByteArrayDataOutput out = ByteStreams.newDataOutput();
+                out.writeUTF("Connect");
+                out.writeUTF(server);
+
+            }
+        }
 
         return true;
     }

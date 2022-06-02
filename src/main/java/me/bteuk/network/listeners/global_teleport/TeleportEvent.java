@@ -82,29 +82,6 @@ public class TeleportEvent implements Listener {
 
                     }
 
-                    //Check if the region is on the plotserver, teleport them there.
-                    if (regionSQL.hasRow("SELECT region FROM regions WHERE region=" + u.region.getRegion(l) + " AND status='plot';")) {
-
-                        //Get server of region.
-                        String server = Network.getInstance().plotSQL.getString("SELECT server FROM regions WHERE region=" + u.region.getRegion(l) + ";");
-                        String location = Network.getInstance().plotSQL.getString("SELECT location FROM regions WHERE region=" + u.region.getRegion(l) + ";");
-
-                        int xTransform = Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE location=" + location + ";");
-                        int zTransform = Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE location=" + location + ";");
-
-                        //Set join event to teleport there.
-                        Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,event) VALUES(" + p.getUniqueId() + "," + "teleport "
-                                + location + " " + (l.getX() + xTransform) + " " + (l.getZ() + zTransform) + " " + l.getYaw() + " " + l.getPitch());
-
-                        //Switch server.
-                        ByteArrayDataOutput out = ByteStreams.newDataOutput();
-                        out.writeUTF("Connect");
-                        out.writeUTF(server);
-                        e.setCancelled(true);
-                        return;
-
-                    }
-
                     //Player is allowed to enter, update the region.
                     //TODO: Tell the player whether they can build in this region.
                     p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.chat("&aYou have entered " + u.region.getRegion(l) + " and left " + u.region.getRegion())));
@@ -115,42 +92,6 @@ public class TeleportEvent implements Listener {
             } else if (u.region.inRegion) {
                 u.region.inRegion = false;
                 return;
-            }
-
-        } else {
-
-            //If the server is a plotserver check their teleport location, if they are trying to teleport to a region with transformed coordinates makes sure to fix it.
-            if (regionSQL.hasRow("SELECT region FROM regions WHERE region=" + u.region.getRegion(l) + " AND status='plot';")) {
-
-                //Get server of region.
-                String server = Network.getInstance().plotSQL.getString("SELECT server FROM regions WHERE region=" + u.region.getRegion(l) + ";");
-                String location = Network.getInstance().plotSQL.getString("SELECT location FROM regions WHERE region=" + u.region.getRegion(l) + ";");
-
-                int xTransform = Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE location=" + location + ";");
-                int zTransform = Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE location=" + location + ";");
-
-                //If they are on the correct server, teleport them directly, else switch their server.
-                if (server.equals(Network.SERVER_NAME)) {
-
-                    e.setCancelled(true);
-                    Location loc = new Location(Bukkit.getWorld(location), (l.getX() + xTransform), 1, (l.getZ() + zTransform), l.getYaw(), l.getPitch());
-                    Location loc2 = LocationUtil.getSafeDestination(loc);
-                    loc.setY(loc2.getY());
-
-                    p.teleport(loc);
-
-                } else {
-
-                    //Set join event to teleport there.
-                    Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,event) VALUES(" + p.getUniqueId() + "," + "teleport "
-                            + location + " " + (l.getX() + xTransform) + " " + (l.getZ() + zTransform) + " " + l.getYaw() + " " + l.getPitch());
-
-                    //Switch server.
-                    ByteArrayDataOutput out = ByteStreams.newDataOutput();
-                    out.writeUTF("Connect");
-                    out.writeUTF(server);
-
-                }
             }
 
         }
