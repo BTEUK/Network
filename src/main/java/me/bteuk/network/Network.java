@@ -9,6 +9,8 @@ import me.bteuk.network.listeners.LeaveServer;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.NavigationSQL;
 import me.bteuk.network.sql.PlotSQL;
+import me.bteuk.network.sql.RegionSQL;
+import me.bteuk.network.utils.Region;
 import me.bteuk.network.utils.enums.ServerType;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
@@ -48,6 +50,7 @@ public final class Network extends JavaPlugin {
     public NavigationSQL navigationSQL;
     public PlotSQL plotSQL;
     public GlobalSQL globalSQL;
+    public RegionSQL regionSQL;
 
     //Chat
     public CustomChat chat;
@@ -92,6 +95,12 @@ public final class Network extends JavaPlugin {
             BasicDataSource navigation_dataSource = mysqlSetup(navigation_database);
             navigationSQL = new NavigationSQL(navigation_dataSource);
             initDb("dbsetup_navigation.sql", navigation_dataSource);
+
+            //Region Database
+            String region_database = config.getString("database.region");
+            BasicDataSource region_dataSource = mysqlSetup(global_database);
+            regionSQL = new RegionSQL(region_dataSource);
+            initDb("dbsetup_region.sql", region_dataSource);
 
             //Plot Database
             String plot_database = config.getString("database.plot");
