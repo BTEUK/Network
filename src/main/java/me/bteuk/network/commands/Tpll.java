@@ -28,8 +28,13 @@ public class Tpll implements CommandExecutor {
 
     private final BTEDymaxionProjection projection = new BTEDymaxionProjection();
 
+    private final boolean isEarth;
+    private final String earthServer;
+
     public Tpll(boolean requires_permission) {
         this.requires_permission = requires_permission;
+        this.isEarth = Network.getInstance().getConfig().getBoolean("earth_server");
+        earthServer = Network.getInstance().navigationSQL.getString("SELECT name FROM server_data WHERE type='earth';");
     }
 
     /**
@@ -182,8 +187,6 @@ public class Tpll implements CommandExecutor {
             if (server.equals(Network.SERVER_NAME)) {
 
                 Location loc = new Location(Bukkit.getWorld(location), (proj[0] + xTransform), altitude, (proj[1] + zTransform), p.getLocation().getYaw(), p.getLocation().getPitch());
-                Location loc2 = LocationUtil.getSafeDestination(loc);
-                loc.setY(loc2.getY());
 
                 LatLng finalDefaultCoords = defaultCoords;
                 p.sendMessage(Utils.chat("&7Teleporting to &9" + DECIMAL_FORMATTER.format(finalDefaultCoords.getLat()) + "&7, &9" + DECIMAL_FORMATTER.format(finalDefaultCoords.getLng())));
@@ -192,13 +195,48 @@ public class Tpll implements CommandExecutor {
             } else {
 
                 //Set join event to teleport there.
-                Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES(" + p.getUniqueId() + ",'network'," + "tpll "
+                Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES(" + p.getUniqueId() + ",'network'," + "teleport "
                         + (proj[0] + xTransform) + " " + (proj[1] + zTransform) + " " + p.getLocation().getYaw() + " " + p.getLocation().getPitch());
 
                 //Switch server.
                 ByteArrayDataOutput out = ByteStreams.newDataOutput();
                 out.writeUTF("Connect");
                 out.writeUTF(server);
+
+            }
+        } else {
+
+            //Switch to the earth server
+
+            //Check if the player cannot enter this region cancel the action.
+            if (Network.getInstance().regionSQL.hasRow("SELECT region FROM regions WHERE region=" + u.region.getRegion(l) + ";") && !p.hasPermission("group.jrbuilder")) {
+
+                p.sendMessage(Utils.chat("&cThis region has not been loaded, you must be Jr.Builder+ to load new areas."));
+                return true;
+
+            }
+
+            //If the player is already on the Earth server teleport them directly.
+            if (isEarth) {
+
+                Location loc = new Location(p.getWorld(), (proj[0]), altitude, (proj[1]), p.getLocation().getYaw(), p.getLocation().getPitch());
+
+                LatLng finalDefaultCoords = defaultCoords;
+                p.sendMessage(Utils.chat("&7Teleporting to &9" + DECIMAL_FORMATTER.format(finalDefaultCoords.getLat()) + "&7, &9" + DECIMAL_FORMATTER.format(finalDefaultCoords.getLng())));
+                p.teleport(loc);
+
+
+            } else {
+
+                //Set join event to teleport there.
+                Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES(" + p.getUniqueId() + ",'network'," + "teleport "
+                        + (proj[0]) + " " + (proj[1]) + " " + p.getLocation().getYaw() + " " + p.getLocation().getPitch());
+
+                //Switch server.
+                ByteArrayDataOutput out = ByteStreams.newDataOutput();
+                out.writeUTF("Connect");
+                out.writeUTF(earthServer);
+
 
             }
         }
