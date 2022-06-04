@@ -10,6 +10,5 @@ public class EventManager {
             InviteEvent.event(uuid, event);
 
         }
-
     }
 }

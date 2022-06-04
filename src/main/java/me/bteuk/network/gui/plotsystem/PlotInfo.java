@@ -59,7 +59,7 @@ public class PlotInfo {
 
                             //Add server event to delete plot.
                             globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES(" + u.player.getUniqueId() + ",'plotsystem'," +
-                                    Network.SERVER_NAME + ",'submit plot" + plotID + "');");
+                                    plotSQL.getString("SELECT server FROM location_data WHERE location=" + plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + ";") + ",'submit plot" + plotID + "');");
 
                         });
 
