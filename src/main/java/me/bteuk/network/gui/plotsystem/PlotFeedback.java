@@ -100,7 +100,7 @@ public class PlotFeedback {
                     u.player.closeInventory();
 
                     //Open the plot menu.
-                    u.uniqueGui = PlotInfo.createPlotInfo(u, plotID);
+                    u.uniqueGui = PlotInfo.createPlotInfo(plotID);
                     u.uniqueGui.open(u);
 
                 });

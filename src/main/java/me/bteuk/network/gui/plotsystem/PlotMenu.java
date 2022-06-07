@@ -3,7 +3,6 @@ package me.bteuk.network.gui.plotsystem;
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.BuildGui;
 import me.bteuk.network.gui.UniqueGui;
-import me.bteuk.network.gui.plotsystem.PlotInfo;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
@@ -22,7 +21,7 @@ public class PlotMenu {
 
         PlotSQL plotSQL = Network.getInstance().plotSQL;
 
-        ArrayList<Integer> plots = plotSQL.getIntList("SELECT id FROM plot_members WHERE uuid=? SORT BY last_enter DESC;");
+        ArrayList<Integer> plots = plotSQL.getIntList("SELECT id FROM plot_members WHERE uuid=" + user.player.getUniqueId() + " SORT BY last_enter DESC;");
 
         //Make a button for each plot.
         for (int i = 0; i < plots.size(); i++) {
@@ -38,7 +37,7 @@ public class PlotMenu {
                         u.player.closeInventory();
 
                         //Open the menu for this plot.
-                        u.uniqueGui = PlotInfo.createPlotInfo(u, plots.get(finalI));
+                        u.uniqueGui = PlotInfo.createPlotInfo(plots.get(finalI));
                         u.uniqueGui.open(u);
 
                     });
