@@ -4,7 +4,6 @@ import me.bteuk.network.Network;
 import me.bteuk.network.gui.UniqueGui;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
-import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -15,21 +14,43 @@ import java.util.ArrayList;
 
 public class InviteMembers {
 
-    public static UniqueGui createInviteMembers(NetworkUser user, int plotID, int page) {
+    public static UniqueGui createInviteMembers(int plotID, int page) {
 
-        UniqueGui gui = new UniqueGui(45, Component.text("Plot Menu", NamedTextColor.AQUA, TextDecoration.BOLD));
+        UniqueGui gui = new UniqueGui(45, Component.text("Invite Members", NamedTextColor.AQUA, TextDecoration.BOLD));
 
         GlobalSQL globalSQL = Network.getInstance().globalSQL;
         PlotSQL plotSQL = Network.getInstance().plotSQL;
 
-        //Get all online players.
+        //Get all online players in the network.
         ArrayList<String> online_users = globalSQL.getStringList("SELECT uuid FROM online_users;");
 
         //Slot count.
         int slot = 10;
 
         //Skip count.
-        int skip = 28 * (page - 1);
+        int skip = 21 * (page - 1);
+
+        //If page is greater than 1 add a previous page button.
+        if (page > 1) {
+            gui.setItem(18, Utils.createItem(Material.ARROW, 1,
+                            Utils.chat("&b&lPrevious Page"),
+                            Utils.chat("&fOpen the previous page of online users.")),
+                    u ->
+
+                    {
+
+                        //Delete current gui.
+                        u.uniqueGui.delete();
+
+                        //Create new gui for the next page.
+                        u.uniqueGui = InviteMembers.createInviteMembers(plotID, page - 1);
+
+                        //Update the gui and set the content of the inventory to the new gui.
+                        u.uniqueGui.update(u);
+                        u.player.getInventory().setContents(u.uniqueGui.getInventory().getContents());
+
+                    });
+        }
 
         //Iterate through all online players.
         for (String uuid : online_users) {
@@ -37,7 +58,24 @@ public class InviteMembers {
             //If the slot is greater than the number that fit in a page, create a new page.
             if (slot > 34) {
 
-                //TODO: Create additional page.
+                gui.setItem(26, Utils.createItem(Material.ARROW, 1,
+                                Utils.chat("&b&lNext Page"),
+                                Utils.chat("&fOpen the next page of online users.")),
+                        u ->
+
+                        {
+
+                            //Delete current gui.
+                            u.uniqueGui.delete();
+
+                            //Create new gui for the next page.
+                            u.uniqueGui = InviteMembers.createInviteMembers(plotID, page + 1);
+
+                            //Update the gui and set the content of the inventory to the new gui.
+                            u.uniqueGui.update(u);
+                            u.player.getInventory().setContents(u.uniqueGui.getInventory().getContents());
+
+                        });
 
             }
 
@@ -55,17 +93,37 @@ public class InviteMembers {
             //Add player to gui.
             gui.setItem(slot, Utils.createItem(Material.DIAMOND_PICKAXE, 1,
                             Utils.chat("&b&lInvite " + globalSQL.getString("SELECT name FROM player_data WHERE uuid=" + uuid + ";" + " to your plot.")),
-                            Utils.chat("&fThey will receive an invitation in chat."),
-                            Utils.chat("&fSpamming invites may result in plot invites being blocked!")),
+                            Utils.chat("&fThey will receive an invitation in chat.")),
                     u ->
 
                     {
 
-                        //Send invite via chat.
-                        //If the player is on this server, send it directly.
-                        //Else, add the event to database for the current server to handle it.
-                        globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES(" + uuid + ",'network'," +
-                                globalSQL.getString("SELECT server FROM online_users WHERE uuid=" + uuid + ";") + ",'invite plot " + plotID + "')");
+                        //Check if the player is still online.
+                        if (globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid=?;")) {
+
+                            //Check if the player is not already a member of the plot.
+                            if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plotID + " AND uuid=" + uuid + ";")) {
+
+                                //Check if the player has not already been invited.
+                                if (!plotSQL.hasRow("SELECT id FROM plot_invites WHERE id=" + plotID + " AND uuid=" + uuid + ";")) {
+
+                                    //Send invite via chat.
+                                    //The invite will be active until they disconnect from the network.
+                                    //They will need to run a command to actually join the plot.
+                                    globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES(" + uuid + ",'network'," +
+                                            globalSQL.getString("SELECT server FROM online_users WHERE uuid=" + uuid + ";") + ",'invite plot " + plotID + "')");
+
+                                } else {
+                                    u.player.sendMessage(Utils.chat("&cYou've already invited this player to your plot."));
+                                }
+
+                            } else {
+                                u.player.sendMessage(Utils.chat("&cThis player is already a member of your plot."));
+                            }
+
+                        } else {
+                            u.player.sendMessage(Utils.chat("&cThis player is no longer online."));
+                        }
 
                     });
 
@@ -79,7 +137,6 @@ public class InviteMembers {
                 slot++;
             }
         }
-
 
         return gui;
 

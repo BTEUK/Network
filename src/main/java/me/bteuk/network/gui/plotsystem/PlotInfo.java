@@ -25,7 +25,7 @@ public class PlotInfo {
         //If this plot has feedback, create button to go to plot feedback.
         if (plotSQL.hasRow("SELECT id FROM deny_data WHERE id=" + plotID + ";")) {
 
-            gui.setItem(12, Utils.createItem(Material.SPRUCE_DOOR, 1,
+            gui.setItem(12, Utils.createItem(Material.BOOK, 1,
                             Utils.chat("&b&lPlot Feedback"),
                             Utils.chat("&fClick to show feedback for this plot.")),
                     u -> {
@@ -47,7 +47,7 @@ public class PlotInfo {
             //If plot is not submitted show submit button.
             if (plotSQL.hasRow("SELECT id FROM plot_data WHERE id=" + plotID + " AND status='claimed';")) {
 
-                gui.setItem(12, Utils.createItem(Material.SPRUCE_DOOR, 1,
+                gui.setItem(12, Utils.createItem(Material.LIGHT_BLUE_CONCRETE, 1,
                                 Utils.chat("&b&lPlot Members"),
                                 Utils.chat("&fManage the members of your plot.")),
                         u -> {
@@ -57,8 +57,9 @@ public class PlotInfo {
                             u.player.closeInventory();
 
                             //Add server event to delete plot.
-                            globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES(" + u.player.getUniqueId() + ",'plotsystem'," +
-                                    plotSQL.getString("SELECT server FROM location_data WHERE location=" + plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + ";") + ",'submit plot" + plotID + "');");
+                            globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES(" + u.player.getUniqueId() + ",'plotsystem',"
+                                    + plotSQL.getString("SELECT server FROM location_data WHERE location=" + plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + ";")
+                                    + ",'submit plot" + plotID + "');");
 
                         });
 
@@ -67,7 +68,7 @@ public class PlotInfo {
             //If plot is submitted show retract submission button.
             if (plotSQL.hasRow("SELECT id FROM plot_data WHERE id=" + plotID + " AND status='submitted';")) {
 
-                gui.setItem(12, Utils.createItem(Material.SPRUCE_DOOR, 1,
+                gui.setItem(12, Utils.createItem(Material.ORANGE_CONCRETE, 1,
                                 Utils.chat("&b&lRetract Submission"),
                                 Utils.chat("&fYour plot will no longer be submitted.")),
                         u -> {
@@ -77,8 +78,9 @@ public class PlotInfo {
                             u.player.closeInventory();
 
                             //Add server event to retract plot submission.
-                            globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES(" + u.player.getUniqueId() + ",'plotsystem'," +
-                                    Network.SERVER_NAME + ",'retract plot" + plotID + "');");
+                            globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES(" + u.player.getUniqueId() + ",'plotsystem',"
+                                    + plotSQL.getString("SELECT server FROM location_data WHERE location=" + plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + ";")
+                                    + ",'retract plot" + plotID + "');");
 
                         });
             }
@@ -123,7 +125,6 @@ public class PlotInfo {
                     });
 
             //Invite new members to your plot.
-            //TODO: Block inviting for users that spam invite.
             gui.setItem(12, Utils.createItem(Material.SPRUCE_DOOR, 1,
                             Utils.chat("&b&lInvite Members"),
                             Utils.chat("&fInvite a new member to your plot."),
@@ -135,7 +136,7 @@ public class PlotInfo {
                         u.player.closeInventory();
 
                         //Open the invite members menu.
-                        u.uniqueGui = InviteMembers.createInviteMembers(u, plotID, 1);
+                        u.uniqueGui = InviteMembers.createInviteMembers(plotID, 1);
                         u.uniqueGui.open(u);
 
                     });

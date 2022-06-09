@@ -7,7 +7,6 @@ import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.coords.CoordinateParseUtils;
 import me.bteuk.network.utils.coords.LatLng;
-import me.bteuk.network.utils.coords.LocationUtil;
 import me.bteuk.network.utils.projection.BTEDymaxionProjection;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

@@ -2,3 +2,8 @@ name: Network
 version: '${project.version}'
 main: me.bteuk.network.Network
 api-version: 1.17
+
+commands:
+  plot:
+    usage: /<command>
+    description: Allows players to manipulate plots without using the gui.
