@@ -119,7 +119,7 @@ public class PlotInfo {
                         u.player.closeInventory();
 
                         //Open the plot members menu.
-                        u.uniqueGui = PlotMembers.createPlotMembers(u, plotID);
+                        u.uniqueGui = PlotMembers.createPlotMembers(plotID,1);
                         u.uniqueGui.open(u);
 
                     });

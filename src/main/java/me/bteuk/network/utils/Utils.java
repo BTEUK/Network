@@ -11,6 +11,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class Utils {
 
@@ -25,6 +26,7 @@ public class Utils {
         List<String> lore = new ArrayList<String>();
 
         item = new ItemStack(material);
+        item.setAmount(amount);
 
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(Utils.chat(displayName));
@@ -38,13 +40,14 @@ public class Utils {
 
     }
 
-    public static ItemStack createPlayerSkull(Inventory inv, Player p, int amount, int invSlot, String displayName, String... loreString) {
+    public static ItemStack createPlayerSkull(String uuid, int amount, String displayName, String... loreString) {
 
         ItemStack item;
 
-        List<String> lore = new ArrayList<String>();
+        List<String> lore = new ArrayList<>();
 
         item = new ItemStack(Material.PLAYER_HEAD);
+        item.setAmount(amount);
 
         SkullMeta meta = (SkullMeta) item.getItemMeta();
         meta.setDisplayName(Utils.chat(displayName));
@@ -52,10 +55,11 @@ public class Utils {
             lore.add(Utils.chat(s));
         }
         meta.setLore(lore);
+
+        OfflinePlayer p = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
+
         meta.setOwningPlayer(p);
         item.setItemMeta(meta);
-
-        inv.setItem(invSlot - 1, item);
 
         return item;
 

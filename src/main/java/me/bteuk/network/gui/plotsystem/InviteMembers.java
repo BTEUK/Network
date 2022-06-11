@@ -91,7 +91,7 @@ public class InviteMembers {
             }
 
             //Add player to gui.
-            gui.setItem(slot, Utils.createItem(Material.DIAMOND_PICKAXE, 1,
+            gui.setItem(slot, Utils.createPlayerSkull(uuid, 1,
                             Utils.chat("&b&lInvite " + globalSQL.getString("SELECT name FROM player_data WHERE uuid=" + uuid + ";" + " to your plot.")),
                             Utils.chat("&fThey will receive an invitation in chat.")),
                     u ->
