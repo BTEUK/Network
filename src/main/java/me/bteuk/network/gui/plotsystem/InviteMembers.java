@@ -138,6 +138,24 @@ public class InviteMembers {
             }
         }
 
+        //Return to plot info menu.
+        gui.setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
+                        Utils.chat("&b&lReturn"),
+                        Utils.chat("&fReturn to the menu of plot " + plotID + ".")),
+                u ->
+
+                {
+
+                    //Delete this inventory.
+                    u.uniqueGui.delete();
+                    u.player.closeInventory();
+
+                    //Return to the plot info menu.
+                    u.uniqueGui = PlotInfo.createPlotInfo(plotID);
+                    u.uniqueGui.open(u);
+
+                });
+
         return gui;
 
     }

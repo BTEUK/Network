@@ -35,7 +35,7 @@ public class PlotInfo {
                         u.player.closeInventory();
 
                         //Open the plot feedback menu.
-                        u.uniqueGui = PlotFeedback.createPlotFeedback(u, plotID);
+                        u.uniqueGui = DeniedPlotFeedback.createDeniedPlotFeedback(plotID);
                         u.uniqueGui.open(u);
 
                     });
