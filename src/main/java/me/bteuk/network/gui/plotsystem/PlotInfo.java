@@ -156,7 +156,7 @@ public class PlotInfo {
                         u.player.closeInventory();
 
                         //Add server event to leave plot.
-                        globalSQL.update("INSERT INTO server_events(uuid,server,event) VALUES(" + u.player.getUniqueId() + "," +
+                        globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES(" + u.player.getUniqueId() + ",'plotsystem'," +
                                 plotSQL.getString("SELECT server FROM location_data WHERE name=" +
                                         plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + ";") +
                                 ",'leave plot" + plotID + "');");
