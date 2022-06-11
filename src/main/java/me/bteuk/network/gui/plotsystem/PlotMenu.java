@@ -23,11 +23,14 @@ public class PlotMenu {
 
         ArrayList<Integer> plots = plotSQL.getIntList("SELECT id FROM plot_members WHERE uuid=" + user.player.getUniqueId() + " SORT BY last_enter DESC;");
 
+        //Slot count.
+        int slot = 10;
+
         //Make a button for each plot.
         for (int i = 0; i < plots.size(); i++) {
 
             int finalI = i;
-            gui.setItem(9 + Math.floorDiv(i, 7) + i, Utils.createItem(Material.LIME_CONCRETE, 1,
+            gui.setItem(slot, Utils.createItem(Material.LIME_CONCRETE, 1,
                             Utils.chat("&b&lPlot " + plots.get(i)),
                             Utils.chat("&fClick to open the menu of this plot.")),
                     u -> {
@@ -42,6 +45,35 @@ public class PlotMenu {
 
                     });
 
+            //Increase slot accordingly.
+            if (slot % 9 == 7) {
+                //Increase row, basically add 3.
+                slot += 3;
+            } else {
+                //Increase value by 1.
+                slot++;
+            }
+
+        }
+
+        //Accepted plots menu, if you have any.
+        if (plotSQL.hasRow("SELECT uuid FROM accept_data WHERE uuid=" + user.player.getUniqueId() + ";")) {
+
+            gui.setItem(40, Utils.createItem(Material.CLOCK, 1,
+                            Utils.chat("&b&lAccepted Plots"),
+                            Utils.chat("&fClick to open the accepted plots menu.")),
+
+                    u -> {
+
+                        //Delete this inventory.
+                        u.uniqueGui.delete();
+                        u.player.closeInventory();
+
+                        //Open the accpeted plot menu.
+                        u.uniqueGui = AcceptedPlotFeedback.createAcceptedPlotFeedback(u, 1);
+                        u.uniqueGui.open(u);
+
+                    });
         }
 
         //Return

@@ -52,7 +52,7 @@ public class DeniedPlotFeedback {
             gui.setItem(slot, Utils.createItem(Material.WRITTEN_BOOK, 1,
                             Utils.chat("&b&lFeedback for submission " + deniedCount),
                             Utils.chat("&fClick to view feedback for this submission."),
-                            Utils.chat("&fReviewed by " + globalSQL.getString("SELECT name FROM player_data WHERE uuid="
+                            Utils.chat("&fReviewed by &7" + globalSQL.getString("SELECT name FROM player_data WHERE uuid="
                                     + plotSQL.getString("SELECT reviewer FROM deny_data WHERE id=" + plotID + " AND uuid=" + uuid + " AND attempt=" + deniedCount + ";")))),
 
                     u ->
@@ -84,7 +84,6 @@ public class DeniedPlotFeedback {
 
                         //Open the book.
                         u.player.openBook(writtenBook);
-
 
                     });
 
