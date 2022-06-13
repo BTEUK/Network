@@ -97,9 +97,6 @@ public class StaffGui {
                                         //If you are not owner or member of the plot select it for the next review.
                                         if (!plotSQL.hasRow("SELECT id FROM plot_members WHERE uuid=" + u.player.getUniqueId() + " AND id=" + nPlot + ";")) {
 
-                                            //Set plot as under review.
-                                            plotSQL.update("UPDATE plot_data SET status='reviewing' WHERE id=" + nPlot + ";");
-
                                             //Get server of plot.
                                             String server = plotSQL.getString("SELECT server FROM location_data WHERE name=" +
                                                     plotSQL.getString("SELECT location FROM plot_data WHERE id=" + nPlot + ";") + ";");
@@ -107,16 +104,16 @@ public class StaffGui {
                                             //If they are not in the same server as the plot teleport them to that server and start the reviewing process.
                                             if (server.equals(Network.SERVER_NAME)) {
 
-                                                Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,server,event) VALUES("
-                                                        + u.player.getUniqueId() + "," + Network.SERVER_NAME + ",'review plot " + nPlot + "');");
+                                                Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES("
+                                                        + u.player.getUniqueId() + ",'plotsystem'," + Network.SERVER_NAME + ",'review plot " + nPlot + "');");
 
                                             } else {
 
                                                 //Player is not on the current server.
                                                 //Set the server join event.
-                                                Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,event) VALUES("
-                                                        + u.player.getUniqueId()
-                                                        + "," + "review plot " + nPlot + ");");
+                                                Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES("
+                                                        + u.player.getUniqueId() + ",'plotsystem',"
+                                                        +  "'review plot " + nPlot + "');");
 
                                                 //Teleport them to another server.
                                                 u.player.closeInventory();
@@ -125,6 +122,9 @@ public class StaffGui {
                                                 out.writeUTF(server);
 
                                             }
+
+                                            //Stop iterating.
+                                            break;
                                         }
                                     }
                                 }
