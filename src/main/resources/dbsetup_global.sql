@@ -9,16 +9,17 @@ CREATE TABLE IF NOT EXISTS player_data
 
 CREATE TABLE IF NOT EXISTS messages
 (
-    id          INT             AUTO_INCREMENT,
     recipient   CHAR(36)        NOT NULL,
-    messages    TEXT            NOT NULL,
-    PRIMARY KEY(id)
+    message    TEXT            NOT NULL,
+    PRIMARY KEY(recipient,message)
 );
 
 CREATE TABLE IF NOT EXISTS join_events
 (
     uuid        CHAR(36)        NOT NULL,
-    join_events TEXT            NOT NULL,
+    type        ENUM('plotsystem',
+                'network')      NOT NULL,
+    event       TEXT            NOT NULL,
     PRIMARY KEY(uuid)
 );
 
@@ -29,7 +30,7 @@ CREATE TABLE IF NOT EXISTS server_events
                 'network')      NOT NULL,
     server      VARCHAR(64)     NOT NULL,
     event       TEXT            NOT NULL,
-    PRIMARY KEY(uuid)
+    PRIMARY KEY(uuid,event)
 );
 
 CREATE TABLE IF NOT EXISTS points_data
@@ -40,7 +41,7 @@ CREATE TABLE IF NOT EXISTS points_data
     building_points INT         NOT NULL,
     building_points_monthly INT NOT NULL,
     messages    INT             NOT NULL,
-    time        INT             NOT NULL,
+    online_time INT             NOT NULL,
     PRIMARY KEY(uuid)
 );
 
@@ -49,16 +50,16 @@ CREATE TABLE IF NOT EXISTS points_info
     uuid        CHAR(36)        NOT NULL,
     type        ENUM('POINTS',
     'BUILDING_POINTS')          NOT NULL,
-    date        DATE            NOT NULL,
-    value       INT             NOT NULL,
-    PRIMARY KEY(uuid,type,date)
+    on_date        DATE            NOT NULL,
+    points       INT             NOT NULL,
+    PRIMARY KEY(uuid,type,on_date)
 );
 
 CREATE TABLE IF NOT EXISTS online_users
 (
     uuid        CHAR(36)        NOT NULL,
     join_time   BIGINT          NOT NULL,
-    last_point  BIGINT          NOT NULL,
+    last_ping   BIGINT          NOT NULL,
     server      VARCHAR(64)     NOT NULL,
     PRIMARY KEY(uuid)
 );
@@ -66,8 +67,45 @@ CREATE TABLE IF NOT EXISTS online_users
 CREATE TABLE IF NOT EXISTS server_switch
 (
     uuid        CHAR(36)        NOT NULL,
-    from        VARCHAR(64)     NOT NULL,
-    to          VARCHAR(64)     NOT NULL,
-    time        BIGINT          NOT NULL,
+    from_server VARCHAR(64)     NOT NULL,
+    to_server   VARCHAR(64)     NOT NULL,
+    switch_time BIGINT          NOT NULL,
     PRIMARY KEY(uuid)
+);
+
+CREATE TABLE IF NOT EXISTS coordinates
+(
+    id          INT         AUTO_INCREMENT,
+    server      VARCHAR(64) NOT NULL,
+    world       VARCHAR(64) NOT NULL,
+    x           DOUBLE      NOT NULL,
+    y           DOUBLE      NULL DEFAULT 0.0,
+    z           DOUBLE      NOT NULL,
+    yaw         FLOAT       NULL DEFAULT 0.0,
+    pitch       FLOAT       NULL DEFAULT 0.0,
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE IF NOT EXISTS location_data
+(
+    location    VARCHAR(128)    NOT NULL,
+    category    VARCHAR(128)    NOT NULL,
+    subcategory VARCHAR(128)    NOT NULL,
+    coordinate  INT             NOT NULL,
+    PRIMARY KEY(location)
+);
+
+CREATE TABLE IF NOT EXISTS location_requests
+(
+    location    VARCHAR(128)    NOT NULL,
+    coordinate  INT             NOT NULL,
+    PRIMARY KEY(location)
+);
+
+CREATE TABLE IF NOT EXISTS server_data
+(
+    id          INT         NOT NULL,
+    owner       CHAR(36)    NOT NULL,
+    uuid        CHAR(36)    NOT NULL,
+    PRIMARY KEY(id,uuid)
 );

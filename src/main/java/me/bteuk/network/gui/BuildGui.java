@@ -185,7 +185,7 @@ public class BuildGui {
                     u.player.closeInventory();
                     ByteArrayDataOutput out = ByteStreams.newDataOutput();
                     out.writeUTF("Connect");
-                    out.writeUTF(Network.getInstance().navigationSQL.getString("SELECT FROM server_data WHERE type='lobby';"));
+                    out.writeUTF(Network.getInstance().globalSQL.getString("SELECT FROM server_data WHERE type='lobby';"));
 
                 });
 

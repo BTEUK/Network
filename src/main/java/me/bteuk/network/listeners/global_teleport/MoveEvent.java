@@ -3,8 +3,6 @@ package me.bteuk.network.listeners.global_teleport;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import me.bteuk.network.Network;
-import me.bteuk.network.sql.NavigationSQL;
-import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.sql.RegionSQL;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
@@ -17,8 +15,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
-
-import java.util.ArrayList;
 
 public class MoveEvent implements Listener {
 

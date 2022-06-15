@@ -24,4 +24,3 @@ public class LatLng {
         return this.lng;
     }
 }
-}

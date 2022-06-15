@@ -8,10 +8,8 @@ import me.bteuk.network.listeners.GuiListener;
 import me.bteuk.network.listeners.JoinServer;
 import me.bteuk.network.listeners.LeaveServer;
 import me.bteuk.network.sql.GlobalSQL;
-import me.bteuk.network.sql.NavigationSQL;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.sql.RegionSQL;
-import me.bteuk.network.utils.Region;
 import me.bteuk.network.utils.enums.ServerType;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
@@ -48,7 +46,6 @@ public final class Network extends JavaPlugin {
     public Navigator navigator;
 
     //SQL
-    public NavigationSQL navigationSQL;
     public PlotSQL plotSQL;
     public GlobalSQL globalSQL;
     public RegionSQL regionSQL;
@@ -91,12 +88,6 @@ public final class Network extends JavaPlugin {
             globalSQL = new GlobalSQL(global_dataSource);
             initDb("dbsetup_global.sql", global_dataSource);
 
-            //Navigation Database
-            String navigation_database = config.getString("database.navigation");
-            BasicDataSource navigation_dataSource = mysqlSetup(navigation_database);
-            navigationSQL = new NavigationSQL(navigation_dataSource);
-            initDb("dbsetup_navigation.sql", navigation_dataSource);
-
             //Region Database
             String region_database = config.getString("database.region");
             BasicDataSource region_dataSource = mysqlSetup(global_database);
@@ -121,10 +112,10 @@ public final class Network extends JavaPlugin {
         //Set the server type from config.
         SERVER_TYPE = ServerType.valueOf(config.getString("server_type"));
 
-        if (!navigationSQL.hasRow("SELECT name FROM server_data WHERE name=" + SERVER_NAME + ";")) {
+        if (!globalSQL.hasRow("SELECT name FROM server_data WHERE name=" + SERVER_NAME + ";")) {
 
             //Add server to database and enable server.
-            if (navigationSQL.update(
+            if (globalSQL.update(
                     "INSERT INTO server_data(name,type) VALUES(" + SERVER_NAME + "," + SERVER_TYPE.toString() + ");"
             )) {
 
