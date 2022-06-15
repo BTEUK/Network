@@ -9,7 +9,6 @@ password: password
 database:
   global: uknet_global
   plot: uknet_plots
-  navigation: uknet_navigation
   region: uknet_regions
 
 #Server configuration

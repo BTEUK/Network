@@ -90,13 +90,13 @@ public class Timers {
 
             //Check for users switching to this server.
             //If their switch time was greater than 10 seconds ago, disconnect them from the network, if not already.
-            uuids = globalSQL.getStringList("SELECT uuid FROM server_switch WHERE to=" + Network.SERVER_NAME + ";");
+            uuids = globalSQL.getStringList("SELECT uuid FROM server_switch WHERE to_server=" + Network.SERVER_NAME + ";");
 
             //Iterate through uuids and check time.
             for (String uuid : uuids) {
 
                 //If it's more than 10 seconds ago.
-                if (globalSQL.getLong("SELECT time FROM server_switch WHERE uuid=" + uuid + ";") < time - (1000 * 10)) {
+                if (globalSQL.getLong("SELECT switch_time FROM server_switch WHERE uuid=" + uuid + ";") < time - (1000 * 10)) {
 
                     //Run network disconnect and remove their entry.
                     globalSQL.update("DELETE FROM server_switch WHERE uuid=" + uuid + ";");

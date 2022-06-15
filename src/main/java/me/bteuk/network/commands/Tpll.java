@@ -179,8 +179,8 @@ public class Tpll implements CommandExecutor {
             String location = Network.getInstance().plotSQL.getString("SELECT location FROM regions WHERE region=" + u.region.getRegion(l) + ";");
 
             //Get the coordinate transformations.
-            int xTransform = Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE location=" + location + ";");
-            int zTransform = Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE location=" + location + ";");
+            int xTransform = Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name=" + location + ";");
+            int zTransform = Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name=" + location + ";");
 
             //If they are on the correct server, teleport them directly, else switch their server.
             if (server.equals(Network.SERVER_NAME)) {

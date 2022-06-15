@@ -17,14 +17,14 @@ public class Points {
             //If the player has points for today, add them.
             //Else create new value.
             if (globalSQL.hasRow("SELECT uuid FROM points_info WHERE uuid=" + uuid +
-                    " AND type='POINTS' AND date=" + Time.getDate(Time.currentTime()) + ";")) {
+                    " AND type='POINTS' AND on_date=" + Time.getDate(Time.currentTime()) + ";")) {
 
                 globalSQL.update("UPDATE points_info SET value=value+" + points +
-                        " WHERE uuid=" + uuid + " AND type='POINTS' AND date=" + Time.getDate(Time.currentTime()) + ";");
+                        " WHERE uuid=" + uuid + " AND type='POINTS' AND on_date=" + Time.getDate(Time.currentTime()) + ";");
 
             } else {
 
-                globalSQL.update("INSERT INTO points_info(uuid,type,date,value) VALUES(" +
+                globalSQL.update("INSERT INTO points_info(uuid,type,on_date,value) VALUES(" +
                         uuid + ",'POINTS'," + Time.getDate(Time.currentTime()) + "," + points + ");");
 
             }
@@ -35,7 +35,7 @@ public class Points {
             //Update weekly points.
             long time = Time.currentTime() - (1000L * 60 * 60 * 24 * 7);
             int wPoints = globalSQL.getInt("SELECT SUM(value) FROM points_info WHERE uuid=" + uuid +
-                    " AND type='POINTS' AND date < " + Time.getDate(time) + ";");
+                    " AND type='POINTS' AND on_date < " + Time.getDate(time) + ";");
             globalSQL.update("UPDATE points_data SET points_weekly=" + wPoints + " WHERE uuid=" + uuid + ";");
 
         } else if (type == PointsType.BUILDING_POINTS) {
@@ -43,14 +43,14 @@ public class Points {
             //If the player has building points for today, add them.
             //Else create new value.
             if (globalSQL.hasRow("SELECT uuid FROM points_info WHERE uuid=" + uuid +
-                    " AND type='BUILDING_POINTS' AND date=" + Time.getDate(Time.currentTime()) + ";")) {
+                    " AND type='BUILDING_POINTS' AND on_date=" + Time.getDate(Time.currentTime()) + ";")) {
 
                 globalSQL.update("UPDATE points_info SET value=value+" + points +
-                        " WHERE uuid=" + uuid + " AND type='BUILDING_POINTS' AND date=" + Time.getDate(Time.currentTime()) + ";");
+                        " WHERE uuid=" + uuid + " AND type='BUILDING_POINTS' AND on_date=" + Time.getDate(Time.currentTime()) + ";");
 
             } else {
 
-                globalSQL.update("INSERT INTO points_info(uuid,type,date,value) VALUES(" +
+                globalSQL.update("INSERT INTO points_info(uuid,type,on_date,value) VALUES(" +
                         uuid + ",'BUILDING_POINTS'," + Time.getDate(Time.currentTime()) + "," + points + ");");
 
             }
@@ -61,7 +61,7 @@ public class Points {
             //Update monthly building points.
             long time = Time.currentTime() - (1000L * 60 * 60 * 24 * 30);
             int wPoints = globalSQL.getInt("SELECT SUM(value) FROM points_info WHERE uuid=" + uuid +
-                    " AND type='BUILDING_POINTS' AND date < " + Time.getDate(time) + ";");
+                    " AND type='BUILDING_POINTS' AND on_date < " + Time.getDate(time) + ";");
             globalSQL.update("UPDATE points_data SET points_weekly=" + wPoints + " WHERE uuid=" + uuid + ";");
         }
     }
@@ -78,13 +78,13 @@ public class Points {
         for (String uuid : uuids) {
 
             int wPoints = globalSQL.getInt("SELECT SUM(value) FROM points_info WHERE uuid=" + uuid +
-                    " AND type='POINTS' AND date < " + Time.getDate(time) + ";");
+                    " AND type='POINTS' AND on_date < " + Time.getDate(time) + ";");
             globalSQL.update("UPDATE points_data SET points_weekly=" + wPoints + " WHERE uuid=" + uuid + ";");
 
         }
 
         //Clear all data from before 7 days ago.
-        globalSQL.update("DELETE FROM points_info WHERE type='POINTS' AND date >= " + Time.getDate(time) + ";");
+        globalSQL.update("DELETE FROM points_info WHERE type='POINTS' AND on_date >= " + Time.getDate(time) + ";");
     }
 
     public static void updateMonthly() {
@@ -99,12 +99,12 @@ public class Points {
         for (String uuid : uuids) {
 
             int wPoints = globalSQL.getInt("SELECT SUM(value) FROM points_info WHERE uuid=" + uuid +
-                    " AND type='BUILDING_POINTS' AND date < " + Time.getDate(time) + ";");
+                    " AND type='BUILDING_POINTS' AND on_date < " + Time.getDate(time) + ";");
             globalSQL.update("UPDATE points_data SET points_weekly=" + wPoints + " WHERE uuid=" + uuid + ";");
 
         }
 
         //Clear all data from before 30 days ago.
-        globalSQL.update("DELETE FROM points_info WHERE type='BUILDING_POINTS' AND date >= " + Time.getDate(time) + ";");
+        globalSQL.update("DELETE FROM points_info WHERE type='BUILDING_POINTS' AND on_date >= " + Time.getDate(time) + ";");
     }
 }

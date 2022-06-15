@@ -69,9 +69,9 @@ public class BuildGui {
                         } else {
 
                             //Set the server join event.
-                            Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,event) VALUES("
-                                    + u.player.getUniqueId()
-                                    + "," + "teleport plot " + id + ");");
+                            Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES("
+                                    + u.player.getUniqueId() + ",'plotsystem',"
+                                    + "teleport plot " + id + ");");
 
                             //Teleport them to another server.
                             u.player.closeInventory();

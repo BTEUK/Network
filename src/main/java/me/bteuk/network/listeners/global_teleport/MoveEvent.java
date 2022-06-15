@@ -88,11 +88,11 @@ public class MoveEvent implements Listener {
                         String server = Network.getInstance().plotSQL.getString("SELECT server FROM regions WHERE region=" + u.region.getRegion(l) + ";");
                         String location = Network.getInstance().plotSQL.getString("SELECT location FROM regions WHERE region=" + u.region.getRegion(l) + ";");
 
-                        int xTransform = Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE location=" + location + ";");
-                        int zTransform = Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE location=" + location + ";");
+                        int xTransform = Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name=" + location + ";");
+                        int zTransform = Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name=" + location + ";");
 
                         //Set join event to teleport there.
-                        Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,event) VALUES(" + p.getUniqueId() + ",'network'," + "teleport "
+                        Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES(" + p.getUniqueId() + ",'network'," + "teleport "
                                 + location + " " + (l.getX() + xTransform) + " " + (l.getZ() + zTransform) + " " + l.getYaw() + " " + l.getPitch());
 
                         //Switch server.

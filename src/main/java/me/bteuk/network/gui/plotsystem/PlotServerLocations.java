@@ -251,17 +251,17 @@ public class PlotServerLocations {
                             if (server.equals(Network.SERVER_NAME)) {
 
                                 u.player.closeInventory();
-                                Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,server,event) VALUES("
-                                        + u.player.getUniqueId()
-                                        + "," + Network.SERVER_NAME
+                                Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES("
+                                        + u.player.getUniqueId() + ",'plotsystem',"
+                                        + Network.SERVER_NAME
                                         + ",teleport plot " + id + ");");
 
                             } else {
 
                                 //Set the server join event.
-                                Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,event) VALUES("
-                                        + u.player.getUniqueId()
-                                        + "," + "teleport plot " + id + ");");
+                                Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES("
+                                        + u.player.getUniqueId() + ",'plotsystem',"
+                                        + "teleport plot " + id + ");");
 
                                 //Teleport them to another server.
                                 u.player.closeInventory();
