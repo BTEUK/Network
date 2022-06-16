@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS player_data
 CREATE TABLE IF NOT EXISTS messages
 (
     recipient   CHAR(36)        NOT NULL,
-    message    TEXT            NOT NULL,
+    message     VARCHAR(256)    NOT NULL,
     PRIMARY KEY(recipient,message)
 );
 
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS join_events
     uuid        CHAR(36)        NOT NULL,
     type        ENUM('plotsystem',
                 'network')      NOT NULL,
-    event       TEXT            NOT NULL,
+    event       VARCHAR(256)    NOT NULL,
     PRIMARY KEY(uuid)
 );
 
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS server_events
     type        ENUM('plotsystem',
                 'network')      NOT NULL,
     server      VARCHAR(64)     NOT NULL,
-    event       TEXT            NOT NULL,
+    event       VARCHAR(256)    NOT NULL,
     PRIMARY KEY(uuid,event)
 );
 
@@ -104,8 +104,8 @@ CREATE TABLE IF NOT EXISTS location_requests
 
 CREATE TABLE IF NOT EXISTS server_data
 (
-    id          INT         NOT NULL,
-    owner       CHAR(36)    NOT NULL,
-    uuid        CHAR(36)    NOT NULL,
-    PRIMARY KEY(id,uuid)
+    name          VARCHAR(64)   NOT NULL,
+    type        ENUM('PLOT','EARTH',
+    'LOBBY','TUTORIAL')     NOT NULL,
+    PRIMARY KEY(name)
 );

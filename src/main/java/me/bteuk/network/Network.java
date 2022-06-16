@@ -12,7 +12,6 @@ import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.sql.RegionSQL;
 import me.bteuk.network.utils.enums.ServerType;
 import me.bteuk.network.utils.NetworkUser;
-import me.bteuk.network.utils.Utils;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -72,9 +71,9 @@ public final class Network extends JavaPlugin {
 
         if (!config.getBoolean("enabled")) {
 
-            Bukkit.getLogger().warning(Utils.chat("&cThe config must be configured before the plugin can be enabled!"));
-            Bukkit.getLogger().warning(Utils.chat("&cPlease edit the database values in the config, give the server a unique name and then set 'enabled: true'"));
-            Bukkit.getLogger().warning(Utils.chat("&cAlso make sure to set the server to the correct type."));
+            Bukkit.getLogger().warning("&The config must be configured before the plugin can be enabled!");
+            Bukkit.getLogger().warning("Please edit the database values in the config, give the server a unique name and then set 'enabled: true'");
+            Bukkit.getLogger().warning("&Also make sure to set the server to the correct type.");
             return;
 
         }
@@ -92,7 +91,7 @@ public final class Network extends JavaPlugin {
             String region_database = config.getString("database.region");
             BasicDataSource region_dataSource = mysqlSetup(global_database);
             regionSQL = new RegionSQL(region_dataSource);
-            initDb("dbsetup_region.sql", region_dataSource);
+            //initDb("dbsetup_region.sql", region_dataSource);
 
             //Plot Database
             String plot_database = config.getString("database.plot");
@@ -102,7 +101,7 @@ public final class Network extends JavaPlugin {
 
         } catch (SQLException | IOException e) {
             e.printStackTrace();
-            Bukkit.getLogger().severe(Utils.chat("&cFailed to connect to the database, please check that you have set the config values correctly."));
+            Bukkit.getLogger().severe("Failed to connect to the database, please check that you have set the config values correctly.");
             return;
         }
 
@@ -112,29 +111,29 @@ public final class Network extends JavaPlugin {
         //Set the server type from config.
         SERVER_TYPE = ServerType.valueOf(config.getString("server_type"));
 
-        if (!globalSQL.hasRow("SELECT name FROM server_data WHERE name=" + SERVER_NAME + ";")) {
+        if (!globalSQL.hasRow("SELECT name FROM server_data WHERE name='" + SERVER_NAME + "';")) {
 
             //Add server to database and enable server.
             if (globalSQL.update(
-                    "INSERT INTO server_data(name,type) VALUES(" + SERVER_NAME + "," + SERVER_TYPE.toString() + ");"
+                    "INSERT INTO server_data(name,type) VALUES('" + SERVER_NAME + "','" + SERVER_TYPE.toString() + "');"
             )) {
 
                 //Enable plugin.
-                Bukkit.getLogger().info(Utils.chat("&aServer added to database with name " + SERVER_NAME + " and type " + SERVER_TYPE));
-                Bukkit.getLogger().info(Utils.chat("&cEnabling Plugin"));
+                Bukkit.getLogger().info("Server added to database with name " + SERVER_NAME + " and type " + SERVER_TYPE);
+                Bukkit.getLogger().info("Enabling Plugin");
                 enablePlugin();
 
             } else {
 
                 //If the server is not in the database, shut down plugin.
-                Bukkit.getLogger().severe(Utils.chat("&cFailed to add server to database, disabling plugin!"));
+                Bukkit.getLogger().severe("Failed to add server to database, disabling plugin!");
 
             }
 
         } else {
 
             //Enable plugin.
-            Bukkit.getLogger().info(Utils.chat("&cEnabling Plugin"));
+            Bukkit.getLogger().info("Enabling Plugin");
             enablePlugin();
 
         }
@@ -186,7 +185,7 @@ public final class Network extends JavaPlugin {
         //Disable bungeecord channel.
         this.getServer().getMessenger().unregisterOutgoingPluginChannel(this);
 
-        chat.onDisable();
+        if (chat != null) {chat.onDisable();}
 
     }
 
@@ -214,7 +213,7 @@ public final class Network extends JavaPlugin {
                 stmt.execute();
             }
         }
-        getLogger().info("§2Database setup complete for " + fileName);
+        getLogger().info("Database setup complete for " + fileName);
     }
 
     //Creates the mysql connection.

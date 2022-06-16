@@ -8,8 +8,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 
 import java.io.*;
@@ -27,7 +25,7 @@ public class CustomChat implements Listener, PluginMessageListener {
         instance.getServer().getPluginManager().registerEvents(this, instance);
         instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:globalchat", this);
 
-        instance.getLogger().info(Utils.chat("&aSuccessfully enabled Global Chat!"));
+        instance.getLogger().info("Successfully enabled Global Chat!");
 
     }
 
@@ -62,7 +60,7 @@ public class CustomChat implements Listener, PluginMessageListener {
 
         } catch (IOException ex) {
 
-            instance.getLogger().log(Level.SEVERE, Utils.chat("&cCould not broadcast received socket message!"), ex);
+            instance.getLogger().log(Level.SEVERE, "Could not broadcast received socket message!", ex);
 
         }
 

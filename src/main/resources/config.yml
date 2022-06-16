@@ -12,8 +12,10 @@ database:
   region: uknet_regions
 
 #Server configuration
+#Server types: PLOT, EARTH, LOBBY, TUTORIAL
 enabled: false
 server_name: server_name
+server_type: earth
 
 #Chat Socket
 socket:

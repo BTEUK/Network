@@ -7,3 +7,6 @@ commands:
   plot:
     usage: /<command>
     description: Allows players to manipulate plots without using the gui.
+  tpll:
+    usage: /<command>
+    description: Teleport to coordinates.
