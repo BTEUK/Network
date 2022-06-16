@@ -29,7 +29,7 @@ public class AcceptedPlotFeedback {
         PlotSQL plotSQL = Network.getInstance().plotSQL;
 
         //Get all accepted plots sorted by most recently accepted.
-        ArrayList<Integer> plots = plotSQL.getIntList("SELECT id FROM accept_data WHERE uuid=" + user.player.getUniqueId() + " SORT BY accept_time DESC;");
+        ArrayList<Integer> plots = plotSQL.getIntList("SELECT id FROM accept_data WHERE uuid='" + user.player.getUniqueId() + "' SORT BY accept_time DESC;");
 
         //Slot count.
         int slot = 10;
@@ -99,8 +99,8 @@ public class AcceptedPlotFeedback {
                 //No feedback
                 gui.setItem(slot, Utils.createItem(Material.BOOK, 1,
                         Utils.chat("&b&lPlot " + plot),
-                        Utils.chat("&fAccepted by &7" + globalSQL.getString("SELECT name FROM player_data WHERE uuid="
-                                + plotSQL.getString("SELECT reviewer FROM accept_data WHERE id=" + plot + ";") + ";")),
+                        Utils.chat("&fAccepted by &7" + globalSQL.getString("SELECT name FROM player_data WHERE uuid='"
+                                + plotSQL.getString("SELECT reviewer FROM accept_data WHERE id=" + plot + ";") + "';")),
                         Utils.chat("&fDifficulty: &7" + PlotValues.difficultyName(plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plot + ";"))),
                         Utils.chat("&fSize: &7" + PlotValues.sizeName(plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + plot + ";"))),
                         Utils.chat("&fAccuracy: &7" + plotSQL.getInt("SELECT accuracy FROM accept_data WHERE id=" + plot + ";") + "&f/&75"),
@@ -111,8 +111,8 @@ public class AcceptedPlotFeedback {
                 //There is feedback
                 gui.setItem(slot, Utils.createItem(Material.WRITTEN_BOOK, 1,
                                 Utils.chat("&b&lPlot " + plot),
-                                Utils.chat("&fAccepted by &7" + globalSQL.getString("SELECT name FROM player_data WHERE uuid="
-                                        + plotSQL.getString("SELECT reviewer FROM accept_data WHERE id=" + plot + ";") + ";")),
+                                Utils.chat("&fAccepted by &7" + globalSQL.getString("SELECT name FROM player_data WHERE uuid='"
+                                        + plotSQL.getString("SELECT reviewer FROM accept_data WHERE id=" + plot + ";") + "';")),
                                 Utils.chat("&fDifficulty: &7" + PlotValues.difficultyName(plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plot + ";"))),
                                 Utils.chat("&fSize: &7" + PlotValues.sizeName(plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + plot + ";"))),
                                 Utils.chat("&fAccuracy: &7" + plotSQL.getInt("SELECT accuracy FROM accept_data WHERE id=" + plot + ";") + "&f/&75"),

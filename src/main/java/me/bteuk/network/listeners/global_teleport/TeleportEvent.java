@@ -74,7 +74,7 @@ public class TeleportEvent implements Listener {
                 if (!u.region.equals(l)) {
 
                     //Check if the player cannot enter this region cancel the action.
-                    if (regionSQL.hasRow("SELECT region FROM regions WHERE region=" + u.region.getRegion(l) + ";") && !p.hasPermission("group.jrbuilder")) {
+                    if (regionSQL.hasRow("SELECT region FROM regions WHERE region='" + u.region.getRegion(l) + "';") && !p.hasPermission("group.jrbuilder")) {
 
                         p.sendMessage(Utils.chat("&cThis region has not been loaded, you must be Jr.Builder+ to load new areas."));
                         e.setCancelled(true);

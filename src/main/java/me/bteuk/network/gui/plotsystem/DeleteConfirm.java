@@ -34,9 +34,9 @@ public class DeleteConfirm {
                     u.player.closeInventory();
 
                     //Add server event to delete plot.
-                    globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES(" + u.player.getUniqueId() + ",'plotsystem'," +
-                            plotSQL.getString("SELECT server FROM location_data WHERE name=" +
-                                    plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + ";") +
+                    globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + u.player.getUniqueId() + "','plotsystem'," +
+                            plotSQL.getString("SELECT server FROM location_data WHERE name='" +
+                                    plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + "';") +
                             ",'delete plot " + plotID + "');");
 
                 });

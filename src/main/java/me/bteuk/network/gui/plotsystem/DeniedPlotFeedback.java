@@ -27,10 +27,10 @@ public class DeniedPlotFeedback {
         GlobalSQL globalSQL = Network.getInstance().globalSQL;
 
         //Get plot owner uuid.
-        String uuid = plotSQL.getString("SELEC FROM plot_members WHERE id=" + plotID + " AND is_owner=1;");
+        String uuid = plotSQL.getString("SELECT FROM plot_members WHERE id=" + plotID + " AND is_owner=1;");
 
         //Get the number of times the plot was denied for the current plot owner.
-        int deniedCount = plotSQL.getInt("SELECT COUNT(attempt) FROM deny_data WHERE id=" + plotID + " AND uuid=" + uuid + ";");
+        int deniedCount = plotSQL.getInt("SELECT COUNT(attempt) FROM deny_data WHERE id=" + plotID + " AND uuid='" + uuid + "';");
 
         //Slot count.
         int slot = 10;
@@ -52,8 +52,8 @@ public class DeniedPlotFeedback {
             gui.setItem(slot, Utils.createItem(Material.WRITTEN_BOOK, 1,
                             Utils.chat("&b&lFeedback for submission " + deniedCount),
                             Utils.chat("&fClick to view feedback for this submission."),
-                            Utils.chat("&fReviewed by &7" + globalSQL.getString("SELECT name FROM player_data WHERE uuid="
-                                    + plotSQL.getString("SELECT reviewer FROM deny_data WHERE id=" + plotID + " AND uuid=" + uuid + " AND attempt=" + deniedCount + ";")))),
+                            Utils.chat("&fReviewed by &7" + globalSQL.getString("SELECT name FROM player_data WHERE uuid='"
+                                    + plotSQL.getString("SELECT reviewer FROM deny_data WHERE id=" + plotID + " AND uuid='" + uuid + "' AND attempt=" + deniedCount + ";") + "';"))),
 
                     u ->
 
@@ -71,12 +71,12 @@ public class DeniedPlotFeedback {
 
                         //Get book author, aka the reviewer.
                         String author = globalSQL.getString("SELECT name FROM player_data WHERE uuid=" +
-                                plotSQL.getString("SELECT reviewer FROM deny_data WHERE id=" + plotID + " AND uuid=" + uuid + " AND attempt=" + finalDeniedCount + ";") + ";");
+                                plotSQL.getString("SELECT reviewer FROM deny_data WHERE id=" + plotID + " AND uuid='" + uuid + "' AND attempt=" + finalDeniedCount + ";") + ";");
                         bookMeta.setAuthor(author);
 
                         //Get pages of the book.
                         ArrayList<String> pages = plotSQL.getStringList("SELECT text FROM book_data WHERE id="
-                                + plotSQL.getInt("SELECT book_id FROM deny_data WHERE id=" + plotID + " AND uuid=" + uuid + " AND attempt=" + finalDeniedCount + ";") + ";");
+                                + plotSQL.getInt("SELECT book_id FROM deny_data WHERE id=" + plotID + " AND uuid='" + uuid + "' AND attempt=" + finalDeniedCount + ";") + ";");
 
                         //Set the pages of the book.
                         bookMeta.setPages(pages);

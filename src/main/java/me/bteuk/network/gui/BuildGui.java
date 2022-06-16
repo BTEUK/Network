@@ -52,9 +52,9 @@ public class BuildGui {
                     } else {
 
                         //Get the server of the plot.
-                        String server = Network.getInstance().plotSQL.getString("SELECT server FROM location_data WHERE name="
+                        String server = Network.getInstance().plotSQL.getString("SELECT server FROM location_data WHERE name='"
                                 + Network.getInstance().plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";")
-                                + ";");
+                                + "';");
 
                         //If the plot is on the current server teleport them directly.
                         //Else teleport them to the correct server and them teleport them to the plot.
@@ -63,15 +63,14 @@ public class BuildGui {
                             u.player.closeInventory();
                             Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES("
                                     + u.player.getUniqueId()
-                                    + ",'plotsystem'," + Network.SERVER_NAME
-                                    + ",teleport plot " + id + ");");
+                                    + ",'plotsystem','" + Network.SERVER_NAME
+                                    + "','teleport plot " + id + "');");
 
                         } else {
 
                             //Set the server join event.
-                            Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES("
-                                    + u.player.getUniqueId() + ",'plotsystem',"
-                                    + "teleport plot " + id + ");");
+                            Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('"
+                                    + u.player.getUniqueId() + "','plotsystem','teleport plot " + id + "');");
 
                             //Teleport them to another server.
                             u.player.closeInventory();
@@ -94,10 +93,10 @@ public class BuildGui {
 
                         //Set the claim event.
                         u.player.closeInventory();
-                        Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES("
+                        Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('"
                                 + u.player.getUniqueId()
-                                + ",'plotsystem'," + Network.SERVER_NAME
-                                + ",claim plot);");
+                                + "','plotsystem','" + Network.SERVER_NAME
+                                + "','claim plot');");
 
                     } else {
 

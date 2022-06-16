@@ -172,15 +172,15 @@ public class Tpll implements CommandExecutor {
         //Check if the region is on a plotserver.
         NetworkUser u = Network.getInstance().getUser(p);
         Location l = new Location(p.getWorld(), proj[0], altitude, proj[1]);
-        if (Network.getInstance().regionSQL.hasRow("SELECT region FROM regions WHERE region=" + u.region.getRegion(l) + " AND status='plot';")) {
+        if (Network.getInstance().regionSQL.hasRow("SELECT region FROM regions WHERE region='" + u.region.getRegion(l) + "' AND status='plot';")) {
 
             //Get server and location of region.
-            String server = Network.getInstance().plotSQL.getString("SELECT server FROM regions WHERE region=" + u.region.getRegion(l) + ";");
-            String location = Network.getInstance().plotSQL.getString("SELECT location FROM regions WHERE region=" + u.region.getRegion(l) + ";");
+            String server = Network.getInstance().plotSQL.getString("SELECT server FROM regions WHERE region='" + u.region.getRegion(l) + "';");
+            String location = Network.getInstance().plotSQL.getString("SELECT location FROM regions WHERE region='" + u.region.getRegion(l) + "';");
 
             //Get the coordinate transformations.
-            int xTransform = Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name=" + location + ";");
-            int zTransform = Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name=" + location + ";");
+            int xTransform = Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + location + "';");
+            int zTransform = Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
 
             //If they are on the correct server, teleport them directly, else switch their server.
             if (server.equals(Network.SERVER_NAME)) {
@@ -194,8 +194,8 @@ public class Tpll implements CommandExecutor {
             } else {
 
                 //Set join event to teleport there.
-                Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES(" + p.getUniqueId() + ",'network'," + "teleport "
-                        + (proj[0] + xTransform) + " " + (proj[1] + zTransform) + " " + p.getLocation().getYaw() + " " + p.getLocation().getPitch());
+                Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('" + p.getUniqueId() + "','network'," + "'teleport "
+                        + (proj[0] + xTransform) + " " + (proj[1] + zTransform) + " " + p.getLocation().getYaw() + " " + p.getLocation().getPitch() + "');");
 
                 //Switch server.
                 ByteArrayDataOutput out = ByteStreams.newDataOutput();
@@ -208,7 +208,7 @@ public class Tpll implements CommandExecutor {
             //Switch to the earth server
 
             //Check if the player cannot enter this region cancel the action.
-            if (Network.getInstance().regionSQL.hasRow("SELECT region FROM regions WHERE region=" + u.region.getRegion(l) + ";") && !p.hasPermission("group.jrbuilder")) {
+            if (Network.getInstance().regionSQL.hasRow("SELECT region FROM regions WHERE region='" + u.region.getRegion(l) + "';") && !p.hasPermission("group.jrbuilder")) {
 
                 p.sendMessage(Utils.chat("&cThis region has not been loaded, you must be Jr.Builder+ to load new areas."));
                 return true;
@@ -228,8 +228,8 @@ public class Tpll implements CommandExecutor {
             } else {
 
                 //Set join event to teleport there.
-                Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES(" + p.getUniqueId() + ",'network'," + "teleport "
-                        + (proj[0]) + " " + (proj[1]) + " " + p.getLocation().getYaw() + " " + p.getLocation().getPitch());
+                Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('" + p.getUniqueId() + "','network'," + "'teleport "
+                        + (proj[0]) + " " + (proj[1]) + " " + p.getLocation().getYaw() + " " + p.getLocation().getPitch() + "');");
 
                 //Switch server.
                 ByteArrayDataOutput out = ByteStreams.newDataOutput();

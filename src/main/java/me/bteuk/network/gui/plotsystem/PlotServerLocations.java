@@ -169,9 +169,9 @@ public class PlotServerLocations {
                             Utils.chat("&fClick to teleport to a plot in this location"),
                             Utils.chat("&fsubject to the settings shown above."),
                             Utils.chat("&fAvailable plots of each difficulty:"),
-                            Utils.chat("&fEasy: &7" + plotSQL.getInt("SELECT count(id) FROM plot_data WHERE location=" + location + " AND status='unclaimed' AND difficulty=1;")),
-                            Utils.chat("&fMedium: &7" + plotSQL.getInt("SELECT count(id) FROM plot_data WHERE location=" + location + " AND status='unclaimed' AND difficulty=2;")),
-                            Utils.chat("&fHard: &7" + plotSQL.getInt("SELECT count(id) FROM plot_data WHERE location=" + location + " AND status='unclaimed' AND difficulty=3;"))),
+                            Utils.chat("&fEasy: &7" + plotSQL.getInt("SELECT count(id) FROM plot_data WHERE location='" + location + "' AND status='unclaimed' AND difficulty=1;")),
+                            Utils.chat("&fMedium: &7" + plotSQL.getInt("SELECT count(id) FROM plot_data WHERE location='" + location + "' AND status='unclaimed' AND difficulty=2;")),
+                            Utils.chat("&fHard: &7" + plotSQL.getInt("SELECT count(id) FROM plot_data WHERE location='" + location + "' AND status='unclaimed' AND difficulty=3;"))),
                     u ->
 
                     {
@@ -185,17 +185,17 @@ public class PlotServerLocations {
                             if (u.player.hasPermission("group.jrbuilder")) {
 
                                 //Select a random plot of any difficulty.
-                                id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location=" + location + " AND status='unclaimed' ORDER BY RAND() LIMIT 1;");
+                                id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location='" + location + "' AND status='unclaimed' ORDER BY RAND() LIMIT 1;");
 
                             } else if (u.player.hasPermission("group.apprentice")) {
 
                                 //Select a random plot of difficulty easy and normal.
-                                id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location=" + location + " AND status='unclaimed' AND (difficulty=1 OR difficulty=2) ORDER BY RAND() LIMIT 1;");
+                                id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location='" + location + "' AND status='unclaimed' AND (difficulty=1 OR difficulty=2) ORDER BY RAND() LIMIT 1;");
 
                             } else {
 
                                 //Select a random plot of difficulty easy.
-                                id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location=" + location + " AND status='unclaimed' AND difficulty=1 ORDER BY RAND() LIMIT 1;");
+                                id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location='" + location + "' AND status='unclaimed' AND difficulty=1 ORDER BY RAND() LIMIT 1;");
 
                             }
 
@@ -205,17 +205,17 @@ public class PlotServerLocations {
                             if (u.player.hasPermission("group.jrbuilder")) {
 
                                 //Select a random plot of any difficulty.
-                                id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location=" + location + " AND status='unclaimed' AND size=" + u.plotSize + " ORDER BY RAND() LIMIT 1;");
+                                id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location='" + location + "' AND status='unclaimed' AND size=" + u.plotSize + " ORDER BY RAND() LIMIT 1;");
 
                             } else if (u.player.hasPermission("group.apprentice")) {
 
                                 //Select a random plot of difficulty easy and normal.
-                                id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location=" + location + " AND status='unclaimed' AND (difficulty=1 OR difficulty=2) AND size=" + u.plotSize + " ORDER BY RAND() LIMIT 1;");
+                                id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location='" + location + "' AND status='unclaimed' AND (difficulty=1 OR difficulty=2) AND size=" + u.plotSize + " ORDER BY RAND() LIMIT 1;");
 
                             } else {
 
                                 //Select a random plot of difficulty easy.
-                                id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location=" + location + " AND status='unclaimed' AND difficulty=1 AND size=" + u.plotSize + "  ORDER BY RAND() LIMIT 1;");
+                                id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location='" + location + "' AND status='unclaimed' AND difficulty=1 AND size=" + u.plotSize + "  ORDER BY RAND() LIMIT 1;");
 
                             }
 
@@ -223,13 +223,13 @@ public class PlotServerLocations {
                         } else if (u.plotSize == 0) {
                             //Pick plot with random size but fixed difficulty.
 
-                            id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location=" + location + " AND status='unclaimed' AND difficulty=" + u.plotDifficulty + " ORDER BY RAND() LIMIT 1;");
+                            id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location='" + location + "' AND status='unclaimed' AND difficulty=" + u.plotDifficulty + " ORDER BY RAND() LIMIT 1;");
 
                         } else {
                             //Both size and difficulty are specified.
 
                             //Select a random plot of any difficulty.
-                            id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location=" + location + " AND status='unclaimed' AND difficulty=" + u.plotDifficulty + " AND size=" + u.plotSize + " ORDER BY RAND() LIMIT 1;");
+                            id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location='" + location + "' AND status='unclaimed' AND difficulty=" + u.plotDifficulty + " AND size=" + u.plotSize + " ORDER BY RAND() LIMIT 1;");
 
                         }
 
@@ -242,26 +242,25 @@ public class PlotServerLocations {
                         } else {
 
                             //Get the server of the plot.
-                            String server = Network.getInstance().plotSQL.getString("SELECT server FROM location_data WHERE name="
+                            String server = Network.getInstance().plotSQL.getString("SELECT server FROM location_data WHERE name='"
                                     + Network.getInstance().plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";")
-                                    + ";");
+                                    + "';");
 
                             //If the plot is on the current server teleport them directly.
                             //Else teleport them to the correct server and them teleport them to the plot.
                             if (server.equals(Network.SERVER_NAME)) {
 
                                 u.player.closeInventory();
-                                Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES("
-                                        + u.player.getUniqueId() + ",'plotsystem',"
+                                Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('"
+                                        + u.player.getUniqueId() + "','plotsystem','"
                                         + Network.SERVER_NAME
-                                        + ",teleport plot " + id + ");");
+                                        + "','teleport plot " + id + "');");
 
                             } else {
 
                                 //Set the server join event.
-                                Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES("
-                                        + u.player.getUniqueId() + ",'plotsystem',"
-                                        + "teleport plot " + id + ");");
+                                Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('"
+                                        + u.player.getUniqueId() + "','plotsystem','teleport plot " + id + "');");
 
                                 //Teleport them to another server.
                                 u.player.closeInventory();

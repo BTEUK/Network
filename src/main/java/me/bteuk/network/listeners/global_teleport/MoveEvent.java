@@ -73,7 +73,7 @@ public class MoveEvent implements Listener {
                 if (!u.region.equals(l)) {
 
                     //Check if the player cannot enter this region cancel the action.
-                    if (regionSQL.hasRow("SELECT region FROM regions WHERE region=" + u.region.getRegion(l) + ";") && !p.hasPermission("group.jrbuilder")) {
+                    if (regionSQL.hasRow("SELECT region FROM regions WHERE region='" + u.region.getRegion(l) + "';") && !p.hasPermission("group.jrbuilder")) {
 
                         p.sendMessage(Utils.chat("&cThis region has not been loaded, you must be Jr.Builder+ to load new areas."));
                         e.setCancelled(true);
@@ -82,18 +82,18 @@ public class MoveEvent implements Listener {
                     }
 
                     //Check if the region is on the plotserver, teleport them there.
-                    if (regionSQL.hasRow("SELECT region FROM regions WHERE region=" + u.region.getRegion(l) + " AND status='plot';")) {
+                    if (regionSQL.hasRow("SELECT region FROM regions WHERE region='" + u.region.getRegion(l) + "' AND status='plot';")) {
 
                         //Get server of region.
-                        String server = Network.getInstance().plotSQL.getString("SELECT server FROM regions WHERE region=" + u.region.getRegion(l) + ";");
-                        String location = Network.getInstance().plotSQL.getString("SELECT location FROM regions WHERE region=" + u.region.getRegion(l) + ";");
+                        String server = Network.getInstance().plotSQL.getString("SELECT server FROM regions WHERE region='" + u.region.getRegion(l) + "';");
+                        String location = Network.getInstance().plotSQL.getString("SELECT location FROM regions WHERE region='" + u.region.getRegion(l) + "';");
 
-                        int xTransform = Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name=" + location + ";");
-                        int zTransform = Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name=" + location + ";");
+                        int xTransform = Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + location + "';");
+                        int zTransform = Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
 
                         //Set join event to teleport there.
-                        Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES(" + p.getUniqueId() + ",'network'," + "teleport "
-                                + location + " " + (l.getX() + xTransform) + " " + (l.getZ() + zTransform) + " " + l.getYaw() + " " + l.getPitch());
+                        Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('" + p.getUniqueId() + "','network','teleport "
+                                + location + " " + (l.getX() + xTransform) + " " + (l.getZ() + zTransform) + " " + l.getYaw() + " " + l.getPitch() + "';");
 
                         //Switch server.
                         ByteArrayDataOutput out = ByteStreams.newDataOutput();

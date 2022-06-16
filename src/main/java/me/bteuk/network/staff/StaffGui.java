@@ -76,7 +76,7 @@ public class StaffGui {
             for (int plot : plots) {
 
                 //If you are not owner or member of the plot select it for the next review.
-                if (plotSQL.hasRow("SELECT id FROM plot_members WHERE uuid=" + user.player.getUniqueId() + " AND id=" + plot + ";")) {
+                if (plotSQL.hasRow("SELECT id FROM plot_members WHERE uuid='" + user.player.getUniqueId() + "' AND id=" + plot + ";")) {
 
                     //Show review plot button in gui.
                     gui.setItem(12, Utils.createItem(Material.ENDER_PEARL, 1,
@@ -95,24 +95,24 @@ public class StaffGui {
                                     for (int nPlot : nPlots) {
 
                                         //If you are not owner or member of the plot select it for the next review.
-                                        if (!plotSQL.hasRow("SELECT id FROM plot_members WHERE uuid=" + u.player.getUniqueId() + " AND id=" + nPlot + ";")) {
+                                        if (!plotSQL.hasRow("SELECT id FROM plot_members WHERE uuid='" + u.player.getUniqueId() + "' AND id=" + nPlot + ";")) {
 
                                             //Get server of plot.
-                                            String server = plotSQL.getString("SELECT server FROM location_data WHERE name=" +
-                                                    plotSQL.getString("SELECT location FROM plot_data WHERE id=" + nPlot + ";") + ";");
+                                            String server = plotSQL.getString("SELECT server FROM location_data WHERE name='" +
+                                                    plotSQL.getString("SELECT location FROM plot_data WHERE id=" + nPlot + ";") + "';");
 
                                             //If they are not in the same server as the plot teleport them to that server and start the reviewing process.
                                             if (server.equals(Network.SERVER_NAME)) {
 
-                                                Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES("
-                                                        + u.player.getUniqueId() + ",'plotsystem'," + Network.SERVER_NAME + ",'review plot " + nPlot + "');");
+                                                Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('"
+                                                        + u.player.getUniqueId() + "','plotsystem','" + Network.SERVER_NAME + "','review plot " + nPlot + "');");
 
                                             } else {
 
                                                 //Player is not on the current server.
                                                 //Set the server join event.
-                                                Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES("
-                                                        + u.player.getUniqueId() + ",'plotsystem',"
+                                                Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('"
+                                                        + u.player.getUniqueId() + "','plotsystem',"
                                                         +  "'review plot " + nPlot + "');");
 
                                                 //Teleport them to another server.

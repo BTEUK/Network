@@ -21,7 +21,7 @@ public class PlotMenu {
 
         PlotSQL plotSQL = Network.getInstance().plotSQL;
 
-        ArrayList<Integer> plots = plotSQL.getIntList("SELECT id FROM plot_members WHERE uuid=" + user.player.getUniqueId() + " SORT BY last_enter DESC;");
+        ArrayList<Integer> plots = plotSQL.getIntList("SELECT id FROM plot_members WHERE uuid='" + user.player.getUniqueId() + "' SORT BY last_enter DESC;");
 
         //Slot count.
         int slot = 10;
@@ -57,7 +57,7 @@ public class PlotMenu {
         }
 
         //Accepted plots menu, if you have any.
-        if (plotSQL.hasRow("SELECT uuid FROM accept_data WHERE uuid=" + user.player.getUniqueId() + ";")) {
+        if (plotSQL.hasRow("SELECT uuid FROM accept_data WHERE uuid='" + user.player.getUniqueId() + "';")) {
 
             gui.setItem(40, Utils.createItem(Material.CLOCK, 1,
                             Utils.chat("&b&lAccepted Plots"),

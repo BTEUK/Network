@@ -33,19 +33,19 @@ public class JoinServer implements Listener {
 
         //If the player is not in the online_users table add them, and run a network connect.
         //If they are update the server.
-        if (globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid=" + e.getPlayer().getUniqueId() + ";")) {
+        if (globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid='" + e.getPlayer().getUniqueId() + "';")) {
 
             //Update server.
-            globalSQL.update("UPDATE online_users SET server=" + Network.SERVER_NAME + " WHERE uuid=" + e.getPlayer().getUniqueId() + ";");
+            globalSQL.update("UPDATE online_users SET server=" + Network.SERVER_NAME + " WHERE uuid='" + e.getPlayer().getUniqueId() + "';");
 
             //Remove their server_switch entry.
-            globalSQL.update("DELETE FROM server_switch WHERE uuid=" + e.getPlayer().getUniqueId() + ";");
+            globalSQL.update("DELETE FROM server_switch WHERE uuid='" + e.getPlayer().getUniqueId() + "';");
 
         } else {
 
             //Add user to table and run network connect.
-            globalSQL.update("INSERT INTO online_users(uuid,join_time,last_ping,server) VALUES(" + e.getPlayer().getUniqueId() +
-                    "," + Time.currentTime() + "," + Time.currentTime() + "," + Network.SERVER_NAME + ");");
+            globalSQL.update("INSERT INTO online_users(uuid,join_time,last_ping,server) VALUES('" + e.getPlayer().getUniqueId() +
+                    "'," + Time.currentTime() + "," + Time.currentTime() + ",'" + Network.SERVER_NAME + "');");
             connect.joinEvent(e.getPlayer());
         }
 

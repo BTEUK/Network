@@ -47,7 +47,7 @@ public class Leaderboard {
         if (lType == LeaderboardType.USER) {
 
             //Get points of user.
-            points = globalSQL.getInt("SELECT " + type + " FROM points_data WHERE uuid=" + uuid + ";");
+            points = globalSQL.getInt("SELECT " + type + " FROM points_data WHERE uuid='" + uuid + "';");
 
             //Get position on leaderboard of user.
             //We can do this by counting all users with more points and adding 1.
@@ -65,7 +65,7 @@ public class Leaderboard {
 
                 while (results.next()) {
 
-                    aUuids[counter] = globalSQL.getString("SELECT name FROM player_data WHERE uuid=" + results.getString(2) + ";");
+                    aUuids[counter] = globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + results.getString(2) + "';");
                     aPoints[counter] = results.getInt(1);
                     aPosition[counter] = position - (4 - counter);
 
@@ -81,13 +81,13 @@ public class Leaderboard {
             }
 
             //Add in user.
-            aUuids[4] = aUuids[counter] = globalSQL.getString("SELECT name FROM player_data WHERE uuid=" + uuid + ";");
+            aUuids[4] = aUuids[counter] = globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
             aPoints[4] = points;
             aPosition[4] = position;
 
             //Get users of 4 nearest points values below the user.
             results = globalSQL.getResultSet("SELECT " + type + ",uuid FROM points_data WHERE "
-                    + type + "<=" + points + " AND UUID <> " + uuid + " ORDER BY " + type + " DESC LIMIT 4;");
+                    + type + "<=" + points + " AND UUID <> '" + uuid + "' ORDER BY " + type + " DESC LIMIT 4;");
 
             //If there are less than 4 values the leaderboard will have empty places.
             counter = 5;
@@ -96,7 +96,7 @@ public class Leaderboard {
 
                 while (results.next()) {
 
-                    aUuids[counter] = aUuids[counter] = globalSQL.getString("SELECT name FROM player_data WHERE uuid=" + results.getString(2) + ";");
+                    aUuids[counter] = aUuids[counter] = globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + results.getString(2) + "';");
                     aPoints[counter] = results.getInt(1);
                     aPosition[counter] = position + (counter - 4);
 
@@ -121,7 +121,7 @@ public class Leaderboard {
 
                 while (results.next()) {
 
-                    aUuids[counter] = aUuids[counter] = globalSQL.getString("SELECT name FROM player_data WHERE uuid=" + results.getString(2) + ";");
+                    aUuids[counter] = aUuids[counter] = globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + results.getString(2) + "';");
                     aPoints[counter] = results.getInt(1);
                     aPosition[counter] = 1 + counter ;
 
