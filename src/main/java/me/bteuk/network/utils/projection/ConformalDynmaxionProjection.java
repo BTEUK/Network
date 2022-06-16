@@ -1,8 +1,8 @@
 package me.bteuk.network.utils.projection;
 
+import me.bteuk.network.Network;
 import me.bteuk.network.utils.coords.MathUtils;
 
-import LZMA.LzmaInputStream;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -24,7 +24,7 @@ public class ConformalDynmaxionProjection extends DymaxionProjection {
         double[][] vy = PArrays.filledBy(SIDE_LENGTH + 1, double[][]::new, i -> new double[SIDE_LENGTH + 1 - i]);
 
         ByteBuf buf;
-        try (InputStream in = new LzmaInputStream(ConformalDynmaxionProjection.class.getResourceAsStream("conformal.lzma"))) {
+        try (InputStream in = Network.getInstance().getClass().getClassLoader().getResourceAsStream("conformal.txt")) {
             buf = Unpooled.wrappedBuffer(StreamUtil.toByteArray(in));
         }
 

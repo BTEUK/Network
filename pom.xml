@@ -96,19 +96,9 @@
             <version>0.5.7-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>lzma</groupId>
-            <artifactId>lzma</artifactId>
-            <version>0.0.1</version>
-        </dependency>
-        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>2.13.3</version>
-        </dependency>
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-buffer</artifactId>
-            <version>4.1.77.Final</version>
         </dependency>
     </dependencies>
 </project>

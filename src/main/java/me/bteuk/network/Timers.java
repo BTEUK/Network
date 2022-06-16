@@ -54,7 +54,7 @@ public class Timers {
         instance.getServer().getScheduler().scheduleSyncRepeatingTask(instance, () -> {
 
             //Check for new server_events.
-            if (globalSQL.hasRow("SELECT uuid FROM server_events WHERE server=" + SERVER_NAME + " AND type='network';")) {
+            if (globalSQL.hasRow("SELECT uuid FROM server_events WHERE server='" + SERVER_NAME + "' AND type='network';")) {
 
                 //Get events for this server.
                 events.clear();
@@ -84,22 +84,22 @@ public class Timers {
             for (NetworkUser user : users) {
 
                 //Update the last_ping.
-                globalSQL.update("UPDATE online_users SET last_ping=" + time + " WHERE uuid=" + user.player.getUniqueId() + " AND server=" + SERVER_NAME + ";");
+                globalSQL.update("UPDATE online_users SET last_ping=" + time + " WHERE uuid='" + user.player.getUniqueId() + "' AND server='" + SERVER_NAME + "';");
 
             }
 
             //Check for users switching to this server.
             //If their switch time was greater than 10 seconds ago, disconnect them from the network, if not already.
-            uuids = globalSQL.getStringList("SELECT uuid FROM server_switch WHERE to_server=" + Network.SERVER_NAME + ";");
+            uuids = globalSQL.getStringList("SELECT uuid FROM server_switch WHERE to_server='" + SERVER_NAME + "';");
 
             //Iterate through uuids and check time.
             for (String uuid : uuids) {
 
                 //If it's more than 10 seconds ago.
-                if (globalSQL.getLong("SELECT switch_time FROM server_switch WHERE uuid=" + uuid + ";") < time - (1000 * 10)) {
+                if (globalSQL.getLong("SELECT switch_time FROM server_switch WHERE uuid='" + uuid + "';") < time - (1000 * 10)) {
 
                     //Run network disconnect and remove their entry.
-                    globalSQL.update("DELETE FROM server_switch WHERE uuid=" + uuid + ";");
+                    globalSQL.update("DELETE FROM server_switch WHERE uuid='" + uuid + "';");
                     connect.leaveEvent(uuid);
 
                 }

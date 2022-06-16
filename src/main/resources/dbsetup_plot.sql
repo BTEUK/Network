@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS plot_data
 (
-	uuid        INT         AUTO_INCREMENT,
+	id          INT         AUTO_INCREMENT,
 	status      ENUM('unclaimed',
 	'claimed','submitted','reviewing',
 	'completed','deleted')  NOT NULL,
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS book_data
 (
     id          INT         NOT NULL,
     page        INT         NOT NULL,
-    contents    TEXT        NOT NULL,
+    contents    VARCHAR(798)    NOT NULL,
     PRIMARY KEY(id, page)
 );
 
