@@ -119,14 +119,14 @@ public final class Network extends JavaPlugin {
             )) {
 
                 //Enable plugin.
-                Bukkit.getLogger().info("Server added to database with name " + SERVER_NAME + " and type " + SERVER_TYPE);
-                Bukkit.getLogger().info("Enabling Plugin");
+                getLogger().info("Server added to database with name " + SERVER_NAME + " and type " + SERVER_TYPE);
+                getLogger().info("Enabling Plugin");
                 enablePlugin();
 
             } else {
 
                 //If the server is not in the database, shut down plugin.
-                Bukkit.getLogger().severe("Failed to add server to database, disabling plugin!");
+                getLogger().severe("Failed to add server to database, disabling plugin!");
 
             }
 
@@ -145,14 +145,21 @@ public final class Network extends JavaPlugin {
         //Create user list.
         networkUsers = new ArrayList<>();
 
+        //Setup custom chat.
+        socketIP = config.getString("socket.IP");
+        socketPort = config.getInt("socket.port");
+
+        getLogger().info(socketIP + "/" + socketPort);
+        chat = new CustomChat(this, socketIP, socketPort);
+
+        //Setup connect.
+        connect = new Connect(this, globalSQL, plotSQL);
+
         //Register events.
         new JoinServer(this, globalSQL, connect);
         new LeaveServer(this, globalSQL, connect);
 
         new GuiListener(this);
-
-        //Setup connect.
-        connect = new Connect(this, globalSQL, plotSQL);
 
         //Setup Timers
         timers = new Timers(this, globalSQL, connect);
@@ -163,11 +170,6 @@ public final class Network extends JavaPlugin {
 
         //Create bungeecord channel
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
-
-        //Setup custom chat.
-        chat = new CustomChat(this);
-        socketIP = config.getString("socket.IP");
-        socketPort = config.getInt("socket.port");
 
         //Setup tpll if enabled in config.
         if (config.getBoolean("tpll.enabled")) {
@@ -253,8 +255,7 @@ public final class Network extends JavaPlugin {
 
         for (NetworkUser u : networkUsers) {
 
-            if (u.player == p) {
-
+            if (u.player.equals(p)) {
                 return u;
 
             }

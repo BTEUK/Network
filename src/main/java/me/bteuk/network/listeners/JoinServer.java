@@ -49,7 +49,6 @@ public class JoinServer implements Listener {
             connect.joinEvent(e.getPlayer());
         }
 
-
         //Add user to the list.
         instance.addUser(new NetworkUser(e.getPlayer()));
 

@@ -16,11 +16,17 @@ import java.util.logging.Level;
 
 public class CustomChat implements Listener, PluginMessageListener {
 
-    private Network instance;
+    private final Network instance;
+    private final String IP;
+    private final int port;
+    private final String serverName;
 
-    public CustomChat(Network instance) {
+    public CustomChat(Network instance, String IP, int port) {
 
         this.instance = instance;
+        this.IP = IP;
+        this.port = port;
+        this.serverName = instance.SERVER_NAME;
 
         instance.getServer().getPluginManager().registerEvents(this, instance);
         instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:globalchat", this);
@@ -38,7 +44,7 @@ public class CustomChat implements Listener, PluginMessageListener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerChatEvent(AsyncPlayerChatEvent e) {
 
-        e.setFormat(getFormattedMessage(e.getPlayer(), e.getMessage()));
+        e.setCancelled(true);
         broadcastPlayerMessage(e.getPlayer(), e.getMessage());
 
     }
@@ -68,12 +74,13 @@ public class CustomChat implements Listener, PluginMessageListener {
 
     public void broadcastPlayerMessage(Player player, String message) {
         Bukkit.getScheduler().runTaskAsynchronously(instance, () -> {
-            try (Socket socket = new Socket(instance.socketIP, instance.socketPort)) {
+            try (Socket socket = new Socket(IP, port)) {
                 OutputStream output = socket.getOutputStream();
                 ObjectOutputStream objectOutput = new ObjectOutputStream(output);
 
                 // Send player message
                 objectOutput.writeObject(getFormattedMessage(player, message));
+                objectOutput.writeObject(serverName);
                 objectOutput.flush();
 
                 objectOutput.close();
@@ -91,6 +98,7 @@ public class CustomChat implements Listener, PluginMessageListener {
 
                 // Send player message
                 objectOutput.writeObject(message);
+                objectOutput.writeObject(serverName);
                 objectOutput.flush();
 
                 objectOutput.close();

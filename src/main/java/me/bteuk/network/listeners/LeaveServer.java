@@ -6,6 +6,7 @@ import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.utils.NetworkUser;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -52,8 +53,8 @@ public class LeaveServer implements Listener {
         }
 
         //If the player is not in the server_switch table they have disconnected from the network.
-        if (!globalSQL.hasRow("SELECT uuid FROM server_switch WHERE uuid=" + e.getPlayer().getUniqueId()
-                + " AND from_server='" + instance.SERVER_NAME + "';")) {
+        if (!globalSQL.hasRow("SELECT uuid FROM server_switch WHERE uuid='" + e.getPlayer().getUniqueId()
+                + "' AND from_server='" + instance.SERVER_NAME + "';")) {
 
             //Run leave network sequence.
             connect.leaveEvent(e.getPlayer().getUniqueId().toString());

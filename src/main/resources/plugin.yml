@@ -1,7 +1,8 @@
 name: Network
 version: '${project.version}'
 main: me.bteuk.network.Network
-api-version: 1.17
+api-version: 1.18
+depend: [ PlaceholderAPI ]
 
 commands:
   plot:

@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS player_data
 (
 	uuid		CHAR(36)		NOT NULL,
 	name		VARCHAR(16)		NOT NULL,
-	last_join	BIGINT			NOT NULL,
+	last_online	BIGINT			NOT NULL,
 	last_submit	BIGINT			NOT NULL,
 	PRIMARY KEY (uuid)
 );

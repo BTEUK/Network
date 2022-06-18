@@ -37,7 +37,7 @@ public class Connect {
     public void joinEvent(Player p) {
 
         //If the user is not yet in the player_data table add them.
-        if (!globalSQL.hasRow("SELECT uuid FROM player_data WHERE uuid=" + p.getUniqueId() + ";")) {
+        if (!globalSQL.hasRow("SELECT uuid FROM player_data WHERE uuid='" + p.getUniqueId() + "';")) {
 
             globalSQL.update("INSERT INTO player_data(uuid,name,last_online,last_submit) VALUES('" +
                     p.getUniqueId() + "','" + p.getName() + "'," + Time.currentTime() + "," + 0 + ");");
@@ -45,7 +45,7 @@ public class Connect {
         } else {
 
             //Update the online time and name.
-            globalSQL.update("UPDATE player_data SET name='" + p.getName() + "',last_online=" + Time.currentTime() + "WHERE uuid='" + p.getUniqueId() + "';");
+            globalSQL.update("UPDATE player_data SET name='" + p.getName() + "',last_online=" + Time.currentTime() + " WHERE uuid='" + p.getUniqueId() + "';");
 
         }
 

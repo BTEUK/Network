@@ -12,7 +12,6 @@ import java.util.ArrayList;
 public class PlotSQL {
 
     private final BasicDataSource dataSource;
-    private int success;
 
     public PlotSQL(BasicDataSource datasource) {
 
@@ -132,17 +131,9 @@ public class PlotSQL {
         try (Connection conn = conn();
              PreparedStatement statement = conn.prepareStatement(sql)) {
 
-            success = statement.executeUpdate();
+            statement.executeUpdate();
 
-            //If the insert was successful return true;
-            if (success > 0) {
-                return true;
-            } else {
-
-                Bukkit.getLogger().warning("SQL update " + sql + " failed!");
-                return false;
-
-            }
+            return true;
 
         } catch (SQLException e) {
             e.printStackTrace();
