@@ -88,6 +88,8 @@ public class CustomChat implements Listener, PluginMessageListener {
                 instance.getLogger().log(Level.SEVERE, "Could not broadcast message to server socket!", ex);
             }
         });
+
+        Bukkit.broadcastMessage(Utils.chat(getFormattedMessage(player, message)));
     }
 
     public void broadcastMessage(String message) {
@@ -106,9 +108,10 @@ public class CustomChat implements Listener, PluginMessageListener {
                 instance.getLogger().log(Level.SEVERE, "Could not broadcast message to server socket!", ex);
             }
         });
+        Bukkit.broadcastMessage(Utils.chat(message));
     }
 
     public String getFormattedMessage(Player player, String message) {
-        return PlaceholderAPI.setPlaceholders(player, "§7] [%luckperms_prefix%§7] %player_name% &7&l> &7") + message;
+        return PlaceholderAPI.setPlaceholders(player, "%luckperms_prefix% &f%player_name% &7&l> &r&f") + message;
     }
 }

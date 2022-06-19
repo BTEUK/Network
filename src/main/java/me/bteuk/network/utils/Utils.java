@@ -3,7 +3,6 @@ package me.bteuk.network.utils;
 import org.bukkit.*;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -12,11 +11,32 @@ import org.bukkit.inventory.meta.SkullMeta;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.bukkit.ChatColor.COLOR_CHAR;
 
 public class Utils {
 
     public static String chat(String s) {
-        return ChatColor.translateAlternateColorCodes('&', s);
+
+        s = ChatColor.translateAlternateColorCodes('&',s);
+
+        final Pattern hexPattern = Pattern.compile("&#([A-Fa-f0-9]{6})");
+        Matcher matcher = hexPattern.matcher(s);
+        StringBuffer buffer = new StringBuffer(s.length() + 4 * 8);
+        while (matcher.find()) {
+
+            String group = matcher.group(1);
+            matcher.appendReplacement(buffer, COLOR_CHAR + "x"
+                    + COLOR_CHAR + group.charAt(0) + COLOR_CHAR + group.charAt(1)
+                    + COLOR_CHAR + group.charAt(2) + COLOR_CHAR + group.charAt(3)
+                    + COLOR_CHAR + group.charAt(4) + COLOR_CHAR + group.charAt(5)
+            );
+
+        }
+        return matcher.appendTail(buffer).toString();
+
     }
 
     public static ItemStack createItem(Material material, int amount, String displayName, String... loreString) {
