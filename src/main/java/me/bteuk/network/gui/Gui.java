@@ -17,9 +17,9 @@ public abstract class Gui {
     public static Map<UUID, UUID> openInventories = new HashMap<>();
 
     //Information about the gui.
-    private UUID uuid;
-    private Inventory inv;
-    private Map<Integer, guiAction> actions;
+    private final UUID uuid;
+    private final Inventory inv;
+    private final Map<Integer, guiAction> actions;
 
     public Gui(int invSize, Component invName) {
 
@@ -60,17 +60,32 @@ public abstract class Gui {
 
     }
 
-    public void update(NetworkUser u) {
+    public void update(NetworkUser u, UniqueGui uniqueGui) {
 
-        openInventories.put(u.player.getUniqueId(), getUuid());
+        //Remove player from openInventories.
+        openInventories.remove(u.player.getUniqueId());
+
+        //Remove current gui without closing inventory.
+        inventoriesByUUID.remove(getUuid());
+
+        //Set the new gui as open inventory.
+        openInventories.put(u.player.getUniqueId(), uniqueGui.getUuid());
+
+        //Set the contents of the players inventory.
+        u.player.getOpenInventory().getTopInventory().setContents(uniqueGui.getInventory().getContents());
+
+        //Set the uniqueGui for user.
+        u.uniqueGui = uniqueGui;
 
     }
 
     public void delete(){
         for (Player p : Bukkit.getOnlinePlayers()){
             UUID u = openInventories.get(p.getUniqueId());
-            if (u.equals(getUuid())){
-                p.closeInventory();
+            if (u != null) {
+                if (u.equals(getUuid())) {
+                    p.closeInventory();
+                }
             }
         }
         inventoriesByUUID.remove(getUuid());

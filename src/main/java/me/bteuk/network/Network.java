@@ -10,6 +10,7 @@ import me.bteuk.network.listeners.LeaveServer;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.sql.RegionSQL;
+import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.enums.ServerType;
 import me.bteuk.network.utils.NetworkUser;
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -186,6 +187,27 @@ public final class Network extends JavaPlugin {
 
         //Disable bungeecord channel.
         this.getServer().getMessenger().unregisterOutgoingPluginChannel(this);
+
+        //Remove all players from network.
+        for (NetworkUser u: networkUsers) {
+
+            //Uuid
+            String uuid = u.player.getUniqueId().toString();
+
+            //Remove any outstanding invites that this player has sent.
+            plotSQL.update("DELETE FROM plot_invites WHERE owner='" + uuid + "';");
+
+            //Remove any outstanding invites that this player has received.
+            plotSQL.update("DELETE FROM plot_invites WHERE uuid='" + uuid + "';");
+
+            //Set last_online time in playerdata.
+            globalSQL.update("UPDATE player_data SET last_online=" + Time.currentTime() + " WHERE UUID='" + uuid + "';");
+
+            //Remove player from online_users.
+            globalSQL.update("DELETE FROM online_users WHERE uuid='" + uuid + "';");
+
+        }
+
 
         if (chat != null) {chat.onDisable();}
 

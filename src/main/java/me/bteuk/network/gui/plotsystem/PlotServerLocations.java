@@ -94,11 +94,8 @@ public class PlotServerLocations {
 
                     }
 
-                    //Update the inventory.
-                    u.uniqueGui.delete();
-                    u.uniqueGui = PlotServerLocations.getPlotServerLocations(u);
-                    u.uniqueGui.update(u);
-                    u.player.getInventory().setContents(u.uniqueGui.getInventory().getContents());
+                    //Update the gui.
+                    u.uniqueGui.update(u, PlotServerLocations.getPlotServerLocations(u));
 
                 });
 
@@ -146,11 +143,8 @@ public class PlotServerLocations {
 
                     }
 
-                    //Update the inventory.
-                    u.uniqueGui.delete();
-                    u.uniqueGui = PlotServerLocations.getPlotServerLocations(u);
-                    u.uniqueGui.update(u);
-                    u.player.getInventory().setContents(u.uniqueGui.getInventory().getContents());
+                    //Update the gui.
+                    u.uniqueGui.update(u, PlotServerLocations.getPlotServerLocations(u));
 
                 });
 

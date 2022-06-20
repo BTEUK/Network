@@ -46,15 +46,8 @@ public class AcceptedPlotFeedback {
 
                     {
 
-                        //Delete current gui.
-                        u.uniqueGui.delete();
-
-                        //Create new gui for the next page.
-                        u.uniqueGui = AcceptedPlotFeedback.createAcceptedPlotFeedback(u, page - 1);
-
-                        //Update the gui and set the content of the inventory to the new gui.
-                        u.uniqueGui.update(u);
-                        u.player.getInventory().setContents(u.uniqueGui.getInventory().getContents());
+                        //Update the gui.
+                        u.uniqueGui.update(u, AcceptedPlotFeedback.createAcceptedPlotFeedback(u, page - 1));
 
                     });
         }
@@ -72,15 +65,8 @@ public class AcceptedPlotFeedback {
 
                         {
 
-                            //Delete current gui.
-                            u.uniqueGui.delete();
-
-                            //Create new gui for the next page.
-                            u.uniqueGui = AcceptedPlotFeedback.createAcceptedPlotFeedback(u, page + 1);
-
-                            //Update the gui and set the content of the inventory to the new gui.
-                            u.uniqueGui.update(u);
-                            u.player.getInventory().setContents(u.uniqueGui.getInventory().getContents());
+                            //Update the gui.
+                            u.uniqueGui.update(u, AcceptedPlotFeedback.createAcceptedPlotFeedback(u, page + 1));
 
                         });
 

@@ -4,7 +4,6 @@ import me.bteuk.network.Network;
 import me.bteuk.network.gui.UniqueGui;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
-import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -41,15 +40,8 @@ public class PlotMembers {
 
                     {
 
-                        //Delete current gui.
-                        u.uniqueGui.delete();
-
-                        //Create new gui for the next page.
-                        u.uniqueGui = PlotMembers.createPlotMembers(plotID, page - 1);
-
-                        //Update the gui and set the content of the inventory to the new gui.
-                        u.uniqueGui.update(u);
-                        u.player.getInventory().setContents(u.uniqueGui.getInventory().getContents());
+                        //Update the gui.
+                        u.uniqueGui.update(u, PlotMembers.createPlotMembers(plotID, page - 1));
 
                     });
         }
@@ -67,15 +59,8 @@ public class PlotMembers {
 
                         {
 
-                            //Delete current gui.
-                            u.uniqueGui.delete();
-
-                            //Create new gui for the next page.
-                            u.uniqueGui = PlotMembers.createPlotMembers(plotID, page + 1);
-
-                            //Update the gui and set the content of the inventory to the new gui.
-                            u.uniqueGui.update(u);
-                            u.player.getInventory().setContents(u.uniqueGui.getInventory().getContents());
+                            //Update the gui.
+                            u.uniqueGui.update(u, PlotMembers.createPlotMembers(plotID, page + 1));
 
                         });
 
@@ -112,15 +97,9 @@ public class PlotMembers {
                             //Refresh the gui page after a second.
                             //The delay is so the plotsystem has time to update the members database.
                             Bukkit.getScheduler().scheduleSyncDelayedTask(Network.getInstance(), () -> {
-                                //Delete current gui.
-                                u.uniqueGui.delete();
 
-                                //Create new gui for the next page.
-                                u.uniqueGui = PlotMembers.createPlotMembers(plotID, page);
-
-                                //Update the gui and set the content of the inventory to the new gui.
-                                u.uniqueGui.update(u);
-                                u.player.getInventory().setContents(u.uniqueGui.getInventory().getContents());
+                                //Update the gui.
+                                u.uniqueGui.update(u, PlotMembers.createPlotMembers(plotID, page));
 
                             }, 20L);
 

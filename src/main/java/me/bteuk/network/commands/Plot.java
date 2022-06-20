@@ -24,7 +24,7 @@ public class Plot implements CommandExecutor {
         Player p = (Player) sender;
 
         if (args.length < 2) {
-            p.sendMessage("&c/plot join <plotID>");
+            p.sendMessage(Utils.chat("&c/plot join <plotID>"));
             return true;
         }
 
@@ -36,13 +36,13 @@ public class Plot implements CommandExecutor {
             plotID = Integer.parseInt(args[1]);
 
         } catch (NumberFormatException e) {
-            p.sendMessage("&c/plot join <plotID>");
+            p.sendMessage(Utils.chat("&c/plot join <plotID>"));
             return true;
         }
 
         //Check if the first arg is 'join'
         if (!args[0].equals("join")) {
-            p.sendMessage("&c/plot join <plotID>");
+            p.sendMessage(Utils.chat("&c/plot join <plotID>"));
             return true;
         }
 
@@ -50,7 +50,7 @@ public class Plot implements CommandExecutor {
         PlotSQL plotSQL = Network.getInstance().plotSQL;
 
         //Check if they have an invite for this plot.
-        if (plotSQL.hasRow("SELECT id FROM plot_invites WHERE id=" + plotID + " AND uuid=" + p.getUniqueId() + ";")) {
+        if (plotSQL.hasRow("SELECT id FROM plot_invites WHERE id=" + plotID + " AND uuid='" + p.getUniqueId() + "';")) {
 
             //Add server event to join plot.
             globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + p.getUniqueId() + "'," + "'plotsystem'" + "," +
