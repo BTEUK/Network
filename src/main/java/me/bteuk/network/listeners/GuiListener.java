@@ -55,22 +55,10 @@ public class GuiListener implements Listener {
     public void onClose(InventoryCloseEvent e) {
 
         Player p = (Player) e.getPlayer();
-        NetworkUser u = instance.getUser(p);
         UUID playerUUID = p.getUniqueId();
 
         //Remove the player from the list of open inventories.
         Gui.openInventories.remove(playerUUID);
-
-        //Remove the unique gui, if it exists.
-        if (u != null) {
-            if (u.uniqueGui != null) {
-
-                u.uniqueGui.delete();
-
-            }
-
-            u.uniqueGui = null;
-        }
 
     }
 }

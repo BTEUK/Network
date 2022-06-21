@@ -241,7 +241,7 @@ public class PlotServerLocations {
                                     + "';");
 
                             //If the plot is on the current server teleport them directly.
-                            //Else teleport them to the correct server and them teleport them to the plot.
+                            //Else teleport them to the correct server and then teleport them to the plot.
                             if (server.equals(Network.SERVER_NAME)) {
 
                                 u.player.closeInventory();
@@ -257,7 +257,7 @@ public class PlotServerLocations {
                                         + u.player.getUniqueId() + "','plotsystem','teleport plot " + id + "');");
 
                                 //Teleport them to another server.
-                                u.player.closeInventory();
+                                u.uniqueGui.delete(u);
                                 ByteArrayDataOutput out = ByteStreams.newDataOutput();
                                 out.writeUTF("Connect");
                                 out.writeUTF(server);
@@ -289,13 +289,8 @@ public class PlotServerLocations {
 
                 {
 
-                    //Delete this inventory.
-                    u.uniqueGui.delete();
-                    u.player.closeInventory();
-
-                    //Open the build menu.
-                    u.uniqueGui = BuildGui.createBuildGui(u);
-                    u.uniqueGui.open(u);
+                    //Switch back to build menu.
+                    u.uniqueGui.switchGui(u, BuildGui.createBuildGui(u));
 
                 });
 

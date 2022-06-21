@@ -15,13 +15,12 @@ public class Plot implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
 
-        if (!(sender instanceof Player)) {
+        if (!(sender instanceof Player p)) {
 
             sender.sendMessage(Utils.chat("&cYou must be a player to run this command."));
+            return true;
 
         }
-
-        Player p = (Player) sender;
 
         if (args.length < 2) {
             p.sendMessage(Utils.chat("&c/plot join <plotID>"));

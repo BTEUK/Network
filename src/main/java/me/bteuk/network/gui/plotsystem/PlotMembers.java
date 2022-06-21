@@ -125,13 +125,8 @@ public class PlotMembers {
                         Utils.chat("&fOpen the plot info for this plot.")),
                 u -> {
 
-                    //Delete this inventory.
-                    u.uniqueGui.delete();
-                    u.player.closeInventory();
-
-                    //Open the plot menu.
-                    u.uniqueGui = PlotInfo.createPlotInfo(plotID);
-                    u.uniqueGui.open(u);
+                    //Switch back to plot info.
+                    u.uniqueGui.switchGui(u, PlotInfo.createPlotInfo(plotID));
 
                 });
 

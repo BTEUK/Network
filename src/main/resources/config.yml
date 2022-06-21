@@ -12,7 +12,7 @@ database:
   region: uknet_regions
 
 #Server configuration
-#Server types: PLOT, EARTH, LOBBY, TUTORIAL
+#Server types: plot, earth, lobby, tutorial
 enabled: false
 server_name: server_name
 server_type: earth

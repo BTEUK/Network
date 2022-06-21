@@ -99,6 +99,8 @@ public class InviteMembers {
                                     globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + uuid + "','network','" +
                                             globalSQL.getString("SELECT server FROM online_users WHERE uuid=" + uuid + ";") + "','invite plot " + plotID + "')");
 
+                                    u.player.sendMessage(Utils.chat("&aInvited " + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "'") + "to your plot."));
+
                                 } else {
                                     u.player.sendMessage(Utils.chat("&cYou've already invited this player to your plot."));
                                 }
@@ -132,13 +134,8 @@ public class InviteMembers {
 
                 {
 
-                    //Delete this inventory.
-                    u.uniqueGui.delete();
-                    u.player.closeInventory();
-
-                    //Return to the plot info menu.
-                    u.uniqueGui = PlotInfo.createPlotInfo(plotID);
-                    u.uniqueGui.open(u);
+                    //Switch back to plot info.
+                    u.uniqueGui.switchGui(u, PlotInfo.createPlotInfo(plotID));
 
                 });
 

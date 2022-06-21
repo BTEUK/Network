@@ -35,13 +35,8 @@ public class PlotMenu {
                             Utils.chat("&fClick to open the menu of this plot.")),
                     u -> {
 
-                        //Delete this inventory.
-                        u.uniqueGui.delete();
-                        u.player.closeInventory();
-
-                        //Open the menu for this plot.
-                        u.uniqueGui = PlotInfo.createPlotInfo(plots.get(finalI));
-                        u.uniqueGui.open(u);
+                        //Switch to plot info.
+                        u.uniqueGui.switchGui(u, PlotInfo.createPlotInfo(plots.get(finalI)));
 
                     });
 
@@ -65,13 +60,8 @@ public class PlotMenu {
 
                     u -> {
 
-                        //Delete this inventory.
-                        u.uniqueGui.delete();
-                        u.player.closeInventory();
-
-                        //Open the accpeted plot menu.
-                        u.uniqueGui = AcceptedPlotFeedback.createAcceptedPlotFeedback(u, 1);
-                        u.uniqueGui.open(u);
+                        //Switch to accepted plot feedback.
+                        u.uniqueGui.switchGui(u, AcceptedPlotFeedback.createAcceptedPlotFeedback(u, 1));
 
                     });
         }
@@ -82,13 +72,8 @@ public class PlotMenu {
                         Utils.chat("&fOpen the building menu.")),
                 u -> {
 
-                    //Delete this inventory.
-                    u.uniqueGui.delete();
-                    u.player.closeInventory();
-
-                    //Open the navigator.
-                    u.uniqueGui = BuildGui.createBuildGui(u);
-                    u.uniqueGui.open(u);
+                    //Switch back to build menu.
+                    u.uniqueGui.switchGui(u, BuildGui.createBuildGui(u));
 
                 });
 

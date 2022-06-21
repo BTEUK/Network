@@ -59,9 +59,7 @@ public class DeniedPlotFeedback {
 
                     {
 
-                        //Delete this inventory.
-                        u.uniqueGui.delete();
-                        u.uniqueGui = null;
+                        //Close inventory.
                         u.player.closeInventory();
 
                         //Create book.
@@ -106,13 +104,8 @@ public class DeniedPlotFeedback {
 
                 {
 
-                    //Delete this inventory.
-                    u.uniqueGui.delete();
-                    u.player.closeInventory();
-
-                    //Return to the plot info menu.
-                    u.uniqueGui = PlotInfo.createPlotInfo(plotID);
-                    u.uniqueGui.open(u);
+                    //Switch back to plot info.
+                    u.uniqueGui.switchGui(u, PlotInfo.createPlotInfo(plotID));
 
                 });
 

@@ -1,8 +1,9 @@
 package me.bteuk.network;
 
+import me.bteuk.network.commands.Navigator;
 import me.bteuk.network.commands.Plot;
 import me.bteuk.network.commands.Tpll;
-import me.bteuk.network.gui.Navigator;
+import me.bteuk.network.gui.NavigatorGui;
 import me.bteuk.network.listeners.Connect;
 import me.bteuk.network.listeners.GuiListener;
 import me.bteuk.network.listeners.JoinServer;
@@ -43,7 +44,7 @@ public final class Network extends JavaPlugin {
     private ArrayList<NetworkUser> networkUsers;
 
     //Guis
-    public Navigator navigator;
+    public NavigatorGui navigator;
 
     //SQL
     public PlotSQL plotSQL;
@@ -166,9 +167,6 @@ public final class Network extends JavaPlugin {
         timers = new Timers(this, globalSQL, connect);
         timers.startTimers();
 
-        //Create Guis.
-        navigator = new Navigator();
-
         //Create bungeecord channel
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 
@@ -179,6 +177,7 @@ public final class Network extends JavaPlugin {
 
         //Enable the plot command.
         getCommand("plot").setExecutor(new Plot());
+        getCommand("navigator").setExecutor(new Navigator());
 
     }
 

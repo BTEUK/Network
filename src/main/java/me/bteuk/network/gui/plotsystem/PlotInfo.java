@@ -30,13 +30,8 @@ public class PlotInfo {
                             Utils.chat("&fClick to show feedback for this plot.")),
                     u -> {
 
-                        //Delete this inventory.
-                        u.uniqueGui.delete();
-                        u.player.closeInventory();
-
-                        //Open the plot feedback menu.
-                        u.uniqueGui = DeniedPlotFeedback.createDeniedPlotFeedback(plotID);
-                        u.uniqueGui.open(u);
+                        //Switch to plot feedback.
+                        u.uniqueGui.switchGui(u, DeniedPlotFeedback.createDeniedPlotFeedback(plotID));
 
                     });
         }
@@ -48,15 +43,15 @@ public class PlotInfo {
             if (plotSQL.hasRow("SELECT id FROM plot_data WHERE id=" + plotID + " AND status='claimed';")) {
 
                 gui.setItem(12, Utils.createItem(Material.LIGHT_BLUE_CONCRETE, 1,
-                                Utils.chat("&b&lPlot Members"),
-                                Utils.chat("&fManage the members of your plot.")),
+                                Utils.chat("&b&lSubmit Plot"),
+                                Utils.chat("&fSubmit your plot to be reviewed."),
+                                Utils.chat("&fReviewing may take over 24 hours.")),
                         u -> {
 
-                            //Delete this inventory.
-                            u.uniqueGui.delete();
+                            //Close inventory.
                             u.player.closeInventory();
 
-                            //Add server event to delete plot.
+                            //Add server event to submit plot.
                             globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + u.player.getUniqueId() + "','plotsystem',"
                                     + plotSQL.getString("SELECT server FROM location_data WHERE name='" +
                                     plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + "';")
@@ -74,8 +69,7 @@ public class PlotInfo {
                                 Utils.chat("&fYour plot will no longer be submitted.")),
                         u -> {
 
-                            //Delete this inventory.
-                            u.uniqueGui.delete();
+                            //Close inventory.
                             u.player.closeInventory();
 
                             //Add server event to retract plot submission.
@@ -95,16 +89,8 @@ public class PlotInfo {
                                 Utils.chat("&fDelete the plot and all its contents.")),
                         u -> {
 
-                            //Copy reference of gui.
-                            UniqueGui previousGui = u.uniqueGui;
-
-                            //Delete this inventory.
-                            u.uniqueGui.delete();
-                            u.player.closeInventory();
-
-                            //Open the delete confirm menu.
-                            u.uniqueGui = DeleteConfirm.createDeleteConfirm(plotID, previousGui);
-                            u.uniqueGui.open(u);
+                            //Switch to delete confirm
+                            u.uniqueGui.switchGui(u, DeleteConfirm.createDeleteConfirm(plotID));
 
                         });
 
@@ -116,13 +102,8 @@ public class PlotInfo {
                             Utils.chat("&fManage the members of your plot.")),
                     u -> {
 
-                        //Delete this inventory.
-                        u.uniqueGui.delete();
-                        u.player.closeInventory();
-
-                        //Open the plot members menu.
-                        u.uniqueGui = PlotMembers.createPlotMembers(plotID,1);
-                        u.uniqueGui.open(u);
+                        //Switch to the plot members.
+                        u.uniqueGui.switchGui(u, PlotMembers.createPlotMembers(plotID, 1));
 
                     });
 
@@ -133,13 +114,8 @@ public class PlotInfo {
                             Utils.chat("&fYou can only invite online users.")),
                     u -> {
 
-                        //Delete this inventory.
-                        u.uniqueGui.delete();
-                        u.player.closeInventory();
-
-                        //Open the invite members menu.
-                        u.uniqueGui = InviteMembers.createInviteMembers(plotID, 1);
-                        u.uniqueGui.open(u);
+                        //Switch to invite members.
+                        u.uniqueGui.switchGui(u, InviteMembers.createInviteMembers(plotID, 1));
 
                     });
 
@@ -153,9 +129,9 @@ public class PlotInfo {
                             Utils.chat("&fYou will not be able to build in the plot once you leave.")),
                     u -> {
 
-                        //Delete this inventory.
-                        u.uniqueGui.delete();
-                        u.player.closeInventory();
+                        //Switch back to plot menu.
+                        u.uniqueGui.switchGui(u, PlotMenu.createPlotMenu(u));
+
 
                         //Add server event to leave plot.
                         globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + u.player.getUniqueId() + "','plotsystem','" +
@@ -173,13 +149,8 @@ public class PlotInfo {
                         Utils.chat("&fOpen the plot menu.")),
                 u -> {
 
-                    //Delete this inventory.
-                    u.uniqueGui.delete();
-                    u.player.closeInventory();
-
-                    //Open the plot menu.
-                    u.uniqueGui = PlotMenu.createPlotMenu(u);
-                    u.uniqueGui.open(u);
+                    //Switch back to plot menu.
+                    u.uniqueGui.switchGui(u, PlotMenu.createPlotMenu(u));
 
                 });
 

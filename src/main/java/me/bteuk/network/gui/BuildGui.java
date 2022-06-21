@@ -73,7 +73,7 @@ public class BuildGui {
                                     + u.player.getUniqueId() + "','plotsystem','teleport plot " + id + "');");
 
                             //Teleport them to another server.
-                            u.player.closeInventory();
+                            u.uniqueGui.delete(u);
                             ByteArrayDataOutput out = ByteStreams.newDataOutput();
                             out.writeUTF("Connect");
                             out.writeUTF(server);
@@ -92,7 +92,7 @@ public class BuildGui {
                     if (Network.SERVER_TYPE == ServerType.PLOT) {
 
                         //Set the claim event.
-                        u.player.closeInventory();
+                        u.uniqueGui.delete(u);
                         Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('"
                                 + u.player.getUniqueId()
                                 + "','plotsystem','" + Network.SERVER_NAME
@@ -115,9 +115,8 @@ public class BuildGui {
 
                 {
 
-                    //Open the build gui.
-                    u.uniqueGui = PlotServerLocations.getPlotServerLocations(u);
-                    u.uniqueGui.open(u);
+                    //Switch to the plot location gui.
+                    u.uniqueGui.switchGui(u, PlotServerLocations.getPlotServerLocations(u));
 
                 });
 
@@ -156,21 +155,10 @@ public class BuildGui {
                         Utils.chat("&fView all your active plots.")),
                 u -> {
 
-                    //Delete this inventory.
-                    u.uniqueGui.delete();
-                    u.player.closeInventory();
-
-                    //Open the plot menu.
-                    u.uniqueGui = PlotMenu.createPlotMenu(u);
-                    u.uniqueGui.open(u);
+                    //Switch to plot menu.
+                    u.uniqueGui.switchGui(u, PlotMenu.createPlotMenu(u));
 
                 });
-
-        //Feedback menu.
-        //Create item
-
-        //Tutorial menu.
-        //Create item
 
         //Spawn
         gui.setItem(12, Utils.createItem(Material.DIAMOND_PICKAXE, 1,
@@ -196,9 +184,8 @@ public class BuildGui {
 
                 {
 
-                    //Open the navigator.
-                    u.player.closeInventory();
-                    Network.getInstance().navigator.open(u);
+                    //Switch to navigation menu.
+                    u.uniqueGui.switchGui(u, NavigatorGui.createNavigator());
 
                 });
 

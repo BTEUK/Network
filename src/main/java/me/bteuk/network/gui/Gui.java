@@ -60,6 +60,7 @@ public abstract class Gui {
 
     }
 
+    //Update the gui the user is in by updating the current menu.
     public void update(NetworkUser u, UniqueGui uniqueGui) {
 
         //Remove player from openInventories.
@@ -76,6 +77,18 @@ public abstract class Gui {
 
         //Set the uniqueGui for user.
         u.uniqueGui = uniqueGui;
+
+    }
+
+    //Switch from current gui to a new one by closing and opening.
+    public void switchGui(NetworkUser u, UniqueGui uniqueGui) {
+
+        //Delete the current gui.
+        delete();
+
+        //Set the new gui and open it.
+        u.uniqueGui = uniqueGui;
+        u.uniqueGui.open(u);
 
     }
 

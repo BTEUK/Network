@@ -108,9 +108,7 @@ public class AcceptedPlotFeedback {
 
                         {
 
-                            //Delete this inventory.
-                            u.uniqueGui.delete();
-                            u.uniqueGui = null;
+                            //Close the inventory.
                             u.player.closeInventory();
 
                             //Create book.
@@ -156,13 +154,8 @@ public class AcceptedPlotFeedback {
 
                 {
 
-                    //Delete this inventory.
-                    u.uniqueGui.delete();
-                    u.player.closeInventory();
-
-                    //Return to the plot info menu.
-                    u.uniqueGui = PlotMenu.createPlotMenu(u);
-                    u.uniqueGui.open(u);
+                    //Switch tback the plot menu.
+                    u.uniqueGui.switchGui(u, PlotMenu.createPlotMenu(u));
 
                 });
 

@@ -13,7 +13,7 @@ import org.bukkit.Material;
 
 public class DeleteConfirm {
 
-    public static UniqueGui createDeleteConfirm(int plotID, UniqueGui previousGui) {
+    public static UniqueGui createDeleteConfirm(int plotID) {
 
         UniqueGui gui = new UniqueGui(27, Component.text("Delete Plot " + plotID, NamedTextColor.AQUA, TextDecoration.BOLD));
 
@@ -30,8 +30,7 @@ public class DeleteConfirm {
                 u -> {
 
                     //Delete this inventory.
-                    u.uniqueGui.delete();
-                    u.player.closeInventory();
+                    u.uniqueGui.delete(u);
 
                     //Add server event to delete plot.
                     globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + u.player.getUniqueId() + "','plotsystem'," +
@@ -49,14 +48,8 @@ public class DeleteConfirm {
 
                 {
 
-                    //Delete this inventory.
-                    u.uniqueGui.delete();
-                    u.player.closeInventory();
-
-                    //Add the plot menu back into the gui list and open it.
-                    Gui.getInventoriesByUUID().put(previousGui.getUuid(), previousGui);
-                    u.uniqueGui = previousGui;
-                    u.uniqueGui.open(u);
+                    //Switch back to plot info.
+                    u.uniqueGui.switchGui(u, PlotInfo.createPlotInfo(plotID));
 
                 });
 
