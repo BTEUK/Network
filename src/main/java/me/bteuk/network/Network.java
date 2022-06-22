@@ -151,7 +151,6 @@ public final class Network extends JavaPlugin {
         socketIP = config.getString("socket.IP");
         socketPort = config.getInt("socket.port");
 
-        getLogger().info(socketIP + "/" + socketPort);
         chat = new CustomChat(this, socketIP, socketPort);
 
         //Setup connect.

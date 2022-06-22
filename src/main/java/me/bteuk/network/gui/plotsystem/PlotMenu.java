@@ -21,7 +21,7 @@ public class PlotMenu {
 
         PlotSQL plotSQL = Network.getInstance().plotSQL;
 
-        ArrayList<Integer> plots = plotSQL.getIntList("SELECT id FROM plot_members WHERE uuid='" + user.player.getUniqueId() + "' SORT BY last_enter DESC;");
+        ArrayList<Integer> plots = plotSQL.getIntList("SELECT id FROM plot_members WHERE uuid='" + user.player.getUniqueId() + "' ORDER BY last_enter DESC;");
 
         //Slot count.
         int slot = 10;

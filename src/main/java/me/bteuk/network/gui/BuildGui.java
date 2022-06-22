@@ -20,7 +20,7 @@ public class BuildGui {
         UniqueGui gui = new UniqueGui(27, Component.text("Building Menu", NamedTextColor.AQUA, TextDecoration.BOLD));
 
         //Teleport to random unclaimed plot.
-        gui.setItem(12, Utils.createItem(Material.ENDER_PEARL, 1,
+        gui.setItem(20, Utils.createItem(Material.ENDER_PEARL, 1,
                         Utils.chat("&b&lRandom Plot"),
                         Utils.chat("&fClick teleport to a random claimable plot.")),
                 u -> {
@@ -73,7 +73,7 @@ public class BuildGui {
                                     + u.player.getUniqueId() + "','plotsystem','teleport plot " + id + "');");
 
                             //Teleport them to another server.
-                            u.uniqueGui.delete(u);
+                            u.player.closeInventory();
                             ByteArrayDataOutput out = ByteStreams.newDataOutput();
                             out.writeUTF("Connect");
                             out.writeUTF(server);
@@ -83,7 +83,7 @@ public class BuildGui {
                 });
 
         //Claim plot
-        gui.setItem(12, Utils.createItem(Material.EMERALD, 1,
+        gui.setItem(2, Utils.createItem(Material.EMERALD, 1,
                         Utils.chat("&b&lClaim Plot"),
                         Utils.chat("&fClick to claim the plot your are currently standing in.")),
                 u -> {
@@ -92,7 +92,7 @@ public class BuildGui {
                     if (Network.SERVER_TYPE == ServerType.PLOT) {
 
                         //Set the claim event.
-                        u.uniqueGui.delete(u);
+                        u.player.closeInventory();
                         Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('"
                                 + u.player.getUniqueId()
                                 + "','plotsystem','" + Network.SERVER_NAME
@@ -108,7 +108,7 @@ public class BuildGui {
 
 
         //Choose location.
-        gui.setItem(12, Utils.createItem(Material.DIAMOND_PICKAXE, 1,
+        gui.setItem(19, Utils.createItem(Material.DIAMOND_PICKAXE, 1,
                         Utils.chat("&b&lPlot Locations"),
                         Utils.chat("&fClick to choose a location to build a plot.")),
                 u ->
@@ -121,7 +121,7 @@ public class BuildGui {
                 });
 
         //Join region (Jr.Builder+ only)
-        gui.setItem(12, Utils.createItem(Material.DIAMOND_PICKAXE, 1,
+        gui.setItem(5, Utils.createItem(Material.DARK_OAK_DOOR, 1,
                         Utils.chat("&b&lJoin Region"),
                         Utils.chat("&fClick to join the region you are standing in.")),
                 u -> {
@@ -150,7 +150,7 @@ public class BuildGui {
                 });
 
         //Plot menu.
-        gui.setItem(12, Utils.createItem(Material.CHEST, 1,
+        gui.setItem(21, Utils.createItem(Material.CHEST, 1,
                         Utils.chat("&b&lPlot Menu"),
                         Utils.chat("&fView all your active plots.")),
                 u -> {
@@ -161,7 +161,7 @@ public class BuildGui {
                 });
 
         //Spawn
-        gui.setItem(12, Utils.createItem(Material.DIAMOND_PICKAXE, 1,
+        gui.setItem(17, Utils.createItem(Material.RED_BED, 1,
                         Utils.chat("&b&lSpawn"),
                         Utils.chat("&fTeleport to spawn.")),
                 u ->
@@ -177,7 +177,7 @@ public class BuildGui {
                 });
 
         //Return
-        gui.setItem(12, Utils.createItem(Material.SPRUCE_DOOR, 1,
+        gui.setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
                         Utils.chat("&b&lReturn"),
                         Utils.chat("&fOpen the navigator main menu.")),
                 u ->

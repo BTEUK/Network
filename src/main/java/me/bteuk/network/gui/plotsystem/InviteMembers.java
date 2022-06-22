@@ -66,7 +66,7 @@ public class InviteMembers {
             }
 
             //Check whether the player is not already the owner or member of the plot, if true skip them.
-            if (plotSQL.hasRow("SELECT uuid FROM plot_members WHERE id=" + plotID + " uuid='" + uuid + "';")) {
+            if (plotSQL.hasRow("SELECT uuid FROM plot_members WHERE id=" + plotID + " AND uuid='" + uuid + "';")) {
                 continue;
             }
 

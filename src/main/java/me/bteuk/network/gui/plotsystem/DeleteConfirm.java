@@ -25,7 +25,7 @@ public class DeleteConfirm {
 
         //Delete plot
         gui.setItem(13, Utils.createItem(Material.TNT, 1,
-                        Utils.chat("&b&lDelete Plot &3" + plotID),
+                        Utils.chat("&b&lDelete Plot " + plotID),
                         Utils.chat("&fDelete the plot and its contents.")),
                 u -> {
 
@@ -33,10 +33,10 @@ public class DeleteConfirm {
                     u.uniqueGui.delete(u);
 
                     //Add server event to delete plot.
-                    globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + u.player.getUniqueId() + "','plotsystem'," +
+                    globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + u.player.getUniqueId() + "','plotsystem','" +
                             plotSQL.getString("SELECT server FROM location_data WHERE name='" +
                                     plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + "';") +
-                            ",'delete plot " + plotID + "');");
+                            "','delete plot " + plotID + "');");
 
                 });
 
