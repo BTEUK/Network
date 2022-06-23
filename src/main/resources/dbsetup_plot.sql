@@ -62,6 +62,7 @@ CREATE TABLE IF NOT EXISTS plot_corners
 CREATE TABLE IF NOT EXISTS location_data
 (
     name        VARCHAR(64) NOT NULL,
+    alias       VARCHAR(128)    NOT NULL,
     server      VARCHAR(64) NOT NULL,
     coordMin    INT         NOT NULL,
     coordMax    INT         NOT NULL,

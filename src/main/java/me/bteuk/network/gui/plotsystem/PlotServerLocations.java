@@ -159,7 +159,7 @@ public class PlotServerLocations {
 
             //Create location button.
             gui.setItem(slot, Utils.createItem(Material.DIAMOND_PICKAXE, 1,
-                            Utils.chat("&b&l" + location),
+                            Utils.chat("&b&l" + plotSQL.getString("SELECT alias FROM location_data WHERE name='" + location + "';")),
                             Utils.chat("&fClick to teleport to a plot in this location"),
                             Utils.chat("&fsubject to the settings shown above."),
                             Utils.chat("&fAvailable plots of each difficulty:"),
