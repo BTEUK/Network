@@ -2,7 +2,7 @@ package me.bteuk.network.gui.plotsystem;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.BuildGui;
-import me.bteuk.network.gui.UniqueGui;
+import me.bteuk.network.gui.Gui;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
@@ -13,13 +13,23 @@ import org.bukkit.Material;
 
 import java.util.ArrayList;
 
-public class PlotMenu {
+public class PlotMenu extends Gui {
 
-    public static UniqueGui createPlotMenu(NetworkUser user) {
+    private final NetworkUser user;
+    private final PlotSQL plotSQL;
 
-        UniqueGui gui = new UniqueGui(45, Component.text("Plot Menu", NamedTextColor.AQUA, TextDecoration.BOLD));
+    public PlotMenu(NetworkUser user) {
 
-        PlotSQL plotSQL = Network.getInstance().plotSQL;
+        super(45, Component.text("Plot Menu", NamedTextColor.AQUA, TextDecoration.BOLD));
+
+        this.user = user;
+        plotSQL = Network.getInstance().plotSQL;
+
+        createGui();
+
+    }
+
+    private void createGui() {
 
         ArrayList<Integer> plots = plotSQL.getIntList("SELECT id FROM plot_members WHERE uuid='" + user.player.getUniqueId() + "' ORDER BY last_enter DESC;");
 
@@ -30,13 +40,18 @@ public class PlotMenu {
         for (int i = 0; i < plots.size(); i++) {
 
             int finalI = i;
-            gui.setItem(slot, Utils.createItem(Material.LIME_CONCRETE, 1,
+            setItem(slot, Utils.createItem(Material.LIME_CONCRETE, 1,
                             Utils.chat("&b&lPlot " + plots.get(i)),
                             Utils.chat("&fClick to open the menu of this plot.")),
                     u -> {
 
+                        //Delete this gui.
+                        this.delete();
+                        u.plotMenu = null;
+
                         //Switch to plot info.
-                        u.uniqueGui.switchGui(u, PlotInfo.createPlotInfo(plots.get(finalI)));
+                        u.plotInfo = new PlotInfo(plots.get(finalI));
+                        u.plotInfo.open(u);
 
                     });
 
@@ -54,30 +69,44 @@ public class PlotMenu {
         //Accepted plots menu, if you have any.
         if (plotSQL.hasRow("SELECT uuid FROM accept_data WHERE uuid='" + user.player.getUniqueId() + "';")) {
 
-            gui.setItem(40, Utils.createItem(Material.CLOCK, 1,
+            setItem(40, Utils.createItem(Material.CLOCK, 1,
                             Utils.chat("&b&lAccepted Plots"),
                             Utils.chat("&fClick to open the accepted plots menu.")),
 
                     u -> {
 
-                        //Switch to accepted plot feedback.
-                        u.uniqueGui.switchGui(u, AcceptedPlotFeedback.createAcceptedPlotFeedback(u, 1));
+                        //Delete this gui.
+                        this.delete();
+                        u.plotMenu = null;
+
+                        //Switch to plot info.
+                        u.acceptedPlotFeedback = new AcceptedPlotFeedback(u);
+                        u.acceptedPlotFeedback.open(u);
 
                     });
         }
 
         //Return
-        gui.setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
+        setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
                         Utils.chat("&b&lReturn"),
                         Utils.chat("&fOpen the building menu.")),
                 u -> {
 
-                    //Switch back to build menu.
-                    u.uniqueGui.switchGui(u, BuildGui.createBuildGui(u));
+                    //Delete this gui.
+                    this.delete();
+                    u.plotMenu = null;
+
+                    //Switch to plot info.
+                    u.buildGui = new BuildGui();
+                    u.buildGui.open(u);
 
                 });
+    }
 
-        return gui;
+    public void refresh() {
+
+        this.clearGui();
+        createGui();
 
     }
 }

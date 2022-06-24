@@ -156,6 +156,9 @@ public final class Network extends JavaPlugin {
         //Setup connect.
         connect = new Connect(this, globalSQL, plotSQL);
 
+        //Create navigator.
+        navigator = new NavigatorGui();
+
         //Register events.
         new JoinServer(this, globalSQL, connect);
         new LeaveServer(this, globalSQL, connect);

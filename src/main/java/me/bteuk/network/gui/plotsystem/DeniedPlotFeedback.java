@@ -1,7 +1,7 @@
 package me.bteuk.network.gui.plotsystem;
 
 import me.bteuk.network.Network;
-import me.bteuk.network.gui.UniqueGui;
+import me.bteuk.network.gui.Gui;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.Utils;
@@ -14,17 +14,30 @@ import org.bukkit.inventory.meta.BookMeta;
 
 import java.util.ArrayList;
 
-public class DeniedPlotFeedback {
+public class DeniedPlotFeedback extends Gui {
 
-    public static UniqueGui createDeniedPlotFeedback(int plotID) {
+    private final PlotSQL plotSQL;
+    private final GlobalSQL globalSQL;
 
-        UniqueGui gui = new UniqueGui(45, Component.text("Plot " + plotID + " feedback", NamedTextColor.AQUA, TextDecoration.BOLD));
+    private final int plotID;
+
+    public DeniedPlotFeedback(int plotID) {
+
+        super(45, Component.text("Plot " + plotID + " feedback", NamedTextColor.AQUA, TextDecoration.BOLD));
+
+        this.plotID = plotID;
 
         //Get plot sql.
-        PlotSQL plotSQL = Network.getInstance().plotSQL;
+        plotSQL = Network.getInstance().plotSQL;
 
         //Get global sql.
-        GlobalSQL globalSQL = Network.getInstance().globalSQL;
+        globalSQL = Network.getInstance().globalSQL;
+
+        createGui();
+
+    }
+
+    private void createGui() {
 
         //Get plot owner uuid.
         String uuid = plotSQL.getString("SELECT FROM plot_members WHERE id=" + plotID + " AND is_owner=1;");
@@ -38,7 +51,7 @@ public class DeniedPlotFeedback {
         //Iterate through the deniedCount inversely.
         //We cap the number at 21, since we'd never expect a player to have more plots denied than that,
         //it also saves us having to create multiple pages.
-        for (int i = deniedCount; i > 0; deniedCount--) {
+        for (int i = deniedCount; i > 0; i--) {
 
             //If the slot is greater than the number that fit in a page, stop.
             if (slot > 34) {
@@ -48,12 +61,12 @@ public class DeniedPlotFeedback {
             }
 
             //Add player to gui.
-            int finalDeniedCount = deniedCount;
-            gui.setItem(slot, Utils.createItem(Material.WRITTEN_BOOK, 1,
-                            Utils.chat("&b&lFeedback for submission " + deniedCount),
+            int finalI = i;
+            setItem(slot, Utils.createItem(Material.WRITTEN_BOOK, 1,
+                            Utils.chat("&b&lFeedback for submission " + i),
                             Utils.chat("&fClick to view feedback for this submission."),
                             Utils.chat("&fReviewed by &7" + globalSQL.getString("SELECT name FROM player_data WHERE uuid='"
-                                    + plotSQL.getString("SELECT reviewer FROM deny_data WHERE id=" + plotID + " AND uuid='" + uuid + "' AND attempt=" + deniedCount + ";") + "';"))),
+                                    + plotSQL.getString("SELECT reviewer FROM deny_data WHERE id=" + plotID + " AND uuid='" + uuid + "' AND attempt=" + i + ";") + "';"))),
 
                     u ->
 
@@ -65,16 +78,16 @@ public class DeniedPlotFeedback {
                         //Create book.
                         ItemStack writtenBook = new ItemStack(Material.WRITTEN_BOOK);
                         BookMeta bookMeta = (BookMeta) writtenBook.getItemMeta();
-                        bookMeta.setTitle(Utils.chat("&b&lPlot " + plotID + " Attempt " + finalDeniedCount));
+                        bookMeta.setTitle(Utils.chat("&b&lPlot " + plotID + " Attempt " + finalI));
 
                         //Get book author, aka the reviewer.
                         String author = globalSQL.getString("SELECT name FROM player_data WHERE uuid=" +
-                                plotSQL.getString("SELECT reviewer FROM deny_data WHERE id=" + plotID + " AND uuid='" + uuid + "' AND attempt=" + finalDeniedCount + ";") + ";");
+                                plotSQL.getString("SELECT reviewer FROM deny_data WHERE id=" + plotID + " AND uuid='" + uuid + "' AND attempt=" + finalI + ";") + ";");
                         bookMeta.setAuthor(author);
 
                         //Get pages of the book.
                         ArrayList<String> pages = plotSQL.getStringList("SELECT text FROM book_data WHERE id="
-                                + plotSQL.getInt("SELECT book_id FROM deny_data WHERE id=" + plotID + " AND uuid='" + uuid + "' AND attempt=" + finalDeniedCount + ";") + ";");
+                                + plotSQL.getInt("SELECT book_id FROM deny_data WHERE id=" + plotID + " AND uuid='" + uuid + "' AND attempt=" + finalI + ";") + ";");
 
                         //Set the pages of the book.
                         bookMeta.setPages(pages);
@@ -97,20 +110,28 @@ public class DeniedPlotFeedback {
         }
 
         //Return to plot info menu.
-        gui.setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
+        setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
                         Utils.chat("&b&lReturn"),
                         Utils.chat("&fReturn to the menu of plot " + plotID + ".")),
                 u ->
 
                 {
 
-                    //Switch back to plot info.
-                    u.uniqueGui.switchGui(u, PlotInfo.createPlotInfo(plotID));
+                    //Delete this gui.
+                    this.delete();
+                    u.deniedPlotFeedback = null;
+
+                    //Switch back to plot menu.
+                    u.plotInfo = new PlotInfo(plotID);
+                    u.plotInfo.open(u);
 
                 });
+    }
 
-        return gui;
+    public void refresh() {
 
+        this.clearGui();
+        createGui();
 
     }
 }

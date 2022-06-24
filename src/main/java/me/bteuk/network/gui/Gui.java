@@ -1,5 +1,6 @@
 package me.bteuk.network.gui;
 
+import me.bteuk.network.Network;
 import me.bteuk.network.utils.NetworkUser;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -53,47 +54,22 @@ public abstract class Gui {
 
     }
 
+    public void clearGui() {
+        inv.clear();
+        actions.clear();
+    }
+
     public void open(NetworkUser u) {
+
+        Network.getInstance().getLogger().info("Number of Gui's: " + inventoriesByUUID.size());
 
         u.player.openInventory(inv);
         openInventories.put(u.player.getUniqueId(), getUuid());
 
     }
 
-    //Update the gui the user is in by updating the current menu.
-    public void update(NetworkUser u, UniqueGui uniqueGui) {
-
-        //Remove player from openInventories.
-        openInventories.remove(u.player.getUniqueId());
-
-        //Remove current gui without closing inventory.
-        inventoriesByUUID.remove(getUuid());
-
-        //Set the new gui as open inventory.
-        openInventories.put(u.player.getUniqueId(), uniqueGui.getUuid());
-
-        //Set the contents of the players inventory.
-        u.player.getOpenInventory().getTopInventory().setContents(uniqueGui.getInventory().getContents());
-
-        //Set the uniqueGui for user.
-        u.uniqueGui = uniqueGui;
-
-    }
-
-    //Switch from current gui to a new one by closing and opening.
-    public void switchGui(NetworkUser u, UniqueGui uniqueGui) {
-
-        //Delete the current gui.
-        delete();
-
-        //Set the new gui and open it.
-        u.uniqueGui = uniqueGui;
-        u.uniqueGui.open(u);
-
-    }
-
-    public void delete(){
-        for (Player p : Bukkit.getOnlinePlayers()){
+    public void delete() {
+        for (Player p : Bukkit.getOnlinePlayers()) {
             UUID u = openInventories.get(p.getUniqueId());
             if (u != null) {
                 if (u.equals(getUuid())) {
@@ -118,5 +94,47 @@ public abstract class Gui {
 
     public Map<Integer, guiAction> getActions() {
         return actions;
+    }
+
+    //Remove any existing guis.
+    public static void deleteGuis(NetworkUser u) {
+
+        if (u.buildGui != null) {
+
+            u.buildGui.delete();
+
+        } else if (u.plotServerLocations != null) {
+
+            u.plotServerLocations.delete();
+
+        } else if (u.plotMenu != null) {
+
+            u.plotMenu.delete();
+
+        } else if (u.plotInfo != null) {
+
+            u.plotInfo.delete();
+
+        } else if (u.acceptedPlotFeedback != null) {
+
+            u.acceptedPlotFeedback.delete();
+
+        } else if (u.deniedPlotFeedback != null) {
+
+            u.deniedPlotFeedback.delete();
+
+        } else if (u.deleteConfirm != null) {
+
+            u.deleteConfirm.delete();
+
+        } else if (u.plotMembers != null) {
+
+            u.plotMembers.delete();
+
+        } else if (u.inviteMembers != null) {
+
+            u.inviteMembers.delete();
+
+        }
     }
 }

@@ -1,7 +1,7 @@
 package me.bteuk.network.gui.plotsystem;
 
 import me.bteuk.network.Network;
-import me.bteuk.network.gui.UniqueGui;
+import me.bteuk.network.gui.Gui;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.NetworkUser;
@@ -16,17 +16,34 @@ import org.bukkit.inventory.meta.BookMeta;
 
 import java.util.ArrayList;
 
-public class AcceptedPlotFeedback {
+public class AcceptedPlotFeedback extends Gui {
 
-    public static UniqueGui createAcceptedPlotFeedback(NetworkUser user, int page) {
+    private final NetworkUser user;
 
-        UniqueGui gui = new UniqueGui(45, Component.text("Accepted Plots", NamedTextColor.AQUA, TextDecoration.BOLD));
+    private int page;
+
+    private final GlobalSQL globalSQL;
+    private final PlotSQL plotSQL;
+
+    public AcceptedPlotFeedback(NetworkUser user) {
+
+        super(45, Component.text("Accepted Plots", NamedTextColor.AQUA, TextDecoration.BOLD));
+
+        this.user = user;
+
+        page = 1;
 
         //Get global sql.
-        GlobalSQL globalSQL = Network.getInstance().globalSQL;
+        globalSQL = Network.getInstance().globalSQL;
 
         //Get plot sql.
-        PlotSQL plotSQL = Network.getInstance().plotSQL;
+        plotSQL = Network.getInstance().plotSQL;
+
+        createGui();
+
+    }
+
+    private void createGui() {
 
         //Get all accepted plots sorted by most recently accepted.
         ArrayList<Integer> plots = plotSQL.getIntList("SELECT id FROM accept_data WHERE uuid='" + user.player.getUniqueId() + "' SORT BY accept_time DESC;");
@@ -39,7 +56,7 @@ public class AcceptedPlotFeedback {
 
         //If page is greater than 1 add a previous page button.
         if (page > 1) {
-            gui.setItem(18, Utils.createItem(Material.ARROW, 1,
+            setItem(18, Utils.createItem(Material.ARROW, 1,
                             Utils.chat("&b&lPrevious Page"),
                             Utils.chat("&fOpen the previous page of accepted plots.")),
                     u ->
@@ -47,7 +64,9 @@ public class AcceptedPlotFeedback {
                     {
 
                         //Update the gui.
-                        u.uniqueGui.update(u, AcceptedPlotFeedback.createAcceptedPlotFeedback(u, page - 1));
+                        page--;
+                        this.refresh();
+                        u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
 
                     });
         }
@@ -58,7 +77,7 @@ public class AcceptedPlotFeedback {
             //If the slot is greater than the number that fit in a page, create a new page.
             if (slot > 34) {
 
-                gui.setItem(26, Utils.createItem(Material.ARROW, 1,
+                setItem(26, Utils.createItem(Material.ARROW, 1,
                                 Utils.chat("&b&lNext Page"),
                                 Utils.chat("&fOpen the next page of online users.")),
                         u ->
@@ -66,7 +85,9 @@ public class AcceptedPlotFeedback {
                         {
 
                             //Update the gui.
-                            u.uniqueGui.update(u, AcceptedPlotFeedback.createAcceptedPlotFeedback(u, page + 1));
+                            page++;
+                            this.refresh();
+                            u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
 
                         });
 
@@ -83,7 +104,7 @@ public class AcceptedPlotFeedback {
             if (plotSQL.hasRow("SELECT FROM accept_data WHERE id=" + plot + " AND book_id=0;")) {
 
                 //No feedback
-                gui.setItem(slot, Utils.createItem(Material.BOOK, 1,
+                setItem(slot, Utils.createItem(Material.BOOK, 1,
                         Utils.chat("&b&lPlot " + plot),
                         Utils.chat("&fAccepted by &7" + globalSQL.getString("SELECT name FROM player_data WHERE uuid='"
                                 + plotSQL.getString("SELECT reviewer FROM accept_data WHERE id=" + plot + ";") + "';")),
@@ -95,7 +116,7 @@ public class AcceptedPlotFeedback {
             } else {
 
                 //There is feedback
-                gui.setItem(slot, Utils.createItem(Material.WRITTEN_BOOK, 1,
+                setItem(slot, Utils.createItem(Material.WRITTEN_BOOK, 1,
                                 Utils.chat("&b&lPlot " + plot),
                                 Utils.chat("&fAccepted by &7" + globalSQL.getString("SELECT name FROM player_data WHERE uuid='"
                                         + plotSQL.getString("SELECT reviewer FROM accept_data WHERE id=" + plot + ";") + "';")),
@@ -147,20 +168,28 @@ public class AcceptedPlotFeedback {
         }
 
         //Return to plot menu.
-        gui.setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
+        setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
                         Utils.chat("&b&lReturn"),
                         Utils.chat("&fOpen the plot menu.")),
                 u ->
 
                 {
 
+                    //Delete this gui.
+                    this.delete();
+                    u.acceptedPlotFeedback = null;
+
                     //Switch tback the plot menu.
-                    u.uniqueGui.switchGui(u, PlotMenu.createPlotMenu(u));
+                    u.plotMenu = new PlotMenu(u);
+                    u.plotMenu.open(u);
 
                 });
+    }
 
-        return gui;
+    public void refresh() {
 
+        this.clearGui();
+        createGui();
 
     }
 }

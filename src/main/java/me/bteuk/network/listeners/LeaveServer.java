@@ -6,7 +6,6 @@ import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.utils.NetworkUser;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -45,12 +44,8 @@ public class LeaveServer implements Listener {
         //If they are currently in an inventory, remove them from the list of open inventories.
         Gui.openInventories.remove(playerUUID);
 
-        //Remove the unique gui, if it exists.
-        if (u.uniqueGui != null) {
-
-            u.uniqueGui.delete();
-
-        }
+        //Delete any guis that may exist.
+        Gui.deleteGuis(u);
 
         //If the player is not in the server_switch table they have disconnected from the network.
         if (!globalSQL.hasRow("SELECT uuid FROM server_switch WHERE uuid='" + e.getPlayer().getUniqueId()

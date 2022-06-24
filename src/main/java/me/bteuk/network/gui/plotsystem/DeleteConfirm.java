@@ -2,7 +2,6 @@ package me.bteuk.network.gui.plotsystem;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
-import me.bteuk.network.gui.UniqueGui;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.Utils;
@@ -11,11 +10,21 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 
-public class DeleteConfirm {
+public class DeleteConfirm extends Gui {
 
-    public static UniqueGui createDeleteConfirm(int plotID) {
+    private final int plotID;
 
-        UniqueGui gui = new UniqueGui(27, Component.text("Delete Plot " + plotID, NamedTextColor.AQUA, TextDecoration.BOLD));
+    public DeleteConfirm(int plotID) {
+
+        super(27, Component.text("Delete Plot " + plotID, NamedTextColor.AQUA, TextDecoration.BOLD));
+
+        this.plotID = plotID;
+
+        createGui();
+
+    }
+
+    private void createGui() {
 
         //Get plot sql.
         PlotSQL plotSQL = Network.getInstance().plotSQL;
@@ -24,13 +33,14 @@ public class DeleteConfirm {
         GlobalSQL globalSQL = Network.getInstance().globalSQL;
 
         //Delete plot
-        gui.setItem(13, Utils.createItem(Material.TNT, 1,
+        setItem(13, Utils.createItem(Material.TNT, 1,
                         Utils.chat("&b&lDelete Plot " + plotID),
                         Utils.chat("&fDelete the plot and its contents.")),
                 u -> {
 
                     //Delete this inventory.
-                    u.uniqueGui.delete(u);
+                    this.delete();
+                    u.deleteConfirm = null;
 
                     //Add server event to delete plot.
                     globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + u.player.getUniqueId() + "','plotsystem','" +
@@ -41,19 +51,28 @@ public class DeleteConfirm {
                 });
 
         //Return to plot info menu.
-        gui.setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
+        setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
                         Utils.chat("&b&lReturn"),
                         Utils.chat("&fReturn to the menu of plot " + plotID + ".")),
                 u ->
 
                 {
 
+                    //Delete this inventory.
+                    this.delete();
+                    u.deleteConfirm = null;
+
                     //Switch back to plot info.
-                    u.uniqueGui.switchGui(u, PlotInfo.createPlotInfo(plotID));
+                    u.plotInfo = new PlotInfo(plotID);
+                    u.plotInfo.open(u);
 
                 });
+    }
 
-        return gui;
+    public void refresh() {
+
+        this.clearGui();
+        createGui();
 
     }
 }

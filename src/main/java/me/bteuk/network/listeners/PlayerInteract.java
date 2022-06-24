@@ -1,6 +1,7 @@
 package me.bteuk.network.listeners;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.commands.Navigator;
 import me.bteuk.network.gui.NavigatorGui;
 import me.bteuk.network.utils.NetworkUser;
 import org.bukkit.Bukkit;
@@ -25,18 +26,7 @@ public class PlayerInteract implements Listener {
         NetworkUser u = instance.getUser(e.getPlayer());
 
         //Open navigator.
-        //If the player has a previous gui, open that.
-        if (u.uniqueGui != null) {
-
-            u.uniqueGui.open(u);
-
-        } else {
-
-            //Open the navigator.
-            u.uniqueGui = NavigatorGui.createNavigator();
-            u.uniqueGui.open(u);
-
-        }
+        Navigator.openNavigator(u);
 
     }
 }

@@ -3,7 +3,7 @@ package me.bteuk.network.staff;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import me.bteuk.network.Network;
-import me.bteuk.network.gui.UniqueGui;
+import me.bteuk.network.gui.Gui;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
@@ -14,11 +14,11 @@ import org.bukkit.Material;
 
 import java.util.ArrayList;
 
-public class StaffGui {
+public class StaffGui extends Gui {
 
-    public static UniqueGui createBuildGui(NetworkUser user) {
+    public StaffGui(NetworkUser user) {
 
-        UniqueGui gui = new UniqueGui(27, Component.text("Staff Menu", NamedTextColor.AQUA, TextDecoration.BOLD));
+        super(7, Component.text("Staff Menu", NamedTextColor.AQUA, TextDecoration.BOLD));
 
         /*TODO:
 
@@ -44,10 +44,12 @@ public class StaffGui {
             Lock regions.
 
          */
-        gui.setItem(12, Utils.createItem(Material.ENDER_PEARL, 1,
+        setItem(12, Utils.createItem(Material.ENDER_PEARL, 1,
                         Utils.chat("&b&lManage Region " + user.getRegion()),
                         Utils.chat("&fOpens a menu to manage details of the region you are currently in.")),
-                u -> {
+                u ->
+
+                {
 
                     //Manage Region Menu.
 
@@ -55,7 +57,7 @@ public class StaffGui {
 
         //Click to open menu to deal with region join requests.
         if (true/*request exists*/) {
-            gui.setItem(12, Utils.createItem(Material.ENDER_PEARL, 1,
+            setItem(12, Utils.createItem(Material.ENDER_PEARL, 1,
                             Utils.chat("&b&lReview Region Requests"),
                             Utils.chat("&fOpens a menu to review active region join requests by Jr.Builders.")),
                     u -> {
@@ -79,7 +81,7 @@ public class StaffGui {
                 if (plotSQL.hasRow("SELECT id FROM plot_members WHERE uuid='" + user.player.getUniqueId() + "' AND id=" + plot + ";")) {
 
                     //Show review plot button in gui.
-                    gui.setItem(12, Utils.createItem(Material.ENDER_PEARL, 1,
+                    setItem(12, Utils.createItem(Material.ENDER_PEARL, 1,
                                     Utils.chat("&b&lReview Plot"),
                                     Utils.chat("&fClick to review a submitted plot.")),
                             u -> {
@@ -113,7 +115,7 @@ public class StaffGui {
                                                 //Set the server join event.
                                                 Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('"
                                                         + u.player.getUniqueId() + "','plotsystem',"
-                                                        +  "'review plot " + nPlot + "');");
+                                                        + "'review plot " + nPlot + "');");
 
                                                 //Teleport them to another server.
                                                 u.player.closeInventory();
@@ -138,7 +140,7 @@ public class StaffGui {
 
         //Click to open menu of navigation menu requests.
         if (true/*request exists*/) {
-            gui.setItem(12, Utils.createItem(Material.ENDER_PEARL, 1,
+            setItem(12, Utils.createItem(Material.ENDER_PEARL, 1,
                             Utils.chat("&b&lReview Navigation Menu Requests"),
                             Utils.chat("&fOpens a menu to review navigation menu requests.")),
                     u -> {
@@ -147,13 +149,13 @@ public class StaffGui {
         }
 
         //Click to open moderation menu.
-        gui.setItem(12, Utils.createItem(Material.ENDER_PEARL, 1,
+        setItem(12, Utils.createItem(Material.ENDER_PEARL, 1,
                         Utils.chat("&b&lModeration Menu"),
                         Utils.chat("&fOpens the moderation menu to deal with wrongdoers.")),
-                u -> {
+                u ->
+
+                {
 
                 });
-
-        return gui;
     }
 }

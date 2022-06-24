@@ -11,11 +11,21 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
-public class PlotInfo {
+public class PlotInfo extends Gui {
 
-    public static UniqueGui createPlotInfo(int plotID) {
+    private final int plotID;
 
-        UniqueGui gui = new UniqueGui(27, Component.text("Plot " + plotID, NamedTextColor.AQUA, TextDecoration.BOLD));
+    public PlotInfo(int plotID) {
+
+        super(27, Component.text("Plot " + plotID, NamedTextColor.AQUA, TextDecoration.BOLD));
+
+        this.plotID = plotID;
+
+        createGui();
+
+    }
+
+    public void createGui() {
 
         //Get plot sql.
         PlotSQL plotSQL = Network.getInstance().plotSQL;
@@ -30,13 +40,18 @@ public class PlotInfo {
         //If this plot has feedback, create button to go to plot feedback.
         if (plotSQL.hasRow("SELECT id FROM deny_data WHERE id=" + plotID + ";")) {
 
-            gui.setItem(24, Utils.createItem(Material.WRITABLE_BOOK, 1,
+            setItem(24, Utils.createItem(Material.WRITABLE_BOOK, 1,
                             Utils.chat("&b&lPlot Feedback"),
                             Utils.chat("&fClick to show feedback for this plot.")),
                     u -> {
 
-                        //Switch to plot feedback.
-                        u.uniqueGui.switchGui(u, DeniedPlotFeedback.createDeniedPlotFeedback(plotID));
+                        //Delete this gui.
+                        this.delete();
+                        u.plotInfo = null;
+
+                        //Switch back to plot menu.
+                        u.deniedPlotFeedback = new DeniedPlotFeedback(plotID);
+                        u.deniedPlotFeedback.open(u);
 
                     });
         }
@@ -47,7 +62,7 @@ public class PlotInfo {
             //If plot is not submitted show submit button.
             if (plotSQL.hasRow("SELECT id FROM plot_data WHERE id=" + plotID + " AND status='claimed';")) {
 
-                gui.setItem(2, Utils.createItem(Material.LIGHT_BLUE_CONCRETE, 1,
+                setItem(2, Utils.createItem(Material.LIGHT_BLUE_CONCRETE, 1,
                                 Utils.chat("&b&lSubmit Plot"),
                                 Utils.chat("&fSubmit your plot to be reviewed."),
                                 Utils.chat("&fReviewing may take over 24 hours.")),
@@ -58,7 +73,8 @@ public class PlotInfo {
                             Bukkit.getScheduler().scheduleSyncDelayedTask(Network.getInstance(), () -> {
 
                                 //Update the gui.
-                                u.uniqueGui.update(u, PlotInfo.createPlotInfo(plotID));
+                                this.refresh();
+                                u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
 
                             }, 20L);
 
@@ -75,7 +91,7 @@ public class PlotInfo {
             //If plot is submitted show retract submission button.
             if (plotSQL.hasRow("SELECT id FROM plot_data WHERE id=" + plotID + " AND status='submitted';")) {
 
-                gui.setItem(2, Utils.createItem(Material.ORANGE_CONCRETE, 1,
+                setItem(2, Utils.createItem(Material.ORANGE_CONCRETE, 1,
                                 Utils.chat("&b&lRetract Submission"),
                                 Utils.chat("&fYour plot will no longer be submitted.")),
                         u -> {
@@ -85,7 +101,8 @@ public class PlotInfo {
                             Bukkit.getScheduler().scheduleSyncDelayedTask(Network.getInstance(), () -> {
 
                                 //Update the gui.
-                                u.uniqueGui.update(u, PlotInfo.createPlotInfo(plotID));
+                                this.refresh();
+                                u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
 
                             }, 20L);
 
@@ -101,38 +118,53 @@ public class PlotInfo {
             //If plot is not under review allow it to be removed.
             if (plotSQL.hasRow("SELECT id FROM plot_data WHERE id=" + plotID + " AND (status='claimed' OR status='submitted');")) {
 
-                gui.setItem(6, Utils.createItem(Material.RED_CONCRETE, 1,
+                setItem(6, Utils.createItem(Material.RED_CONCRETE, 1,
                                 Utils.chat("&b&lDelete Plot"),
                                 Utils.chat("&fDelete the plot and all its contents.")),
                         u -> {
 
-                            //Switch to delete confirm
-                            u.uniqueGui.switchGui(u, DeleteConfirm.createDeleteConfirm(plotID));
+                            //Delete this gui.
+                            this.delete();
+                            u.plotInfo = null;
+
+                            //Switch back to plot menu.
+                            u.deleteConfirm = new DeleteConfirm(plotID);
+                            u.deleteConfirm.open(u);
 
                         });
 
             }
 
             //If plot has members, edit plot members.
-            gui.setItem(21, Utils.createItem(Material.PLAYER_HEAD, 1,
+            setItem(21, Utils.createItem(Material.PLAYER_HEAD, 1,
                             Utils.chat("&b&lPlot Members"),
                             Utils.chat("&fManage the members of your plot.")),
                     u -> {
 
-                        //Switch to the plot members.
-                        u.uniqueGui.switchGui(u, PlotMembers.createPlotMembers(plotID, 1));
+                        //Delete this gui.
+                        this.delete();
+                        u.plotInfo = null;
+
+                        //Switch back to plot menu.
+                        u.plotMembers = new PlotMembers(plotID);
+                        u.plotMembers.open(u);
 
                     });
 
             //Invite new members to your plot.
-            gui.setItem(20, Utils.createItem(Material.OAK_BOAT, 1,
+            setItem(20, Utils.createItem(Material.OAK_BOAT, 1,
                             Utils.chat("&b&lInvite Members"),
                             Utils.chat("&fInvite a new member to your plot."),
                             Utils.chat("&fYou can only invite online users.")),
                     u -> {
 
-                        //Switch to invite members.
-                        u.uniqueGui.switchGui(u, InviteMembers.createInviteMembers(plotID, 1));
+                        //Delete this gui.
+                        this.delete();
+                        u.plotInfo = null;
+
+                        //Switch back to plot menu.
+                        u.inviteMembers = new InviteMembers(plotID);
+                        u.inviteMembers.open(u);
 
                     });
 
@@ -140,13 +172,18 @@ public class PlotInfo {
             //You are a member of this plot.
 
             //Leave plot.
-            gui.setItem(20, Utils.createItem(Material.RED_CONCRETE, 1,
+            setItem(20, Utils.createItem(Material.RED_CONCRETE, 1,
                             Utils.chat("&b&lLeave Plot"),
                             Utils.chat("&fYou will not be able to build in the plot once you leave.")),
                     u -> {
 
+                        //Delete this gui.
+                        this.delete();
+                        u.plotInfo = null;
+
                         //Switch back to plot menu.
-                        u.uniqueGui.switchGui(u, PlotMenu.createPlotMenu(u));
+                        u.plotMenu = new PlotMenu(u);
+                        u.plotMenu.open(u);
 
 
                         //Add server event to leave plot.
@@ -160,17 +197,26 @@ public class PlotInfo {
         }
 
         //Return
-        gui.setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
+        setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
                         Utils.chat("&b&lReturn"),
                         Utils.chat("&fOpen the plot menu.")),
                 u -> {
 
+                    //Delete this gui.
+                    this.delete();
+                    u.plotInfo = null;
+
                     //Switch back to plot menu.
-                    u.uniqueGui.switchGui(u, PlotMenu.createPlotMenu(u));
+                    u.plotMenu = new PlotMenu(u);
+                    u.plotMenu.open(u);
 
                 });
+    }
 
-        return gui;
+    public void refresh() {
+
+        this.clearGui();
+        createGui();
 
     }
 }

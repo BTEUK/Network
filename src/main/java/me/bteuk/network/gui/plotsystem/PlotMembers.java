@@ -1,7 +1,7 @@
 package me.bteuk.network.gui.plotsystem;
 
 import me.bteuk.network.Network;
-import me.bteuk.network.gui.UniqueGui;
+import me.bteuk.network.gui.Gui;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.Utils;
@@ -13,14 +13,31 @@ import org.bukkit.Material;
 
 import java.util.ArrayList;
 
-public class PlotMembers {
+public class PlotMembers extends Gui {
 
-    public static UniqueGui createPlotMembers(int plotID, int page) {
+    private int page;
 
-        UniqueGui gui = new UniqueGui(45, Component.text("Manage Members", NamedTextColor.AQUA, TextDecoration.BOLD));
+    private final int plotID;
 
-        GlobalSQL globalSQL = Network.getInstance().globalSQL;
-        PlotSQL plotSQL = Network.getInstance().plotSQL;
+    private final GlobalSQL globalSQL;
+    private final PlotSQL plotSQL;
+
+    public PlotMembers(int plotID) {
+
+        super(45, Component.text("Manage Members", NamedTextColor.AQUA, TextDecoration.BOLD));
+
+        this.plotID = plotID;
+
+        page = 1;
+
+        globalSQL = Network.getInstance().globalSQL;
+        plotSQL = Network.getInstance().plotSQL;
+
+        createGui();
+
+    }
+
+    private void createGui() {
 
         //Get all online players in the network.
         ArrayList<String> plot_members = plotSQL.getStringList("SELECT uuid FROM plot_members WHERE id=" + plotID + ";");
@@ -33,7 +50,7 @@ public class PlotMembers {
 
         //If page is greater than 1 add a previous page button.
         if (page > 1) {
-            gui.setItem(18, Utils.createItem(Material.ARROW, 1,
+            setItem(18, Utils.createItem(Material.ARROW, 1,
                             Utils.chat("&b&lPrevious Page"),
                             Utils.chat("&fOpen the previous page of online users.")),
                     u ->
@@ -41,7 +58,9 @@ public class PlotMembers {
                     {
 
                         //Update the gui.
-                        u.uniqueGui.update(u, PlotMembers.createPlotMembers(plotID, page - 1));
+                        page--;
+                        this.refresh();
+                        u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
 
                     });
         }
@@ -53,7 +72,7 @@ public class PlotMembers {
                 //If the slot is greater than the number that fit in a page, create a new page.
                 if (slot > 34) {
 
-                    gui.setItem(26, Utils.createItem(Material.ARROW, 1,
+                    setItem(26, Utils.createItem(Material.ARROW, 1,
                                     Utils.chat("&b&lNext Page"),
                                     Utils.chat("&fOpen the next page of online users.")),
                             u ->
@@ -61,7 +80,9 @@ public class PlotMembers {
                             {
 
                                 //Update the gui.
-                                u.uniqueGui.update(u, PlotMembers.createPlotMembers(plotID, page + 1));
+                                page++;
+                                this.refresh();
+                                u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
 
                             });
 
@@ -79,7 +100,7 @@ public class PlotMembers {
                 }
 
                 //Add player to gui.
-                gui.setItem(slot, Utils.createPlayerSkull(uuid, 1,
+                setItem(slot, Utils.createPlayerSkull(uuid, 1,
                                 Utils.chat("&b&lKick " + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';" + " from your plot.")),
                                 Utils.chat("&fClick to remove them as member of your plot."),
                                 Utils.chat("&fThey will no longer be able to build in it.")),
@@ -100,7 +121,8 @@ public class PlotMembers {
                                 Bukkit.getScheduler().scheduleSyncDelayedTask(Network.getInstance(), () -> {
 
                                     //Update the gui.
-                                    u.uniqueGui.update(u, PlotMembers.createPlotMembers(plotID, page));
+                                    this.refresh();
+                                    u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
 
                                 }, 20L);
 
@@ -122,17 +144,26 @@ public class PlotMembers {
         }
 
         //Return
-        gui.setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
+        setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
                         Utils.chat("&b&lReturn"),
                         Utils.chat("&fOpen the plot info for this plot.")),
                 u -> {
 
+                    //Delete this gui.
+                    this.delete();
+                    u.plotMembers = null;
+
                     //Switch back to plot info.
-                    u.uniqueGui.switchGui(u, PlotInfo.createPlotInfo(plotID));
+                    u.plotInfo = new PlotInfo(plotID);
+                    u.plotInfo.open(u);
 
                 });
+    }
 
-        return gui;
+    public void refresh() {
+
+        this.clearGui();
+        createGui();
 
     }
 }
