@@ -1,5 +1,6 @@
 package me.bteuk.network.gui;
 
+import me.bteuk.network.Network;
 import me.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -29,6 +30,36 @@ public class NavigatorGui extends Gui {
                 u -> {
 
                     //Click Action
+
+                });
+
+        setItem(8, Utils.createItem(Material.NETHER_STAR, 1,
+                        Utils.chat("&b&lToggle Navigator"),
+                        Utils.chat("&fClick to toggle the navigator in your inventory."),
+                        Utils.chat("&fYou can always open this menu with /navigator")),
+                u -> {
+
+                    if (u.navigator) {
+
+                        //Set navigator to false and remove the navigator from the inventory.
+                        u.navigator = false;
+                        u.player.getInventory().setItem(8, null);
+
+                        //Disable navigator in database.
+                        Network.getInstance().globalSQL.update("UPDATE player_data SET navigator=0 WHERE uuid='" + u.player.getUniqueId() + "';");
+
+                        u.player.sendMessage(Utils.chat("&aDisabled navigator in inventory."));
+
+                    } else {
+
+                        //Set navigator to true.
+                        u.navigator = true;
+
+                        //Enable navigator in database.
+                        Network.getInstance().globalSQL.update("UPDATE player_data SET navigator=1 WHERE uuid='" + u.player.getUniqueId() + "';");
+
+                        u.player.sendMessage(Utils.chat("&aEnabled navigator in inventory."));
+                    }
 
                 });
     }

@@ -1,15 +1,25 @@
 package me.bteuk.network.gui.plotsystem;
 
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.*;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
+import me.bteuk.network.utils.PlotValues;
 import me.bteuk.network.utils.Utils;
+import net.buildtheearth.terraminusminus.generator.EarthGeneratorSettings;
+import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
+import net.buildtheearth.terraminusminus.projection.dymaxion.BTEDymaxionProjection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+
+import java.util.Arrays;
 
 public class PlotInfo extends Gui {
 
@@ -33,14 +43,104 @@ public class PlotInfo extends Gui {
         //Get global sql.
         GlobalSQL globalSQL = Network.getInstance().globalSQL;
 
-        //TODO PLOT INFO
+        setItem(4, Utils.createItem(Material.BOOK, 1,
+                Utils.chat("&b&lPlot &7" + plotID),
+                Utils.chat("&fPlot Owner: &7" + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
+                        plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plotID + " AND is_owner=1;") + "';")),
+                Utils.chat("&fPlot Members: " + plotSQL.getInt("SELECT COUNT(uuid) FROM plot_members WHERE id=" + plotID + " AND is_owner=0;")),
+                Utils.chat("&fDifficulty: &7" + PlotValues.difficultyName(plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plotID + ";"))),
+                Utils.chat("&fSize: &7" + PlotValues.sizeName(plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + plotID + ";")))));
 
-        //TODO TELEPORT TO PLOT
+        setItem(24, Utils.createItem(Material.ENDER_PEARL, 1,
+                        Utils.chat("&b&lTeleport to Plot"),
+                        Utils.chat("&fClick to teleport to this plot.")),
+
+                u -> {
+
+                    //Get the server of the plot.
+                    String server = Network.getInstance().plotSQL.getString("SELECT server FROM location_data WHERE name='"
+                            + Network.getInstance().plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";")
+                            + "';");
+
+                    //If the plot is on the current server teleport them directly.
+                    //Else teleport them to the correct server and them teleport them to the plot.
+                    if (server.equals(Network.SERVER_NAME)) {
+
+                        u.player.closeInventory();
+                        Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('"
+                                + u.player.getUniqueId()
+                                + "','plotsystem','" + Network.SERVER_NAME
+                                + "','teleport plot " + plotID + "');");
+
+                    } else {
+
+                        //Set the server join event.
+                        Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('"
+                                + u.player.getUniqueId() + "','plotsystem','teleport plot " + plotID + "');");
+
+                        //Teleport them to another server.
+                        u.player.closeInventory();
+                        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+                        out.writeUTF("Connect");
+                        out.writeUTF(server);
+
+                    }
+
+                });
+
+        setItem(23, Utils.createItem(Material.ENDER_EYE, 1,
+                        Utils.chat("&b&lView plot in Google Maps"),
+                        Utils.chat("&fClick to be linked to the plot in Google Maps.")),
+
+                u -> {
+
+                    //Get corners of the plot.
+                    int[][] corners = plotSQL.getPlotCorners(plotID);
+
+                    int sumX = 0;
+                    int sumZ = 0;
+
+                    //Find the centre.
+                    for (int i = 0; i<corners.length; i++) {
+
+                        sumX += corners[i][0];
+                        sumZ += corners[i][1];
+
+                    }
+
+                    double x = sumX / (double) corners.length;
+                    double z = sumZ / (double) corners.length;
+
+                    //Subtract the coordinate transform to make the coordinates in the real location.
+                    x -= plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" +
+                            plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + "';");
+                    z -= plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" +
+                            plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + "';");
+
+                    //Convert to irl coordinates.
+                    try {
+
+                        final EarthGeneratorSettings bteGeneratorSettings = EarthGeneratorSettings.parse(EarthGeneratorSettings.BTE_DEFAULT_SETTINGS);
+                        double[] coords = bteGeneratorSettings.projection().toGeo(x, z);
+
+                        //Generate link to google maps.
+                        u.player.closeInventory();
+
+                        TextComponent message = new TextComponent("Click here to open the plot in Google Maps");
+                        message.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.google.com/maps/@?api=1&map_action=map&basemap=satellite&zoom=21&center=" + coords[1] + "," + coords[0]));
+
+                        u.player.sendMessage(message);
+
+                    } catch (OutOfProjectionBoundsException e) {
+                        e.printStackTrace();
+                    }
+
+                });
 
         //If this plot has feedback, create button to go to plot feedback.
         if (plotSQL.hasRow("SELECT id FROM deny_data WHERE id=" + plotID + ";")) {
 
-            setItem(24, Utils.createItem(Material.WRITABLE_BOOK, 1,
+            setItem(22, Utils.createItem(Material.WRITABLE_BOOK, 1,
                             Utils.chat("&b&lPlot Feedback"),
                             Utils.chat("&fClick to show feedback for this plot.")),
                     u -> {

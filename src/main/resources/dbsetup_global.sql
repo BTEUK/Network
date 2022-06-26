@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS player_data
 	name		VARCHAR(16)		NOT NULL,
 	last_online	BIGINT			NOT NULL,
 	last_submit	BIGINT			NOT NULL,
+	navigator   TINYINT(1)      NOT NULL DEFAULT 1,
 	PRIMARY KEY (uuid)
 );
 

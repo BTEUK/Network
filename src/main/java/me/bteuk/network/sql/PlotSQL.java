@@ -140,4 +140,46 @@ public class PlotSQL {
             return false;
         }
     }
+
+    public int[][] getPlotCorners(int plotID) {
+
+        try (Connection conn = conn();
+             PreparedStatement statement = conn.prepareStatement("SELECT COUNT(corner) FROM plot_corners WHERE id=" + plotID + ";");
+             ResultSet results = statement.executeQuery()) {
+
+            results.next();
+
+            int[][] corners = new int[results.getInt(1)][2];
+
+            corners = getPlotCorners(corners, plotID);
+
+            return corners;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private int[][] getPlotCorners(int[][] corners, int plotID) {
+
+        try (Connection conn = conn();
+             PreparedStatement statement = conn.prepareStatement("SELECT x,z FROM plot_corners WHERE id=" + plotID + ";");
+             ResultSet results = statement.executeQuery()) {
+
+            for (int i = 0; i < corners.length; i++) {
+
+                results.next();
+                corners[i][0] = results.getInt(1);
+                corners[i][1] = results.getInt(2);
+
+            }
+
+            return corners;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return corners;
+        }
+    }
 }

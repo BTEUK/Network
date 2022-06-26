@@ -41,7 +41,7 @@ public class GuiListener implements Listener {
 
             e.setCancelled(true);
             Gui gui = Gui.getInventoriesByUUID().get(inventoryUUID);
-            Gui.guiAction action = gui.getActions().get(e.getSlot());
+            Gui.guiAction action = gui.getActions().get(e.getRawSlot());
 
             if (action != null){
 

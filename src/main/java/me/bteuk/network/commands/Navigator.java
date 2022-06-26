@@ -85,7 +85,7 @@ public class Navigator implements CommandExecutor {
 
         } else {
 
-            Network.getInstance().navigator.open(u);
+            Network.getInstance().navigatorGui.open(u);
 
         }
     }

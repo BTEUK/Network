@@ -1,5 +1,6 @@
 package me.bteuk.network.utils;
 
+import me.bteuk.network.Network;
 import me.bteuk.network.gui.BuildGui;
 import me.bteuk.network.gui.plotsystem.*;
 import org.bukkit.Location;
@@ -26,9 +27,14 @@ public class NetworkUser {
     //Region information.
     public Region region;
 
+    //Navigator in hotbar.
+    public boolean navigator;
+
     public NetworkUser(Player player) {
 
         this.player = player;
+
+        navigator = Network.getInstance().globalSQL.hasRow("SELECT navigator FROM player_data WHERE uuid='" + player.getUniqueId() + "' AND navigator=1;");
 
         region = new Region(player.getLocation());
 

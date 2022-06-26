@@ -4,20 +4,20 @@ import me.bteuk.network.commands.Navigator;
 import me.bteuk.network.commands.Plot;
 import me.bteuk.network.commands.Tpll;
 import me.bteuk.network.gui.NavigatorGui;
-import me.bteuk.network.listeners.Connect;
-import me.bteuk.network.listeners.GuiListener;
-import me.bteuk.network.listeners.JoinServer;
-import me.bteuk.network.listeners.LeaveServer;
+import me.bteuk.network.listeners.*;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.sql.RegionSQL;
 import me.bteuk.network.utils.Time;
+import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.ServerType;
 import me.bteuk.network.utils.NetworkUser;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.BufferedReader;
@@ -44,7 +44,8 @@ public final class Network extends JavaPlugin {
     private ArrayList<NetworkUser> networkUsers;
 
     //Guis
-    public NavigatorGui navigator;
+    public NavigatorGui navigatorGui;
+    public ItemStack navigator;
 
     //SQL
     public PlotSQL plotSQL;
@@ -157,13 +158,15 @@ public final class Network extends JavaPlugin {
         connect = new Connect(this, globalSQL, plotSQL);
 
         //Create navigator.
-        navigator = new NavigatorGui();
+        navigatorGui = new NavigatorGui();
+        navigator = Utils.createItem(Material.NETHER_STAR, 1, Utils.chat("&b&lNavigator"), Utils.chat("&fClick to open the navigator."));
 
         //Register events.
         new JoinServer(this, globalSQL, connect);
         new LeaveServer(this, globalSQL, connect);
 
         new GuiListener(this);
+        new PlayerInteract(this);
 
         //Setup Timers
         timers = new Timers(this, globalSQL, connect);

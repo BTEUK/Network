@@ -5,6 +5,7 @@ import com.google.common.io.ByteStreams;
 import me.bteuk.network.Network;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
+import net.buildtheearth.terraminusminus.generator.EarthGeneratorSettings;
 import net.buildtheearth.terraminusminus.projection.dymaxion.BTEDymaxionProjection;
 import net.buildtheearth.terraminusminus.util.geo.CoordinateParseUtils;
 import net.buildtheearth.terraminusminus.util.geo.LatLng;
@@ -25,7 +26,7 @@ public class Tpll implements CommandExecutor {
     private final boolean requires_permission;
     private static final DecimalFormat DECIMAL_FORMATTER = new DecimalFormat("##.#####");
 
-    private final BTEDymaxionProjection projection = new BTEDymaxionProjection();
+    private final EarthGeneratorSettings bteGeneratorSettings = EarthGeneratorSettings.parse(EarthGeneratorSettings.BTE_DEFAULT_SETTINGS);
 
     private final boolean isEarth;
     private final String earthServer;
@@ -156,7 +157,7 @@ public class Tpll implements CommandExecutor {
         double[] proj;
 
         try {
-            proj = projection.fromGeo(defaultCoords.getLng(), defaultCoords.getLat());
+            proj = bteGeneratorSettings.projection().fromGeo(defaultCoords.getLng(), defaultCoords.getLat());
         } catch (Exception e) {
             this.usage(p);
             return true;

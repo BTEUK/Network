@@ -204,7 +204,7 @@ public class BuildGui extends Gui {
                     u.buildGui = null;
 
                     //Switch to navigation menu.
-                    Network.getInstance().navigator.open(u);
+                    Network.getInstance().navigatorGui.open(u);
 
                 });
     }

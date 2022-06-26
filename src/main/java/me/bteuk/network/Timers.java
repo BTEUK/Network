@@ -5,6 +5,7 @@ import me.bteuk.network.listeners.Connect;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Time;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +33,9 @@ public class Timers {
 
     //Uuids
     private ArrayList<String> uuids;
+
+    //Navigator Check
+    private ItemStack slot9;
 
     public Timers(Network instance, GlobalSQL globalSQL, Connect connect) {
 
@@ -85,6 +89,17 @@ public class Timers {
 
                 //Update the last_ping.
                 globalSQL.update("UPDATE online_users SET last_ping=" + time + " WHERE uuid='" + user.player.getUniqueId() + "' AND server='" + SERVER_NAME + "';");
+
+                //If navigator is enabled check if they have it in slot 9.
+                if (user.navigator) {
+                    slot9 = user.player.getInventory().getItem(8);
+
+                    if (slot9 == null) {
+                        user.player.getInventory().setItem(8, instance.navigator);
+                    } else if (!(slot9.equals(instance.navigator))) {
+                        user.player.getInventory().setItem(8, instance.navigator);
+                    }
+                }
 
             }
 
