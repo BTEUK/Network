@@ -16,9 +16,19 @@ import java.util.ArrayList;
 
 public class StaffGui extends Gui {
 
+    private NetworkUser user;
+
     public StaffGui(NetworkUser user) {
 
-        super(7, Component.text("Staff Menu", NamedTextColor.AQUA, TextDecoration.BOLD));
+        super(27, Component.text("Staff Menu", NamedTextColor.AQUA, TextDecoration.BOLD));
+
+        this.user = user;
+
+        createGui();
+
+    }
+
+    private void createGui() {
 
         /*TODO:
 
@@ -44,7 +54,7 @@ public class StaffGui extends Gui {
             Lock regions.
 
          */
-        setItem(12, Utils.createItem(Material.ENDER_PEARL, 1,
+        setItem(10, Utils.createItem(Material.ANVIL, 1,
                         Utils.chat("&b&lManage Region " + user.getRegion()),
                         Utils.chat("&fOpens a menu to manage details of the region you are currently in.")),
                 u ->
@@ -57,7 +67,7 @@ public class StaffGui extends Gui {
 
         //Click to open menu to deal with region join requests.
         if (true/*request exists*/) {
-            setItem(12, Utils.createItem(Material.ENDER_PEARL, 1,
+            setItem(11, Utils.createItem(Material.CHEST_MINECART, 1,
                             Utils.chat("&b&lReview Region Requests"),
                             Utils.chat("&fOpens a menu to review active region join requests by Jr.Builders.")),
                     u -> {
@@ -78,10 +88,10 @@ public class StaffGui extends Gui {
             for (int plot : plots) {
 
                 //If you are not owner or member of the plot select it for the next review.
-                if (plotSQL.hasRow("SELECT id FROM plot_members WHERE uuid='" + user.player.getUniqueId() + "' AND id=" + plot + ";")) {
+                if (!plotSQL.hasRow("SELECT id FROM plot_members WHERE uuid='" + user.player.getUniqueId() + "' AND id=" + plot + ";")) {
 
                     //Show review plot button in gui.
-                    setItem(12, Utils.createItem(Material.ENDER_PEARL, 1,
+                    setItem(13, Utils.createItem(Material.WRITABLE_BOOK, 1,
                                     Utils.chat("&b&lReview Plot"),
                                     Utils.chat("&fClick to review a submitted plot.")),
                             u -> {
@@ -106,6 +116,7 @@ public class StaffGui extends Gui {
                                             //If they are not in the same server as the plot teleport them to that server and start the reviewing process.
                                             if (server.equals(Network.SERVER_NAME)) {
 
+                                                u.player.closeInventory();
                                                 Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('"
                                                         + u.player.getUniqueId() + "','plotsystem','" + Network.SERVER_NAME + "','review plot " + nPlot + "');");
 
@@ -140,7 +151,7 @@ public class StaffGui extends Gui {
 
         //Click to open menu of navigation menu requests.
         if (true/*request exists*/) {
-            setItem(12, Utils.createItem(Material.ENDER_PEARL, 1,
+            setItem(15, Utils.createItem(Material.ENDER_EYE, 1,
                             Utils.chat("&b&lReview Navigation Menu Requests"),
                             Utils.chat("&fOpens a menu to review navigation menu requests.")),
                     u -> {
@@ -149,7 +160,7 @@ public class StaffGui extends Gui {
         }
 
         //Click to open moderation menu.
-        setItem(12, Utils.createItem(Material.ENDER_PEARL, 1,
+        setItem(16, Utils.createItem(Material.REDSTONE_BLOCK, 1,
                         Utils.chat("&b&lModeration Menu"),
                         Utils.chat("&fOpens the moderation menu to deal with wrongdoers.")),
                 u ->
@@ -157,5 +168,12 @@ public class StaffGui extends Gui {
                 {
 
                 });
+    }
+
+    public void refresh() {
+
+        this.clearGui();
+        createGui();
+
     }
 }

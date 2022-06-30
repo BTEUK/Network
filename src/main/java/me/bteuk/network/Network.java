@@ -2,6 +2,7 @@ package me.bteuk.network;
 
 import me.bteuk.network.commands.Navigator;
 import me.bteuk.network.commands.Plot;
+import me.bteuk.network.commands.Staff;
 import me.bteuk.network.commands.Tpll;
 import me.bteuk.network.gui.NavigatorGui;
 import me.bteuk.network.listeners.*;
@@ -180,9 +181,11 @@ public final class Network extends JavaPlugin {
             getCommand("tpll").setExecutor(new Tpll(config.getBoolean("requires_permission")));
         }
 
-        //Enable the plot command.
+        //Enable commands.
         getCommand("plot").setExecutor(new Plot());
         getCommand("navigator").setExecutor(new Navigator());
+        getCommand("staff").setExecutor(new Staff());
+
 
     }
 

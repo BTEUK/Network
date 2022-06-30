@@ -108,7 +108,7 @@ public class Tpll implements CommandExecutor {
         //Check if permission is required.
         if (requires_permission) {
 
-            if (!p.hasPermission("uknet.network.tpll")) {
+            if (!p.hasPermission("uknet.tpll")) {
 
                 p.sendMessage(Utils.chat("&cYou do not have permission to use this command."));
                 return true;

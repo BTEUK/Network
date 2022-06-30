@@ -109,7 +109,7 @@ public class InviteMembers extends Gui {
                         if (globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "';")) {
 
                             //Check if the player is not already a member of the plot.
-                            if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plotID + " AND uuid='" + uuid + "';")) {
+                            if (!plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plotID + " AND uuid='" + uuid + "';")) {
 
                                 //Check if the player has not already been invited.
                                 if (!plotSQL.hasRow("SELECT id FROM plot_invites WHERE id=" + plotID + " AND uuid='" + uuid + "';")) {
@@ -118,9 +118,9 @@ public class InviteMembers extends Gui {
                                     //The invite will be active until they disconnect from the network.
                                     //They will need to run a command to actually join the plot.
                                     globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + uuid + "','network','" +
-                                            globalSQL.getString("SELECT server FROM online_users WHERE uuid=" + uuid + ";") + "','invite plot " + plotID + "')");
+                                            globalSQL.getString("SELECT server FROM online_users WHERE uuid='" + uuid + "';") + "','invite plot " + plotID + "')");
 
-                                    u.player.sendMessage(Utils.chat("&aInvited " + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "'") + "to your plot."));
+                                    u.player.sendMessage(Utils.chat("&aInvited " + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "'") + " to your plot."));
 
                                 } else {
                                     u.player.sendMessage(Utils.chat("&cYou've already invited this player to your plot."));

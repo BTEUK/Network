@@ -47,7 +47,7 @@ public class PlotInfo extends Gui {
                 Utils.chat("&b&lPlot &7" + plotID),
                 Utils.chat("&fPlot Owner: &7" + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
                         plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plotID + " AND is_owner=1;") + "';")),
-                Utils.chat("&fPlot Members: " + plotSQL.getInt("SELECT COUNT(uuid) FROM plot_members WHERE id=" + plotID + " AND is_owner=0;")),
+                Utils.chat("&fPlot Members: &7" + plotSQL.getInt("SELECT COUNT(uuid) FROM plot_members WHERE id=" + plotID + " AND is_owner=0;")),
                 Utils.chat("&fDifficulty: &7" + PlotValues.difficultyName(plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plotID + ";"))),
                 Utils.chat("&fSize: &7" + PlotValues.sizeName(plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + plotID + ";")))));
 

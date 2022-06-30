@@ -40,7 +40,7 @@ public class DeniedPlotFeedback extends Gui {
     private void createGui() {
 
         //Get plot owner uuid.
-        String uuid = plotSQL.getString("SELECT FROM plot_members WHERE id=" + plotID + " AND is_owner=1;");
+        String uuid = plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plotID + " AND is_owner=1;");
 
         //Get the number of times the plot was denied for the current plot owner.
         int deniedCount = plotSQL.getInt("SELECT COUNT(attempt) FROM deny_data WHERE id=" + plotID + " AND uuid='" + uuid + "';");
@@ -81,8 +81,8 @@ public class DeniedPlotFeedback extends Gui {
                         bookMeta.setTitle(Utils.chat("&b&lPlot " + plotID + " Attempt " + finalI));
 
                         //Get book author, aka the reviewer.
-                        String author = globalSQL.getString("SELECT name FROM player_data WHERE uuid=" +
-                                plotSQL.getString("SELECT reviewer FROM deny_data WHERE id=" + plotID + " AND uuid='" + uuid + "' AND attempt=" + finalI + ";") + ";");
+                        String author = globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
+                                plotSQL.getString("SELECT reviewer FROM deny_data WHERE id=" + plotID + " AND uuid='" + uuid + "' AND attempt=" + finalI + ";") + "';");
                         bookMeta.setAuthor(author);
 
                         //Get pages of the book.

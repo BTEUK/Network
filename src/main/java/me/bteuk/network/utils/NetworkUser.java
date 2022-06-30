@@ -3,6 +3,7 @@ package me.bteuk.network.utils;
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.BuildGui;
 import me.bteuk.network.gui.plotsystem.*;
+import me.bteuk.network.staff.StaffGui;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -24,6 +25,9 @@ public class NetworkUser {
     public PlotMembers plotMembers;
     public InviteMembers inviteMembers;
 
+    //Staff user.
+    public StaffUser staffUser;
+
     //Region information.
     public Region region;
 
@@ -37,6 +41,11 @@ public class NetworkUser {
         navigator = Network.getInstance().globalSQL.hasRow("SELECT navigator FROM player_data WHERE uuid='" + player.getUniqueId() + "' AND navigator=1;");
 
         region = new Region(player.getLocation());
+
+        //If the user is a member of staff, create staff user instance.
+        if (player.hasPermission("uknet.staff")) {
+            staffUser = new StaffUser();
+        }
 
     }
 

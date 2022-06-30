@@ -15,3 +15,6 @@ commands:
     aliases: [nav,gui,menu]
     usage: /<command>
     description: Opens the main gui targetting a relevant menu depending where the player is situated.
+  staff:
+    usage: /<command>
+    description: Opens the Staff Menu.

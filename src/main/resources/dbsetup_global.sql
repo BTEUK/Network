@@ -26,12 +26,12 @@ CREATE TABLE IF NOT EXISTS join_events
 
 CREATE TABLE IF NOT EXISTS server_events
 (
-    uuid        CHAR(36)        NOT NULL,
+    uuid        CHAR(36)        NULL DEFAULT NULL,
     type        ENUM('plotsystem',
                 'network')      NOT NULL,
     server      VARCHAR(64)     NOT NULL,
     event       VARCHAR(256)    NOT NULL,
-    PRIMARY KEY(uuid,event)
+    UNIQUE(uuid,event)
 );
 
 CREATE TABLE IF NOT EXISTS points_data
