@@ -50,7 +50,7 @@ public class PlotMenu extends Gui {
                         u.plotMenu = null;
 
                         //Switch to plot info.
-                        u.plotInfo = new PlotInfo(plots.get(finalI));
+                        u.plotInfo = new PlotInfo(plots.get(finalI), u.player.getUniqueId().toString());
                         u.plotInfo.open(u);
 
                     });
@@ -71,7 +71,7 @@ public class PlotMenu extends Gui {
 
             setItem(40, Utils.createItem(Material.CLOCK, 1,
                             Utils.chat("&b&lAccepted Plots"),
-                            Utils.chat("&fClick to open the accepted plots menu.")),
+                            Utils.chat("&fClick view your accepted plots.")),
 
                     u -> {
 

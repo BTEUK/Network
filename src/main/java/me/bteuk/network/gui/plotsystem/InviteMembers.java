@@ -117,10 +117,13 @@ public class InviteMembers extends Gui {
                                     //Send invite via chat.
                                     //The invite will be active until they disconnect from the network.
                                     //They will need to run a command to actually join the plot.
+                                    plotSQL.update("INSERT INTO plot_invites(id,owner,uuid) VALUES(" + plotID + ",'" +
+                                            plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plotID + " AND is_owner=1;") + "','" + uuid + "');");
+
                                     globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + uuid + "','network','" +
                                             globalSQL.getString("SELECT server FROM online_users WHERE uuid='" + uuid + "';") + "','invite plot " + plotID + "')");
 
-                                    u.player.sendMessage(Utils.chat("&aInvited " + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "'") + " to your plot."));
+                                    u.player.sendMessage(Utils.chat("&aInvited &3" + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "'") + " &ato your plot."));
 
                                 } else {
                                     u.player.sendMessage(Utils.chat("&cYou've already invited this player to your plot."));
@@ -160,7 +163,7 @@ public class InviteMembers extends Gui {
                     u.inviteMembers = null;
 
                     //Switch back to plot info.
-                    u.plotInfo = new PlotInfo(plotID);
+                    u.plotInfo = new PlotInfo(plotID, u.player.getUniqueId().toString());
                     u.plotInfo.open(u);
 
                 });

@@ -49,6 +49,8 @@ public class Connect {
 
         }
 
+        //TODO If reviewer show number of submitted plots.
+
         //Send global connect message.
         instance.chat.broadcastMessage(joinMessage.replace("%player%", p.getName()));
 

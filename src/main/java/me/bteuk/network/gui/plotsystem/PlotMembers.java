@@ -154,7 +154,7 @@ public class PlotMembers extends Gui {
                     u.plotMembers = null;
 
                     //Switch back to plot info.
-                    u.plotInfo = new PlotInfo(plotID);
+                    u.plotInfo = new PlotInfo(plotID, u.player.getUniqueId().toString());
                     u.plotInfo.open(u);
 
                 });

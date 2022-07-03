@@ -42,6 +42,9 @@ public class DeleteConfirm extends Gui {
                     this.delete();
                     u.deleteConfirm = null;
 
+                    //Create plot menu, so the next time you open the navigator you return to that.
+                    u.plotMenu = new PlotMenu(u);
+
                     //Add server event to delete plot.
                     globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + u.player.getUniqueId() + "','plotsystem','" +
                             plotSQL.getString("SELECT server FROM location_data WHERE name='" +
@@ -63,7 +66,7 @@ public class DeleteConfirm extends Gui {
                     u.deleteConfirm = null;
 
                     //Switch back to plot info.
-                    u.plotInfo = new PlotInfo(plotID);
+                    u.plotInfo = new PlotInfo(plotID, u.player.getUniqueId().toString());
                     u.plotInfo.open(u);
 
                 });

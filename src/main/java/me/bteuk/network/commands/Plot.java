@@ -52,15 +52,15 @@ public class Plot implements CommandExecutor {
         if (plotSQL.hasRow("SELECT id FROM plot_invites WHERE id=" + plotID + " AND uuid='" + p.getUniqueId() + "';")) {
 
             //Add server event to join plot.
-            globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + p.getUniqueId() + "'," + "'plotsystem'" + "," +
+            globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + p.getUniqueId() + "'," + "'plotsystem'" + ",'" +
                     plotSQL.getString("SELECT server FROM location_data WHERE name='" +
                             plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + "';") +
-                    ",'join plot" + plotID + "');");
+                    "','join plot " + plotID + "');");
 
             return true;
 
         } else {
-            p.sendMessage(Utils.chat("&aYou have not been invited to join this plot."));
+            p.sendMessage(Utils.chat("&cYou have not been invited to join this plot."));
             return true;
         }
     }

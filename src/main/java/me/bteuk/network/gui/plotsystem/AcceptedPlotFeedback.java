@@ -46,7 +46,7 @@ public class AcceptedPlotFeedback extends Gui {
     private void createGui() {
 
         //Get all accepted plots sorted by most recently accepted.
-        ArrayList<Integer> plots = plotSQL.getIntList("SELECT id FROM accept_data WHERE uuid='" + user.player.getUniqueId() + "' SORT BY accept_time DESC;");
+        ArrayList<Integer> plots = plotSQL.getIntList("SELECT id FROM accept_data WHERE uuid='" + user.player.getUniqueId() + "' ORDER BY accept_time DESC;");
 
         //Slot count.
         int slot = 10;
@@ -101,7 +101,7 @@ public class AcceptedPlotFeedback extends Gui {
 
             //Add plot to gui.
             //If there is feedback add click event to view feedback, else not.
-            if (plotSQL.hasRow("SELECT FROM accept_data WHERE id=" + plot + " AND book_id=0;")) {
+            if (plotSQL.hasRow("SELECT id FROM accept_data WHERE id=" + plot + " AND book_id=0;")) {
 
                 //No feedback
                 setItem(slot, Utils.createItem(Material.BOOK, 1,
@@ -138,12 +138,12 @@ public class AcceptedPlotFeedback extends Gui {
                             bookMeta.setTitle(Utils.chat("&b&lPlot " + plot));
 
                             //Get book author, aka the reviewer.
-                            String author = globalSQL.getString("SELECT name FROM player_data WHERE uuid=" +
-                                    plotSQL.getString("SELECT reviewer FROM accept_data WHERE id=" + plot + ";") + ";");
+                            String author = globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
+                                    plotSQL.getString("SELECT reviewer FROM accept_data WHERE id=" + plot + ";") + "';");
                             bookMeta.setAuthor(author);
 
                             //Get pages of the book.
-                            ArrayList<String> pages = plotSQL.getStringList("SELECT text FROM book_data WHERE id="
+                            ArrayList<String> pages = plotSQL.getStringList("SELECT contents FROM book_data WHERE id="
                                     + plotSQL.getInt("SELECT book_id FROM accept_data WHERE id=" + plot + ";") + ";");
 
                             //Set the pages of the book.

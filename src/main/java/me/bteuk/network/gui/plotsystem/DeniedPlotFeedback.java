@@ -86,7 +86,7 @@ public class DeniedPlotFeedback extends Gui {
                         bookMeta.setAuthor(author);
 
                         //Get pages of the book.
-                        ArrayList<String> pages = plotSQL.getStringList("SELECT text FROM book_data WHERE id="
+                        ArrayList<String> pages = plotSQL.getStringList("SELECT contents FROM book_data WHERE id="
                                 + plotSQL.getInt("SELECT book_id FROM deny_data WHERE id=" + plotID + " AND uuid='" + uuid + "' AND attempt=" + finalI + ";") + ";");
 
                         //Set the pages of the book.
@@ -122,7 +122,7 @@ public class DeniedPlotFeedback extends Gui {
                     u.deniedPlotFeedback = null;
 
                     //Switch back to plot menu.
-                    u.plotInfo = new PlotInfo(plotID);
+                    u.plotInfo = new PlotInfo(plotID, u.player.getUniqueId().toString());
                     u.plotInfo.open(u);
 
                 });

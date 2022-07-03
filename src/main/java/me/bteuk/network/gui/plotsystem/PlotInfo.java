@@ -10,7 +10,6 @@ import me.bteuk.network.utils.PlotValues;
 import me.bteuk.network.utils.Utils;
 import net.buildtheearth.terraminusminus.generator.EarthGeneratorSettings;
 import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
-import net.buildtheearth.terraminusminus.projection.dymaxion.BTEDymaxionProjection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -19,17 +18,17 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
-import java.util.Arrays;
-
 public class PlotInfo extends Gui {
 
     private final int plotID;
+    private final String uuid;
 
-    public PlotInfo(int plotID) {
+    public PlotInfo(int plotID, String uuid) {
 
         super(27, Component.text("Plot " + plotID, NamedTextColor.AQUA, TextDecoration.BOLD));
 
         this.plotID = plotID;
+        this.uuid = uuid;
 
         createGui();
 
@@ -101,10 +100,10 @@ public class PlotInfo extends Gui {
                     int sumZ = 0;
 
                     //Find the centre.
-                    for (int i = 0; i<corners.length; i++) {
+                    for (int[] corner : corners) {
 
-                        sumX += corners[i][0];
-                        sumZ += corners[i][1];
+                        sumX += corner[0];
+                        sumZ += corner[1];
 
                     }
 
@@ -157,7 +156,7 @@ public class PlotInfo extends Gui {
         }
 
         //If you the owner of this plot.
-        if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plotID + " AND is_owner=1;")) {
+        if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plotID + " AND uuid='" + uuid + "' AND is_owner=1;")) {
 
             //If plot is not submitted show submit button.
             if (plotSQL.hasRow("SELECT id FROM plot_data WHERE id=" + plotID + " AND status='claimed';")) {
@@ -282,8 +281,10 @@ public class PlotInfo extends Gui {
                         u.plotInfo = null;
 
                         //Switch back to plot menu.
-                        u.plotMenu = new PlotMenu(u);
-                        u.plotMenu.open(u);
+                        Bukkit.getScheduler().scheduleSyncDelayedTask(Network.getInstance(), () -> {
+                            u.plotMenu = new PlotMenu(u);
+                            u.plotMenu.open(u);
+                        }, 20L);
 
 
                         //Add server event to leave plot.
