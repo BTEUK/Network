@@ -71,7 +71,7 @@ public class PlotMenu extends Gui {
 
             setItem(40, Utils.createItem(Material.CLOCK, 1,
                             Utils.chat("&b&lAccepted Plots"),
-                            Utils.chat("&fClick view your accepted plots.")),
+                            Utils.chat("&fClick to view your accepted plots.")),
 
                     u -> {
 

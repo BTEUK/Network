@@ -3,7 +3,7 @@ package me.bteuk.network.utils;
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.BuildGui;
 import me.bteuk.network.gui.plotsystem.*;
-import me.bteuk.network.staff.StaffGui;
+import me.bteuk.network.utils.regions.Region;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -29,7 +29,10 @@ public class NetworkUser {
     public StaffUser staffUser;
 
     //Region information.
+    public boolean inRegion;
     public Region region;
+    public int dx;
+    public int dz;
 
     //Navigator in hotbar.
     public boolean navigator;
@@ -40,7 +43,23 @@ public class NetworkUser {
 
         navigator = Network.getInstance().globalSQL.hasRow("SELECT navigator FROM player_data WHERE uuid='" + player.getUniqueId() + "' AND navigator=1;");
 
-        region = new Region(player.getLocation());
+        //Check if the player is in a region.
+        if (Network.SERVER_NAME.equals(Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH'"))) {
+            //Check if they are in the earth world.
+            if (player.getLocation().getWorld().getName().equals(Network.getInstance().getConfig().getString("earth_world"))) {
+                region = Network.getInstance().getRegionManager().getRegion(player.getLocation());
+                inRegion = true;
+            }
+        } else if (Network.SERVER_NAME.equals(Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='PLOT';"))) {
+            //Check if the player is in a buildable plot world and apply coordinate transform if true.
+            if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';")) {
+                dx = -Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';");
+                dz = -Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';");
+
+                region = Network.getInstance().getRegionManager().getRegion(player.getLocation(), dx, dz);
+                inRegion = true;
+            }
+        }
 
         //If the user is a member of staff, create staff user instance.
         if (player.hasPermission("uknet.staff")) {

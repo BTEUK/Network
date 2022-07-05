@@ -3,10 +3,10 @@ package me.bteuk.network.commands;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import me.bteuk.network.Network;
-import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.regions.Region;
+import me.bteuk.network.utils.regions.RegionManager;
 import net.buildtheearth.terraminusminus.generator.EarthGeneratorSettings;
-import net.buildtheearth.terraminusminus.projection.dymaxion.BTEDymaxionProjection;
 import net.buildtheearth.terraminusminus.util.geo.CoordinateParseUtils;
 import net.buildtheearth.terraminusminus.util.geo.LatLng;
 import org.bukkit.Bukkit;
@@ -14,6 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,10 +32,19 @@ public class Tpll implements CommandExecutor {
     private final boolean isEarth;
     private final String earthServer;
 
+    private final RegionManager regionManager;
+    private final boolean regionsEnabled;
+
     public Tpll(boolean requires_permission) {
         this.requires_permission = requires_permission;
         this.isEarth = Network.getInstance().getConfig().getBoolean("earth_server");
         earthServer = Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='earth';");
+
+        regionManager = Network.getInstance().getRegionManager();
+
+        FileConfiguration config = Network.getInstance().getConfig();
+        regionsEnabled = config.getBoolean("regions_enabled");
+
     }
 
     /**
@@ -95,15 +105,12 @@ public class Tpll implements CommandExecutor {
 
         //Check if the sender is a player.
         //Only players can use /tpll.
-        if (!(sender instanceof Player)) {
+        if (!(sender instanceof Player p)) {
 
             sender.sendMessage(Utils.chat("&cThis command can only be used by players."));
             return true;
 
         }
-
-        //Get player.
-        Player p = (Player) sender;
 
         //Check if permission is required.
         if (requires_permission) {
@@ -170,75 +177,83 @@ public class Tpll implements CommandExecutor {
 
         }
 
-        //Check if the region is on a plotserver.
-        NetworkUser u = Network.getInstance().getUser(p);
         Location l = new Location(p.getWorld(), proj[0], altitude, proj[1]);
-        if (Network.getInstance().regionSQL.hasRow("SELECT region FROM regions WHERE region='" + u.region.getRegion(l) + "' AND status='plot';")) {
 
-            //Get server and location of region.
-            String server = Network.getInstance().plotSQL.getString("SELECT server FROM regions WHERE region='" + u.region.getRegion(l) + "';");
-            String location = Network.getInstance().plotSQL.getString("SELECT location FROM regions WHERE region='" + u.region.getRegion(l) + "';");
+        if (regionsEnabled) {
+            //Get region.
+            Region region = regionManager.getRegion(l);
 
-            //Get the coordinate transformations.
-            int xTransform = Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + location + "';");
-            int zTransform = Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
+            //Check if the region is on a plot server.
+            if (Network.getInstance().regionSQL.hasRow("SELECT region FROM regions WHERE region='" + region.getName() + "' AND status='plot';")) {
 
-            //If they are on the correct server, teleport them directly, else switch their server.
-            if (server.equals(Network.SERVER_NAME)) {
+                //Get server and location of region.
+                String server = Network.getInstance().plotSQL.getString("SELECT server FROM regions WHERE region='" + region.getName() + "';");
+                String location = Network.getInstance().plotSQL.getString("SELECT location FROM regions WHERE region='" + region.getName() + "';");
 
-                Location loc = new Location(Bukkit.getWorld(location), (proj[0] + xTransform), altitude, (proj[1] + zTransform), p.getLocation().getYaw(), p.getLocation().getPitch());
+                //Get the coordinate transformations.
+                int xTransform = Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + location + "';");
+                int zTransform = Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
 
-                LatLng finalDefaultCoords = defaultCoords;
-                p.sendMessage(Utils.chat("&7Teleporting to &9" + DECIMAL_FORMATTER.format(finalDefaultCoords.getLat()) + "&7, &9" + DECIMAL_FORMATTER.format(finalDefaultCoords.getLng())));
-                p.teleport(loc);
+                //If they are on the correct server, teleport them directly, else switch their server.
+                if (server.equals(Network.SERVER_NAME)) {
+
+                    Location loc = new Location(Bukkit.getWorld(location), (proj[0] + xTransform), altitude, (proj[1] + zTransform), p.getLocation().getYaw(), p.getLocation().getPitch());
+
+                    p.sendMessage(Utils.chat("&7Teleporting to &9" + DECIMAL_FORMATTER.format(defaultCoords.getLat()) + "&7, &9" + DECIMAL_FORMATTER.format(defaultCoords.getLng())));
+                    p.teleport(loc);
+
+                } else {
+
+                    //Set join event to teleport there.
+                    Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('" + p.getUniqueId() + "','network'," + "'teleport "
+                            + (proj[0] + xTransform) + " " + (proj[1] + zTransform) + " " + p.getLocation().getYaw() + " " + p.getLocation().getPitch() + "');");
+
+                    //Switch server.
+                    ByteArrayDataOutput out = ByteStreams.newDataOutput();
+                    out.writeUTF("Connect");
+                    out.writeUTF(server);
+                }
 
             } else {
 
-                //Set join event to teleport there.
-                Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('" + p.getUniqueId() + "','network'," + "'teleport "
-                        + (proj[0] + xTransform) + " " + (proj[1] + zTransform) + " " + p.getLocation().getYaw() + " " + p.getLocation().getPitch() + "');");
+                //Region is on earth server.
+                //Check if the player can enter this region.
+                if (region.inDatabase() || p.hasPermission("group.jrbuilder")) {
 
-                //Switch server.
-                ByteArrayDataOutput out = ByteStreams.newDataOutput();
-                out.writeUTF("Connect");
-                out.writeUTF(server);
+                    //If the player is already on the Earth server teleport them directly.
+                    if (isEarth) {
 
+                        Location loc = new Location(p.getWorld(), (proj[0]), altitude, (proj[1]), p.getLocation().getYaw(), p.getLocation().getPitch());
+
+                        p.sendMessage(Utils.chat("&7Teleporting to &9" + DECIMAL_FORMATTER.format(defaultCoords.getLat()) + "&7, &9" + DECIMAL_FORMATTER.format(defaultCoords.getLng())));
+                        p.teleport(loc);
+
+
+                    } else {
+
+                        //Set join event to teleport there.
+                        Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('" + p.getUniqueId() + "','network'," + "'teleport "
+                                + (proj[0]) + " " + (proj[1]) + " " + p.getLocation().getYaw() + " " + p.getLocation().getPitch() + "');");
+
+                        //Switch server.
+                        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+                        out.writeUTF("Connect");
+                        out.writeUTF(earthServer);
+
+                    }
+
+                } else {
+
+                    //You can't enter this region.
+                    p.sendMessage(Utils.chat("&cThe terrain for this region has not been generated, you must be Jr.Builder or higher to load new terrain."));
+
+                }
             }
         } else {
+            Location loc = new Location(p.getWorld(), (proj[0]), altitude, (proj[1]), p.getLocation().getYaw(), p.getLocation().getPitch());
 
-            //Switch to the earth server
-
-            //Check if the player cannot enter this region cancel the action.
-            if (Network.getInstance().regionSQL.hasRow("SELECT region FROM regions WHERE region='" + u.region.getRegion(l) + "';") && !p.hasPermission("group.jrbuilder")) {
-
-                p.sendMessage(Utils.chat("&cThis region has not been loaded, you must be Jr.Builder+ to load new areas."));
-                return true;
-
-            }
-
-            //If the player is already on the Earth server teleport them directly.
-            if (isEarth) {
-
-                Location loc = new Location(p.getWorld(), (proj[0]), altitude, (proj[1]), p.getLocation().getYaw(), p.getLocation().getPitch());
-
-                LatLng finalDefaultCoords = defaultCoords;
-                p.sendMessage(Utils.chat("&7Teleporting to &9" + DECIMAL_FORMATTER.format(finalDefaultCoords.getLat()) + "&7, &9" + DECIMAL_FORMATTER.format(finalDefaultCoords.getLng())));
-                p.teleport(loc);
-
-
-            } else {
-
-                //Set join event to teleport there.
-                Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('" + p.getUniqueId() + "','network'," + "'teleport "
-                        + (proj[0]) + " " + (proj[1]) + " " + p.getLocation().getYaw() + " " + p.getLocation().getPitch() + "');");
-
-                //Switch server.
-                ByteArrayDataOutput out = ByteStreams.newDataOutput();
-                out.writeUTF("Connect");
-                out.writeUTF(earthServer);
-
-
-            }
+            p.sendMessage(Utils.chat("&7Teleporting to &9" + DECIMAL_FORMATTER.format(defaultCoords.getLat()) + "&7, &9" + DECIMAL_FORMATTER.format(defaultCoords.getLng())));
+            p.teleport(loc);
         }
 
         return true;

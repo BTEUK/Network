@@ -35,4 +35,20 @@ public class RegionSQL {
             return false;
         }
     }
+
+    //Generic update statement, return true if successful.
+    public boolean update(String sql) {
+
+        try (Connection conn = conn();
+             PreparedStatement statement = conn.prepareStatement(sql)) {
+
+            statement.executeUpdate();
+
+            return true;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

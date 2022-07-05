@@ -13,6 +13,7 @@ import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.ServerType;
 import me.bteuk.network.utils.NetworkUser;
+import me.bteuk.network.utils.regions.RegionManager;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -40,6 +41,9 @@ public final class Network extends JavaPlugin {
 
     private static Network instance;
     private static FileConfiguration config;
+
+    //RegionManager
+    private RegionManager regionManager;
 
     //User List
     private ArrayList<NetworkUser> networkUsers;
@@ -95,7 +99,7 @@ public final class Network extends JavaPlugin {
             String region_database = config.getString("database.region");
             BasicDataSource region_dataSource = mysqlSetup(global_database);
             regionSQL = new RegionSQL(region_dataSource);
-            //initDb("dbsetup_region.sql", region_dataSource);
+            initDb("dbsetup_region.sql", region_dataSource);
 
             //Plot Database
             String plot_database = config.getString("database.plot");
@@ -168,6 +172,11 @@ public final class Network extends JavaPlugin {
 
         new GuiListener(this);
         new PlayerInteract(this);
+
+        //Create regionManager if enabled.
+        if (config.getBoolean("regions_enabled")) {
+            regionManager = new RegionManager(regionSQL);
+        }
 
         //Setup Timers
         timers = new Timers(this, globalSQL, connect);
@@ -277,6 +286,11 @@ public final class Network extends JavaPlugin {
     //Returns an instance of the plugin.
     public static Network getInstance() {
         return instance;
+    }
+
+    //Return an instance of the regionManager.
+    public RegionManager getRegionManager() {
+        return regionManager;
     }
 
     //Get user from player.

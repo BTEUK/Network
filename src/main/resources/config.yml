@@ -12,10 +12,10 @@ database:
   region: uknet_regions
 
 #Server configuration
-#Server types: plot, earth, lobby, tutorial
+#Server types: PLOT, EARTH, LOBBY, TUTORIAL
 enabled: false
 server_name: server_name
-server_type: earth
+server_type: EARTH
 
 #Chat Socket
 socket:
@@ -33,9 +33,10 @@ tpll:
   enabled: true
   requires_permission: false
 
-#Enable cross-server teleporting using region plugin.
+#Enable regions and cross-server teleport.
+#Regions must be enabled for cross-server teleport to function.
+regions_enabled: true
 global_teleport: true
-earth_server: false
 earth_world: earth
 
 #Movement limits.

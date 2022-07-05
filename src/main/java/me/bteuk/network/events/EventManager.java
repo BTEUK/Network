@@ -9,6 +9,10 @@ public class EventManager {
 
             InviteEvent.event(uuid, event);
 
+        } else if (event[0].equals("teleport")) {
+
+            TeleportEvent.event(uuid, event);
+
         }
     }
 }
