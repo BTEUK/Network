@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS region_logs
     uuid        CHAR(36)        NOT NULL,
     is_owner    TINYINT(1)      NULL DEFAULT 0,
     start_time  BIGINT          NOT NULL,
-    end_time    BIGINT          NOT NULL,
+    end_time    BIGINT          NULL DEFAULT 0,
     PRIMARY KEY(region,uuid,start_time)
 );
 
@@ -29,8 +29,8 @@ CREATE TABLE IF NOT EXISTS region_requests
 (
     region      VARCHAR(16)     NOT NULL,
     uuid        CHAR(36)        NOT NULL,
-    staff_accept    TINYINT(1)  NULL DEFAULT 0,
-    owner_accept    TINYINT(1)  NULL DEFAULT 0,
+    staff_accept    TINYINT(1)  NULL DEFAULT 1,
+    owner_accept    TINYINT(1)  NULL DEFAULT 1,
     coordinate_id   INT         NOT NULL,
     UNIQUE(region,uuid)
 );

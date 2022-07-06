@@ -5,8 +5,10 @@ import com.google.common.io.ByteStreams;
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.plotsystem.PlotMenu;
 import me.bteuk.network.gui.plotsystem.PlotServerLocations;
+import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.enums.ServerType;
 import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.regions.RegionManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -14,9 +16,13 @@ import org.bukkit.Material;
 
 public class BuildGui extends Gui {
 
-    public BuildGui() {
+    private final NetworkUser user;
+
+    public BuildGui(NetworkUser user) {
 
         super(27, Component.text("Building Menu", NamedTextColor.AQUA, TextDecoration.BOLD));
+
+        this.user = user;
 
         createGui();
 
@@ -131,39 +137,129 @@ public class BuildGui extends Gui {
                 });
 
         //Join region (Jr.Builder+ only)
-        setItem(5, Utils.createItem(Material.DARK_OAK_DOOR, 1,
-                        Utils.chat("&b&lJoin Region"),
-                        Utils.chat("&fClick to join the region you are standing in.")),
-                u -> {
+        //If region is claimable.
+        //Check if the player is in a region.
+        if (user.inRegion) {
 
-                    if (Network.SERVER_TYPE == ServerType.EARTH) {
+            //Check if region is claimable.
+            if (user.region.isClaimable()) {
 
-                        //If the user is Jr.Builder+ go through the region joining process.
-                        if (u.player.hasPermission("group.jrbuilder")) {
+                //TODO deal with jr.builder requests if region is nearby.
 
+                //If the region has an owner.
+                if (user.region.hasOwner()) {
 
-                        } else {
+                    //Check if the region is public.
+                    if (user.region.isPublic()) {
 
-                            //If they are not a Jr.Builder, cancel.
-                            u.player.closeInventory();
-                            u.player.sendMessage(Utils.chat("&cYou must be at least a Jr.Builder to claim a region."));
+                        setItem(5, Utils.createItem(Material.DARK_OAK_DOOR, 1,
+                                        Utils.chat("&b&lJoin Region"),
+                                        Utils.chat("&fClick to join the region you are standing in."),
+                                        Utils.chat("&fThe region is owned by " + user.region.ownerName() + "."),
+                                        Utils.chat("&fThe region is public, so they don't need to accept your request.")),
+                                u -> {
 
-                        }
+                                    //If the user is Jr.Builder+ go through the region joining process.
+                                    if (u.player.hasPermission("group.jrbuilder")) {
+
+                                        u.region.joinRegion(u);
+                                        u.player.closeInventory();
+
+                                    } else {
+
+                                        //If they are not a Jr.Builder, cancel.
+                                        u.player.closeInventory();
+                                        u.player.sendMessage(Utils.chat("&cYou must be at least a Jr.Builder to join a region."));
+
+                                    }
+                                });
 
                     } else {
 
-                        //If the server is not an earth server, cancel.
-                        u.player.closeInventory();
-                        u.player.sendMessage(Utils.chat("&cThis is not a valid region to claim."));
+                        //Join requires owner to approve request.
+                        setItem(5, Utils.createItem(Material.DARK_OAK_DOOR, 1,
+                                        Utils.chat("&b&lJoin Region"),
+                                        Utils.chat("&fClick to request to join the region you are standing in."),
+                                        Utils.chat("&fThe region is owned by " + user.region.ownerName() + "."),
+                                        Utils.chat("&fThey must accept the request for you to join.")),
+                                u -> {
 
+                                    //If the user is Jr.Builder+ go through the region joining process.
+                                    if (u.player.hasPermission("group.jrbuilder")) {
+
+                                        u.region.joinRegion(u, false);
+                                        u.player.closeInventory();
+
+                                    } else {
+
+                                        //If they are not a Jr.Builder, cancel.
+                                        u.player.closeInventory();
+                                        u.player.sendMessage(Utils.chat("&cYou must be at least a Jr.Builder to join a region."));
+
+                                    }
+                                });
                     }
-                });
+
+                } else
+
+                    //Join region.
+                    setItem(5, Utils.createItem(Material.DARK_OAK_DOOR, 1,
+                                    Utils.chat("&b&lJoin Region"),
+                                    Utils.chat("&fClick to join the region you are standing in."),
+                                    Utils.chat("&fThe region currently has no active owner."),
+                                    Utils.chat("&fJoining the region will make you region owner.")),
+                            u -> {
+
+                                //If the user is Jr.Builder+ go through the region joining process.
+                                if (u.player.hasPermission("group.jrbuilder")) {
+
+                                    u.region.joinRegion(u);
+                                    u.player.closeInventory();
+
+                                } else {
+
+                                    //If they are not a Jr.Builder, cancel.
+                                    u.player.closeInventory();
+                                    u.player.sendMessage(Utils.chat("&cYou must be at least a Jr.Builder to join a region."));
+
+                                }
+                            });
+
+            } else {
+
+                //If the region is open.
+                if (user.region.isOpen()) {
+                    setItem(5, Utils.createItem(Material.END_GATEWAY, 1,
+                            Utils.chat("&b&lOpen Region"),
+                            Utils.chat("&fThis region is open to all Jr.Builder+."),
+                            Utils.chat("&fYou can build here without claiming.")));
+
+                } else {
+
+                    //This region is not claimable.
+                    setItem(5, Utils.createItem(Material.IRON_DOOR, 1,
+                            Utils.chat("&b&Locked Region"),
+                            Utils.chat("&fThis region can not be claimed."),
+                            Utils.chat("&fIt is either locked or used in the plot system.")));
+
+                }
+
+            }
+        } else {
+            //Show that the user is not in a region.
+            setItem(5, Utils.createItem(Material.STRUCTURE_VOID, 1,
+                    Utils.chat("&b&lNo Region"),
+                    Utils.chat("&fYou are currently not standing in a valid region."),
+                    Utils.chat("&fThis is likely due to being in a lobby.")));
+        }
 
         //Plot menu.
         setItem(21, Utils.createItem(Material.CHEST, 1,
                         Utils.chat("&b&lPlot Menu"),
                         Utils.chat("&fView all your active plots.")),
-                u -> {
+                u ->
+
+                {
 
                     //Delete this gui.
                     this.delete();

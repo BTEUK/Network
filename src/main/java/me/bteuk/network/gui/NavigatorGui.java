@@ -19,7 +19,7 @@ public class NavigatorGui extends Gui {
                 u -> {
 
                     //Switch to the build menu.
-                    u.buildGui = new BuildGui();
+                    u.buildGui = new BuildGui(u);
                     u.buildGui.open(u);
 
                 });

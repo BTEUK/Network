@@ -2,7 +2,7 @@ name: Network
 version: '${project.version}'
 main: me.bteuk.network.Network
 api-version: 1.18
-depend: [ PlaceholderAPI ]
+depend: [ PlaceholderAPI, WorldGuard]
 
 commands:
   plot:
@@ -14,7 +14,10 @@ commands:
   navigator:
     aliases: [nav,gui,menu]
     usage: /<command>
-    description: Opens the main gui targetting a relevant menu depending where the player is situated.
+    description: Opens the main gui, will always return to the previous menu if possible.
   staff:
     usage: /<command>
     description: Opens the Staff Menu.
+  claim:
+    usage: /<command>
+    description: Routes directly to the build menu of the gui, mainly for the purpose of player habits as this was the command previously.

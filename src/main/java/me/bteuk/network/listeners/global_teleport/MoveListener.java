@@ -141,7 +141,7 @@ public class MoveListener implements Listener {
                             } else {
 
                                 //You can't enter this region.
-                                p.sendMessage(Utils.chat("&cThe terrain for this region has not been generated, you must be Jr.Builder or higher to load new terrain."));
+                                p.sendMessage(Utils.chat("&cThe terrain for this region has not been generated, you must be at least Jr.Builder to load new terrain."));
                                 e.setCancelled(true);
                             }
 
@@ -189,7 +189,7 @@ public class MoveListener implements Listener {
                         } else {
 
                             //You can't enter this region.
-                            p.sendMessage(Utils.chat("&cThe terrain for this region has not been generated, you must be Jr.Builder or higher to load new terrain."));
+                            p.sendMessage(Utils.chat("&cThe terrain for this region has not been generated, you must be at least Jr.Builder to load new terrain."));
                             e.setCancelled(true);
                         }
                     }

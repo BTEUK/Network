@@ -327,7 +327,7 @@ public class PlotServerLocations extends Gui {
                     u.plotServerLocations = null;
 
                     //Create build menu.
-                    u.buildGui = new BuildGui();
+                    u.buildGui = new BuildGui(u);
                     u.buildGui.open(u);
 
                 });

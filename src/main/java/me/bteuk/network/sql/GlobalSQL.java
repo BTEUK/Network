@@ -1,12 +1,10 @@
 package me.bteuk.network.sql;
 
+import me.bteuk.network.Network;
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.bukkit.Bukkit;
+import org.bukkit.Location;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -188,5 +186,41 @@ public class GlobalSQL {
         //Return the map.
         return map;
 
+    }
+
+    //Add new coordinate to database and return the id.
+    public int addCoordinate(Location l) {
+
+        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
+                "INSERT INTO coordinates(server,world, x, y, z, yaw, pitch) VALUES(?, ?, ?, ?, ?, ?, ?);",
+                Statement.RETURN_GENERATED_KEYS
+        )) {
+            statement.setString(1, Network.SERVER_NAME);
+            statement.setString(2, l.getWorld().getName());
+            statement.setDouble(3, l.getX());
+            statement.setDouble(4, l.getY());
+            statement.setDouble(5, l.getZ());
+            statement.setFloat(6, l.getYaw());
+            statement.setFloat(7, l.getPitch());
+            statement.executeUpdate();
+
+            //If the id does not exist return 0.
+            ResultSet results = statement.getGeneratedKeys();
+            if (results.next()) {
+
+                return results.getInt(1);
+
+            } else {
+
+                return 0;
+
+            }
+
+        } catch (SQLException sql) {
+
+            sql.printStackTrace();
+            return 0;
+
+        }
     }
 }
