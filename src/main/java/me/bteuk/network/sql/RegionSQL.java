@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class RegionSQL {
 
@@ -94,5 +95,27 @@ public class RegionSQL {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public ArrayList<String> getStringList(String sql) {
+
+        ArrayList<String> list = new ArrayList<>();
+
+        try (Connection conn = conn();
+             PreparedStatement statement = conn.prepareStatement(sql);
+             ResultSet results = statement.executeQuery()) {
+
+            while (results.next()) {
+
+                list.add(results.getString(1));
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        return list;
     }
 }

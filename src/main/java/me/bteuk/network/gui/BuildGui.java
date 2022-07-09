@@ -5,10 +5,10 @@ import com.google.common.io.ByteStreams;
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.plotsystem.PlotMenu;
 import me.bteuk.network.gui.plotsystem.PlotServerLocations;
+import me.bteuk.network.gui.regions.RegionMenu;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.enums.ServerType;
 import me.bteuk.network.utils.Utils;
-import me.bteuk.network.utils.regions.RegionManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -268,6 +268,24 @@ public class BuildGui extends Gui {
                     //Switch to plot menu.
                     u.plotMenu = new PlotMenu(u);
                     u.plotMenu.open(u);
+
+                });
+
+        //Region menu.
+        setItem(23, Utils.createItem(Material.CHEST, 1,
+                        Utils.chat("&b&lRegion Menu"),
+                        Utils.chat("&fView all regions you can build in.")),
+                u ->
+
+                {
+
+                    //Delete this gui.
+                    this.delete();
+                    u.buildGui = null;
+
+                    //Switch to plot menu.
+                    u.regionMenu = new RegionMenu(u);
+                    u.regionMenu.open(u);
 
                 });
 

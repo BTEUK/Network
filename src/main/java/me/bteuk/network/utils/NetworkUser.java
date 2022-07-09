@@ -3,8 +3,9 @@ package me.bteuk.network.utils;
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.BuildGui;
 import me.bteuk.network.gui.plotsystem.*;
+import me.bteuk.network.gui.regions.RegionInfo;
+import me.bteuk.network.gui.regions.RegionMenu;
 import me.bteuk.network.utils.regions.Region;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 public class NetworkUser {
@@ -24,6 +25,9 @@ public class NetworkUser {
 
     public PlotMembers plotMembers;
     public InviteMembers inviteMembers;
+
+    public RegionMenu regionMenu;
+    public RegionInfo regionInfo;
 
     //Staff user.
     public StaffUser staffUser;
@@ -66,21 +70,5 @@ public class NetworkUser {
             staffUser = new StaffUser();
         }
 
-    }
-
-    public String getRegion(Location l) {
-        double x = l.getX();
-        double z = l.getZ();
-        int rX = (int) Math.floor((x/512));
-        int rZ = (int) Math.floor((z/512));
-        return (rX + "," + rZ);
-    }
-
-    public String getRegion() {
-        double x = player.getLocation().getX();
-        double z = player.getLocation().getZ();
-        int rX = (int) Math.floor((x/512));
-        int rZ = (int) Math.floor((z/512));
-        return (rX + "," + rZ);
     }
 }
