@@ -131,9 +131,9 @@ public abstract class Gui {
 
             u.plotMembers.delete();
 
-        } else if (u.inviteMembers != null) {
+        } else if (u.invitePlotMembers != null) {
 
-            u.inviteMembers.delete();
+            u.invitePlotMembers.delete();
 
         }
     }

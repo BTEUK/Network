@@ -78,10 +78,10 @@ public class Navigator implements CommandExecutor {
             u.plotMembers.refresh();
             u.plotMembers.open(u);
 
-        } else if (u.inviteMembers != null) {
+        } else if (u.invitePlotMembers != null) {
 
-            u.inviteMembers.refresh();
-            u.inviteMembers.open(u);
+            u.invitePlotMembers.refresh();
+            u.invitePlotMembers.open(u);
 
         } else {
 

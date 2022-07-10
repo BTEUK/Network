@@ -50,7 +50,7 @@ public class RegionManager {
         return (regionSQL.hasRow("SELECT region FROM regions WHERE region='" + regionName + "';" ));
     }
 
-    private Region getRegion(String regionName) {
+    public Region getRegion(String regionName) {
         for (Region region : regions) {
             if (region.getName().equals(regionName)) {
                 return region;

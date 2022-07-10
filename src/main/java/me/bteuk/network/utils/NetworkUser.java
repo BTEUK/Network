@@ -24,7 +24,7 @@ public class NetworkUser {
     public DeleteConfirm deleteConfirm;
 
     public PlotMembers plotMembers;
-    public InviteMembers inviteMembers;
+    public InvitePlotMembers invitePlotMembers;
 
     public RegionMenu regionMenu;
     public RegionInfo regionInfo;

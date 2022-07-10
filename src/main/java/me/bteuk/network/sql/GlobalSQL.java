@@ -2,6 +2,7 @@ package me.bteuk.network.sql;
 
 import me.bteuk.network.Network;
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 import java.sql.*;
@@ -222,5 +223,29 @@ public class GlobalSQL {
             return 0;
 
         }
+    }
+
+    //Get coordinate from database by id.
+    //World must be on this server else this will throw a null pointer exception.
+    public Location getCoordinate(int coordinateID) {
+
+        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
+                "SELECT * FROM coordinates WHERE id=" + coordinateID + ";"
+        ); ResultSet results = statement.executeQuery()) {
+
+            return (new Location(Bukkit.getWorld(results.getString("world")),
+                    results.getDouble("x"),
+                    results.getDouble("y"),
+                    results.getDouble("z"),
+                    results.getFloat("yaw"),
+                    results.getFloat("pitch")));
+
+        } catch (SQLException sql) {
+
+            sql.printStackTrace();
+            return null;
+
+        }
+
     }
 }

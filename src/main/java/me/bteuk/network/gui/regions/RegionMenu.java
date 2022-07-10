@@ -39,8 +39,8 @@ public class RegionMenu extends Gui {
     private void createGui() {
 
         //Get regions you are owner or member of.
-        ArrayList<String> owner = regionSQL.getStringList("SELECT region FROM region_members WHERE uuid=" + user.player.getUniqueId() + " AND is_owner=1;");
-        ArrayList<String> member = regionSQL.getStringList("SELECT region FROM region_members WHERE uuid=" + user.player.getUniqueId() + " AND is_owner=1;");
+        ArrayList<String> owner = regionSQL.getStringList("SELECT region FROM region_members WHERE uuid='" + user.player.getUniqueId() + "' AND is_owner=1;");
+        ArrayList<String> member = regionSQL.getStringList("SELECT region FROM region_members WHERE uuid='" + user.player.getUniqueId() + "' AND is_owner=1;");
 
         //Slot count.
         int slot = 10;

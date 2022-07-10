@@ -3,7 +3,6 @@ package me.bteuk.network.listeners.global_teleport;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import me.bteuk.network.Network;
-import me.bteuk.network.sql.RegionSQL;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
@@ -30,9 +29,7 @@ public class MoveListener implements Listener {
 
     private final RegionManager regionManager;
 
-    private final RegionSQL regionSQL;
-
-    public MoveListener(Network instance, RegionSQL regionSQL) {
+    public MoveListener(Network instance) {
 
         Bukkit.getServer().getPluginManager().registerEvents(this, instance);
 
@@ -43,8 +40,6 @@ public class MoveListener implements Listener {
         regionsEnabled = config.getBoolean("regions_enabled");
         teleportEnabled = config.getBoolean("global_teleport");
         earthWorld = config.getString("earth_world");
-
-        this.regionSQL = regionSQL;
 
         regionManager = instance.getRegionManager();
 
@@ -102,7 +97,7 @@ public class MoveListener implements Listener {
                                 //Region is on another server, teleport them accordingly.
                                 //If the new region is on a plot server, check for coordinate transform.
                                 String server;
-                                if (regionSQL.hasRow("SELECT region FROM regions WHERE region='" + region.getName() + "' AND status='plot';")) {
+                                if (region.isPlot()) {
 
                                     //Get server and world of region.
                                     server = Network.getInstance().plotSQL.getString("SELECT server FROM regions WHERE region='" + region.getName() + "';");
@@ -159,24 +154,24 @@ public class MoveListener implements Listener {
                             //If the player is the region owner update last enter and tell set the message.
                             if (region.isOwner(p.getUniqueId().toString())) {
 
-                                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.chat("&aYou have entered " + region.getName() + " and left " + u.region.getName() + ", you are the owner of this region.")));
-                                regionSQL.update("UPDATE region_members SET last_enter=" + Time.currentTime() + " WHERE region='" + region.getName() + "' AND uuid='" + p.getUniqueId() + "';");
+                                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.chat("&aYou have entered " + region.getTag(p.getUniqueId().toString()) + " and left " + u.region.getTag(p.getUniqueId().toString()) + ", you are the owner of this region.")));
+                                region.setLastEnter(p.getUniqueId().toString());
 
                                 //Check if the player is a region members.
                             } else if (region.isMember(p.getUniqueId().toString())) {
 
-                                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.chat("&aYou have entered " + region.getName() + " and left " + u.region.getName() + ", you are a member of this region.")));
-                                regionSQL.update("UPDATE region_members SET last_enter=" + Time.currentTime() + " WHERE region='" + region.getName() + "' AND uuid='" + p.getUniqueId() + "';");
+                                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.chat("&aYou have entered " + region.getTag(p.getUniqueId().toString()) + " and left " + u.region.getTag(p.getUniqueId().toString()) + ", you are a member of this region.")));
+                                region.setLastEnter(p.getUniqueId().toString());
 
                                 //Check if the region is open and the player is at least jr.builder.
                             } else if (region.isOpen() && p.hasPermission("group.jrbuilder")) {
 
-                                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.chat("&aYou have entered " + region.getName() + " and left " + u.region.getName() + ", you can build in this region.")));
+                                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.chat("&aYou have entered " + region.getTag(p.getUniqueId().toString()) + " and left " + u.region.getTag(p.getUniqueId().toString()) + ", you can build in this region.")));
 
                             } else {
 
                                 //Send default enter message.
-                                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.chat("&aYou have entered " + region.getName() + " and left " + u.region.getName() + ".")));
+                                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.chat("&aYou have entered " + region.getTag(p.getUniqueId().toString()) + " and left " + u.region.getTag(p.getUniqueId().toString()) + ".")));
 
                             }
 

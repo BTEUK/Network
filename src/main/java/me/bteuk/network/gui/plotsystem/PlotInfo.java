@@ -262,8 +262,8 @@ public class PlotInfo extends Gui {
                         u.plotInfo = null;
 
                         //Switch back to plot menu.
-                        u.inviteMembers = new InviteMembers(plotID);
-                        u.inviteMembers.open(u);
+                        u.invitePlotMembers = new InvitePlotMembers(plotID);
+                        u.invitePlotMembers.open(u);
 
                     });
 

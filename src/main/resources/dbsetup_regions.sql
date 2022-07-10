@@ -12,6 +12,8 @@ CREATE TABLE IF NOT EXISTS region_members
     uuid        CHAR(36)        NOT NULL,
     is_owner    TINYINT(1)      NULL DEFAULT 0,
     last_enter  BIGINT          NOT NULL,
+    tag         VARCHAR(64)     NULL DEFAULT NULL,
+    coordinate_id   INT         NOT NULL,
     PRIMARY KEY(region,uuid)
 );
 

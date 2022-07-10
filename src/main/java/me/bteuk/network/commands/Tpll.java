@@ -31,6 +31,7 @@ public class Tpll implements CommandExecutor {
 
     private final boolean isEarth;
     private final String earthServer;
+    private final String earthWorld;
 
     private final RegionManager regionManager;
     private final boolean regionsEnabled;
@@ -39,6 +40,7 @@ public class Tpll implements CommandExecutor {
         this.requires_permission = requires_permission;
         this.isEarth = Network.getInstance().getConfig().getBoolean("earth_server");
         earthServer = Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='earth';");
+        earthWorld = Network.getInstance().getConfig().getString("earth_world");
 
         regionManager = Network.getInstance().getRegionManager();
 
@@ -206,7 +208,7 @@ public class Tpll implements CommandExecutor {
 
                     //Set join event to teleport there.
                     Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('" + p.getUniqueId() + "','network'," + "'teleport "
-                            + (proj[0] + xTransform) + " " + (proj[1] + zTransform) + " " + p.getLocation().getYaw() + " " + p.getLocation().getPitch() + "');");
+                            + location + " " + (proj[0] + xTransform) + " " + (proj[1] + zTransform) + " " + p.getLocation().getYaw() + " " + p.getLocation().getPitch() + "');");
 
                     //Switch server.
                     ByteArrayDataOutput out = ByteStreams.newDataOutput();
@@ -223,7 +225,7 @@ public class Tpll implements CommandExecutor {
                     //If the player is already on the Earth server teleport them directly.
                     if (isEarth) {
 
-                        Location loc = new Location(p.getWorld(), (proj[0]), altitude, (proj[1]), p.getLocation().getYaw(), p.getLocation().getPitch());
+                        Location loc = new Location(Bukkit.getWorld(earthWorld), (proj[0]), altitude, (proj[1]), p.getLocation().getYaw(), p.getLocation().getPitch());
 
                         p.sendMessage(Utils.chat("&7Teleporting to &9" + DECIMAL_FORMATTER.format(defaultCoords.getLat()) + "&7, &9" + DECIMAL_FORMATTER.format(defaultCoords.getLng())));
                         p.teleport(loc);
@@ -233,7 +235,7 @@ public class Tpll implements CommandExecutor {
 
                         //Set join event to teleport there.
                         Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('" + p.getUniqueId() + "','network'," + "'teleport "
-                                + (proj[0]) + " " + (proj[1]) + " " + p.getLocation().getYaw() + " " + p.getLocation().getPitch() + "');");
+                                + earthWorld + " " + (proj[0]) + " " + (proj[1]) + " " + p.getLocation().getYaw() + " " + p.getLocation().getPitch() + "');");
 
                         //Switch server.
                         ByteArrayDataOutput out = ByteStreams.newDataOutput();

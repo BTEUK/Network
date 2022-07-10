@@ -12,6 +12,20 @@ public record Region(String regionName) {
         return regionName;
     }
 
+    //Get the tag of the region for a specific player, or name if no tag is set.
+    public String getTag(String uuid) {
+        if (hasTag(uuid)) {
+            return Network.getInstance().regionSQL.getString("SELECT tag FROM region_members WHERE region='" + regionName + "' AND uuid='" + uuid + "';");
+        } else {
+            return regionName;
+        }
+    }
+
+    //Return whether the region has a tag for the specified uuid.
+    private boolean hasTag(String uuid) {
+        return (Network.getInstance().regionSQL.hasRow("SELECT region FROM region_members WHERE region='" + regionName + "' AND uuid='" + uuid + "' AND tag IS NOT NULL;"));
+    }
+
     //Get the server of the region.
     public String getServer() {
         if (Network.getInstance().regionSQL.hasRow("SELECT region FROM regions WHERE region='" + regionName + "' AND status='plot'")) {
@@ -25,12 +39,12 @@ public record Region(String regionName) {
 
     //Return whether the uuid is the uuid of the region owner.
     public boolean isOwner(String uuid) {
-        return (Network.getInstance().regionSQL.hasRow("SELECT region FROM region_members WHERE region='" + regionName + " AND 'uuid='" + uuid + "' AND is_owner=1;"));
+        return (Network.getInstance().regionSQL.hasRow("SELECT region FROM region_members WHERE region='" + regionName + "' AND 'uuid='" + uuid + "' AND is_owner=1;"));
     }
 
     //Return whether the uuid is the uuid of a region member.
     public boolean isMember(String uuid) {
-        return (Network.getInstance().regionSQL.hasRow("SELECT region FROM region_members WHERE region='" + regionName + " AND uuid='" + uuid + "' AND is_owner=0;"));
+        return (Network.getInstance().regionSQL.hasRow("SELECT region FROM region_members WHERE region='" + regionName + "' AND uuid='" + uuid + "' AND is_owner=0;"));
     }
 
     //Return whether the region is open or not.
@@ -51,6 +65,11 @@ public record Region(String regionName) {
     //Return whether the region is inactive.
     public boolean isInactive() {
         return (Network.getInstance().regionSQL.hasRow("SELECT region FROM regions WHERE region='" + regionName + "' AND status='inactive';"));
+    }
+
+    //Return whether the region is on the plot server.
+    public boolean isPlot() {
+        return (Network.getInstance().regionSQL.hasRow("SELECT region FROM regions WHERE region='" + regionName + "' AND status='plot';"));
     }
 
     //Return whether the region has an owner.
@@ -84,6 +103,21 @@ public record Region(String regionName) {
         } else {
             return "nobody";
         }
+    }
+
+    //Get the coordinate id for the location the player has set.
+    public int getCoordinateID(String uuid) {
+        return Network.getInstance().regionSQL.getInt("SELECT coordinate_id FROM region_members WHERE region='" + regionName + "' AND uuid='" + uuid + "';");
+    }
+
+    //Set the coordinate id for the location of the specified player.
+    public void setCoordinateID(String uuid, int id) {
+        Network.getInstance().regionSQL.update("UPDATE region_members SET coordinate_id=" + id + " WHERE region='" + regionName + "' AND uuid='" + uuid + "';");
+    }
+
+    //Set the last enter time for the region.
+    public void setLastEnter(String uuid) {
+        Network.getInstance().regionSQL.update("UPDATE region_members SET last_enter=" + Time.currentTime() + " WHERE region='" + regionName + "' AND uuid='" + uuid + "';");
     }
 
     //Check whether the region equals another region.

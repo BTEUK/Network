@@ -35,6 +35,8 @@ tpll:
 
 #Enable regions and cross-server teleport.
 #Regions must be enabled for cross-server teleport to function.
+#Earth world must be specified on all servers as it is used to determine cross-server tpll to the earth server.
+#To make sure the player is teleported to the correct world if multiple exist.
 regions_enabled: true
 global_teleport: true
 earth_world: earth

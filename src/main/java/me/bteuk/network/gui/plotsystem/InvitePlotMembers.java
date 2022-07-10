@@ -12,7 +12,7 @@ import org.bukkit.Material;
 
 import java.util.ArrayList;
 
-public class InviteMembers extends Gui {
+public class InvitePlotMembers extends Gui {
 
     private int page;
 
@@ -21,7 +21,7 @@ public class InviteMembers extends Gui {
     private final GlobalSQL globalSQL;
     private final PlotSQL plotSQL;
 
-    public InviteMembers(int plotID) {
+    public InvitePlotMembers(int plotID) {
 
         super(45, Component.text("Invite Members", NamedTextColor.AQUA, TextDecoration.BOLD));
 
@@ -160,7 +160,7 @@ public class InviteMembers extends Gui {
 
                     //Delete this gui.
                     this.delete();
-                    u.inviteMembers = null;
+                    u.invitePlotMembers = null;
 
                     //Switch back to plot info.
                     u.plotInfo = new PlotInfo(plotID, u.player.getUniqueId().toString());

@@ -54,16 +54,20 @@ public class StaffGui extends Gui {
             Lock regions.
 
          */
-        setItem(10, Utils.createItem(Material.ANVIL, 1,
-                        Utils.chat("&b&lManage Region " + user.getRegion()),
-                        Utils.chat("&fOpens a menu to manage details of the region you are currently in.")),
-                u ->
+        if (user.player.hasPermission("")) {
+            if (user.inRegion) {
+                setItem(10, Utils.createItem(Material.ANVIL, 1,
+                                Utils.chat("&b&lManage Region " + user.region.getName()),
+                                Utils.chat("&fOpens a menu to manage details of the region you are currently in.")),
+                        u ->
 
-                {
+                        {
 
-                    //Manage Region Menu.
+                            //Manage Region Menu.
 
-                });
+                        });
+            }
+        }
 
         //Click to open menu to deal with region join requests.
         if (true/*request exists*/) {
