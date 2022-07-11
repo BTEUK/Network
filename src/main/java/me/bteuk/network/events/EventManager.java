@@ -13,6 +13,10 @@ public class EventManager {
 
             TeleportEvent.event(uuid, event);
 
+        } else if (event[0].equals("leave")) {
+
+            LeaveEvent.event(uuid, event);
+
         }
     }
 }

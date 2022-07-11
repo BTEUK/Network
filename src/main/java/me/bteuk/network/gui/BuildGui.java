@@ -187,7 +187,7 @@ public class BuildGui extends Gui {
                                     //If the user is Jr.Builder+ go through the region joining process.
                                     if (u.player.hasPermission("group.jrbuilder")) {
 
-                                        u.region.joinRegion(u, false);
+                                        u.region.requestRegion(u, false);
                                         u.player.closeInventory();
 
                                     } else {
