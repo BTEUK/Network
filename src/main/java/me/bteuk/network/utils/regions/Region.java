@@ -7,6 +7,8 @@ import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.WorldGuard;
 import org.bukkit.Bukkit;
 
+import java.util.ArrayList;
+
 public record Region(String regionName) {
 
     public String getName() {
@@ -135,6 +137,16 @@ public record Region(String regionName) {
         }
     }
 
+    //Set the region to private (default).
+    public void setPrivate() {
+        Network.getInstance().regionSQL.update("UPDATE regions SET status='default' WHERE region='" + regionName + "';");
+    }
+
+    //Set the region to public.
+    public void setPublic() {
+        Network.getInstance().regionSQL.update("UPDATE regions SET status='public' WHERE region='" + regionName + "';");
+    }
+
     //Check whether the region equals another region.
     public boolean equals(Region region) {
         return (getName().equals(region.getName()));
@@ -153,6 +165,48 @@ public record Region(String regionName) {
         }
     }
 
+    //Check if this region has any requests.
+    public boolean hasRequests() {
+        return Network.getInstance().regionSQL.hasRow("SELECT region FROM region_requests WHERE region='" + regionName + "';");
+    }
+
+    //Accept any requests for this region.
+    public void acceptRequests() {
+
+        //Get all requests for this region by uuid.
+        ArrayList<String> uuids = Network.getInstance().regionSQL.getStringList("SELECT uuid FROM region_requests WHERE region='" + regionName + "';");
+        int coordinate_id;
+
+        //Add all users to the region.
+        for (String uuid : uuids) {
+
+            //Get coordinate id from request.
+            coordinate_id = Network.getInstance().regionSQL.getInt("SELECT coordinate_id FROM region_requests WHERE region='" + regionName + "' AND uuid='" + uuid + "';");
+
+            //Join region.
+            joinRegion(uuid, coordinate_id);
+
+        }
+
+        //Clear all requests for the region.
+        Network.getInstance().regionSQL.update("DELETE FROM region_requests WHERE region='" + regionName + "';");
+
+    }
+
+    //Accept a request for a specific user.
+    public void acceptRequest(String uuid) {
+
+        //Get the coordinate id for the request.
+        int coordinate_id = Network.getInstance().regionSQL.getInt("SELECT coordinate_id FROM region_requests WHERE region='" + regionName + "' AND uuid='" + uuid + "';");
+
+        //Add them to the region.
+        joinRegion(uuid, coordinate_id);
+
+        //Delete request.
+        Network.getInstance().regionSQL.update("DELETE FROM region_requests WHERE region='" + regionName + "' AND uuid='" + uuid + "'; ");
+
+    }
+
     //Join region with owner or staff request.
     //If staff request is true then it requires a staff request else it's an owner request.
     public void requestRegion(NetworkUser u, boolean staffRequest) {
@@ -167,7 +221,7 @@ public record Region(String regionName) {
                     u.player.getUniqueId() + "',0," + coordinate + ");");
 
             //Send message to player.
-            u.player.sendMessage(Utils.chat("&aRequested to join region " + regionName + ", awaiting staff review."));
+            u.player.sendMessage(Utils.chat("&aRequested to join region &3" + regionName + ", &aawaiting staff review."));
 
             //TODO send message to reviewers if online.
 
@@ -179,7 +233,7 @@ public record Region(String regionName) {
                     u.player.getUniqueId() + "',0," + coordinate + ");");
 
             //Send message to player.
-            u.player.sendMessage(Utils.chat("&aRequested to join region " + regionName + ", awaiting owner review."));
+            u.player.sendMessage(Utils.chat("&aRequested to join region &3" + regionName + ", &aawaiting owner review."));
 
             //TODO send message to owner if online.
 
@@ -192,9 +246,12 @@ public record Region(String regionName) {
         //If region is public then it must already have an owner.
         if (isPublic()) {
 
+            //Add new coordinate at the location of the player.
+            int coordinateID = Network.getInstance().globalSQL.addCoordinate(u.player.getLocation());
+
             //Join region as member.
-            Network.getInstance().regionSQL.update("INSERT INTO region_members(region,uuid,last_enter) VALUES('" + regionName + "','" +
-                    u.player.getUniqueId() + "'," + Time.currentTime() + ");");
+            Network.getInstance().regionSQL.update("INSERT INTO region_members(region,uuid,last_enter,coordinate_id) VALUES('" + regionName + "','" +
+                    u.player.getUniqueId() + "'," + Time.currentTime() + "," + coordinateID + ");");
 
             //Start log of player in region.
             Network.getInstance().regionSQL.update("INSERT INTO region_logs(region,uuid,start_time) VALUES('" + regionName + "','" +
@@ -203,7 +260,7 @@ public record Region(String regionName) {
             //Join region in WorldGuard.
             WorldGuard.addMember(regionName, u.player.getUniqueId().toString(), u.player.getWorld());
 
-            u.player.sendMessage(Utils.chat("&aYou have joined the region " + regionName + " as a member."));
+            u.player.sendMessage(Utils.chat("&aYou have joined the region &3" + regionName + " &aas a member."));
 
         } else {
 
@@ -222,14 +279,17 @@ public record Region(String regionName) {
                 Network.getInstance().regionSQL.update("INSERT INTO region_logs(region,uuid,start_time) VALUES('" + regionName + "','" +
                         owner + "'," + Time.currentTime() + ");");
 
-                Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + owner + "','&aYou have been demoted to a member in region "
-                        + getTag(owner) + " due to inactivity.');");
+                Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + owner + "','&aYou have been demoted to a member in region &3"
+                        + getTag(owner) + " &adue to inactivity.');");
 
             }
 
+            //Add new coordinate at the location of the player.
+            int coordinateID = Network.getInstance().globalSQL.addCoordinate(u.player.getLocation());
+
             //Join region as owner.
-            Network.getInstance().regionSQL.update("INSERT INTO region_members(region,uuid,is_owner,last_enter) VALUES('" + regionName + "','" +
-                    u.player.getUniqueId() + "',1," + Time.currentTime() + ");");
+            Network.getInstance().regionSQL.update("INSERT INTO region_members(region,uuid,is_owner,last_enter,coordinate_id) VALUES('" + regionName + "','" +
+                    u.player.getUniqueId() + "',1," + Time.currentTime() + "," + coordinateID + ");");
 
             //Start log of player in region.
             Network.getInstance().regionSQL.update("INSERT INTO region_logs(region,uuid,is_owner,start_time) VALUES('" + regionName + "','" +
@@ -238,13 +298,75 @@ public record Region(String regionName) {
             //Join region in WorldGuard.
             WorldGuard.addMember(regionName, u.player.getUniqueId().toString(), u.player.getWorld());
 
-            u.player.sendMessage(Utils.chat("&aYou have joined the region " + regionName + " as the owner."));
+            u.player.sendMessage(Utils.chat("&aYou have joined the region &3" + regionName + " &aas the owner."));
+
+        }
+    }
+
+    //Join region if we don't know whether the user is online.
+    public void joinRegion(String uuid, int coordinateID) {
+
+        //If region has an owner join as member.
+        if (hasOwner()) {
+
+            //Join region as member.
+            Network.getInstance().regionSQL.update("INSERT INTO region_members(region,uuid,last_enter,coordinate_id) VALUES('" + regionName + "','" +
+                    uuid + "'," + Time.currentTime() + "," + coordinateID + ");");
+
+            //Start log of player in region.
+            Network.getInstance().regionSQL.update("INSERT INTO region_logs(region,uuid,start_time) VALUES('" + regionName + "','" +
+                    uuid + "'," + Time.currentTime() + ");");
+
+            //Join region in WorldGuard.
+            WorldGuard.addMember(regionName, uuid, Bukkit.getWorld(Network.getInstance().getConfig().getString("earth_world")));
+
+            //Send message to user.
+            Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aYou have joined the region &3" + regionName + " &aas a member.'");
+
+        } else {
+
+            //If the region is inactive, demote the previous owner to a member.
+            if (isInactive()) {
+
+                String owner = getOwner();
+
+                //Demote owner in database.
+                Network.getInstance().regionSQL.update("UPDATE region_members SET is_owner=0 WHERE region='" + regionName + "' AND uuid='" + owner + "';");
+
+                //Close log for owner.
+                Network.getInstance().regionSQL.update("UPDATE region_logs SET end_time=" + Time.currentTime() + " WHERE region='" + regionName + "' AND uuid='" + owner + "';");
+
+                //Open log for previous owner as member.
+                Network.getInstance().regionSQL.update("INSERT INTO region_logs(region,uuid,start_time) VALUES('" + regionName + "','" +
+                        owner + "'," + Time.currentTime() + ");");
+
+                Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + owner + "','&aYou have been demoted to a member in region &3"
+                        + getTag(owner) + " &adue to inactivity.');");
+
+            }
+
+            //Join region as owner.
+            Network.getInstance().regionSQL.update("INSERT INTO region_members(region,uuid,is_owner,last_enter) VALUES('" + regionName + "','" +
+                    uuid + "',1," + Time.currentTime() + ");");
+
+            //Start log of player in region.
+            Network.getInstance().regionSQL.update("INSERT INTO region_logs(region,uuid,is_owner,start_time) VALUES('" + regionName + "','" +
+                    uuid + "',1," + Time.currentTime() + ");");
+
+            //Join region in WorldGuard.
+            WorldGuard.addMember(regionName, uuid, Bukkit.getWorld(Network.getInstance().getConfig().getString("earth_world")));
+
+            Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aYou have joined the region &3" + regionName + " &aas the owner.'");
 
         }
     }
 
     //Leave region.
     public void leaveRegion(String uuid) {
+
+        //Send message to user.
+        //Is sent before actual removal so we can read the region tag.
+        Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aYou have left region &3" + getTag(uuid) + "')");
 
         //Leave region in database.
         Network.getInstance().regionSQL.update("DELETE FROM region_members WHERE region='" + regionName + "' AND uuid='" + uuid + "';");

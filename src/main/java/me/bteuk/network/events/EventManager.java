@@ -13,9 +13,9 @@ public class EventManager {
 
             TeleportEvent.event(uuid, event);
 
-        } else if (event[0].equals("leave")) {
+        } else if (event[0].equals("region")) {
 
-            LeaveEvent.event(uuid, event);
+            RegionEvent.event(uuid, event);
 
         }
     }

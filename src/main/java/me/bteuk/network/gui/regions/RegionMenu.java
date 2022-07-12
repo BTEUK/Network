@@ -3,7 +3,6 @@ package me.bteuk.network.gui.regions;
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.BuildGui;
 import me.bteuk.network.gui.Gui;
-import me.bteuk.network.gui.plotsystem.PlotInfo;
 import me.bteuk.network.sql.RegionSQL;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
@@ -112,7 +111,7 @@ public class RegionMenu extends Gui {
                             u.regionMenu = null;
 
                             //Switch to region info.
-                            u.regionInfo = new RegionInfo(owner.get(finalI), u.player.getUniqueId().toString());
+                            u.regionInfo = new RegionInfo(Network.getInstance().getRegionManager().getRegion(owner.get(finalI)), u.player.getUniqueId().toString());
                             u.regionInfo.open(u);
 
                         });
@@ -130,7 +129,7 @@ public class RegionMenu extends Gui {
                             u.regionMenu = null;
 
                             //Switch to plot info.
-                            u.regionInfo = new RegionInfo(member.get((finalI-owner.size())), u.player.getUniqueId().toString());
+                            u.regionInfo = new RegionInfo(Network.getInstance().getRegionManager().getRegion(member.get((finalI-owner.size()))), u.player.getUniqueId().toString());
                             u.regionInfo.open(u);
 
                         });
@@ -146,6 +145,9 @@ public class RegionMenu extends Gui {
                 slot++;
             }
         }
+
+        //TODO If the user has region join requests show a button for them.
+
 
         //Return
         setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,

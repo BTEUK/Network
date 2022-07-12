@@ -21,3 +21,7 @@ commands:
   claim:
     usage: /<command>
     description: Routes directly to the build menu of the gui, mainly for the purpose of player habits as this was the command previously.
+  region:
+    aliases: [region]
+    usage: /<command>
+    description: Allows players to manipulate regions without using the gui.

@@ -5,7 +5,6 @@ import com.google.common.io.ByteStreams;
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.sql.GlobalSQL;
-import me.bteuk.network.sql.RegionSQL;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.regions.Region;
 import me.bteuk.network.utils.regions.RegionTagListener;
@@ -22,11 +21,11 @@ public class RegionInfo extends Gui {
 
     private final GlobalSQL globalSQL;
 
-    public RegionInfo(String region, String uuid) {
+    public RegionInfo(Region region, String uuid) {
 
-        super(27, Component.text("Region " + region, NamedTextColor.AQUA, TextDecoration.BOLD));
+        super(27, Component.text("Region " + region.getTag(uuid), NamedTextColor.AQUA, TextDecoration.BOLD));
 
-        this.region = Network.getInstance().getRegionManager().getRegion(region);
+        this.region = region;
         this.uuid = uuid;
 
         globalSQL = Network.getInstance().globalSQL;
@@ -42,14 +41,45 @@ public class RegionInfo extends Gui {
         //Manage members. 18
         //Set public. 0
 
-        //For both:
-        //Set region name. 21
-
         //Region info.
         setItem(4, Utils.createItem(Material.BOOK, 1,
                 Utils.chat("&b&lRegion " + region.getTag(uuid)),
                 Utils.chat("&fRegion Owner &7" + region.ownerName()),
                 Utils.chat("&fRegion Members &7" + region.memberCount())));
+
+        //Leave Region.
+        setItem(8, Utils.createItem(Material.RED_CONCRETE, 1,
+                        Utils.chat("&b&lLeave Region")),
+                u -> {
+
+                    //Send leave event to server events.
+                    Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + u.player.getUniqueId() + "','network','"
+                            + globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';") + "','region leave " + region.getName() + "');");
+
+                    //Return to region menu and close inventory.
+                    this.delete();
+                    u.regionInfo = null;
+
+                    u.regionMenu = new RegionMenu(u);
+
+                });
+
+        //Set region tag.
+        setItem(21, Utils.createItem(Material.WRITABLE_BOOK, 1,
+                        Utils.chat("&b&lSet Region Tag"),
+                        Utils.chat("&fClick to give this region a custom name."),
+                        Utils.chat("&fYou will be prompted to type a name in chat."),
+                        Utils.chat("&fIt can have a maximum of 64 characters.")),
+
+                u -> {
+
+                    //Create chat listener and send message telling the player.
+                    //Listener will automatically close after 1 minute or if a message is sent.
+                    new RegionTagListener(u.player, region);
+                    u.player.sendMessage(Utils.chat("&aWrite your region tag in chat, the first message counts."));
+                    u.player.closeInventory();
+
+                });
 
         //Teleport to region.
         setItem(22, Utils.createItem(Material.ENDER_PEARL, 1,
@@ -73,7 +103,7 @@ public class RegionInfo extends Gui {
                     } else {
 
                         //Create teleport region event.
-                        Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('" + u.player.getUniqueId() + "','network'," + "'teleport region "
+                        Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('" + u.player.getUniqueId() + "','network'," + "'region teleport "
                                 + region + "');");
 
                         //Switch server.
@@ -109,40 +139,78 @@ public class RegionInfo extends Gui {
                     }
                 });
 
-        //Leave Region.
-        setItem(8, Utils.createItem(Material.RED_CONCRETE, 1,
-                        Utils.chat("&b&lLeave Region")),
-                u -> {
+        //Owner only settings.
+        if (region.isOwner(uuid)) {
 
-                    //Send leave event to server events.
-                    Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + u.player.getUniqueId() + "','network','"
-                            + globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';") + "','leave region " + region.getName() + "');");
+            //If region is private, make public button, if public make private button.
+            if (region.isPublic()) {
+                setItem(0, Utils.createItem(Material.IRON_TRAPDOOR, 1,
+                                Utils.chat("&b&lMake Private"),
+                                Utils.chat("&fNew members will need your approval to join the region.")),
+                        u -> {
 
-                    //Return to region menu and close inventory.
-                    this.delete();
-                    u.regionInfo = null;
+                            //Set the region as private and refresh gui.
+                            region.setPrivate();
 
-                    u.regionMenu = new RegionMenu(u);
+                            u.player.sendMessage(Utils.chat("&aRegion &3" + region.getTag(uuid) + " &ais now private."));
+                            this.refresh();
 
-                });
+                        });
+            } else {
+                setItem(0, Utils.createItem(Material.OAK_TRAPDOOR, 1,
+                                Utils.chat("&b&lMake Public"),
+                                Utils.chat("&fNew members can join the region without approval.")),
+                        u -> {
 
-        //Set region tag.
-        setItem(21, Utils.createItem(Material.WRITABLE_BOOK, 1,
-                        Utils.chat("&b&lSet Region Tag"),
-                        Utils.chat("&fClick to give this region a custom name."),
-                        Utils.chat("&fYou will be prompted to type a name in chat."),
-                        Utils.chat("&fIt can have a maximum of 64 characters.")),
+                            //Set the region as public and refresh gui.
+                            region.setPublic();
 
-                u -> {
+                            //Approve any active region requests for this region.
+                            //Make sure this is done on the correct server.
+                            //Create teleport region event.
+                            if (region.hasRequests()) {
+                                Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + u.player.getUniqueId() + "','network'," +
+                                        Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';") + "'region request accept "
+                                        + region + "');");
+                            }
 
-                    //Create chat listener and send message telling the player.
-                    //Listener will automatically close after 1 minute or if a message is sent.
-                    new RegionTagListener(u.player, region);
-                    u.player.sendMessage(Utils.chat("&aWrite your region tag in chat, the first message counts."));
-                    u.player.closeInventory();
+                            u.player.sendMessage(Utils.chat("&aRegion &3" + region.getTag(uuid) + " &ais now public."));
+                            this.refresh();
 
-                });
+                        });
+            }
 
+            //Invite member.
+            setItem(9, Utils.createItem(Material.OAK_BOAT, 1,
+                            Utils.chat("&b&lInvite Members"),
+                            Utils.chat("&fInvite a new member to your region."),
+                            Utils.chat("&fYou can only invite online users.")),
+                    u -> {
+
+                        //Open the invite member menu.
+                        this.delete();
+                        u.regionInfo = null;
+
+                        u.inviteRegionMembers = new InviteRegionMembers();
+                        u.inviteRegionMembers.open(u);
+
+                    });
+
+            //Manage members.
+            setItem(18, Utils.createItem(Material.OAK_BOAT, 1,
+                            Utils.chat("&b&lRegion Members"),
+                            Utils.chat("&fManage the members in your region.")),
+                    u -> {
+
+                        //Open the invite member menu.
+                        this.delete();
+                        u.regionInfo = null;
+
+                        u.regionMembers = new RegionMembers();
+                        u.regionMembers.open(u);
+
+                    });
+        }
 
     }
 

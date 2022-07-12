@@ -22,27 +22,6 @@ public class TeleportEvent {
             return;
         }
 
-        //If second string is 'coordinate' then the player must be teleported to a coordinate id.
-        if (event[1].equals("region")) {
-
-            //Get the region.
-            Region region = Network.getInstance().getRegionManager().getRegion(event[2]);
-
-            Location l = Network.getInstance().globalSQL.getCoordinate(region.getCoordinateID(uuid));
-
-            if (l == null) {
-                p.sendMessage(Utils.chat("&cAn error occurred while fetching the location to teleport."));
-                Network.getInstance().getLogger().warning("Location is null for coodinate id " + region.getCoordinateID(uuid));
-                return;
-            }
-
-            //Teleport player.
-            p.teleport(l);
-            p.sendMessage(Utils.chat("&aTeleported to region &3" + region.getTag(uuid)));
-            return;
-
-        }
-
         //Get world.
         World world = Bukkit.getWorld(event[1]);
 

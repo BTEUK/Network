@@ -3,7 +3,9 @@ package me.bteuk.network.utils;
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.BuildGui;
 import me.bteuk.network.gui.plotsystem.*;
+import me.bteuk.network.gui.regions.InviteRegionMembers;
 import me.bteuk.network.gui.regions.RegionInfo;
+import me.bteuk.network.gui.regions.RegionMembers;
 import me.bteuk.network.gui.regions.RegionMenu;
 import me.bteuk.network.utils.regions.Region;
 import org.bukkit.entity.Player;
@@ -28,6 +30,9 @@ public class NetworkUser {
 
     public RegionMenu regionMenu;
     public RegionInfo regionInfo;
+
+    public InviteRegionMembers inviteRegionMembers;
+    public RegionMembers regionMembers;
 
     //Staff user.
     public StaffUser staffUser;
