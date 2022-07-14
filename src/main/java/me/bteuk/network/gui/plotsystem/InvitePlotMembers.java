@@ -118,7 +118,7 @@ public class InvitePlotMembers extends Gui {
                                     //The invite will be active until they disconnect from the network.
                                     //They will need to run a command to actually join the plot.
                                     plotSQL.update("INSERT INTO plot_invites(id,owner,uuid) VALUES(" + plotID + ",'" +
-                                            plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plotID + " AND is_owner=1;") + "','" + uuid + "');");
+                                            u.player.getUniqueId() + "','" + uuid + "');");
 
                                     globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + uuid + "','network','" +
                                             globalSQL.getString("SELECT server FROM online_users WHERE uuid='" + uuid + "';") + "','invite plot " + plotID + "')");

@@ -11,10 +11,6 @@ import java.util.ArrayList;
 
 public record Region(String regionName) {
 
-    public String getName() {
-        return regionName;
-    }
-
     //Get the tag of the region for a specific player, or name if no tag is set.
     public String getTag(String uuid) {
         if (hasTag(uuid)) {
@@ -149,7 +145,7 @@ public record Region(String regionName) {
 
     //Check whether the region equals another region.
     public boolean equals(Region region) {
-        return (getName().equals(region.getName()));
+        return (regionName.equals(region.regionName()));
     }
 
     //Check whether the region is in the database.
@@ -168,6 +164,16 @@ public record Region(String regionName) {
     //Check if this region has any requests.
     public boolean hasRequests() {
         return Network.getInstance().regionSQL.hasRow("SELECT region FROM region_requests WHERE region='" + regionName + "';");
+    }
+
+    //Check if the specified player has been invited to this region.
+    public boolean hasInvite(String uuid) {
+        return Network.getInstance().regionSQL.hasRow("SELECT region FROM region_invites WHERE region='" + regionName + "' AND uuid='" + uuid + "';");
+    }
+
+    //Remove a region invite.
+    public void removeInvite(String uuid) {
+        Network.getInstance().regionSQL.update("DELETE FROM region_invites WHERE region='" + regionName + "' AND uuid='" + uuid + "';");
     }
 
     //Accept any requests for this region.

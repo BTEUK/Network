@@ -36,3 +36,11 @@ CREATE TABLE IF NOT EXISTS region_requests
     coordinate_id   INT         NOT NULL,
     UNIQUE(region,uuid)
 );
+
+CREATE TABLE IF NOT EXISTS region_invites
+(
+    region      VARCHAR(16)     NOT NULL,
+    owner       CHAR(36)        NOT NULL<
+    uuid        CHAR(36)        NOT NULL,
+    PRIMARY KEY(region,uuid)
+);

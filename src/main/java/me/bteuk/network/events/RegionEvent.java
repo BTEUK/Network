@@ -30,8 +30,6 @@ public class RegionEvent {
 
             }
 
-
-
         } else if (event[1].equals("request")) {
 
             if (event[2].equals("accept")) {
@@ -83,8 +81,28 @@ public class RegionEvent {
             //Teleport player.
             p.teleport(l);
             p.sendMessage(Utils.chat("&aTeleported to region &3" + region.getTag(uuid)));
-            return;
 
+        } else if (event[1].equals("join")) {
+
+            //Get the region.
+            Region region = Network.getInstance().getRegionManager().getRegion(event[2]);
+
+            //Add player to the region.
+            //Set the coordinate id the same as the location of the owner.
+            region.joinRegion(uuid, region.getCoordinateID(region.getOwner()));
+
+            String message = "&aYou have joined region " + region.getTag(uuid) + " as a member.";
+
+            if (p != null) {
+
+                p.sendMessage(Utils.chat(message));
+
+            } else {
+
+                //Send a cross-server message.
+                Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','" + message + "';");
+
+            }
         }
     }
 }

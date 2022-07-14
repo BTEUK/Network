@@ -57,6 +57,9 @@ public class Plot implements CommandExecutor {
                             plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + "';") +
                     "','join plot " + plotID + "');");
 
+            //Remove invite.
+            plotSQL.update("DELETE FROM plot_invites WHERE id=" + plotID + " AND uuid='" + p.getUniqueId() + "';");
+
             return true;
 
         } else {

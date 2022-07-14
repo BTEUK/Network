@@ -46,13 +46,13 @@ public class RegionManager {
 
     //Check whether the region exists in the database.
     //This is mainly used to check whether guests can teleport there.
-    private boolean exists(String regionName) {
+    public boolean exists(String regionName) {
         return (regionSQL.hasRow("SELECT region FROM regions WHERE region='" + regionName + "';" ));
     }
 
     public Region getRegion(String regionName) {
         for (Region region : regions) {
-            if (region.getName().equals(regionName)) {
+            if (region.regionName().equals(regionName)) {
                 return region;
             }
         }

@@ -54,7 +54,7 @@ public class RegionInfo extends Gui {
 
                     //Send leave event to server events.
                     Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + u.player.getUniqueId() + "','network','"
-                            + globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';") + "','region leave " + region.getName() + "');");
+                            + globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';") + "','region leave " + region.regionName() + "');");
 
                     //Return to region menu and close inventory.
                     this.delete();
@@ -191,7 +191,7 @@ public class RegionInfo extends Gui {
                         this.delete();
                         u.regionInfo = null;
 
-                        u.inviteRegionMembers = new InviteRegionMembers();
+                        u.inviteRegionMembers = new InviteRegionMembers(region);
                         u.inviteRegionMembers.open(u);
 
                     });
