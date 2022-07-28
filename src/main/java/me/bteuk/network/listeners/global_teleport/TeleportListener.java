@@ -190,7 +190,7 @@ public class TeleportListener implements Listener {
                         if (!u.region.equals(region)) {
 
                             //Send default enter message.
-                            p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.chat("&aYou have entered " + region.getName() + " and left " + u.region.getName() + ".")));
+                            p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.chat("&aYou have entered " + region.regionName() + " and left " + u.region.regionName() + ".")));
 
                             //Update the region the player is in.
                             u.region = region;
@@ -199,7 +199,7 @@ public class TeleportListener implements Listener {
                     } else {
 
                         //Send default enter message.
-                        p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.chat("&aYou have entered " + region.getName() + ".")));
+                        p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.chat("&aYou have entered " + region.regionName() + ".")));
 
 
                         //Update the region the player is in.

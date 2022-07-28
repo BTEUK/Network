@@ -20,14 +20,17 @@ public class RegionEvent {
         if (event[1].equals("set")) {
             if (event[2].equals("plotsystem")) {
 
-                //Set region to plotsystem.
+                //Get region.
                 Region region = Network.getInstance().getRegionManager().getRegion(event[3]);
 
-                //Kick any members.
+                //If region is not already set to plotsystem.
+                if (!region.isPlot()) {
 
-                //Set region to plotsystem.
+                    //Set region to plotsystem.
+                    //This will kick any members.
+                    region.setPlot();
 
-
+                }
             }
 
         } else if (event[1].equals("request")) {

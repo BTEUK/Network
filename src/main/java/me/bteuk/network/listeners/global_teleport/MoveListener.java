@@ -100,8 +100,8 @@ public class MoveListener implements Listener {
                                 if (region.isPlot()) {
 
                                     //Get server and world of region.
-                                    server = Network.getInstance().plotSQL.getString("SELECT server FROM regions WHERE region='" + region.getName() + "';");
-                                    String location = Network.getInstance().plotSQL.getString("SELECT location FROM regions WHERE region='" + region.getName() + "';");
+                                    server = Network.getInstance().plotSQL.getString("SELECT server FROM regions WHERE region='" + region.regionName() + "';");
+                                    String location = Network.getInstance().plotSQL.getString("SELECT location FROM regions WHERE region='" + region.regionName() + "';");
 
                                     int xTransform = Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + location + "';");
                                     int zTransform = Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");

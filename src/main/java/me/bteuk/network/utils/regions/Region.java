@@ -76,6 +76,33 @@ public record Region(String regionName) {
         return (Network.getInstance().regionSQL.hasRow("SELECT region FROM regions WHERE region='" + regionName + "' AND status='plot';"));
     }
 
+    //Set the region to be for plots.
+    public void setPlot() {
+
+        //Kick members if exist.
+        for (String uuid : getMembers()) {
+
+            //Send message to user.
+            //Is sent before actual removal so we can read the region tag.
+            Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aYou have been kicked from region &3" + getTag(uuid) + ", it has been moved to the plot system.')");
+
+            //Leave region in database.
+            Network.getInstance().regionSQL.update("DELETE FROM region_members WHERE region='" + regionName + "' AND uuid='" + uuid + "';");
+
+            //Close log of player in region.
+            Network.getInstance().regionSQL.update("UPDATE region_logs SET end_time=" + Time.currentTime()
+                    + " WHERE region='" + regionName + "' AND uuid='" + uuid + "';");
+
+            //Leave region in WorldGuard.
+            WorldGuard.addMember(regionName, uuid, Bukkit.getWorld(Network.getInstance().getConfig().getString("earth_world")));
+
+        }
+
+        //Set region to plot.
+        Network.getInstance().regionSQL.update("UPDATE regions SET status='plot' WHERE region='" + regionName + "';");
+        Network.getInstance().getLogger().info("Region " + regionName + " set to plot status.");
+    }
+
     //Return whether the region has an owner.
     public boolean hasOwner() {
         return (Network.getInstance().regionSQL.hasRow("SELECT region FROM region_members WHERE region='" + regionName + "' AND is_owner=1;"));
@@ -107,6 +134,11 @@ public record Region(String regionName) {
         } else {
             return "nobody";
         }
+    }
+
+    //Return string array of member uuids.
+    public ArrayList<String> getMembers() {
+        return Network.getInstance().regionSQL.getStringList("SELECT uuid FROM region_members WHERE region='" + regionName + "';");
     }
 
     //Get the coordinate id for the location the player has set.

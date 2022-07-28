@@ -186,11 +186,11 @@ public class Tpll implements CommandExecutor {
             Region region = regionManager.getRegion(l);
 
             //Check if the region is on a plot server.
-            if (Network.getInstance().regionSQL.hasRow("SELECT region FROM regions WHERE region='" + region.getName() + "' AND status='plot';")) {
+            if (Network.getInstance().regionSQL.hasRow("SELECT region FROM regions WHERE region='" + region.regionName() + "' AND status='plot';")) {
 
                 //Get server and location of region.
-                String server = Network.getInstance().plotSQL.getString("SELECT server FROM regions WHERE region='" + region.getName() + "';");
-                String location = Network.getInstance().plotSQL.getString("SELECT location FROM regions WHERE region='" + region.getName() + "';");
+                String server = Network.getInstance().plotSQL.getString("SELECT server FROM regions WHERE region='" + region.regionName() + "';");
+                String location = Network.getInstance().plotSQL.getString("SELECT location FROM regions WHERE region='" + region.regionName() + "';");
 
                 //Get the coordinate transformations.
                 int xTransform = Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + location + "';");

@@ -51,7 +51,7 @@ public class RegionTagListener implements Listener {
                 region.setTag(p.getUniqueId().toString(), e.getMessage());
 
                 //Send message to player.
-                p.sendMessage(Utils.chat("&aSet tag for region " + region.getName() + " to " + e.getMessage()));
+                p.sendMessage(Utils.chat("&aSet tag for region " + region.regionName() + " to " + e.getMessage()));
 
                 //Unregister listener and task.
                 task.cancel();

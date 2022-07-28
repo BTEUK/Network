@@ -57,7 +57,7 @@ public class StaffGui extends Gui {
         if (user.player.hasPermission("")) {
             if (user.inRegion) {
                 setItem(10, Utils.createItem(Material.ANVIL, 1,
-                                Utils.chat("&b&lManage Region " + user.region.getName()),
+                                Utils.chat("&b&lManage Region " + user.region.regionName()),
                                 Utils.chat("&fOpens a menu to manage details of the region you are currently in.")),
                         u ->
 
