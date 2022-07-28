@@ -5,6 +5,7 @@ import me.bteuk.network.listeners.Connect;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Time;
+import me.bteuk.network.utils.Utils;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -33,6 +34,9 @@ public class Timers {
 
     //Uuids
     private ArrayList<String> uuids;
+
+    //Messages
+    private ArrayList<String> messages;
 
     //Navigator Check
     private ItemStack slot9;
@@ -101,6 +105,18 @@ public class Timers {
                     }
                 }
 
+                //Check for messages that have been sent to this player.
+                if (instance.globalSQL.hasRow("SELECT message FROM messages WHERE recipient='" + user.player.getUniqueId() + "';")) {
+
+                    //Get messages.
+                    messages = instance.globalSQL.getStringList("SELECT message FROM messages WHERE recipient='" + user.player.getUniqueId() + "';");
+
+                    for (String message : messages) {
+
+                        user.player.sendMessage(Utils.chat(message));
+
+                    }
+                }
             }
 
             //Check for users switching to this server.
