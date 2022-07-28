@@ -22,6 +22,27 @@ public class TeleportEvent {
             return;
         }
 
+        //Check if the teleport is to a specific player.
+        if (event[1].equals("player")) {
+
+            //Get player if they're online and teleport the player there.
+            Player player = Bukkit.getPlayer(UUID.fromString(event[2]));
+
+            if (player != null) {
+
+                p.teleport(player.getLocation());
+                p.sendMessage(Utils.chat("&aTeleported to " +
+                        Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + event[2] + "';")));
+
+            } else {
+                p.sendMessage(Utils.chat("&c" +
+                        Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + event[2] + "';") +
+                        " is not online."));
+            }
+            return;
+
+        }
+
         //Get world.
         World world = Bukkit.getWorld(event[1]);
 

@@ -5,6 +5,8 @@ CREATE TABLE IF NOT EXISTS player_data
 	last_online	BIGINT			NOT NULL,
 	last_submit	BIGINT			NOT NULL,
 	navigator   TINYINT(1)      NOT NULL DEFAULT 1,
+	teleport_enabled    TINYINT(1)  NOT NULL DEFAULT 1,
+	previous_coordinate INT     NOT NULL DEFAULT 0,
 	PRIMARY KEY (uuid)
 );
 

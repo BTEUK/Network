@@ -25,3 +25,7 @@ commands:
     aliases: [region]
     usage: /<command>
     description: Allows players to manipulate regions without using the gui.
+  teleport:
+    aliasses: [tp]
+    usage: /<command>
+    description: Teleport to any online player.

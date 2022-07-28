@@ -1,9 +1,7 @@
 package me.bteuk.network;
 
-import me.bteuk.network.commands.Navigator;
-import me.bteuk.network.commands.Plot;
-import me.bteuk.network.commands.Staff;
-import me.bteuk.network.commands.Tpll;
+import me.bteuk.network.commands.*;
+import me.bteuk.network.commands.tabcompleter.PlayerSelector;
 import me.bteuk.network.gui.NavigatorGui;
 import me.bteuk.network.listeners.*;
 import me.bteuk.network.sql.GlobalSQL;
@@ -195,6 +193,8 @@ public final class Network extends JavaPlugin {
         getCommand("navigator").setExecutor(new Navigator());
         getCommand("staff").setExecutor(new Staff());
 
+        getCommand("teleport").setExecutor(new Tp());
+        getCommand("teleport").setTabCompleter(new PlayerSelector());
 
     }
 
