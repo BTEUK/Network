@@ -114,6 +114,22 @@ public class TeleportListener implements Listener {
                                 //Update the region the player is in.
                                 u.region = region;
 
+                                //Save location in database for /back.
+                                if (Network.getInstance().globalSQL.getInt("SELECT previous_coordinate FROM player_data WHERE uuid='" + p.getUniqueId() + "';") == 0) {
+
+                                    //No coordinate exists, create new.
+                                    int coordinateID = Network.getInstance().globalSQL.addCoordinate(e.getFrom());
+
+                                } else {
+
+                                    //Get coordinate id.
+                                    int coordinateID = Network.getInstance().globalSQL.getInt("SELECT previous_coordinate FROM player_data WHERE uuid='" + p.getUniqueId() + "';");
+
+                                    //Update existing coordinate.
+                                    Network.getInstance().globalSQL.updateCoordinate(coordinateID, e.getFrom());
+
+                                }
+
                             } else {
 
                                 //You can't enter this region.
@@ -156,6 +172,22 @@ public class TeleportListener implements Listener {
 
                             //Update the region the player is in.
                             u.region = region;
+
+                            //Save location in database for /back.
+                            if (Network.getInstance().globalSQL.getInt("SELECT previous_coordinate FROM player_data WHERE uuid='" + p.getUniqueId() + "';") == 0) {
+
+                                //No coordinate exists, create new.
+                                int coordinateID = Network.getInstance().globalSQL.addCoordinate(e.getFrom());
+
+                            } else {
+
+                                //Get coordinate id.
+                                int coordinateID = Network.getInstance().globalSQL.getInt("SELECT previous_coordinate FROM player_data WHERE uuid='" + p.getUniqueId() + "';");
+
+                                //Update existing coordinate.
+                                Network.getInstance().globalSQL.updateCoordinate(coordinateID, e.getFrom());
+
+                            }
 
                         } else {
 
@@ -204,6 +236,22 @@ public class TeleportListener implements Listener {
 
                         //Update the region the player is in.
                         u.region = region;
+
+                    }
+
+                    //Save location in database for /back.
+                    if (Network.getInstance().globalSQL.getInt("SELECT previous_coordinate FROM player_data WHERE uuid='" + p.getUniqueId() + "';") == 0) {
+
+                        //No coordinate exists, create new.
+                        int coordinateID = Network.getInstance().globalSQL.addCoordinate(e.getFrom());
+
+                    } else {
+
+                        //Get coordinate id.
+                        int coordinateID = Network.getInstance().globalSQL.getInt("SELECT previous_coordinate FROM player_data WHERE uuid='" + p.getUniqueId() + "';");
+
+                        //Update existing coordinate.
+                        Network.getInstance().globalSQL.updateCoordinate(coordinateID, e.getFrom());
 
                     }
 

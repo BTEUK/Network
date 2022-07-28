@@ -225,6 +225,30 @@ public class GlobalSQL {
         }
     }
 
+    //Update an existing coordinate.
+    public void updateCoordinate(int coordinateID, Location l) {
+
+        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
+                "UPDATE coordinates SET server=?, world=?, x=?, y=?, z=?, yaw=?, pitch=? WHERE id=?;"
+        )) {
+            statement.setString(1, Network.SERVER_NAME);
+            statement.setString(2, l.getWorld().getName());
+            statement.setDouble(3, l.getX());
+            statement.setDouble(4, l.getY());
+            statement.setDouble(5, l.getZ());
+            statement.setFloat(6, l.getYaw());
+            statement.setFloat(7, l.getPitch());
+            statement.setInt(8, coordinateID);
+            statement.executeUpdate();
+
+        } catch (SQLException sql) {
+
+            sql.printStackTrace();
+
+        }
+
+    }
+
     //Get coordinate from database by id.
     //World must be on this server else this will throw a null pointer exception.
     public Location getCoordinate(int coordinateID) {
