@@ -7,6 +7,7 @@ import me.bteuk.network.gui.plotsystem.PlotMenu;
 import me.bteuk.network.gui.plotsystem.PlotServerLocations;
 import me.bteuk.network.gui.regions.RegionMenu;
 import me.bteuk.network.utils.NetworkUser;
+import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.enums.ServerType;
 import me.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
@@ -85,9 +86,7 @@ public class BuildGui extends Gui {
 
                             //Teleport them to another server.
                             u.player.closeInventory();
-                            ByteArrayDataOutput out = ByteStreams.newDataOutput();
-                            out.writeUTF("Connect");
-                            out.writeUTF(server);
+                            SwitchServer.switchServer(u.player, server);
 
                         }
                     }
@@ -299,9 +298,7 @@ public class BuildGui extends Gui {
 
                     //Connect to the lobby server.
                     u.player.closeInventory();
-                    ByteArrayDataOutput out = ByteStreams.newDataOutput();
-                    out.writeUTF("Connect");
-                    out.writeUTF(Network.getInstance().globalSQL.getString("SELECT FROM server_data WHERE type='lobby';"));
+                    SwitchServer.switchServer(u.player, Network.getInstance().globalSQL.getString("SELECT FROM server_data WHERE type='lobby';"));
 
                 });
 

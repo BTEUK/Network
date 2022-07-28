@@ -3,6 +3,7 @@ package me.bteuk.network.commands;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import me.bteuk.network.Network;
+import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.regions.Region;
 import me.bteuk.network.utils.regions.RegionManager;
@@ -211,9 +212,8 @@ public class Tpll implements CommandExecutor {
                             + location + " " + (proj[0] + xTransform) + " " + (proj[1] + zTransform) + " " + p.getLocation().getYaw() + " " + p.getLocation().getPitch() + "');");
 
                     //Switch server.
-                    ByteArrayDataOutput out = ByteStreams.newDataOutput();
-                    out.writeUTF("Connect");
-                    out.writeUTF(server);
+                    SwitchServer.switchServer(p, server);
+
                 }
 
             } else {
@@ -238,9 +238,7 @@ public class Tpll implements CommandExecutor {
                                 + earthWorld + " " + (proj[0]) + " " + (proj[1]) + " " + p.getLocation().getYaw() + " " + p.getLocation().getPitch() + "');");
 
                         //Switch server.
-                        ByteArrayDataOutput out = ByteStreams.newDataOutput();
-                        out.writeUTF("Connect");
-                        out.writeUTF(earthServer);
+                        SwitchServer.switchServer(p, earthServer);
 
                     }
 

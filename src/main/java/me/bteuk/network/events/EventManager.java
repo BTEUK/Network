@@ -5,18 +5,10 @@ public class EventManager {
     public static void event(String uuid, String[] event) {
 
         //Start the execution process by looking at the event message structure.
-        if (event[0].equals("invite")) {
-
-            InviteEvent.event(uuid, event);
-
-        } else if (event[0].equals("teleport")) {
-
-            TeleportEvent.event(uuid, event);
-
-        } else if (event[0].equals("region")) {
-
-            RegionEvent.event(uuid, event);
-
+        switch (event[0]) {
+            case "invite" -> InviteEvent.event(uuid, event);
+            case "teleport" -> TeleportEvent.event(uuid, event);
+            case "region" -> RegionEvent.event(uuid, event);
         }
     }
 }

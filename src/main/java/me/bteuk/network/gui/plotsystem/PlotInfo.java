@@ -7,6 +7,7 @@ import me.bteuk.network.gui.*;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.PlotValues;
+import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
 import net.buildtheearth.terraminusminus.generator.EarthGeneratorSettings;
 import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
@@ -79,9 +80,7 @@ public class PlotInfo extends Gui {
 
                         //Teleport them to another server.
                         u.player.closeInventory();
-                        ByteArrayDataOutput out = ByteStreams.newDataOutput();
-                        out.writeUTF("Connect");
-                        out.writeUTF(server);
+                        SwitchServer.switchServer(u.player, server);
 
                     }
 

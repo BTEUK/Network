@@ -5,34 +5,22 @@ public class PlotValues {
     //Returns the plot difficulty name.
     public static String difficultyName(int difficulty) {
 
-        switch (difficulty) {
-
-            case 1:
-                return "Easy";
-            case 2:
-                return "Normal";
-            case 3:
-                return "Hard";
-            default:
-                return null;
-
-        }
+        return switch (difficulty) {
+            case 1 -> "Easy";
+            case 2 -> "Normal";
+            case 3 -> "Hard";
+            default -> null;
+        };
     }
 
     //Returns the plot size name.
     public static String sizeName(int size) {
 
-        switch (size) {
-
-            case 1:
-                return "Small";
-            case 2:
-                return "Medium";
-            case 3:
-                return "Large";
-            default:
-                return null;
-
-        }
+        return switch (size) {
+            case 1 -> "Small";
+            case 2 -> "Medium";
+            case 3 -> "Large";
+            default -> null;
+        };
     }
 }

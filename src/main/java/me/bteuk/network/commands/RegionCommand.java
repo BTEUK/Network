@@ -49,12 +49,10 @@ public class RegionCommand implements CommandExecutor {
                 //Remove invite.
                 region.removeInvite(p.getUniqueId().toString());
 
-                return true;
-
             } else {
                 p.sendMessage(Utils.chat("&cYou have not been invited to join this region."));
-                return true;
             }
+            return true;
         } else {
 
             p.sendMessage(Utils.chat("&cThe region " + args[1] + " does not exist."));

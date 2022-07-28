@@ -6,6 +6,7 @@ import me.bteuk.network.Network;
 import me.bteuk.network.gui.BuildGui;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.sql.PlotSQL;
+import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -290,9 +291,7 @@ public class PlotServerLocations extends Gui {
 
                                 //Teleport them to another server.
                                 this.delete();
-                                ByteArrayDataOutput out = ByteStreams.newDataOutput();
-                                out.writeUTF("Connect");
-                                out.writeUTF(server);
+                                SwitchServer.switchServer(u.player, server);
 
                             }
                         }

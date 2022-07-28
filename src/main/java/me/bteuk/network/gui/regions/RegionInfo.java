@@ -1,10 +1,9 @@
 package me.bteuk.network.gui.regions;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.sql.GlobalSQL;
+import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.regions.Region;
 import me.bteuk.network.utils.regions.RegionTagListener;
@@ -107,9 +106,7 @@ public class RegionInfo extends Gui {
                                 + region + "');");
 
                         //Switch server.
-                        ByteArrayDataOutput out = ByteStreams.newDataOutput();
-                        out.writeUTF("Connect");
-                        out.writeUTF(globalSQL.getString("SELECT name FROM server_data WHERE type='PLOT'"));
+                        SwitchServer.switchServer(u.player, globalSQL.getString("SELECT name FROM server_data WHERE type='PLOT'"));
 
                     }
                 });

@@ -5,7 +5,6 @@ import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.regions.Region;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -17,94 +16,103 @@ public class RegionEvent {
         //Get player.
         Player p = Bukkit.getPlayer(UUID.fromString(uuid));
 
-        if (event[1].equals("set")) {
-            if (event[2].equals("plotsystem")) {
+        switch (event[1]) {
+            case "set":
+                if (event[2].equals("plotsystem")) {
 
-                //Get region.
-                Region region = Network.getInstance().getRegionManager().getRegion(event[3]);
-
-                //If region is not already set to plotsystem.
-                if (!region.isPlot()) {
-
-                    //Set region to plotsystem.
-                    //This will kick any members.
-                    region.setPlot();
-
-                }
-            }
-
-        } else if (event[1].equals("request")) {
-
-            if (event[2].equals("accept")) {
-
-                //If length is 4 then no user is specified, this implies that it should accept all requests for the region, rather than a specific request.
-                if (event.length == 4) {
-
+                    //Get region.
                     Region region = Network.getInstance().getRegionManager().getRegion(event[3]);
 
-                    region.acceptRequests();
+                    //If region is not already set to plotsystem.
+                    if (!region.isPlot()) {
+
+                        //Set region to plotsystem.
+                        //This will kick any members.
+                        region.setPlot();
+
+                    }
+                }
+
+                break;
+            case "request":
+
+                if (event[2].equals("accept")) {
+
+                    //If length is 4 then no user is specified, this implies that it should accept all requests for the region, rather than a specific request.
+                    if (event.length == 4) {
+
+                        Region region = Network.getInstance().getRegionManager().getRegion(event[3]);
+
+                        region.acceptRequests();
+
+                    }
+                }
+
+                break;
+            case "leave": {
+
+                //Get region.
+                Region region = Network.getInstance().getRegionManager().getRegion(event[2]);
+
+                //Leave region.
+                region.leaveRegion(uuid);
+
+                //If the region has members after you've left.
+                //Find the most recent member and make them owner.
+                if (region.hasMember()) {
+
+                    String member = region.getRecentMember();
+
+                    region.makeOwner(member);
+
+                    //Send message to member that they are now the owner.
+                    Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + member + "','&aTransferred ownership of region "
+                            + region.getTag(member) + " to you due to the previous owner leaving the region.');");
 
                 }
+                break;
             }
+            case "teleport": {
 
-        } else if (event[1].equals("leave")) {
+                //Get the region.
+                Region region = Network.getInstance().getRegionManager().getRegion(event[2]);
 
-            //Get region.
-            Region region = Network.getInstance().getRegionManager().getRegion(event[2]);
+                Location l = Network.getInstance().globalSQL.getCoordinate(region.getCoordinateID(uuid));
 
-            //Leave region.
-            region.leaveRegion(uuid);
+                if (l == null) {
+                    p.sendMessage(Utils.chat("&cAn error occurred while fetching the location to teleport."));
+                    Network.getInstance().getLogger().warning("Location is null for coodinate id " + region.getCoordinateID(uuid));
+                    return;
+                }
 
-            //If the region has members after you've left.
-            //Find the most recent member and make them owner.
-            if (region.hasMember()) {
+                //Teleport player.
+                p.teleport(l);
+                p.sendMessage(Utils.chat("&aTeleported to region &3" + region.getTag(uuid)));
 
-                String member = region.getRecentMember();
-
-                region.makeOwner(member);
-
-                //Send message to member that they are now the owner.
-                Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + member + "','&aTransferred ownership of region "
-                        + region.getTag(member) + " to you due to the previous owner leaving the region.');");
-
+                break;
             }
-        } else if (event[1].equals("teleport")) {
+            case "join": {
 
-            //Get the region.
-            Region region = Network.getInstance().getRegionManager().getRegion(event[2]);
+                //Get the region.
+                Region region = Network.getInstance().getRegionManager().getRegion(event[2]);
 
-            Location l = Network.getInstance().globalSQL.getCoordinate(region.getCoordinateID(uuid));
+                //Add player to the region.
+                //Set the coordinate id the same as the location of the owner.
+                region.joinRegion(uuid, region.getCoordinateID(region.getOwner()));
 
-            if (l == null) {
-                p.sendMessage(Utils.chat("&cAn error occurred while fetching the location to teleport."));
-                Network.getInstance().getLogger().warning("Location is null for coodinate id " + region.getCoordinateID(uuid));
-                return;
-            }
+                String message = "&aYou have joined region " + region.getTag(uuid) + " as a member.";
 
-            //Teleport player.
-            p.teleport(l);
-            p.sendMessage(Utils.chat("&aTeleported to region &3" + region.getTag(uuid)));
+                if (p != null) {
 
-        } else if (event[1].equals("join")) {
+                    p.sendMessage(Utils.chat(message));
 
-            //Get the region.
-            Region region = Network.getInstance().getRegionManager().getRegion(event[2]);
+                } else {
 
-            //Add player to the region.
-            //Set the coordinate id the same as the location of the owner.
-            region.joinRegion(uuid, region.getCoordinateID(region.getOwner()));
+                    //Send a cross-server message.
+                    Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','" + message + "';");
 
-            String message = "&aYou have joined region " + region.getTag(uuid) + " as a member.";
-
-            if (p != null) {
-
-                p.sendMessage(Utils.chat(message));
-
-            } else {
-
-                //Send a cross-server message.
-                Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','" + message + "';");
-
+                }
+                break;
             }
         }
     }

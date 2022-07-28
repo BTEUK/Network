@@ -4,7 +4,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import me.bteuk.network.Network;
 import me.bteuk.network.utils.NetworkUser;
-import me.bteuk.network.utils.Time;
+import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.regions.Region;
 import me.bteuk.network.utils.regions.RegionManager;
@@ -111,10 +111,7 @@ public class MoveListener implements Listener {
                                             + location + " " + (l.getX() + xTransform) + " " + (l.getZ() + zTransform) + " " + l.getYaw() + " " + l.getPitch() + "';");
 
                                     //Switch server.
-                                    ByteArrayDataOutput out = ByteStreams.newDataOutput();
-                                    out.writeUTF("Connect");
-                                    out.writeUTF(server);
-                                    e.setCancelled(true);
+                                    SwitchServer.switchServer(u.player, server);
 
                                 } else {
 
@@ -126,12 +123,10 @@ public class MoveListener implements Listener {
                                             + earthWorld + " " + l.getX() + " " + l.getZ() + " " + l.getYaw() + " " + l.getPitch() + "';");
 
                                     //Switch server.
-                                    ByteArrayDataOutput out = ByteStreams.newDataOutput();
-                                    out.writeUTF("Connect");
-                                    out.writeUTF(server);
-                                    e.setCancelled(true);
+                                    SwitchServer.switchServer(u.player, server);
 
                                 }
+                                e.setCancelled(true);
 
                             } else {
 

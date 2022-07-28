@@ -6,6 +6,7 @@ import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.NetworkUser;
+import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -134,9 +135,7 @@ public class StaffGui extends Gui {
 
                                                 //Teleport them to another server.
                                                 u.player.closeInventory();
-                                                ByteArrayDataOutput out = ByteStreams.newDataOutput();
-                                                out.writeUTF("Connect");
-                                                out.writeUTF(server);
+                                                SwitchServer.switchServer(u.player, server);
 
                                             }
 

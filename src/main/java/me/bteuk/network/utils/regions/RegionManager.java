@@ -1,6 +1,5 @@
 package me.bteuk.network.utils.regions;
 
-import me.bteuk.network.Network;
 import me.bteuk.network.sql.RegionSQL;
 import org.bukkit.Location;
 
