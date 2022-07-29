@@ -25,8 +25,8 @@ public class NavigatorGui extends Gui {
                 });
 
         setItem(14, Utils.createItem(Material.SPRUCE_BOAT, 1,
-                        Utils.chat("&b&lVisit"),
-                        Utils.chat("&fClick to open the visit menu.")),
+                        Utils.chat("&b&lExplore"),
+                        Utils.chat("&fClick to open the explore menu.")),
                 u -> {
 
                     //Click Action

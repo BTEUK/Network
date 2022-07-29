@@ -20,7 +20,7 @@ public class RegionRequest extends Gui {
 
     public RegionRequest(Request request) {
 
-        super(45, Component.text("Region Request", NamedTextColor.AQUA, TextDecoration.BOLD));
+        super(27, Component.text("Region Request", NamedTextColor.AQUA, TextDecoration.BOLD));
 
         regionSQL = Network.getInstance().regionSQL;
 

@@ -2,6 +2,7 @@ package me.bteuk.network.utils;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.BuildGui;
+import me.bteuk.network.gui.navigation.ExploreGui;
 import me.bteuk.network.gui.plotsystem.*;
 import me.bteuk.network.gui.regions.InviteRegionMembers;
 import me.bteuk.network.gui.regions.RegionInfo;
@@ -33,6 +34,8 @@ public class NetworkUser {
 
     public InviteRegionMembers inviteRegionMembers;
     public RegionMembers regionMembers;
+
+    public ExploreGui exploreGui;
 
     //Staff user.
     public StaffUser staffUser;
