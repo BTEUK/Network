@@ -245,6 +245,17 @@ public record Region(String regionName) {
 
     }
 
+    //Deny a request for a specific user.
+    public void denyRequest(String uuid) {
+
+        //Delete the request.
+        Network.getInstance().regionSQL.update("DELETE FROM region_requests WHERE region='" + regionName + "' AND uuid='" + uuid + "';");
+
+        //Send message to user.
+        Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aYour request to join region &3" + regionName + " &ahas been denied.'");
+
+    }
+
     //Join region with owner or staff request.
     //If staff request is true then it requires a staff request else it's an owner request.
     public void requestRegion(NetworkUser u, boolean staffRequest) {

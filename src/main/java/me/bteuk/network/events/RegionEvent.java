@@ -39,13 +39,30 @@ public class RegionEvent {
                 if (event[2].equals("accept")) {
 
                     //If length is 4 then no user is specified, this implies that it should accept all requests for the region, rather than a specific request.
+                    Region region = Network.getInstance().getRegionManager().getRegion(event[3]);
                     if (event.length == 4) {
-
-                        Region region = Network.getInstance().getRegionManager().getRegion(event[3]);
 
                         region.acceptRequests();
 
+                    } else {
+
+                        //The 5th argument specifies the uuid of the player who created the request.
+
+                        region.acceptRequest(event[4]);
+
+                        //Send feedback to user who accepted the request.
+                        Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aAccepted region request for &3" + Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + event[4] + "';") + " &ain the region &3 " + event[3] + ".'");
+
                     }
+                } else if (event[2].equals("deny")) {
+
+                    Region region = Network.getInstance().getRegionManager().getRegion(event[3]);
+
+                    region.denyRequest(event[4]);
+
+                    //Send feedback to user who accepted the request.
+                    Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aDenied region request for &3" + Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + event[4] + "';") + " &ain the region &3 " + event[3] + ".'");
+
                 }
 
                 break;

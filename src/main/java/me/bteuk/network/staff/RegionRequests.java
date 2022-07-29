@@ -1,11 +1,8 @@
 package me.bteuk.network.staff;
 
 import me.bteuk.network.Network;
-import me.bteuk.network.gui.BuildGui;
 import me.bteuk.network.gui.Gui;
-import me.bteuk.network.gui.regions.RegionInfo;
 import me.bteuk.network.sql.RegionSQL;
-import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.regions.Request;
 import net.kyori.adventure.text.Component;
@@ -14,7 +11,6 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class RegionRequests extends Gui {
 
@@ -104,7 +100,7 @@ public class RegionRequests extends Gui {
                         u.staffUser.regionRequests = null;
 
                         //Switch to region request.
-                        u.staffUser.regionRequest = new RegionRequest(requests.get(finalI).region, requests.get(finalI).uuid);
+                        u.staffUser.regionRequest = new RegionRequest(requests.get(finalI));
                         u.staffUser.regionRequest.open(u);
 
                     });
