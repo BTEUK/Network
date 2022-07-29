@@ -56,15 +56,15 @@ public class Staff implements CommandExecutor {
         //If not then open the first inventory found after refreshing its contents.
         //If no gui exists open the staff menu.
 
-        if (u.buildGui != null) {
-
-            u.buildGui.refresh();
-            u.buildGui.open(u);
-
-        } else if (u.staffUser.staffGui != null) {
+        if (u.staffUser.staffGui != null) {
 
             u.staffUser.staffGui.refresh();
             u.staffUser.staffGui.open(u);
+
+        } else if (u.staffUser.regionRequests != null) {
+
+            u.staffUser.regionRequests.refresh();
+            u.staffUser.regionRequests.open(u);
 
         } else {
 

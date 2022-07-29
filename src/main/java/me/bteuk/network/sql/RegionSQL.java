@@ -1,5 +1,6 @@
 package me.bteuk.network.sql;
 
+import me.bteuk.network.utils.regions.Request;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 import java.sql.Connection;
@@ -108,6 +109,28 @@ public class RegionSQL {
             while (results.next()) {
 
                 list.add(results.getString(1));
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        return list;
+    }
+
+    public ArrayList<Request> getRequestList(String sql) {
+
+        ArrayList<Request> list = new ArrayList<>();
+
+        try (Connection conn = conn();
+             PreparedStatement statement = conn.prepareStatement(sql);
+             ResultSet results = statement.executeQuery()) {
+
+            while (results.next()) {
+
+                list.add(new Request(results.getString(1), results.getString(2)));
 
             }
 

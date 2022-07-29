@@ -36,9 +36,7 @@ public class RegionInfo extends Gui {
     private void createGui() {
 
         //For owners:
-        //Invite member. 9
         //Manage members. 18
-        //Set public. 0
 
         //Region info.
         setItem(4, Utils.createItem(Material.BOOK, 1,
