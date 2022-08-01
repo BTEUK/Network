@@ -53,19 +53,38 @@ public class StaffGui extends Gui {
             Lock regions.
 
          */
-        if (user.player.hasPermission("")) {
-            if (user.inRegion) {
-                setItem(10, Utils.createItem(Material.ANVIL, 1,
-                                Utils.chat("&b&lManage Region " + user.region.regionName()),
-                                Utils.chat("&fOpens a menu to manage details of the region you are currently in.")),
-                        u ->
+        //If player is in a region show manage region, else show no region.
+        if (user.inRegion) {
 
-                        {
+            setItem(10, Utils.createItem(Material.ANVIL, 1,
+                            Utils.chat("&b&lManage Region " + user.region.regionName()),
+                            Utils.chat("&fOpens a menu to manage details of the region you are currently in.")),
+                    u ->
 
-                            //Manage Region Menu.
+                    {
 
-                        });
-            }
+                        //Check if user has the relevant permissions.
+                        if (u.player.hasPermission("uknet.regions.manage")) {
+
+                            if (u.inRegion) {
+
+                                //Open manage region menu
+
+                            }
+
+                        }
+
+                        //Check if the user is in a region.
+
+                        //Manage Region Menu.
+
+                    });
+        } else {
+
+            setItem(10, Utils.createItem(Material.ANVIL, 1,
+                    Utils.chat("&b&lNo Region"),
+                    Utils.chat("&fYou are currently not in a region.")));
+
         }
 
         //Click to open menu to deal with region join requests.
@@ -78,7 +97,7 @@ public class StaffGui extends Gui {
                 u -> {
 
                     if (Network.getInstance().regionSQL.hasRow("SELECT region FROM region_requests WHERE staff_accept=0;")) {
-                        if (u.player.hasPermission("group.reviewer")) {
+                        if (u.player.hasPermission("uknet.regions.request")) {
 
                             //Open region request menu.
                             this.delete();
@@ -124,29 +143,35 @@ public class StaffGui extends Gui {
                             //If you are not owner or member of the plot select it for the next review.
                             if (!Network.getInstance().plotSQL.hasRow("SELECT id FROM plot_members WHERE uuid='" + u.player.getUniqueId() + "' AND id=" + nPlot + ";")) {
 
-                                //Get server of plot.
-                                String server = Network.getInstance().plotSQL.getString("SELECT server FROM location_data WHERE name='" +
-                                        Network.getInstance().plotSQL.getString("SELECT location FROM plot_data WHERE id=" + nPlot + ";") + "';");
+                                //Check if the player has permission to review a plot.
+                                if (u.player.hasPermission("uknet.plots.review")) {
 
-                                //If they are not in the same server as the plot teleport them to that server and start the reviewing process.
-                                if (server.equals(Network.SERVER_NAME)) {
+                                    //Get server of plot.
+                                    String server = Network.getInstance().plotSQL.getString("SELECT server FROM location_data WHERE name='" +
+                                            Network.getInstance().plotSQL.getString("SELECT location FROM plot_data WHERE id=" + nPlot + ";") + "';");
 
-                                    u.player.closeInventory();
-                                    Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('"
-                                            + u.player.getUniqueId() + "','plotsystem','" + Network.SERVER_NAME + "','review plot " + nPlot + "');");
+                                    //If they are not in the same server as the plot teleport them to that server and start the reviewing process.
+                                    if (server.equals(Network.SERVER_NAME)) {
 
+                                        u.player.closeInventory();
+                                        Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('"
+                                                + u.player.getUniqueId() + "','plotsystem','" + Network.SERVER_NAME + "','review plot " + nPlot + "');");
+
+                                    } else {
+
+                                        //Player is not on the current server.
+                                        //Set the server join event.
+                                        Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('"
+                                                + u.player.getUniqueId() + "','plotsystem',"
+                                                + "'review plot " + nPlot + "');");
+
+                                        //Teleport them to another server.
+                                        u.player.closeInventory();
+                                        SwitchServer.switchServer(u.player, server);
+
+                                    }
                                 } else {
-
-                                    //Player is not on the current server.
-                                    //Set the server join event.
-                                    Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('"
-                                            + u.player.getUniqueId() + "','plotsystem',"
-                                            + "'review plot " + nPlot + "');");
-
-                                    //Teleport them to another server.
-                                    u.player.closeInventory();
-                                    SwitchServer.switchServer(u.player, server);
-
+                                    u.player.sendMessage(Utils.chat("&cYou must be a reviewer to review plots."));
                                 }
 
                                 //Stop iterating.

@@ -11,6 +11,11 @@ import java.util.ArrayList;
 
 public record Region(String regionName) {
 
+    //Get the status of the region.
+    public String getStatus() {
+        return Network.getInstance().regionSQL.getString("SELECT status FROM region WHERE region='" + regionName + "';");
+    }
+
     //Get the tag of the region for a specific player, or name if no tag is set.
     public String getTag(String uuid) {
         if (hasTag(uuid)) {
