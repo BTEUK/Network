@@ -56,9 +56,19 @@ public record Region(String regionName) {
         return (Network.getInstance().regionSQL.hasRow("SELECT region FROM region_members WHERE region='" + regionName + "' AND uuid='" + uuid + "' AND is_owner=0;"));
     }
 
+    //Return whether the region is default or not.
+    public boolean isDefault() {
+        return (Network.getInstance().regionSQL.hasRow("SELECT region FROM regions WHERE region='" + regionName + "' AND status='default';"));
+    }
+
     //Return whether the region is open or not.
     public boolean isOpen() {
         return (Network.getInstance().regionSQL.hasRow("SELECT region FROM regions WHERE region='" + regionName + "' AND status='open';"));
+    }
+
+    //Return whether the region is locked or not.
+    public boolean isLocked() {
+        return (Network.getInstance().regionSQL.hasRow("SELECT region FROM regions WHERE region='" + regionName + "' AND status='locked';"));
     }
 
     //Return whether the region is public or not.
@@ -170,14 +180,35 @@ public record Region(String regionName) {
         }
     }
 
-    //Set the region to private (default).
-    public void setPrivate() {
+    //Set the region to default.
+    public void setDefault() {
         Network.getInstance().regionSQL.update("UPDATE regions SET status='default' WHERE region='" + regionName + "';");
     }
 
     //Set the region to public.
     public void setPublic() {
         Network.getInstance().regionSQL.update("UPDATE regions SET status='public' WHERE region='" + regionName + "';");
+    }
+
+    //Set region to locked.
+    public void setLocked() {
+
+        //Remove all members and the owner.
+        removeMembers();
+
+        //Set locked.
+        Network.getInstance().regionSQL.update("UPDATE regions SET status='locked' WHERE region='" + regionName + "';");
+
+    }
+
+    //Set region to open.
+    public void setOpen() {
+
+        //Remove all members and the owner.
+
+        //Set open.
+        Network.getInstance().regionSQL.update("UPDATE regions SET status='open' WHERE region='" + regionName + "';");
+
     }
 
     //Check whether the region equals another region.
@@ -451,6 +482,22 @@ public record Region(String regionName) {
             //Update region member to set as owner.
             Network.getInstance().regionSQL.update("UPDATE region_members SET is_owner=1 WHERE region='" + regionName + "' AND uuid='" + uuid + "';");
 
+        }
+    }
+
+    //Remove all members and owner of the region.
+    public void removeMembers() {
+
+        if (hasOwner() || hasMember()) {
+
+            //Get all members.
+            ArrayList<String> uuids = Network.getInstance().regionSQL.getStringList("SELECT uuid FROM region_members WHERE region='" + regionName + "';");
+
+            for (String uuid : uuids) {
+
+                leaveRegion(uuid);
+
+            }
         }
     }
 }

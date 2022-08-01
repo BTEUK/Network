@@ -1,7 +1,7 @@
 package me.bteuk.network.staff;
 
-import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
+import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.regions.Region;
 import net.kyori.adventure.text.Component;
@@ -12,12 +12,14 @@ import org.bukkit.Material;
 public class ManageRegion extends Gui {
 
     private final Region region;
+    private final NetworkUser user;
 
-    public ManageRegion(Region region) {
+    public ManageRegion(NetworkUser user, Region region) {
 
         super(27, Component.text("Manage Region", NamedTextColor.AQUA, TextDecoration.BOLD));
 
         this.region = region;
+        this.user = user;
 
         createGui();
 
@@ -34,36 +36,126 @@ public class ManageRegion extends Gui {
 
         //Set public if status is default or inactive.
         //Set private if status is public.
-        if (region.isDefault() || region.isInactive()) {
+        if (user.player.hasPermission("uknet.regions.manage.public")) {
+            if (region.isDefault() || region.isInactive()) {
 
-        } else if (region.isPublic()) {
+                setItem(11, Utils.createItem(Material.OAK_DOOR, 1,
+                                Utils.chat("&b&lMake region public"),
+                                Utils.chat("&fA public region allows members"),
+                                Utils.chat("&fto join without needing"),
+                                Utils.chat("&fthe owner to accept it.")),
 
+                        u -> {
+
+                            region.setPublic();
+                            this.refresh();
+
+                        });
+
+            } else if (region.isPublic()) {
+
+                setItem(11, Utils.createItem(Material.IRON_DOOR, 1,
+                                Utils.chat("&b&lMake region private"),
+                                Utils.chat("&fThe default region setting,"),
+                                Utils.chat("&fjoining requires the owner"),
+                                Utils.chat("&fto accept the request.")),
+
+                        u -> {
+
+                            region.setDefault();
+                            this.refresh();
+
+                        });
+            }
         }
 
         //Transfer ownership if status is default or public, must have at least 1 member.
-        if (region.hasMember()) {
+        if (user.player.hasPermission("uknet.regions.manage.owner")) {
+            if (region.hasMember()) {
 
+                //Slot 14
+
+            }
         }
 
         //Kick members, must have owner and/or members.
-        if (region.hasOwner() || region.hasMember()) {
+        if (user.player.hasPermission("uknet.regions.manage.kick")) {
+            if (region.hasOwner() || region.hasMember()) {
 
+                //Slot 15
+
+            }
         }
 
         //Set region locked if region is default, public, open or inactive.
         //Set region unlocked if region is locked.
-        if (region.isDefault() || region.isPublic() || region.isOpen() || region.isInactive()) {
+        if (user.player.hasPermission("uknet.regions.manage.lock")) {
+            if (region.isDefault() || region.isPublic() || region.isOpen() || region.isInactive()) {
 
-        } else if (region.isLocked()) {
+                setItem(12, Utils.createItem(Material.IRON_TRAPDOOR, 1,
+                                Utils.chat("&b&lLock Region"),
+                                Utils.chat("&fLocking a region stops anyone"),
+                                Utils.chat("&ffrom joining or building in the"),
+                                Utils.chat("&fregion, any existing members"),
+                                Utils.chat("&fwill be kicked")),
 
+                        u -> {
+
+                            region.setLocked();
+                            this.refresh();
+
+                        });
+
+            } else if (region.isLocked()) {
+
+                setItem(12, Utils.createItem(Material.OAK_TRAPDOOR, 1,
+                                Utils.chat("&b&lUnlock Region"),
+                                Utils.chat("&fThe default region setting,"),
+                                Utils.chat("&fpeople will be able to join"),
+                                Utils.chat("&fand building in the region again.")),
+
+                        u -> {
+
+                            region.setDefault();
+                            this.refresh();
+
+                        });
+            }
         }
 
         //Set region open if status is default, public or inactive.
         //Set region default if status is open.
-        if (region.isDefault() || region.isPublic() || region.isInactive()) {
+        if (user.player.hasPermission("uknet.regions.manage.open")) {
+            if (region.isDefault() || region.isPublic() || region.isInactive()) {
 
-        } else if (region.isOpen()) {
+                setItem(13, Utils.createItem(Material.OAK_FENCE_GATE, 1,
+                                Utils.chat("&b&lMake region open"),
+                                Utils.chat("&fAn open region allows all"),
+                                Utils.chat("&fJr.Builder+ to build without"),
+                                Utils.chat("&fneeding to join the region."),
+                                Utils.chat("&fAny existing members will be kicked.")),
 
+                        u -> {
+
+                            region.setOpen();
+
+                        });
+
+            } else if (region.isOpen()) {
+
+                setItem(13, Utils.createItem(Material.OAK_FENCE, 1,
+                                Utils.chat("&b&lMake region closed"),
+                                Utils.chat("&fThe default region setting,"),
+                                Utils.chat("&fpeople will again be required"),
+                                Utils.chat("&fto join the region to build.")),
+
+                        u -> {
+
+                            region.setDefault();
+
+                        });
+
+            }
         }
 
         setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,

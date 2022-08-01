@@ -145,7 +145,7 @@ public class RegionInfo extends Gui {
                         u -> {
 
                             //Set the region as private and refresh gui.
-                            region.setPrivate();
+                            region.setDefault();
 
                             u.player.sendMessage(Utils.chat("&aRegion &3" + region.getTag(uuid) + " &ais now private."));
                             this.refresh();
