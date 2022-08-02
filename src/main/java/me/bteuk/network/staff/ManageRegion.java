@@ -74,7 +74,24 @@ public class ManageRegion extends Gui {
             if (region.hasMember()) {
 
                 //Slot 14
+                setItem(14, Utils.createItem(Material.MAGENTA_GLAZED_TERRACOTTA, 1,
+                                Utils.chat("&b&lTransfer Ownership"),
+                                Utils.chat("&fOpen the transfer ownership menu."),
+                                Utils.chat("&fAllows you to make a member"),
+                                Utils.chat("&fthe new region owner.")),
 
+                        u -> {
+
+                            //Close this menu.
+                            u.staffUser.manageRegion.delete();
+                            u.staffUser.manageRegion = null;
+
+                            //Open transfer owner menu.
+                            u.staffUser.transferOwner = new TransferOwner(region);
+                            u.staffUser.transferOwner.open(u);
+
+
+                        });
             }
         }
 
@@ -83,7 +100,23 @@ public class ManageRegion extends Gui {
             if (region.hasOwner() || region.hasMember()) {
 
                 //Slot 15
+                setItem(15, Utils.createItem(Material.BARRIER, 1,
+                                Utils.chat("&b&lKick Members"),
+                                Utils.chat("&fRemove any current members."),
+                                Utils.chat("&for the owner from the region.")),
 
+                        u -> {
+
+                            //Close this menu.
+                            u.staffUser.manageRegion.delete();
+                            u.staffUser.manageRegion = null;
+
+                            //Open transfer owner menu.
+                            u.staffUser.kickMembers = new KickMembers(region);
+                            u.staffUser.kickMembers.open(u);
+
+
+                        });
             }
         }
 
@@ -135,11 +168,7 @@ public class ManageRegion extends Gui {
                                 Utils.chat("&fneeding to join the region."),
                                 Utils.chat("&fAny existing members will be kicked.")),
 
-                        u -> {
-
-                            region.setOpen();
-
-                        });
+                        u -> region.setOpen());
 
             } else if (region.isOpen()) {
 
@@ -149,11 +178,7 @@ public class ManageRegion extends Gui {
                                 Utils.chat("&fpeople will again be required"),
                                 Utils.chat("&fto join the region to build.")),
 
-                        u -> {
-
-                            region.setDefault();
-
-                        });
+                        u -> region.setDefault());
 
             }
         }

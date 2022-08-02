@@ -1,9 +1,6 @@
 package me.bteuk.network.utils;
 
-import me.bteuk.network.staff.ManageRegion;
-import me.bteuk.network.staff.RegionRequest;
-import me.bteuk.network.staff.RegionRequests;
-import me.bteuk.network.staff.StaffGui;
+import me.bteuk.network.staff.*;
 
 public class StaffUser {
 
@@ -13,6 +10,8 @@ public class StaffUser {
     public RegionRequest regionRequest;
 
     public ManageRegion manageRegion;
+    public TransferOwner transferOwner;
+    public KickMembers kickMembers;
 
     public StaffUser() {
 

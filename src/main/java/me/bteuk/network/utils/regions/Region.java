@@ -465,6 +465,25 @@ public record Region(String regionName) {
 
     }
 
+    //Make the owner a member of the region.
+    public void makeMember() {
+
+        //Get the owner.
+        String uuid = getOwner();
+
+        //Close log of player as owner.
+        Network.getInstance().regionSQL.update("UPDATE region_logs SET end_time=" + Time.currentTime()
+                + " WHERE region='" + regionName + "' AND uuid='" + uuid + "';");
+
+        //Open log of player as member.
+        Network.getInstance().regionSQL.update("INSERT INTO region_logs(region,uuid,start_time) VALUES('" + regionName + "','" +
+                uuid + "'," + Time.currentTime() + ");");
+
+        //Update region member to set as member.
+        Network.getInstance().regionSQL.update("UPDATE region_members SET is_owner=0 WHERE region='" + regionName + "' AND uuid='" + uuid + "';");
+
+    }
+
     //Make a member the owner of the region.
     public void makeOwner(String uuid) {
 
