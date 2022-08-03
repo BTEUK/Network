@@ -1,8 +1,9 @@
-package me.bteuk.network.staff;
+package me.bteuk.network.gui.regions;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.sql.RegionSQL;
+import me.bteuk.network.staff.StaffGui;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.regions.Request;
 import net.kyori.adventure.text.Component;
@@ -18,13 +19,17 @@ public class RegionRequests extends Gui {
 
     private int page;
 
-    public RegionRequests() {
+    private final boolean staff;
+
+    public RegionRequests(boolean staff) {
 
         super(45, Component.text("Region Requests", NamedTextColor.AQUA, TextDecoration.BOLD));
 
         page = 1;
 
         regionSQL = Network.getInstance().regionSQL;
+
+        this.staff = staff;
 
         createGui();
 
@@ -33,7 +38,12 @@ public class RegionRequests extends Gui {
     private void createGui() {
 
         //Get all regions with uuid.
-        ArrayList<Request> requests = regionSQL.getRequestList("SELECT region,uuid FROM region_requests WHERE staff_accept=0;");
+        ArrayList<Request> requests;
+        if (staff) {
+            requests = regionSQL.getRequestList("SELECT region,uuid FROM region_requests WHERE staff_accept=0;");
+        } else {
+            requests = regionSQL.getRequestList("SELECT region,uuid FROM region_requests WHERE owner_accept=0;");
+        }
 
         //Slot count.
         int slot = 10;
@@ -97,11 +107,23 @@ public class RegionRequests extends Gui {
 
                         //Delete this gui.
                         this.delete();
-                        u.staffUser.regionRequests = null;
+                        if (staff) {
 
-                        //Switch to region request.
-                        u.staffUser.regionRequest = new RegionRequest(requests.get(finalI));
-                        u.staffUser.regionRequest.open(u);
+                            u.staffUser.regionRequests = null;
+
+                            //Switch to region request.
+                            u.staffUser.regionRequest = new RegionRequest(requests.get(finalI), true);
+                            u.staffUser.regionRequest.open(u);
+
+                        } else {
+
+                            u.regionRequests = null;
+
+                            //Switch to region request.
+                            u.regionRequest = new RegionRequest(requests.get(finalI), false);
+                            u.regionRequest.open(u);
+
+                        }
 
                     });
 
@@ -116,22 +138,43 @@ public class RegionRequests extends Gui {
         }
 
         //Return
-        setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        Utils.chat("&b&lReturn"),
-                        Utils.chat("&fOpen the staff menu.")),
-                u ->
+        if (staff) {
 
-                {
+            setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
+                            Utils.chat("&b&lReturn"),
+                            Utils.chat("&fOpen the staff menu.")),
+                    u ->
 
-                    //Delete this gui.
-                    this.delete();
-                    u.staffUser.regionRequests = null;
+                    {
 
-                    //Switch to staff menu.
-                    u.staffUser.staffGui = new StaffGui(u);
-                    u.staffUser.staffGui.open(u);
+                        //Delete this gui.
+                        this.delete();
+                        u.staffUser.regionRequests = null;
 
-                });
+                        //Switch to staff menu.
+                        u.staffUser.staffGui = new StaffGui(u);
+                        u.staffUser.staffGui.open(u);
+
+                    });
+        } else {
+
+            setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
+                            Utils.chat("&b&lReturn"),
+                            Utils.chat("&fOpen the region menu.")),
+                    u ->
+
+                    {
+
+                        //Delete this gui.
+                        this.delete();
+                        u.regionRequests = null;
+
+                        //Switch to staff menu.
+                        u.regionMenu = new RegionMenu(u);
+                        u.regionMenu.open(u);
+
+                    });
+        }
     }
 
     public void refresh() {

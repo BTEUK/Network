@@ -302,8 +302,8 @@ public record Region(String regionName) {
             //Staff request
 
             //Create request.
-            Network.getInstance().regionSQL.update("INSERT INTO region_requests(region,uuid,staff_accept,coordinate_id) VALUES ('" + regionName + "','" +
-                    u.player.getUniqueId() + "',0," + coordinate + ");");
+            Network.getInstance().regionSQL.update("INSERT INTO region_requests(region,uuid,owner,staff_accept,coordinate_id) VALUES ('" + regionName + "','" +
+                    u.player.getUniqueId() + "','" + getOwner() + "',0," + coordinate + ");");
 
             //Send message to player.
             u.player.sendMessage(Utils.chat("&aRequested to join region &3" + regionName + ", &aawaiting staff review."));
@@ -314,8 +314,8 @@ public record Region(String regionName) {
             //Owner request
 
             //Create request.
-            Network.getInstance().regionSQL.update("INSERT INTO region_requests(region,uuid,owner_accept,coordinate_id) VALUES ('" + regionName + "','" +
-                    u.player.getUniqueId() + "',0," + coordinate + ");");
+            Network.getInstance().regionSQL.update("INSERT INTO region_requests(region,uuid,owner,owner_accept,coordinate_id) VALUES ('" + regionName + "','" +
+                    u.player.getUniqueId() + "','" + getOwner() + "',0," + coordinate + ");");
 
             //Send message to player.
             u.player.sendMessage(Utils.chat("&aRequested to join region &3" + regionName + ", &aawaiting owner review."));
@@ -500,6 +500,22 @@ public record Region(String regionName) {
 
             //Update region member to set as owner.
             Network.getInstance().regionSQL.update("UPDATE region_members SET is_owner=1 WHERE region='" + regionName + "' AND uuid='" + uuid + "';");
+
+        }
+    }
+
+    //Update any region requests.
+    public void updateRequests() {
+
+        //If the region has no owner, accept all requests.
+        //If there is an owner, update the owner row in the request.
+        if (hasOwner()) {
+
+            Network.getInstance().regionSQL.update("UPDATE region_requests SET owner='" + getOwner() + "' WHERE region='" + regionName + "';");
+
+        } else {
+
+            acceptRequests();
 
         }
     }

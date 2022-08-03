@@ -1,4 +1,4 @@
-package me.bteuk.network.staff;
+package me.bteuk.network.gui.regions;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
@@ -17,14 +17,16 @@ public class RegionRequest extends Gui {
 
     private final RegionSQL regionSQL;
     private final Request request;
+    private final boolean staff;
 
-    public RegionRequest(Request request) {
+    public RegionRequest(Request request, boolean staff) {
 
         super(27, Component.text("Region Request", NamedTextColor.AQUA, TextDecoration.BOLD));
 
         regionSQL = Network.getInstance().regionSQL;
 
         this.request = request;
+        this.staff = staff;
 
         createGui();
 
@@ -54,7 +56,7 @@ public class RegionRequest extends Gui {
                     this.delete();
                     u.staffUser.regionRequest = null;
 
-                    u.staffUser.regionRequests = new RegionRequests();
+                    u.staffUser.regionRequests = new RegionRequests(staff);
                     u.staffUser.regionRequests.open(u);
 
 
@@ -76,7 +78,7 @@ public class RegionRequest extends Gui {
                     this.delete();
                     u.staffUser.regionRequest = null;
 
-                    u.staffUser.regionRequests = new RegionRequests();
+                    u.staffUser.regionRequests = new RegionRequests(staff);
                     u.staffUser.regionRequests.open(u);
 
                 });
@@ -91,7 +93,7 @@ public class RegionRequest extends Gui {
                     GlobalSQL globalSQL = Network.getInstance().globalSQL;
 
                     //Get coordinate.
-                    Location l = globalSQL.getCoordinate(regionSQL.getInt("SELECT coordinate_id FROM region_requests WHERE region='" + request.region + "' AND uuuid='" + request.uuid + "';"));
+                    Location l = globalSQL.getCoordinate(regionSQL.getInt("SELECT coordinate_id FROM region_requests WHERE region='" + request.region + "' AND uuid='" + request.uuid + "';"));
 
                     //If the player is on the earth server get the coordinate.
                     if (Network.SERVER_NAME.equals(globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';"))) {
@@ -127,7 +129,7 @@ public class RegionRequest extends Gui {
                     this.delete();
                     u.staffUser.regionRequest = null;
 
-                    u.staffUser.regionRequests = new RegionRequests();
+                    u.staffUser.regionRequests = new RegionRequests(staff);
                     u.staffUser.regionRequests.open(u);
 
                 });

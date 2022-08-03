@@ -105,6 +105,9 @@ public class TransferOwner extends Gui {
                         //Give the new player ownership.
                         region.makeOwner(uuid);
 
+                        //Update any requests to take into account the new region owner.
+                        region.updateRequests();
+
                         //Send message to user.
                         u.player.sendMessage(Utils.chat("&aTransferred ownership of the region to &3" +
                                 globalSQL.getString("SELECT name FROM player_data WHERE uuid ='" + region.getOwner() + "';")));

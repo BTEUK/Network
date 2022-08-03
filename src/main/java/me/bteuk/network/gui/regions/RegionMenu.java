@@ -119,7 +119,7 @@ public class RegionMenu extends Gui {
             } else {
 
                 setItem(slot, Utils.createItem(Material.YELLOW_CONCRETE, 1,
-                                Utils.chat("&b&lRegion " + member.get((i-owner.size()))),
+                                Utils.chat("&b&lRegion " + member.get((i - owner.size()))),
                                 Utils.chat("&fYou are a member of this region."),
                                 Utils.chat("&fClick to open the menu of this plot.")),
                         u -> {
@@ -129,7 +129,7 @@ public class RegionMenu extends Gui {
                             u.regionMenu = null;
 
                             //Switch to plot info.
-                            u.regionInfo = new RegionInfo(Network.getInstance().getRegionManager().getRegion(member.get((finalI-owner.size()))), u.player.getUniqueId().toString());
+                            u.regionInfo = new RegionInfo(Network.getInstance().getRegionManager().getRegion(member.get((finalI - owner.size()))), u.player.getUniqueId().toString());
                             u.regionInfo.open(u);
 
                         });
@@ -146,7 +146,25 @@ public class RegionMenu extends Gui {
             }
         }
 
-        //TODO If the user has region join requests show a button for them.
+        //Check if you have any requests for regions you own.
+        if (regionSQL.hasRow("SELECT region FROM region_requests WHERE owner='" + user.player.getUniqueId() + "' AND owner_request=0;")) {
+
+            setItem(40, Utils.createItem(Material.LIME_STAINED_GLASS_PANE, 1,
+                            Utils.chat("&b&lReview Region Requests"),
+                            Utils.chat("&fView all region join requests for"),
+                            Utils.chat("&fregions that you are the owner of.")),
+
+                    u -> {
+
+                        //Delete this gui and switch to region requests.
+                        this.delete();
+                        u.regionMenu = null;
+
+                        u.regionRequests = new RegionRequests(false);
+                        u.regionRequests.open(u);
+
+                    });
+        }
 
 
         //Return

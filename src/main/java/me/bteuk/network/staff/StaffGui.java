@@ -1,10 +1,8 @@
 package me.bteuk.network.staff;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
-import me.bteuk.network.sql.PlotSQL;
+import me.bteuk.network.gui.regions.RegionRequests;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
@@ -103,7 +101,7 @@ public class StaffGui extends Gui {
                             this.delete();
                             u.staffUser.staffGui = null;
 
-                            u.staffUser.regionRequests = new RegionRequests();
+                            u.staffUser.regionRequests = new RegionRequests(true);
                             u.staffUser.regionRequests.open(u);
 
                         } else {

@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS region_requests
 (
     region      VARCHAR(16)     NOT NULL,
     uuid        CHAR(36)        NOT NULL,
+    owner       CHAR(36)        NULL DEFAULT NULL,
     staff_accept    TINYINT(1)  NULL DEFAULT 1,
     owner_accept    TINYINT(1)  NULL DEFAULT 1,
     coordinate_id   INT         NOT NULL,

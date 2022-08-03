@@ -35,9 +35,6 @@ public class RegionInfo extends Gui {
 
     private void createGui() {
 
-        //For owners:
-        //Manage members. 18
-
         //Region info.
         setItem(4, Utils.createItem(Material.BOOK, 1,
                 Utils.chat("&b&lRegion " + region.getTag(uuid)),
@@ -201,7 +198,7 @@ public class RegionInfo extends Gui {
                         this.delete();
                         u.regionInfo = null;
 
-                        u.regionMembers = new RegionMembers();
+                        u.regionMembers = new RegionMembers(region);
                         u.regionMembers.open(u);
 
                     });
