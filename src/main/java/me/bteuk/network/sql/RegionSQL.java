@@ -1,5 +1,8 @@
 package me.bteuk.network.sql;
 
+import me.bteuk.network.Network;
+import me.bteuk.network.utils.regions.Inactivity;
+import me.bteuk.network.utils.regions.Region;
 import me.bteuk.network.utils.regions.Request;
 import org.apache.commons.dbcp2.BasicDataSource;
 
@@ -12,7 +15,6 @@ import java.util.ArrayList;
 public class RegionSQL {
 
     private final BasicDataSource dataSource;
-    private int success;
 
     public RegionSQL(BasicDataSource datasource) {
 
@@ -131,6 +133,31 @@ public class RegionSQL {
             while (results.next()) {
 
                 list.add(new Request(results.getString(1), results.getString(2)));
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        return list;
+    }
+
+    public ArrayList<Inactivity> getInactives(String sql) {
+
+        ArrayList<Inactivity> list = new ArrayList<>();
+        Region region;
+
+        try (Connection conn = conn();
+             PreparedStatement statement = conn.prepareStatement(sql);
+             ResultSet results = statement.executeQuery()) {
+
+            while (results.next()) {
+
+                region = Network.getInstance().getRegionManager().getRegion(results.getString(1));
+
+                list.add(new Inactivity(region, results.getString(2)));
 
             }
 

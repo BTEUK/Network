@@ -30,7 +30,7 @@ public class TeleportEvent {
             if (player != null) {
 
                 p.teleport(player.getLocation());
-                p.sendMessage(Utils.chat("&aTeleported to " +
+                p.sendMessage(Utils.chat("&aTeleported to &3" +
                         Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + event[2] + "';")));
 
             } else {
@@ -66,7 +66,7 @@ public class TeleportEvent {
 
         //Teleport player.
         p.teleport(l);
-        p.sendMessage(Utils.chat("&cTeleport to " + x + ", " + y + ", " + z));
+        p.sendMessage(Utils.chat("&aTeleport to &3" + x + ", " + y + ", " + z));
 
     }
 }

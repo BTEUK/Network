@@ -6,6 +6,7 @@ import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.regions.Inactivity;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -41,6 +42,11 @@ public class Timers {
     //Navigator Check
     private ItemStack slot9;
 
+    //Region Inactivity
+    private final long inactivity;
+    private ArrayList<Inactivity> inactive_owners;
+    private String uuid;
+
     public Timers(Network instance, GlobalSQL globalSQL, Connect connect) {
 
         this.instance = instance;
@@ -53,6 +59,9 @@ public class Timers {
         SERVER_NAME = Network.SERVER_NAME;
 
         events = new HashMap<>();
+
+        //days * 24 hours * 60 minutes * 60 seconds * 1000 milliseconds
+        inactivity = instance.getConfig().getInt("region_inactivity") * 24L * 60L * 60L * 1000L;
 
     }
 
@@ -149,5 +158,39 @@ public class Timers {
 
         }, 0L, 20L);
 
+        //1 minute timer.
+        instance.getServer().getScheduler().scheduleSyncRepeatingTask(instance, () -> {
+
+            //Check for inactive owners.
+            //If the region has members then make another member the new owner,
+            //If the region has no members then set it inactive.
+            inactive_owners.clear();
+            inactive_owners = instance.regionSQL.getInactives("SELECT region,uuid FROM region_members WHERE is_owner=1 AND last_enter>" + (Time.currentTime() - inactivity) + ";");
+
+            for (Inactivity inactive : inactive_owners) {
+
+                if (inactive.region.hasMember()) {
+
+                    //Get most recent member.
+                    uuid = inactive.region.getRecentMember();
+
+                    //Make the previous owner a member.
+                    inactive.region.makeMember();
+
+                    //Give the new player ownership.
+                    inactive.region.makeOwner(uuid);
+
+                    //Update any requests to take into account the new region owner.
+                    inactive.region.updateRequests();
+
+                } else {
+
+                    //Set region as inactive.
+                    inactive.region.setInactive();
+
+                }
+            }
+
+        }, 0L, 1200L);
     }
 }

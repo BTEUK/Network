@@ -81,6 +81,11 @@ public record Region(String regionName) {
         return (Network.getInstance().regionSQL.hasRow("SELECT region FROM regions WHERE region='" + regionName + "' AND (status='default' OR status='public' OR status='inactive');"));
     }
 
+    //Set the region as inactive.
+    public void setInactive() {
+        Network.getInstance().regionSQL.hasRow("UPDATE regions SET status='inactive' WHERE region='" + regionName + "';");
+    }
+
     //Return whether the region is inactive.
     public boolean isInactive() {
         return (Network.getInstance().regionSQL.hasRow("SELECT region FROM regions WHERE region='" + regionName + "' AND status='inactive';"));
