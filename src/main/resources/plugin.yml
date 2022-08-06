@@ -11,16 +11,16 @@ commands:
   tpll:
     usage: /<command>
     description: Teleport to coordinates.
+  ll:
+    usage: /<command>
+    description: Returns the coordinates where the player is standing with a link to google maps.
   navigator:
-    aliases: [nav,gui,menu]
+    aliases: [nav,gui,menu,claim]
     usage: /<command>
     description: Opens the main gui, will always return to the previous menu if possible.
   staff:
     usage: /<command>
     description: Opens the Staff Menu.
-  claim:
-    usage: /<command>
-    description: Routes directly to the build menu of the gui, mainly for the purpose of player habits as this was the command previously.
   region:
     aliases: [region]
     usage: /<command>

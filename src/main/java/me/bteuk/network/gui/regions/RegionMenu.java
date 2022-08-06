@@ -147,7 +147,7 @@ public class RegionMenu extends Gui {
         }
 
         //Check if you have any requests for regions you own.
-        if (regionSQL.hasRow("SELECT region FROM region_requests WHERE owner='" + user.player.getUniqueId() + "' AND owner_request=0;")) {
+        if (regionSQL.hasRow("SELECT region FROM region_requests WHERE owner='" + user.player.getUniqueId() + "' AND owner_accept=0;")) {
 
             setItem(40, Utils.createItem(Material.LIME_STAINED_GLASS_PANE, 1,
                             Utils.chat("&b&lReview Region Requests"),

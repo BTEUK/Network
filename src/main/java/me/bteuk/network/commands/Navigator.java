@@ -83,6 +83,41 @@ public class Navigator implements CommandExecutor {
             u.invitePlotMembers.refresh();
             u.invitePlotMembers.open(u);
 
+        } else if (u.regionMenu != null) {
+
+            u.regionMenu.refresh();
+            u.regionMenu.open(u);
+
+        } else if (u.regionInfo != null) {
+
+            u.regionInfo.refresh();
+            u.regionInfo.open(u);
+
+        } else if (u.inviteRegionMembers != null) {
+
+            u.inviteRegionMembers.refresh();
+            u.inviteRegionMembers.open(u);
+
+        } else if (u.regionMembers != null) {
+
+            u.regionMembers.refresh();
+            u.regionMembers.open(u);
+
+        } else if (u.regionRequests != null) {
+
+            u.regionRequests.refresh();
+            u.regionRequests.open(u);
+
+        } else if (u.regionRequest != null) {
+
+            u.regionRequest.refresh();
+            u.regionRequest.open(u);
+
+        } else if (u.exploreGui != null) {
+
+            u.exploreGui.refresh();
+            u.exploreGui.open(u);
+
         } else {
 
             Network.getInstance().navigatorGui.open(u);

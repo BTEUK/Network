@@ -13,7 +13,6 @@ import me.bteuk.network.utils.enums.ServerType;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.regions.RegionManager;
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -77,9 +76,9 @@ public final class Network extends JavaPlugin {
 
         if (!config.getBoolean("enabled")) {
 
-            Bukkit.getLogger().warning("&The config must be configured before the plugin can be enabled!");
-            Bukkit.getLogger().warning("Please edit the database values in the config, give the server a unique name and then set 'enabled: true'");
-            Bukkit.getLogger().warning("&Also make sure to set the server to the correct type.");
+            getLogger().warning("The config must be configured before the plugin can be enabled!");
+            getLogger().warning("Please edit the database values in the config, give the server a unique name and then set 'enabled: true'");
+            getLogger().warning("Also make sure to set the server to the correct type.");
             return;
 
         }
@@ -95,19 +94,19 @@ public final class Network extends JavaPlugin {
 
             //Region Database
             String region_database = config.getString("database.region");
-            BasicDataSource region_dataSource = mysqlSetup(global_database);
+            BasicDataSource region_dataSource = mysqlSetup(region_database);
             regionSQL = new RegionSQL(region_dataSource);
-            initDb("dbsetup_region.sql", region_dataSource);
+            initDb("dbsetup_regions.sql", region_dataSource);
 
             //Plot Database
             String plot_database = config.getString("database.plot");
             BasicDataSource plot_dataSource = mysqlSetup(plot_database);
             plotSQL = new PlotSQL(plot_dataSource);
-            initDb("dbsetup_plot.sql", plot_dataSource);
+            initDb("dbsetup_plots.sql", plot_dataSource);
 
         } catch (SQLException | IOException e) {
             e.printStackTrace();
-            Bukkit.getLogger().severe("Failed to connect to the database, please check that you have set the config values correctly.");
+            getLogger().severe("Failed to connect to the database, please check that you have set the config values correctly.");
             return;
         }
 
@@ -139,7 +138,7 @@ public final class Network extends JavaPlugin {
         } else {
 
             //Enable plugin.
-            Bukkit.getLogger().info("Enabling Plugin");
+            getLogger().info("Enabling Plugin");
             enablePlugin();
 
         }

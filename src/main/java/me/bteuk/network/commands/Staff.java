@@ -66,6 +66,26 @@ public class Staff implements CommandExecutor {
             u.staffUser.regionRequests.refresh();
             u.staffUser.regionRequests.open(u);
 
+        } else if (u.staffUser.regionRequest != null) {
+
+            u.staffUser.regionRequest.refresh();
+            u.staffUser.regionRequest.open(u);
+
+        } else if (u.staffUser.manageRegion != null) {
+
+            u.staffUser.manageRegion.refresh();
+            u.staffUser.manageRegion.open(u);
+
+        } else if (u.staffUser.transferOwner != null) {
+
+            u.staffUser.transferOwner.refresh();
+            u.staffUser.transferOwner.open(u);
+
+        } else if (u.staffUser.kickMembers != null) {
+
+            u.staffUser.kickMembers.refresh();
+            u.staffUser.kickMembers.open(u);
+
         } else {
 
             u.staffUser.staffGui = new StaffGui(u);

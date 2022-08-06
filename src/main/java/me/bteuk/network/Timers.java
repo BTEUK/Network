@@ -62,6 +62,7 @@ public class Timers {
 
         //days * 24 hours * 60 minutes * 60 seconds * 1000 milliseconds
         inactivity = instance.getConfig().getInt("region_inactivity") * 24L * 60L * 60L * 1000L;
+        inactive_owners = new ArrayList<>();
 
     }
 

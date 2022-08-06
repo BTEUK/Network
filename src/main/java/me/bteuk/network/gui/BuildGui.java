@@ -298,7 +298,7 @@ public class BuildGui extends Gui {
 
                     //Connect to the lobby server.
                     u.player.closeInventory();
-                    SwitchServer.switchServer(u.player, Network.getInstance().globalSQL.getString("SELECT FROM server_data WHERE type='lobby';"));
+                    SwitchServer.switchServer(u.player, Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='LOBBY';"));
 
                 });
 

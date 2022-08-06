@@ -39,8 +39,8 @@ public class ExploreGui extends Gui {
                         u.exploreGui = null;
 
                         //Switch to the location add menu.
-                        u.addLocation = new AddLocation(u);
-                        u.addLocation.open(u);
+                        //u.addLocation = new AddLocation(u);
+                        //u.addLocation.open(u);
 
                     });
 
