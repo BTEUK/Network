@@ -40,7 +40,7 @@ public class RegionRequest extends Gui {
                         Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
                                 request.uuid + "';") + ".")));
 
-        setItem(11, Utils.createItem(Material.GREEN_CONCRETE, 1,
+        setItem(11, Utils.createItem(Material.LIME_CONCRETE, 1,
                         Utils.chat("&b&lAccept Request"),
                         Utils.chat("&fThe user will be able to build in this region.")),
                 u ->

@@ -29,7 +29,7 @@ public class ExploreGui extends Gui {
         //If the player is Jr.Builder+ show the 'add location' button.
         if (u.player.hasPermission("group.jrbuilder")) {
 
-            setItem(8, Utils.createItem(Material.GREEN_CONCRETE, 1,
+            setItem(8, Utils.createItem(Material.LIME_CONCRETE, 1,
                             Utils.chat("&b&lAdd Location"),
                             Utils.chat("&fRequest a new location to add"),
                             Utils.chat("&fto the exploration menu.")),

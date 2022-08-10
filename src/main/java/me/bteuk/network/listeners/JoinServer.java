@@ -36,7 +36,7 @@ public class JoinServer implements Listener {
         if (globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid='" + e.getPlayer().getUniqueId() + "';")) {
 
             //Update server.
-            globalSQL.update("UPDATE online_users SET server=" + Network.SERVER_NAME + " WHERE uuid='" + e.getPlayer().getUniqueId() + "';");
+            globalSQL.update("UPDATE online_users SET server='" + Network.SERVER_NAME + "' WHERE uuid='" + e.getPlayer().getUniqueId() + "';");
 
             //Remove their server_switch entry.
             globalSQL.update("DELETE FROM server_switch WHERE uuid='" + e.getPlayer().getUniqueId() + "';");

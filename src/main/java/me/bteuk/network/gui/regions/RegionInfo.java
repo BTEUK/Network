@@ -189,7 +189,7 @@ public class RegionInfo extends Gui {
                     });
 
             //Manage members.
-            setItem(18, Utils.createItem(Material.OAK_BOAT, 1,
+            setItem(18, Utils.createItem(Material.PLAYER_HEAD, 1,
                             Utils.chat("&b&lRegion Members"),
                             Utils.chat("&fManage the members in your region.")),
                     u -> {

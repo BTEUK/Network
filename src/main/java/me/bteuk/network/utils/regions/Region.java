@@ -231,6 +231,11 @@ public record Region(String regionName) {
         //Check if it's not already in the database.
         if (!inDatabase()) {
             Network.getInstance().regionSQL.update("INSERT INTO regions(region,status) VALUES('" + regionName + "','default');");
+
+            //Create region in worldguard.
+            WorldGuard.createRegion(regionName, Integer.valueOf(regionName.split(",")[0]), Integer.valueOf(regionName.split(",")[1]),
+                    Integer.valueOf(regionName.split(",")[0]) + 511, Integer.valueOf(regionName.split(",")[1]) + 511,
+                    Bukkit.getWorld(Network.getInstance().getConfig().getString("earth_world")));
         }
     }
 

@@ -18,25 +18,16 @@ import static org.bukkit.ChatColor.COLOR_CHAR;
 
 public class Utils {
 
-    public static String chat(String s) {
+    public static String chat(String message) {
+        Pattern pattern = Pattern.compile("#[a-fA-F0-9]{6}");
+        Matcher matcher = pattern.matcher(message);
 
-        s = ChatColor.translateAlternateColorCodes('&',s);
-
-        final Pattern hexPattern = Pattern.compile("&#([A-Fa-f0-9]{6})");
-        Matcher matcher = hexPattern.matcher(s);
-        StringBuffer buffer = new StringBuffer(s.length() + 4 * 8);
         while (matcher.find()) {
-
-            String group = matcher.group(1);
-            matcher.appendReplacement(buffer, COLOR_CHAR + "x"
-                    + COLOR_CHAR + group.charAt(0) + COLOR_CHAR + group.charAt(1)
-                    + COLOR_CHAR + group.charAt(2) + COLOR_CHAR + group.charAt(3)
-                    + COLOR_CHAR + group.charAt(4) + COLOR_CHAR + group.charAt(5)
-            );
-
+            String color = message.substring(matcher.start(), matcher.end());
+            message = message.replace(color, ChatColor.valueOf(color) + "");
+            matcher = pattern.matcher(message);
         }
-        return matcher.appendTail(buffer).toString();
-
+        return ChatColor.translateAlternateColorCodes('&', message);
     }
 
     public static ItemStack createItem(Material material, int amount, String displayName, String... loreString) {

@@ -60,6 +60,8 @@ public class NetworkUser {
             //Check if they are in the earth world.
             if (player.getLocation().getWorld().getName().equals(Network.getInstance().getConfig().getString("earth_world"))) {
                 region = Network.getInstance().getRegionManager().getRegion(player.getLocation());
+                //Add region to database if not exists.
+                region.addToDatabase();
                 inRegion = true;
             }
         } else if (Network.SERVER_NAME.equals(Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='PLOT';"))) {

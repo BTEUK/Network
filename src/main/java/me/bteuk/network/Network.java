@@ -203,24 +203,26 @@ public final class Network extends JavaPlugin {
         //Disable bungeecord channel.
         this.getServer().getMessenger().unregisterOutgoingPluginChannel(this);
 
-        //Remove all players from network.
-        for (NetworkUser u: networkUsers) {
+        if (networkUsers != null) {
+            //Remove all players from network.
+            for (NetworkUser u : networkUsers) {
 
-            //Uuid
-            String uuid = u.player.getUniqueId().toString();
+                //Uuid
+                String uuid = u.player.getUniqueId().toString();
 
-            //Remove any outstanding invites that this player has sent.
-            plotSQL.update("DELETE FROM plot_invites WHERE owner='" + uuid + "';");
+                //Remove any outstanding invites that this player has sent.
+                plotSQL.update("DELETE FROM plot_invites WHERE owner='" + uuid + "';");
 
-            //Remove any outstanding invites that this player has received.
-            plotSQL.update("DELETE FROM plot_invites WHERE uuid='" + uuid + "';");
+                //Remove any outstanding invites that this player has received.
+                plotSQL.update("DELETE FROM plot_invites WHERE uuid='" + uuid + "';");
 
-            //Set last_online time in playerdata.
-            globalSQL.update("UPDATE player_data SET last_online=" + Time.currentTime() + " WHERE UUID='" + uuid + "';");
+                //Set last_online time in playerdata.
+                globalSQL.update("UPDATE player_data SET last_online=" + Time.currentTime() + " WHERE UUID='" + uuid + "';");
 
-            //Remove player from online_users.
-            globalSQL.update("DELETE FROM online_users WHERE uuid='" + uuid + "';");
+                //Remove player from online_users.
+                globalSQL.update("DELETE FROM online_users WHERE uuid='" + uuid + "';");
 
+            }
         }
 
 
