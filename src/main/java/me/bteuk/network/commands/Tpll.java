@@ -39,7 +39,7 @@ public class Tpll implements CommandExecutor {
 
     public Tpll(boolean requires_permission) {
         this.requires_permission = requires_permission;
-        this.isEarth = Network.getInstance().getConfig().getBoolean("earth_server");
+        this.isEarth = Network.getInstance().globalSQL.hasRow("SELECT name FROM server_data WHERE name='" + Network.SERVER_NAME + "' AND type='earth'");
         earthServer = Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='earth';");
         earthWorld = Network.getInstance().getConfig().getString("earth_world");
 

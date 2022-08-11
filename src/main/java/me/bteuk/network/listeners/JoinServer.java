@@ -1,6 +1,7 @@
 package me.bteuk.network.listeners;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.events.EventManager;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Time;
@@ -50,7 +51,24 @@ public class JoinServer implements Listener {
         }
 
         //Add user to the list.
-        instance.addUser(new NetworkUser(e.getPlayer()));
+        NetworkUser u = new NetworkUser(e.getPlayer());
+        instance.addUser(u);
 
+        //Check if the player has any join events, if try run them.
+        if (globalSQL.hasRow("SELECT uuid FROM join_events WHERE uuid='" + u.player.getUniqueId() + "' AND type='network';")) {
+
+            //Get the event from the database.
+            String event = globalSQL.getString("SELECT event FROM join_events WHERE uuid='" + u.player.getUniqueId() + "' AND type='network'");
+
+            //Split the event by word.
+            String[] aEvent = event.split(" ");
+
+            //Send the event to the event handler.
+            EventManager.event(u.player.getUniqueId().toString(), aEvent);
+
+            //Clear the events.
+            globalSQL.update("DELETE FROM join_events WHERE uuid='" + u.player.getUniqueId() + "' AND type='network';");
+
+        }
     }
 }

@@ -42,13 +42,13 @@ public record Region(String regionName) {
             return (Network.getInstance().plotSQL.getString("SELECT server FROM regions WHERE region='" + regionName + "';"));
         } else {
             //Region is on earth server.
-            return (Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='PLOT';"));
+            return (Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';"));
         }
     }
 
     //Return whether the uuid is the uuid of the region owner.
     public boolean isOwner(String uuid) {
-        return (Network.getInstance().regionSQL.hasRow("SELECT region FROM region_members WHERE region='" + regionName + "' AND 'uuid='" + uuid + "' AND is_owner=1;"));
+        return (Network.getInstance().regionSQL.hasRow("SELECT region FROM region_members WHERE region='" + regionName + "' AND uuid='" + uuid + "' AND is_owner=1;"));
     }
 
     //Return whether the uuid is the uuid of a region member.
@@ -83,7 +83,7 @@ public record Region(String regionName) {
 
     //Set the region as inactive.
     public void setInactive() {
-        Network.getInstance().regionSQL.hasRow("UPDATE regions SET status='inactive' WHERE region='" + regionName + "';");
+        Network.getInstance().regionSQL.update("UPDATE regions SET status='inactive' WHERE region='" + regionName + "';");
     }
 
     //Return whether the region is inactive.
@@ -150,7 +150,7 @@ public record Region(String regionName) {
     //Return the name of the region owner, if exists.
     public String ownerName() {
         if (hasOwner()) {
-            return (Network.getInstance().globalSQL.getString("SELECT name FROM player_Data WHERE uuid='" + getOwner() + "';"));
+            return (Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + getOwner() + "';"));
         } else {
             return "nobody";
         }
@@ -233,8 +233,8 @@ public record Region(String regionName) {
             Network.getInstance().regionSQL.update("INSERT INTO regions(region,status) VALUES('" + regionName + "','default');");
 
             //Create region in worldguard.
-            WorldGuard.createRegion(regionName, Integer.valueOf(regionName.split(",")[0]), Integer.valueOf(regionName.split(",")[1]),
-                    Integer.valueOf(regionName.split(",")[0]) + 511, Integer.valueOf(regionName.split(",")[1]) + 511,
+            WorldGuard.createRegion(regionName, Integer.valueOf(regionName.split(",")[0]) * 512, Integer.valueOf(regionName.split(",")[1]) * 512,
+                    Integer.valueOf(regionName.split(",")[0]) * 512 + 511, Integer.valueOf(regionName.split(",")[1]) * 512 + 511,
                     Bukkit.getWorld(Network.getInstance().getConfig().getString("earth_world")));
         }
     }
@@ -471,7 +471,7 @@ public record Region(String regionName) {
                 + " WHERE region='" + regionName + "' AND uuid='" + uuid + "';");
 
         //Leave region in WorldGuard.
-        WorldGuard.addMember(regionName, uuid, Bukkit.getWorld(Network.getInstance().getConfig().getString("earth_world")));
+        WorldGuard.removeMember(regionName, uuid, Bukkit.getWorld(Network.getInstance().getConfig().getString("earth_world")));
 
     }
 

@@ -23,7 +23,7 @@ public class SwitchServer {
         //Switch Server
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("Connect");
-        out.writeUTF("building");
+        out.writeUTF(server);
         p.sendPluginMessage(Network.getInstance(), "BungeeCord", out.toByteArray());
 
         //Set delayed check to see whether the player is still on this server or not.

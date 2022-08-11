@@ -237,7 +237,7 @@ public class BuildGui extends Gui {
 
                     //This region is not claimable.
                     setItem(5, Utils.createItem(Material.IRON_DOOR, 1,
-                            Utils.chat("&b&Locked Region"),
+                            Utils.chat("&b&lLocked Region"),
                             Utils.chat("&fThis region can not be claimed."),
                             Utils.chat("&fIt is either locked or used in the plot system.")));
 

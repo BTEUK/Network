@@ -126,6 +126,9 @@ public class Timers {
                         user.player.sendMessage(Utils.chat(message));
 
                     }
+
+                    //Delete messages.
+                    instance.globalSQL.update("DELETE FROM messages WHERE recipient='" + user.player.getUniqueId() + "'");
                 }
             }
 
@@ -166,7 +169,7 @@ public class Timers {
             //If the region has members then make another member the new owner,
             //If the region has no members then set it inactive.
             inactive_owners.clear();
-            inactive_owners = instance.regionSQL.getInactives("SELECT region,uuid FROM region_members WHERE is_owner=1 AND last_enter>" + (Time.currentTime() - inactivity) + ";");
+            inactive_owners = instance.regionSQL.getInactives("SELECT region,uuid FROM region_members WHERE is_owner=1 AND last_enter<" + (Time.currentTime() - inactivity) + ";");
 
             for (Inactivity inactive : inactive_owners) {
 

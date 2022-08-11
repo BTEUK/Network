@@ -4,6 +4,8 @@ import me.bteuk.network.commands.*;
 import me.bteuk.network.commands.tabcompleter.PlayerSelector;
 import me.bteuk.network.gui.NavigatorGui;
 import me.bteuk.network.listeners.*;
+import me.bteuk.network.listeners.global_teleport.MoveListener;
+import me.bteuk.network.listeners.global_teleport.TeleportListener;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.sql.RegionSQL;
@@ -174,6 +176,9 @@ public final class Network extends JavaPlugin {
         if (config.getBoolean("regions_enabled")) {
             regionManager = new RegionManager(regionSQL);
         }
+
+        new MoveListener(this);
+        new TeleportListener(this);
 
         //Setup Timers
         timers = new Timers(this, globalSQL, connect);
