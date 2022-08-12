@@ -39,8 +39,11 @@ public class JoinServer implements Listener {
             //Update server.
             globalSQL.update("UPDATE online_users SET server='" + Network.SERVER_NAME + "' WHERE uuid='" + e.getPlayer().getUniqueId() + "';");
 
-            //Remove their server_switch entry.
-            globalSQL.update("DELETE FROM server_switch WHERE uuid='" + e.getPlayer().getUniqueId() + "';");
+            //Remove their server_switch entry. Delayed by 1 second to make sure the previous server has run their PlayerQuitEvent.
+            Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> globalSQL.update("DELETE FROM server_switch WHERE uuid='" + e.getPlayer().getUniqueId() + "';"), 20L);
+
+            //Update the last_ping.
+            globalSQL.update("UPDATE online_users SET last_ping=" + Time.currentTime() + " WHERE uuid='" + e.getPlayer().getUniqueId() + "' AND server='" + Network.SERVER_NAME + "';");
 
         } else {
 

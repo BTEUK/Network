@@ -20,6 +20,9 @@ public class RegionEvent {
                     //Get region.
                     Region region = Network.getInstance().getRegionManager().getRegion(event[3]);
 
+                    //If the region is not in the database add it.
+                    region.addToPlotsystem();
+
                     //If region is not already set to plotsystem.
                     if (!region.isPlot()) {
 

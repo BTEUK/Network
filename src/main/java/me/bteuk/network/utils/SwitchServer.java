@@ -10,11 +10,16 @@ public class SwitchServer {
 
     public static void switchServer(Player p, String server) {
 
+        NetworkUser u = Network.getInstance().getUser(p);
+
         //If server is null, cancel and notify player.
         if (server == null) {
             p.sendMessage(Utils.chat("&cAn error occured, server does not exist."));
             Network.getInstance().getLogger().warning("Player attempting to switch to non-existing server.");
         }
+
+        //Set switching to true in user.
+        u.switching = true;
 
         //Add switch server instance in database.
         Network.getInstance().globalSQL.update("INSERT INTO server_switch(uuid,from_server,to_server,switch_time) VALUES('" +
@@ -32,14 +37,12 @@ public class SwitchServer {
         Bukkit.getScheduler().scheduleSyncDelayedTask(Network.getInstance(), () -> {
 
             //Check for ping within the last 2 seconds and with a connection to this server.
-            if (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM online_users WHERE last_ping < " + (Time.currentTime() - 2000) + " AND server='" + Network.SERVER_NAME + "';")) {
+            if (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM online_users WHERE last_ping > " + (Time.currentTime() - 2000) + " AND server='" + Network.SERVER_NAME + "';")) {
 
                 //Delete server switch.
-                Network.getInstance().globalSQL.update("DELETE FROM server_switch WHERE uuid='" + p.getUniqueId().toString() + "';");
+                Network.getInstance().globalSQL.update("DELETE FROM server_switch WHERE uuid='" + p.getUniqueId() + "';");
 
             }
-
-
         }, 60L);
     }
 }

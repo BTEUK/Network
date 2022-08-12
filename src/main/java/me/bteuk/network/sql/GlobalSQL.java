@@ -156,7 +156,7 @@ public class GlobalSQL {
     }
 
     //Get a hashmap of all events for this server for the Network plugin.
-    public HashMap<String, String> getEvents(String serverName, HashMap<String, String> map) {
+    public ArrayList<String[]> getEvents(String serverName, ArrayList<String[]> list) {
 
         //Try and get all events for this server.
         try (Connection conn = conn();
@@ -165,12 +165,12 @@ public class GlobalSQL {
 
             while (results.next()) {
 
-                map.put(results.getString(1), results.getString(2));
+                list.add(new String[]{results.getString(1), results.getString(2)});
 
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            return map;
+            return list;
         }
 
         //Try and delete all events for this server.
@@ -181,11 +181,11 @@ public class GlobalSQL {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            return map;
+            return list;
         }
 
         //Return the map.
-        return map;
+        return list;
 
     }
 

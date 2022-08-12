@@ -51,6 +51,12 @@ public class MoveListener implements Listener {
         Player p = e.getPlayer();
         NetworkUser u = Network.getInstance().getUser(p);
 
+        //Cancel event if player is switching server.
+        if (u.switching) {
+            e.setCancelled(true);
+            return;
+        }
+
         if (!(p.hasPermission("uknet.network.elevation.bypass"))) {
 
             if (e.getTo().getY() > yMax) {
@@ -109,21 +115,23 @@ public class MoveListener implements Listener {
 
                                     //Set join event to teleport there.
                                     Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('" + p.getUniqueId() + "','network','teleport "
-                                            + location + " " + (l.getX() + xTransform) + " " + (l.getZ() + zTransform) + " " + l.getYaw() + " " + l.getPitch() + "';");
+                                            + location + " " + (l.getX() + xTransform) + " " + (l.getZ() + zTransform) + " " + l.getYaw() + " " + l.getPitch() + "');");
 
                                     //Switch server.
+                                    u.switching = true;
                                     SwitchServer.switchServer(u.player, server);
 
                                 } else {
 
                                     //Location is on the earth server.
-                                    server = Network.getInstance().globalSQL.getString("SELECT name FROM regions WHERE type='EARTH';");
+                                    server = Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';");
 
                                     //Set join event to teleport there.
                                     Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('" + p.getUniqueId() + "','network','teleport "
-                                            + earthWorld + " " + l.getX() + " " + l.getZ() + " " + l.getYaw() + " " + l.getPitch() + "';");
+                                            + earthWorld + " " + l.getX() + " " + l.getZ() + " " + l.getYaw() + " " + l.getPitch() + "');");
 
                                     //Switch server.
+                                    u.switching = true;
                                     SwitchServer.switchServer(u.player, server);
 
                                 }

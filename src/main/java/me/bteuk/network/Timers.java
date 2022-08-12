@@ -31,7 +31,8 @@ public class Timers {
     private final Connect connect;
 
     //Server events
-    private HashMap<String, String> events;
+    private ArrayList<String[]> events;
+    private boolean isBusy;
 
     //Uuids
     private ArrayList<String> uuids;
@@ -58,7 +59,7 @@ public class Timers {
 
         SERVER_NAME = Network.SERVER_NAME;
 
-        events = new HashMap<>();
+        events = new ArrayList<>();
 
         //days * 24 hours * 60 minutes * 60 seconds * 1000 milliseconds
         inactivity = instance.getConfig().getInt("region_inactivity") * 24L * 60L * 60L * 1000L;
@@ -74,22 +75,34 @@ public class Timers {
             //Check for new server_events.
             if (globalSQL.hasRow("SELECT uuid FROM server_events WHERE server='" + SERVER_NAME + "' AND type='network';")) {
 
-                //Get events for this server.
-                events.clear();
-                events = globalSQL.getEvents(SERVER_NAME, events);
+                //If events is not empty, skip this iteration.
+                //Additionally isBusy needs to be false, implying that the server is not still running a previous iteration.
+                if (events.isEmpty() && !isBusy) {
 
-                for (Map.Entry<String, String> entry : events.entrySet()) {
+                    isBusy = true;
 
-                    //Deal with events here.
+                    //Get events for this server.
+                    events = globalSQL.getEvents(SERVER_NAME, events);
 
-                    //Split the event by word.
-                    String[] aEvent = entry.getValue().split(" ");
+                    for (String[] event : events) {
 
-                    //Send the event to the event handler.
-                    EventManager.event(entry.getKey(), aEvent);
+                        //Deal with events here.
+                        Network.getInstance().getLogger().info("Event: " + event[1]);
 
+                        //Split the event by word.
+                        String[] aEvent = event[1].split(" ");
+
+                        //Send the event to the event handler.
+                        EventManager.event(event[0], aEvent);
+
+                    }
+
+                    //Clear events when done.
+                    events.clear();
+                    isBusy = false;
                 }
             }
+
         }, 0L, 1L);
 
         //1 second timer.

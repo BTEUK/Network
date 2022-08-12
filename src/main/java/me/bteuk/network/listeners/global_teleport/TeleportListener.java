@@ -47,6 +47,12 @@ public class TeleportListener implements Listener {
         Player p = e.getPlayer();
         NetworkUser u = Network.getInstance().getUser(p);
 
+        //Cancel event if player is switching server.
+        if (u.switching) {
+            e.setCancelled(true);
+            return;
+        }
+
         if (!(p.hasPermission("uknet.network.elevation.bypass"))) {
 
             if (e.getTo().getY() > yMax) {

@@ -49,9 +49,14 @@ public class NetworkUser {
     //Navigator in hotbar.
     public boolean navigator;
 
+    //If the player is switching server.
+    public boolean switching;
+
     public NetworkUser(Player player) {
 
         this.player = player;
+
+        switching = false;
 
         navigator = Network.getInstance().globalSQL.hasRow("SELECT navigator FROM player_data WHERE uuid='" + player.getUniqueId() + "' AND navigator=1;");
 

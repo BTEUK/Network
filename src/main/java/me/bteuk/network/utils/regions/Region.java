@@ -239,6 +239,19 @@ public record Region(String regionName) {
         }
     }
 
+    //Add the region to the database for plotsystem.
+    public void addToPlotsystem() {
+        //Check if it's not already in the database.
+        if (!inDatabase()) {
+            Network.getInstance().regionSQL.update("INSERT INTO regions(region,status) VALUES('" + regionName + "','plot');");
+
+            //Create region in worldguard.
+            WorldGuard.createRegion(regionName, Integer.valueOf(regionName.split(",")[0]) * 512, Integer.valueOf(regionName.split(",")[1]) * 512,
+                    Integer.valueOf(regionName.split(",")[0]) * 512 + 511, Integer.valueOf(regionName.split(",")[1]) * 512 + 511,
+                    Bukkit.getWorld(Network.getInstance().getConfig().getString("earth_world")));
+        }
+    }
+
     //Check if this region has any requests.
     public boolean hasRequests() {
         return Network.getInstance().regionSQL.hasRow("SELECT region FROM region_requests WHERE region='" + regionName + "';");

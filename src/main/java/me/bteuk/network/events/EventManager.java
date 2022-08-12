@@ -1,5 +1,7 @@
 package me.bteuk.network.events;
 
+import me.bteuk.network.Network;
+
 public class EventManager {
 
     public static void event(String uuid, String[] event) {

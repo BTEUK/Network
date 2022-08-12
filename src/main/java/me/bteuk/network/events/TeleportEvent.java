@@ -62,6 +62,7 @@ public class TeleportEvent {
 
         //Get y elevation for teleport.
         int y = world.getHighestBlockYAt((int) x, (int) z);
+        y++;
 
         //Get pitch and yaw.
         float yaw = Float.parseFloat(event[4]);

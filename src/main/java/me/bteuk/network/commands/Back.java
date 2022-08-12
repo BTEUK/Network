@@ -49,7 +49,7 @@ public class Back implements CommandExecutor {
 
             //Teleport the player to the correct server with a join event to teleport to the coordinate id.
             Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('" + p.getUniqueId() + "','network','teleport coordinateID "
-                    + coordinateID + "';");
+                    + coordinateID + "');");
 
             //Switch server.
             SwitchServer.switchServer(p, server);
