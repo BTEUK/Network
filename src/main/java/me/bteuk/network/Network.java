@@ -200,6 +200,8 @@ public final class Network extends JavaPlugin {
         getCommand("teleport").setExecutor(new Tp());
         getCommand("teleport").setTabCompleter(new PlayerSelector());
 
+        getCommand("back").setExecutor(new Back());
+
     }
 
     @Override

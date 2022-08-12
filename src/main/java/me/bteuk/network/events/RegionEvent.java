@@ -13,9 +13,6 @@ public class RegionEvent {
 
     public static void event(String uuid, String[] event) {
 
-        //Get player.
-        Player p = Bukkit.getPlayer(UUID.fromString(uuid));
-
         switch (event[1]) {
             case "set":
                 if (event[2].equals("plotsystem")) {
@@ -91,6 +88,9 @@ public class RegionEvent {
             }
             case "teleport": {
 
+                //Get player.
+                Player p = Bukkit.getPlayer(UUID.fromString(uuid));
+
                 //Get the region.
                 Region region = Network.getInstance().getRegionManager().getRegion(event[2]);
 
@@ -110,12 +110,19 @@ public class RegionEvent {
             }
             case "join": {
 
+                //Get player.
+                Player p = Bukkit.getPlayer(UUID.fromString(uuid));
+
                 //Get the region.
                 Region region = Network.getInstance().getRegionManager().getRegion(event[2]);
 
                 //Add player to the region.
-                //Set the coordinate id the same as the location of the owner.
-                region.joinRegion(uuid, region.getCoordinateID(region.getOwner()));
+                //Create a copy of the coordinate id that the owner has.
+                //The reason for a copy rather than using the same copy id is for if the user wants to set a new location.
+                //This then allows us to update the existing coordinate rather than create a new coordinate each time this is done.
+                Location l = Network.getInstance().globalSQL.getCoordinate(region.getCoordinateID(region.getOwner()));
+                int coordinateID = Network.getInstance().globalSQL.addCoordinate(l);
+                region.joinRegion(uuid, coordinateID);
 
                 String message = "&aYou have joined region " + region.getTag(uuid) + " as a member.";
 

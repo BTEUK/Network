@@ -29,3 +29,6 @@ commands:
     aliasses: [tp]
     usage: /<command>
     description: Teleport to any online player.
+  back:
+    usage: /<command>
+    description: Teleports the player to the previous teleported location.

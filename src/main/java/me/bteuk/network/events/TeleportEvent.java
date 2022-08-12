@@ -40,6 +40,12 @@ public class TeleportEvent {
             }
             return;
 
+            //Check if the teleport is to a specific coordinate ID.
+        } else if (event[1].equals("coordinateID")) {
+
+            p.teleport(Network.getInstance().globalSQL.getCoordinate(Integer.parseInt(event[2])));
+            p.sendMessage(Utils.chat("&aTeleported to previous location."));
+
         }
 
         //Get world.

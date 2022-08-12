@@ -119,8 +119,12 @@ public class RegionInfo extends Gui {
                     if (u.inRegion) {
                         if (u.region.equals(region)) {
 
+                            //Update the previous coordinate.
+                            int coordinateID = region.getCoordinateID(uuid);
+                            Network.getInstance().globalSQL.updateCoordinate(coordinateID, u.player.getLocation());
+
                             //Create coordinate id for location of player and set that as the new coordinate id.
-                            region.setCoordinateID(uuid, globalSQL.addCoordinate(u.player.getLocation()));
+                            region.setCoordinateID(uuid, coordinateID);
                             u.player.sendMessage(Utils.chat("&aSet teleport location for region &3" + region.getTag(uuid) + " &aat your current location."));
 
                         } else {

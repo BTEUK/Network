@@ -50,17 +50,16 @@ public class MoveListener implements Listener {
 
         Player p = e.getPlayer();
         NetworkUser u = Network.getInstance().getUser(p);
-        Location l = e.getTo();
 
         if (!(p.hasPermission("uknet.network.elevation.bypass"))) {
 
-            if (l.getY() > yMax) {
+            if (e.getTo().getY() > yMax) {
                 e.setCancelled(true);
                 p.sendMessage(Utils.chat("&cYou may not go above y " + yMax + ", please contact staff if you need to bypass it."));
                 return;
             }
 
-            if (l.getY() < yMin) {
+            if (e.getTo().getY() < yMin) {
                 e.setCancelled(true);
                 p.sendMessage(Utils.chat("&cYou may not go below y " + yMin + ", please contact staff if you need to bypass it."));
                 return;
@@ -74,6 +73,8 @@ public class MoveListener implements Listener {
             //If the player is currently not in a region then that implies they are in a world without regions, so movement will not effect this.
             //Not being in a region also means that region is null.
             if (u.inRegion) {
+
+                Location l = e.getTo().clone();
 
                 //Alter location to add necessary coordinate transformation.
                 l.setX(l.getX() + u.dx);
@@ -186,5 +187,8 @@ public class MoveListener implements Listener {
                 }
             }
         }
+
+        //Network.getInstance().getLogger().info("Move: " + e.getTo().getX() + "," + e.getTo().getZ());
+
     }
 }

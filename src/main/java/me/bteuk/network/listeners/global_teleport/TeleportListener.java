@@ -46,17 +46,16 @@ public class TeleportListener implements Listener {
 
         Player p = e.getPlayer();
         NetworkUser u = Network.getInstance().getUser(p);
-        Location l = e.getTo();
 
         if (!(p.hasPermission("uknet.network.elevation.bypass"))) {
 
-            if (l.getY() > yMax) {
+            if (e.getTo().getY() > yMax) {
                 e.setCancelled(true);
                 p.sendMessage(Utils.chat("&cYou may not go above y " + yMax + ", please contact staff if you need to bypass it."));
                 return;
             }
 
-            if (l.getY() < yMin) {
+            if (e.getTo().getY() < yMin) {
                 e.setCancelled(true);
                 p.sendMessage(Utils.chat("&cYou may not go below y " + yMin + ", please contact staff if you need to bypass it."));
                 return;
@@ -69,10 +68,10 @@ public class TeleportListener implements Listener {
             //Check whether the player is teleporting to a server and world that uses regions.
             //If the player is on the earth server check if they are teleporting to the earth world.
             if (Network.SERVER_NAME.equals(Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';"))) {
-                if (l.getWorld().getName().equals(earthWorld)) {
+                if (e.getTo().getWorld().getName().equals(earthWorld)) {
 
                     //Get region.
-                    Region region = regionManager.getRegion(l);
+                    Region region = regionManager.getRegion(e.getTo());
 
                     //Player is teleport to earth world on earth server.
                     //Check if are teleporting to a new region, if currently in one.
@@ -119,6 +118,9 @@ public class TeleportListener implements Listener {
 
                                     //No coordinate exists, create new.
                                     int coordinateID = Network.getInstance().globalSQL.addCoordinate(e.getFrom());
+
+                                    //Set coordinate id in player data.
+                                    Network.getInstance().globalSQL.update("UPDATE player_data SET previous_coordinate=" + coordinateID + " WHERE uuid='" + u.player.getUniqueId() + "';");
 
                                 } else {
 
@@ -179,6 +181,9 @@ public class TeleportListener implements Listener {
                                 //No coordinate exists, create new.
                                 int coordinateID = Network.getInstance().globalSQL.addCoordinate(e.getFrom());
 
+                                //Set coordinate id in player data.
+                                Network.getInstance().globalSQL.update("UPDATE player_data SET previous_coordinate=" + coordinateID + " WHERE uuid='" + u.player.getUniqueId() + "';");
+
                             } else {
 
                                 //Get coordinate id.
@@ -202,11 +207,13 @@ public class TeleportListener implements Listener {
             } else if (Network.SERVER_TYPE == ServerType.PLOT) {
 
                 //Check if the player is teleporting to a buildable world in the plot system.
-                if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + l.getWorld().getName() + "';")) {
+                if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + e.getTo().getWorld().getName() + "';")) {
 
                     //Get negative coordinate transform of new location.
-                    u.dx = -Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + l.getWorld().getName() + "';");
-                    u.dz = -Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + l.getWorld().getName() + "';");
+                    u.dx = -Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + e.getTo().getWorld().getName() + "';");
+                    u.dz = -Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + e.getTo().getWorld().getName() + "';");
+
+                    Location l = e.getTo().clone();
 
                     //Alter location to add necessary coordinate transformation.
                     l.setX(l.getX() + u.dx);
@@ -245,6 +252,9 @@ public class TeleportListener implements Listener {
                         //No coordinate exists, create new.
                         int coordinateID = Network.getInstance().globalSQL.addCoordinate(e.getFrom());
 
+                        //Set coordinate id in player data.
+                        Network.getInstance().globalSQL.update("UPDATE player_data SET previous_coordinate=" + coordinateID + " WHERE uuid='" + u.player.getUniqueId() + "';");
+
                     } else {
 
                         //Get coordinate id.
@@ -258,5 +268,8 @@ public class TeleportListener implements Listener {
                 }
             }
         }
+
+        //Network.getInstance().getLogger().info("Teleport: " + e.getTo().getX() + "," + e.getTo().getZ());
+
     }
 }
