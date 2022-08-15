@@ -12,6 +12,7 @@ commands:
     usage: /<command>
     description: Teleport to coordinates.
   ll:
+    aliases: [location]
     usage: /<command>
     description: Returns the coordinates where the player is standing with a link to google maps.
   navigator:
