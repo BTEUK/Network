@@ -202,6 +202,8 @@ public final class Network extends JavaPlugin {
 
         getCommand("back").setExecutor(new Back());
 
+        getCommand("modpack").setExecutor(new Modpack());
+
     }
 
     @Override

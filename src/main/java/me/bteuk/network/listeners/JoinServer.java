@@ -5,6 +5,8 @@ import me.bteuk.network.events.EventManager;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Time;
+import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.enums.ServerType;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -56,6 +58,23 @@ public class JoinServer implements Listener {
         //Add user to the list.
         NetworkUser u = new NetworkUser(e.getPlayer());
         instance.addUser(u);
+
+        //Check version per server type.
+        //Ignore lobby, only relevant for Earth and Plot.
+        int version = u.player.getProtocolVersion();
+
+        if (Network.SERVER_TYPE.equals(ServerType.EARTH) && version != 340) {
+
+            //Player is not on 1.12.2, give them a warning letting them know using 1.12.2 with the BTE modpack is the most stable version.
+            u.player.sendMessage(Utils.chat(Network.getInstance().getConfig().getString("version.earth")));
+
+
+        } else if (Network.SERVER_TYPE.equals(ServerType.PLOT) && version < 755) {
+
+            //Player is in a version below 1.17.1, this means they do not have full access to the blocks available in the server thus limiting their ability to build and view builds.
+            u.player.sendMessage(Utils.chat(Network.getInstance().getConfig().getString("version.plot")));
+
+        }
 
         //Check if the player has any join events, if try run them.
         if (globalSQL.hasRow("SELECT uuid FROM join_events WHERE uuid='" + u.player.getUniqueId() + "' AND type='network';")) {
