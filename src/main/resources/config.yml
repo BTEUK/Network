@@ -64,3 +64,6 @@ modpack:
   mac: 'https://s3.buildtheearth.net/public/installer/latest/BTEInstaller-mac.dmg'
   linux: 'https://s3.buildtheearth.net/public/installer/latest/BTEInstaller-linux.AppImage'
   universal: 'https://s3.buildtheearth.net/public/installer/latest/BTEInstaller-universal.jar'
+
+#Discord link
+discord: 'https://discord.gg/5m56EgEVW6'

@@ -35,3 +35,6 @@ commands:
   modpack:
     usage: /<command>
     description: Sends links to the BTE modpack download, can be configured in the plugin config.
+  discord:
+    usage: /<command>
+    description: Sends a link to our discord server.
