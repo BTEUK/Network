@@ -1,11 +1,13 @@
 package me.bteuk.network.gui;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.commands.Nightvision;
 import me.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
+import org.bukkit.potion.PotionEffectType;
 
 public class NavigatorGui extends Gui {
 
@@ -60,6 +62,16 @@ public class NavigatorGui extends Gui {
 
                         u.player.sendMessage(Utils.chat("&aEnabled navigator in inventory."));
                     }
+
+                });
+
+        setItem(7, Utils.createPotion(Material.SPLASH_POTION, PotionEffectType.NIGHT_VISION, 1,
+                        Utils.chat("&b&lToggle Nightvision"),
+                        Utils.chat("&fClick to toggle nightvision."),
+                        Utils.chat("&fYou can also use the command &7/nightvision &for &7/nv&f.")),
+                u -> {
+
+                    Nightvision.toggleNightvision(u.player);
 
                 });
     }

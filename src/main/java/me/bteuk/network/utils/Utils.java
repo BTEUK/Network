@@ -6,7 +6,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,6 +73,29 @@ public class Utils {
         OfflinePlayer p = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
 
         meta.setOwningPlayer(p);
+        item.setItemMeta(meta);
+
+        return item;
+
+    }
+
+    public static ItemStack createPotion(Material material, PotionEffectType effect, int amount, String displayName, String... loreString) {
+
+        ItemStack item;
+
+        List<String> lore = new ArrayList<String>();
+
+        item = new ItemStack(material);
+        item.setAmount(amount);
+
+        PotionMeta meta = (PotionMeta) item.getItemMeta();
+        meta.addCustomEffect(new PotionEffect(effect, Integer.MAX_VALUE, 1), true);
+
+        meta.setDisplayName(Utils.chat(displayName));
+        for (String s : loreString) {
+            lore.add(Utils.chat(s));
+        }
+        meta.setLore(lore);
         item.setItemMeta(meta);
 
         return item;

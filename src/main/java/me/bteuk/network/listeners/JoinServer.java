@@ -1,6 +1,7 @@
 package me.bteuk.network.listeners;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.commands.Nightvision;
 import me.bteuk.network.events.EventManager;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.utils.NetworkUser;
@@ -90,6 +91,17 @@ public class JoinServer implements Listener {
 
             //Clear the events.
             globalSQL.update("DELETE FROM join_events WHERE uuid='" + u.player.getUniqueId() + "' AND type='network';");
+
+        }
+
+        //Give the player nightvision if enabled or remove it if disabled.
+        if (globalSQL.hasRow("SELECT nightvision_enabled FROM player_data WHERE nightvision_enabled=1 AND uuid='" + u.player.getUniqueId() + "';")) {
+
+            Nightvision.giveNightvision(u.player);
+
+        } else {
+
+            Nightvision.removeNightvision(u.player);
 
         }
     }

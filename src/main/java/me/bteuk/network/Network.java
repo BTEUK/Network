@@ -207,6 +207,8 @@ public final class Network extends JavaPlugin {
 
         getCommand("ll").setExecutor(new ll());
 
+        getCommand("nightvision").setExecutor(new Nightvision());
+
     }
 
     @Override

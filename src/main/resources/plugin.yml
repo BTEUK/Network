@@ -39,3 +39,7 @@ commands:
   discord:
     usage: /<command>
     description: Sends a link to our discord server.
+  nightvision:
+    aliases: [nv]
+    usage: /<command>
+    description: Toggle nightvision.
