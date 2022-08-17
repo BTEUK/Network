@@ -43,3 +43,6 @@ commands:
     aliases: [nv]
     usage: /<command>
     description: Toggle nightvision.
+  speed:
+    usage: /<command>
+    description: Sets the players speed, value up to 10.
