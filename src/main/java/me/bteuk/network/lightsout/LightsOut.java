@@ -59,6 +59,13 @@ public class LightsOut extends Gui {
         long timeDiff = Time.currentTime() - startTime;
 
         //Other game end functionality.
+        u.player.closeInventory();
+        u.lightsOut = null;
+        this.delete();
+
+        u.player.sendMessage(Utils.chat("&aCongratulations, you beat Lights Out!"));
+        u.player.sendMessage(Utils.chat("&aYou took &7" + Time.minutes(timeDiff) + " &a" + Time.minuteString(timeDiff)
+                + " and &7" + Time.seconds(timeDiff) + " &a" + Time.secondString(timeDiff) + "."));
 
     }
 
@@ -105,7 +112,7 @@ public class LightsOut extends Gui {
         }
 
         if (j != 5) {
-            game[i][j + 1] = !game[i + 1][j + 1];
+            game[i][j + 1] = !game[i][j + 1];
         }
 
         //Refresh the gui.
@@ -132,6 +139,5 @@ public class LightsOut extends Gui {
 
         }
     }
-
 }
 

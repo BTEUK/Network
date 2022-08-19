@@ -2,6 +2,7 @@ package me.bteuk.network.gui;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.commands.Nightvision;
+import me.bteuk.network.lightsout.LightsOut;
 import me.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -74,5 +75,24 @@ public class NavigatorGui extends Gui {
                     Nightvision.toggleNightvision(u.player);
 
                 });
+
+        setItem(0, Utils.createItem(Material.REDSTONE_LAMP, 1,
+                        Utils.chat("&b&lLights Out"),
+                        Utils.chat("&fPlay a game of Lights Out.")),
+                u -> {
+
+                    if (u.lightsOut == null) {
+
+                        u.lightsOut = new LightsOut(u);
+                        u.lightsOut.open(u);
+
+                    } else {
+
+                        u.lightsOut.open(u);
+
+                    }
+                });
+
+
     }
 }

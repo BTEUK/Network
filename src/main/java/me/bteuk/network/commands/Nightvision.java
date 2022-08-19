@@ -6,6 +6,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,7 +44,7 @@ public class Nightvision implements CommandExecutor {
         } else {
 
             //Enable nightvision.
-            p.addPotionEffect(PotionEffectType.NIGHT_VISION.createEffect(Integer.MAX_VALUE,1));
+            p.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 1, false, false));
 
             //Enable nightvision in database.
             Network.getInstance().globalSQL.update("UPDATE player_data SET nightvision_enabled=1 WHERE uuid='" + p.getUniqueId() + "';");
@@ -58,7 +59,7 @@ public class Nightvision implements CommandExecutor {
         if (!p.hasPotionEffect(PotionEffectType.NIGHT_VISION)) {
 
             //Enable nightvision.
-            p.addPotionEffect(PotionEffectType.NIGHT_VISION.createEffect(Integer.MAX_VALUE,1));
+            p.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 1, false, false));
 
         }
 

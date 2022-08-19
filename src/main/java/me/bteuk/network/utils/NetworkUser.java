@@ -5,6 +5,7 @@ import me.bteuk.network.gui.BuildGui;
 import me.bteuk.network.gui.navigation.ExploreGui;
 import me.bteuk.network.gui.plotsystem.*;
 import me.bteuk.network.gui.regions.*;
+import me.bteuk.network.lightsout.LightsOut;
 import me.bteuk.network.utils.regions.Region;
 import org.bukkit.entity.Player;
 
@@ -36,6 +37,8 @@ public class NetworkUser {
     public RegionRequest regionRequest;
 
     public ExploreGui exploreGui;
+
+    public LightsOut lightsOut;
 
     //Staff user.
     public StaffUser staffUser;
