@@ -60,22 +60,25 @@ public class JoinServer implements Listener {
         NetworkUser u = new NetworkUser(e.getPlayer());
         instance.addUser(u);
 
+        /*
         //Check version per server type.
         //Ignore lobby, only relevant for Earth and Plot.
-        int version = u.player.getProtocolVersion();
+        int version = ProtocolLibrary.getProtocolManager().getProtocolVersion(u.player);
+        TODO: Get protocol version from database.
 
-        if (Network.SERVER_TYPE.equals(ServerType.EARTH) && version != 340) {
+        if (Network.SERVER_TYPE == ServerType.EARTH && version != 340) {
 
             //Player is not on 1.12.2, give them a warning letting them know using 1.12.2 with the BTE modpack is the most stable version.
             u.player.sendMessage(Utils.chat(Network.getInstance().getConfig().getString("version.earth")));
 
 
-        } else if (Network.SERVER_TYPE.equals(ServerType.PLOT) && version < 755) {
+        } else if (Network.SERVER_TYPE == ServerType.PLOT && version < 755) {
 
             //Player is in a version below 1.17.1, this means they do not have full access to the blocks available in the server thus limiting their ability to build and view builds.
             u.player.sendMessage(Utils.chat(Network.getInstance().getConfig().getString("version.plot")));
 
         }
+        */
 
         //Check if the player has any join events, if try run them.
         if (globalSQL.hasRow("SELECT uuid FROM join_events WHERE uuid='" + u.player.getUniqueId() + "' AND type='network';")) {
