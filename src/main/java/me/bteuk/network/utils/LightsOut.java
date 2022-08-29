@@ -1,4 +1,4 @@
-package me.bteuk.network.lightsout;
+package me.bteuk.network.utils;
 
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.utils.NetworkUser;

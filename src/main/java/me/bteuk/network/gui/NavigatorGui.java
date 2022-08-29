@@ -2,7 +2,7 @@ package me.bteuk.network.gui;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.commands.Nightvision;
-import me.bteuk.network.lightsout.LightsOut;
+import me.bteuk.network.utils.LightsOut;
 import me.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

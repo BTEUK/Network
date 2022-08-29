@@ -1,7 +1,5 @@
 package me.bteuk.network.gui;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.plotsystem.PlotMenu;
 import me.bteuk.network.gui.plotsystem.PlotServerLocations;
@@ -10,6 +8,8 @@ import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.enums.ServerType;
 import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.regions.Region;
+import me.bteuk.network.utils.regions.RegionManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -143,8 +143,6 @@ public class BuildGui extends Gui {
             //Check if region is claimable.
             if (user.region.isClaimable()) {
 
-                //TODO deal with jr.builder requests if region is nearby.
-
                 //If the region has an owner.
                 if (user.region.hasOwner()) {
 
@@ -212,8 +210,73 @@ public class BuildGui extends Gui {
                                 //If the user is Jr.Builder+ go through the region joining process.
                                 if (u.player.hasPermission("group.jrbuilder")) {
 
-                                    u.region.joinRegion(u);
-                                    u.player.closeInventory();
+
+                                    //If the player is a Jr.Builder
+                                    //Check if any nearby regions are claimed by someone else.
+                                    //If true then the region needs to be checked by a staff member.
+                                    if (u.player.hasPermission("group.builder")) {
+
+                                        //If staff approval is always required do that.
+                                        if (Network.getInstance().getConfig().getBoolean("staff_request.always")) {
+
+                                            u.region.requestRegion(u, true);
+
+                                        } else {
+
+                                            //Get region coords.
+                                            int x = Integer.parseInt(u.region.regionName().split(",")[0]);
+                                            int z = Integer.parseInt(u.region.regionName().split(",")[1]);
+
+                                            //Get the radius.
+                                            int radius = Network.getInstance().getConfig().getInt("staff_request.always");
+
+                                            //For zero radius, skip.
+                                            if (radius == 0) {
+
+                                                u.region.joinRegion(u);
+                                                u.player.closeInventory();
+
+                                            } else {
+
+                                                //Subtract the config radius value.
+                                                x -= radius;
+                                                z -= radius;
+
+                                                //Get the region manager.
+                                                RegionManager regionManager = Network.getInstance().getRegionManager();
+
+                                                //Iterate through all regions in the radius.
+                                                for (int i = x; i <= x + radius*2; i++) {
+                                                    for (int j = z; j <= z + radius*2; j++) {
+
+                                                        String regionName = i + "," + j;
+
+                                                        //If the region exists, check if it has an owner that is not the player.
+                                                        if (regionManager.exists(regionName)) {
+
+                                                            Region region = regionManager.getRegion(regionName);
+
+                                                            if (region.hasOwner()) {
+                                                                if (!region.getOwner().equals(u.player.getUniqueId().toString())) {
+
+                                                                    //Staff approval is required.
+                                                                    u.region.requestRegion(u, true);
+                                                                    break;
+
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                    } else {
+
+                                        u.region.joinRegion(u);
+                                        u.player.closeInventory();
+
+                                    }
 
                                 } else {
 

@@ -233,8 +233,8 @@ public record Region(String regionName) {
             Network.getInstance().regionSQL.update("INSERT INTO regions(region,status) VALUES('" + regionName + "','default');");
 
             //Create region in worldguard.
-            WorldGuard.createRegion(regionName, Integer.valueOf(regionName.split(",")[0]) * 512, Integer.valueOf(regionName.split(",")[1]) * 512,
-                    Integer.valueOf(regionName.split(",")[0]) * 512 + 511, Integer.valueOf(regionName.split(",")[1]) * 512 + 511,
+            WorldGuard.createRegion(regionName, Integer.parseInt(regionName.split(",")[0]) * 512, Integer.parseInt(regionName.split(",")[1]) * 512,
+                    Integer.parseInt(regionName.split(",")[0]) * 512 + 511, Integer.parseInt(regionName.split(",")[1]) * 512 + 511,
                     Bukkit.getWorld(Network.getInstance().getConfig().getString("earth_world")));
         }
     }
@@ -246,8 +246,8 @@ public record Region(String regionName) {
             Network.getInstance().regionSQL.update("INSERT INTO regions(region,status) VALUES('" + regionName + "','plot');");
 
             //Create region in worldguard.
-            WorldGuard.createRegion(regionName, Integer.valueOf(regionName.split(",")[0]) * 512, Integer.valueOf(regionName.split(",")[1]) * 512,
-                    Integer.valueOf(regionName.split(",")[0]) * 512 + 511, Integer.valueOf(regionName.split(",")[1]) * 512 + 511,
+            WorldGuard.createRegion(regionName, Integer.parseInt(regionName.split(",")[0]) * 512, Integer.parseInt(regionName.split(",")[1]) * 512,
+                    Integer.parseInt(regionName.split(",")[0]) * 512 + 511, Integer.parseInt(regionName.split(",")[1]) * 512 + 511,
                     Bukkit.getWorld(Network.getInstance().getConfig().getString("earth_world")));
         }
     }

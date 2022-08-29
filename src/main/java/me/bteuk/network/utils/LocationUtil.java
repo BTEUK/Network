@@ -1,4 +1,4 @@
-package me.bteuk.network.utils.coords;
+package me.bteuk.network.utils;
 
 import org.bukkit.Location;
 import org.bukkit.World;
