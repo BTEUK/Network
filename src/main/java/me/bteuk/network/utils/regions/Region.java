@@ -331,7 +331,7 @@ public record Region(String regionName) {
             //Send message to player.
             u.player.sendMessage(Utils.chat("&aRequested to join region &3" + regionName + ", &aawaiting staff review."));
 
-            //TODO send message to reviewers if online.
+            Network.getInstance().chat.broadcastMessage("&aA region join request has been submitted by &7" + u.player.getName() + "&a for region &7" + regionName + "&a.", "uknet:reviewer");
 
         } else {
             //Owner request
@@ -343,8 +343,10 @@ public record Region(String regionName) {
             //Send message to player.
             u.player.sendMessage(Utils.chat("&aRequested to join region &3" + regionName + ", &aawaiting owner review."));
 
-            //TODO send message to owner if online.
-
+            //If owner is in the online users list send a message.
+            if (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid=" + getOwner() + ";")) {
+                Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + getOwner() + "','&7" + u.player.getName() + " &a has requested to join region &7" + getTag(getOwner()) + "');");
+            }
         }
     }
 

@@ -19,17 +19,18 @@ public class CustomChat implements Listener, PluginMessageListener {
     private final Network instance;
     private final String IP;
     private final int port;
-    private final String serverName;
 
     public CustomChat(Network instance, String IP, int port) {
 
         this.instance = instance;
         this.IP = IP;
         this.port = port;
-        this.serverName = instance.SERVER_NAME;
 
         instance.getServer().getPluginManager().registerEvents(this, instance);
+
+        //Register chat channels.
         instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:globalchat", this);
+        instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:reviewer", this);
 
         instance.getLogger().info("Successfully enabled Global Chat!");
 
@@ -38,6 +39,7 @@ public class CustomChat implements Listener, PluginMessageListener {
     public void onDisable() {
 
         instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:globalchat");
+        instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:reviewer");
 
     }
 
@@ -45,14 +47,14 @@ public class CustomChat implements Listener, PluginMessageListener {
     public void onPlayerChatEvent(AsyncPlayerChatEvent e) {
 
         e.setCancelled(true);
-        broadcastPlayerMessage(e.getPlayer(), e.getMessage());
+        broadcastPlayerMessage(e.getPlayer(), e.getMessage(), "uknet:globalchat");
 
     }
 
     @Override
     public void onPluginMessageReceived(String channel, Player player, byte[] message) {
 
-        if (!channel.equals("uknet:globalchat")) {
+        if (!channel.equals("uknet:globalchat") && !channel.equals("uknet:reviewer")) {
 
             return;
 
@@ -62,7 +64,20 @@ public class CustomChat implements Listener, PluginMessageListener {
 
         try {
 
-            Bukkit.broadcastMessage(Utils.chat(in.readUTF()));
+            if (channel.equals("uknet:reviewer")) {
+
+                //Send only to reviewers.
+                for (Player p : instance.getServer().getOnlinePlayers()) {
+                    if (p.hasPermission("group.reviewer")) {
+                        p.sendMessage(Utils.chat(in.readUTF()));
+                    }
+                }
+
+            } else {
+
+                Bukkit.broadcastMessage(Utils.chat(in.readUTF()));
+
+            }
 
         } catch (IOException ex) {
 
@@ -72,7 +87,7 @@ public class CustomChat implements Listener, PluginMessageListener {
 
     }
 
-    public void broadcastPlayerMessage(Player player, String message) {
+    public void broadcastPlayerMessage(Player player, String message, String channel) {
         Bukkit.getScheduler().runTaskAsynchronously(instance, () -> {
             try (Socket socket = new Socket(IP, port)) {
                 OutputStream output = socket.getOutputStream();
@@ -80,7 +95,7 @@ public class CustomChat implements Listener, PluginMessageListener {
 
                 // Send player message
                 objectOutput.writeObject(getFormattedMessage(player, message));
-                objectOutput.writeObject(serverName);
+                objectOutput.writeObject(channel);
                 objectOutput.flush();
 
                 objectOutput.close();
@@ -88,11 +103,9 @@ public class CustomChat implements Listener, PluginMessageListener {
                 instance.getLogger().log(Level.SEVERE, "Could not broadcast message to server socket!", ex);
             }
         });
-
-        Bukkit.broadcastMessage(Utils.chat(getFormattedMessage(player, message)));
     }
 
-    public void broadcastMessage(String message) {
+    public void broadcastMessage(String message, String channel) {
         Bukkit.getScheduler().runTaskAsynchronously(instance, () -> {
             try (Socket socket = new Socket(instance.socketIP, instance.socketPort)) {
                 OutputStream output = socket.getOutputStream();
@@ -100,7 +113,7 @@ public class CustomChat implements Listener, PluginMessageListener {
 
                 // Send player message
                 objectOutput.writeObject(message);
-                objectOutput.writeObject(serverName);
+                objectOutput.writeObject(channel);
                 objectOutput.flush();
 
                 objectOutput.close();
@@ -108,7 +121,6 @@ public class CustomChat implements Listener, PluginMessageListener {
                 instance.getLogger().log(Level.SEVERE, "Could not broadcast message to server socket!", ex);
             }
         });
-        Bukkit.broadcastMessage(Utils.chat(message));
     }
 
     public String getFormattedMessage(Player player, String message) {

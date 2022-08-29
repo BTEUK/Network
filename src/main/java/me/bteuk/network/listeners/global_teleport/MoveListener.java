@@ -1,7 +1,5 @@
 package me.bteuk.network.listeners.global_teleport;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 import me.bteuk.network.Network;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.SwitchServer;
@@ -117,10 +115,6 @@ public class MoveListener implements Listener {
                                     Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('" + p.getUniqueId() + "','network','teleport "
                                             + location + " " + (l.getX() + xTransform) + " " + (l.getZ() + zTransform) + " " + l.getYaw() + " " + l.getPitch() + "');");
 
-                                    //Switch server.
-                                    u.switching = true;
-                                    SwitchServer.switchServer(u.player, server);
-
                                 } else {
 
                                     //Location is on the earth server.
@@ -130,26 +124,24 @@ public class MoveListener implements Listener {
                                     Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('" + p.getUniqueId() + "','network','teleport "
                                             + earthWorld + " " + l.getX() + " " + l.getZ() + " " + l.getYaw() + " " + l.getPitch() + "');");
 
-                                    //Switch server.
-                                    u.switching = true;
-                                    SwitchServer.switchServer(u.player, server);
-
                                 }
-                                e.setCancelled(true);
+
+                                //Switch server.
+                                u.switching = true;
+                                SwitchServer.switchServer(u.player, server);
 
                             } else {
 
                                 //You can't enter this region.
                                 p.sendMessage(Utils.chat("&cThe terrain for this region has not been generated, you must be at least Jr.Builder to load new terrain."));
-                                e.setCancelled(true);
                             }
 
                         } else {
 
                             //Cancel movement as the location is on another server.
                             p.sendMessage(Utils.chat("&cThe terrain for this location is on another server, you may not enter."));
-                            e.setCancelled(true);
                         }
+                        e.setCancelled(true);
                     } else {
 
                         //Check if the player can enter the region.

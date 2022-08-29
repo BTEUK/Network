@@ -4,6 +4,7 @@ import me.bteuk.network.Network;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.Time;
+import me.bteuk.network.utils.Utils;
 import org.bukkit.entity.Player;
 
 //This class deals with players joining and leaving the network.
@@ -49,10 +50,21 @@ public class Connect {
 
         }
 
-        //TODO If reviewer show number of submitted plots.
+        if (p.hasPermission("group.reviewer")) {
+            int plots = instance.plotSQL.getInt("SELECT COUNT(id) FROM plot_data WHERE status='submitted';");
+
+            if (plots != 0) {
+                if (plots == 1) {
+                    p.sendMessage(Utils.chat("&aThere is 1 plot available for review."));
+                } else {
+                    p.sendMessage(Utils.chat("&aThere are " + plots + " plots available for review."));
+                }
+            }
+
+        }
 
         //Send global connect message.
-        instance.chat.broadcastMessage(joinMessage.replace("%player%", p.getName()));
+        instance.chat.broadcastMessage(joinMessage.replace("%player%", p.getName()), "uknet:globalchat");
 
     }
 
@@ -74,7 +86,7 @@ public class Connect {
 
         //Get the player name and send global disconnect message.
         String name = globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
-        instance.chat.broadcastMessage(leaveMessage.replace("%player%", name));
+        instance.chat.broadcastMessage(leaveMessage.replace("%player%", name), "uknet:globalchat");
 
         //Remove player from online_users.
         globalSQL.update("DELETE FROM online_users WHERE uuid='" + uuid + "';");
