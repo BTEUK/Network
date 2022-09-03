@@ -2,6 +2,7 @@ package me.bteuk.network.utils;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.BuildGui;
+import me.bteuk.network.gui.navigation.AddLocation;
 import me.bteuk.network.gui.navigation.ExploreGui;
 import me.bteuk.network.gui.plotsystem.*;
 import me.bteuk.network.gui.regions.*;
@@ -36,6 +37,7 @@ public class NetworkUser {
     public RegionRequest regionRequest;
 
     public ExploreGui exploreGui;
+    public AddLocation addLocation;
 
     public LightsOut lightsOut;
 

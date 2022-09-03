@@ -65,7 +65,7 @@ public class ExploreGui extends Gui {
 
         The sub categories are the regions of England:
 
-        - London: Greater London an City of London
+        - London: Greater London and City of London
         - North East: Northumberland, Tyne and Wear and Durham
         - North West: Cumbria, Lancashire, Merseyside, Cheshire and Greater Manchester
         - Yorkshire: North Yorkshire, South Yorkshire, West Yorkshire and the East Riding of Yorkshire
