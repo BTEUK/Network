@@ -20,6 +20,8 @@ public class RegionInfo extends Gui {
 
     private final GlobalSQL globalSQL;
 
+    private RegionTagListener regionTagListener;
+
     public RegionInfo(Region region, String uuid) {
 
         super(27, Component.text("Region " + region.getTag(uuid), NamedTextColor.AQUA, TextDecoration.BOLD));
@@ -69,7 +71,13 @@ public class RegionInfo extends Gui {
 
                     //Create chat listener and send message telling the player.
                     //Listener will automatically close after 1 minute or if a message is sent.
-                    new RegionTagListener(u.player, region);
+                    if (regionTagListener != null) {
+                        regionTagListener.unregister();
+                    }
+
+                    //Create chat listener and send message telling the player.
+                    //Listener will automatically close after 1 minute or if a message is sent.
+                    regionTagListener = new RegionTagListener(u.player, region);
                     u.player.sendMessage(Utils.chat("&aWrite your region tag in chat, the first message counts."));
                     u.player.closeInventory();
 
