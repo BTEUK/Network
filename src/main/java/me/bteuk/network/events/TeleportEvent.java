@@ -46,6 +46,15 @@ public class TeleportEvent {
             p.teleport(Network.getInstance().globalSQL.getCoordinate(Integer.parseInt(event[2])));
             p.sendMessage(Utils.chat("&aTeleported to previous location."));
 
+        } else if (event[1].equals("location")) {
+
+            //Get the coordinate id.
+            int coordinate_id = Network.getInstance().globalSQL.getInt("SELECT coordinate FROM location_data WHERE location='" + event[2] + "';");
+
+            Location l = Network.getInstance().globalSQL.getCoordinate(coordinate_id);
+            p.teleport(l);
+            p.sendMessage(Utils.chat("&aTeleported to &3" + event[2]));
+
         }
 
         //Get world.

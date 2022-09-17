@@ -13,9 +13,9 @@ import org.bukkit.Material;
 
 public class AddLocation extends Gui {
 
-    private String name = null;
-    private Categories category = null;
-    private Counties county = null;
+    private String name;
+    private Categories category;
+    private Counties county;
 
     private final NetworkUser u;
 

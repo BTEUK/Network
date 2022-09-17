@@ -60,6 +60,7 @@ public class ExploreGui extends Gui {
 
         - Suggested Locations
         - Nearby Locations
+        - Find Location
 
         England will also have sub-categories due to it being by far the largest category.
 

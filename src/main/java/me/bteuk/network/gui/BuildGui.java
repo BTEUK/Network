@@ -138,6 +138,7 @@ public class BuildGui extends Gui {
         //Join region (Jr.Builder+ only)
         //If region is claimable.
         //Check if the player is in a region.
+        //TODO: If the player is not able to claim a region change the icon.
         if (user.inRegion) {
 
             //Check if region is claimable.
