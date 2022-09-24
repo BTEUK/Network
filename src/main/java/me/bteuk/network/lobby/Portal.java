@@ -1,14 +1,15 @@
 package me.bteuk.network.lobby;
 
+import me.bteuk.network.events.EventManager;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 public class Portal {
 
     private final double x1,y1,z1,x2,y2,z2;
-    private final String event;
+    private final String[] events;
 
-    public Portal(int x1, int y1, int z1, int x2, int y2, int z2, String event) {
+    public Portal(int x1, int y1, int z1, int x2, int y2, int z2, String[] events) {
 
         //Check if the min/max area configured correctly.
         //Else which them out.
@@ -37,10 +38,11 @@ public class Portal {
             this.z2 = z1 + 1;
         }
 
-        this.event = event;
+        this.events = events;
 
     }
 
+    //Check if the location parameter is located inside the portal.
     public boolean in(Location l) {
         if (x1 <= l.getX() && x2 >= l.getX() && y1 <= l.getY() && y2 >= l.getY() && z1 <= l.getZ() && z2 >= l.getZ()) {
             return true;
@@ -49,7 +51,19 @@ public class Portal {
         }
     }
 
+    //Runs the portal events for a specific player.
+    //Leverages existing event infrastructure to run the events.
+    //If the event is a command, execute that instead.
     public void event(Player p) {
+        for (String event: events) {
+            if (event.startsWith("/")) {
 
+                //Send command by using chat.
+                p.chat(event);
+
+            } else {
+                EventManager.event(p.getUniqueId().toString(), event.split(" "));
+            }
+        }
     }
 }
