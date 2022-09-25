@@ -61,4 +61,8 @@ public class RegionManager {
         regions.add(region);
         return region;
     }
+
+    public ArrayList<Region> getRegions() {
+        return regions;
+    }
 }
