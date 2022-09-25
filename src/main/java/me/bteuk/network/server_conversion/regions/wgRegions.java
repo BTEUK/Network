@@ -2,6 +2,7 @@ package me.bteuk.network.server_conversion.regions;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
@@ -11,6 +12,7 @@ import me.bteuk.network.utils.regions.RegionManager;
 import org.bukkit.Bukkit;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class wgRegions {
 
@@ -52,6 +54,24 @@ public class wgRegions {
 
             wgRegion = new ProtectedCuboidRegion(region.regionName(), BlockVector3.at(xmin, -512, zmin), BlockVector3.at(xmax, 1536, zmax));
 
+            DefaultDomain wgMembers = wgRegion.getMembers();
+
+            //If the region has an owner, add them.
+            if (region.hasOwner()) {
+                wgMembers.addPlayer(UUID.fromString(region.getOwner()));
+            }
+
+            //If the region should have members, add them.
+            ArrayList<String> members = region.getMembers();
+
+            for (String uuid: members) {
+                wgMembers.addPlayer(UUID.fromString(uuid));
+            }
+
+            //Set the members.
+            wgRegion.setMembers(wgMembers);
+
+            //Add the region.
             regions.addRegion(wgRegion);
 
         }
