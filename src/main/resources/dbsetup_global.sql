@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS location_data
 (
     location    VARCHAR(128)    NOT NULL,
     category    VARCHAR(128)    NOT NULL,
-    subcategory VARCHAR(128)    NOT NULL,
+    subcategory VARCHAR(128)    NULL DEFAULT NULL,
     coordinate  INT             NOT NULL,
     PRIMARY KEY(location)
 );
@@ -102,6 +102,8 @@ CREATE TABLE IF NOT EXISTS location_data
 CREATE TABLE IF NOT EXISTS location_requests
 (
     location    VARCHAR(128)    NOT NULL,
+    category    VARCHAR(128)    NOT NULL,
+    subcategory VARCHAR(128)    NULL DEFAULT NULL,
     coordinate  INT             NOT NULL,
     PRIMARY KEY(location)
 );

@@ -5,6 +5,7 @@ import me.bteuk.network.gui.BuildGui;
 import me.bteuk.network.gui.navigation.AddLocation;
 import me.bteuk.network.gui.navigation.ExploreGui;
 import me.bteuk.network.gui.navigation.LocationMenu;
+import me.bteuk.network.gui.navigation.SelectCounty;
 import me.bteuk.network.gui.plotsystem.*;
 import me.bteuk.network.gui.regions.*;
 import me.bteuk.network.utils.regions.Region;
@@ -39,6 +40,7 @@ public class NetworkUser {
 
     public ExploreGui exploreGui;
     public AddLocation addLocation;
+    public SelectCounty selectCounty;
     public LocationMenu locationMenu;
 
     public LightsOut lightsOut;
