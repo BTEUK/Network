@@ -1,6 +1,7 @@
 package me.bteuk.network;
 
 import me.bteuk.network.commands.*;
+import me.bteuk.network.commands.tabcompleter.LocationSelector;
 import me.bteuk.network.commands.tabcompleter.PlayerSelector;
 import me.bteuk.network.gui.NavigatorGui;
 import me.bteuk.network.listeners.*;
@@ -211,6 +212,9 @@ public final class Network extends JavaPlugin {
         getCommand("speed").setExecutor(new Speed());
 
         getCommand("help").setExecutor(new Help());
+
+        getCommand("warp").setExecutor(new Warp());
+        getCommand("warp").setTabCompleter(new LocationSelector());
 
     }
 

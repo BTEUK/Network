@@ -49,3 +49,6 @@ commands:
   help:
     usage: /<command>
     description: Help menu for information on commands and server features.
+  warp:
+    usage: /<command>
+    description: Warp to locations in the exploration menu.
