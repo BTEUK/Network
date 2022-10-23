@@ -33,6 +33,22 @@ public class Utils {
         return ChatColor.translateAlternateColorCodes('&', message);
     }
 
+    public static String title(String message) {
+        return chat("&b&l" + message);
+    }
+
+    public static String line(String message) {
+        return chat("&f" + message);
+    }
+
+    public static String error(String message) {
+        return chat("&c" + message);
+    }
+
+    public static String success(String message) {
+        return chat("&a" + message);
+    }
+
     public static ItemStack createItem(Material material, int amount, String displayName, String... loreString) {
 
         ItemStack item;
