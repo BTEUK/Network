@@ -16,6 +16,9 @@ public class StaffUser {
     public TransferOwner transferOwner;
     public KickMembers kickMembers;
 
+    public LocationRequests locationRequests;
+    public LocationRequest locationRequest;
+
     public StaffUser() {
 
     }
