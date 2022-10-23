@@ -2,6 +2,7 @@ package me.bteuk.network.utils.navigation;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.navigation.AddLocation;
+import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -29,6 +30,16 @@ public class LocationNameListener implements Listener {
             //Send message to player telling them it's been timer out.
             if (p != null) {
                 p.sendMessage(Utils.chat("&c'Set Location Name' cancelled."));
+
+                //If AddLocation gui still exists, reopen it.
+                //Also check if player is actually still online.
+                if (p.isOnline()) {
+                    NetworkUser u = Network.getInstance().getUser(p);
+                    if (u.addLocation != null) {
+                        u.addLocation.open(u);
+                    }
+                }
+
             }
             unregister();
         }, 1200L);
@@ -57,6 +68,12 @@ public class LocationNameListener implements Listener {
                 //Unregister listener and task.
                 task.cancel();
                 unregister();
+
+                //If AddLocation gui still exists, reopen it.
+                NetworkUser u = Network.getInstance().getUser(p);
+                if (u.addLocation != null) {
+                    u.addLocation.open(u);
+                }
 
             }
         }
