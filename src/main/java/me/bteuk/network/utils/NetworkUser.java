@@ -16,8 +16,8 @@ public class NetworkUser {
     //Lights out, a gui game.
     public LightsOut lightsOut;
 
-    //Staff user.
-    public StaffUser staffUser;
+    //Staff gui.
+    public Gui staffGui;
 
     //Region information.
     public boolean inRegion;
@@ -58,11 +58,5 @@ public class NetworkUser {
                 inRegion = true;
             }
         }
-
-        //If the user is a member of staff, create staff user instance.
-        if (player.hasPermission("uknet.staff")) {
-            staffUser = new StaffUser();
-        }
-
     }
 }

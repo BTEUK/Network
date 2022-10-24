@@ -99,10 +99,10 @@ public class StaffGui extends Gui {
 
                             //Open region request menu.
                             this.delete();
-                            u.staffUser.staffGui = null;
+                            u.staffGui = null;
 
-                            u.staffUser.regionRequests = new RegionRequests(true);
-                            u.staffUser.regionRequests.open(u);
+                            u.staffGui = new RegionRequests(true);
+                            u.staffGui.open(u);
 
                         } else {
                             u.player.sendMessage(Utils.chat("&cYou must be a reviewer to review region requests."));
