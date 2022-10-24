@@ -136,11 +136,11 @@ public class TransferOwner extends Gui {
 
                     //Delete this gui.
                     this.delete();
-                    u.staffUser.transferOwner = null;
+                    u.staffGui = null;
 
                     //Switch back to plot info.
-                    u.staffUser.manageRegion = new ManageRegion(u, region);
-                    u.staffUser.manageRegion.open(u);
+                    u.staffGui = new ManageRegion(u, region);
+                    u.staffGui.open(u);
 
                 });
     }

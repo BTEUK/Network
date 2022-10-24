@@ -83,12 +83,12 @@ public class ManageRegion extends Gui {
                         u -> {
 
                             //Close this menu.
-                            u.staffUser.manageRegion.delete();
-                            u.staffUser.manageRegion = null;
+                            this.delete();
+                            u.staffGui = null;
 
                             //Open transfer owner menu.
-                            u.staffUser.transferOwner = new TransferOwner(region);
-                            u.staffUser.transferOwner.open(u);
+                            u.staffGui = new TransferOwner(region);
+                            u.staffGui.open(u);
 
 
                         });
@@ -108,12 +108,12 @@ public class ManageRegion extends Gui {
                         u -> {
 
                             //Close this menu.
-                            u.staffUser.manageRegion.delete();
-                            u.staffUser.manageRegion = null;
+                            this.delete();
+                            u.staffGui = null;
 
                             //Open transfer owner menu.
-                            u.staffUser.kickMembers = new KickMembers(region);
-                            u.staffUser.kickMembers.open(u);
+                            u.staffGui = new KickMembers(region);
+                            u.staffGui.open(u);
 
 
                         });
@@ -192,10 +192,10 @@ public class ManageRegion extends Gui {
 
                     //Return to request menu.
                     this.delete();
-                    u.staffUser.manageRegion = null;
+                    u.staffGui = null;
 
-                    u.staffUser.staffGui = new StaffGui(u);
-                    u.staffUser.staffGui.open(u);
+                    u.staffGui = new StaffGui(u);
+                    u.staffGui.open(u);
 
                 });
     }
