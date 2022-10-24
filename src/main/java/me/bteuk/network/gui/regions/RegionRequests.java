@@ -117,11 +117,11 @@ public class RegionRequests extends Gui {
 
                         } else {
 
-                            u.regionRequests = null;
+                            u.mainGui = null;
 
                             //Switch to region request.
-                            u.regionRequest = new RegionRequest(requests.get(finalI), false);
-                            u.regionRequest.open(u);
+                            u.mainGui = new RegionRequest(requests.get(finalI), false);
+                            u.mainGui.open(u);
 
                         }
 
@@ -167,11 +167,11 @@ public class RegionRequests extends Gui {
 
                         //Delete this gui.
                         this.delete();
-                        u.regionRequests = null;
+                        u.mainGui = null;
 
                         //Switch to staff menu.
-                        u.regionMenu = new RegionMenu(u);
-                        u.regionMenu.open(u);
+                        u.mainGui = new RegionMenu(u);
+                        u.mainGui.open(u);
 
                     });
         }

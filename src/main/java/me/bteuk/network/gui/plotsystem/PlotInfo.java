@@ -145,11 +145,11 @@ public class PlotInfo extends Gui {
 
                         //Delete this gui.
                         this.delete();
-                        u.plotInfo = null;
+                        u.mainGui = null;
 
                         //Switch back to plot menu.
-                        u.deniedPlotFeedback = new DeniedPlotFeedback(plotID);
-                        u.deniedPlotFeedback.open(u);
+                        u.mainGui = new DeniedPlotFeedback(plotID);
+                        u.mainGui.open(u);
 
                     });
         }
@@ -223,11 +223,11 @@ public class PlotInfo extends Gui {
 
                             //Delete this gui.
                             this.delete();
-                            u.plotInfo = null;
+                            u.mainGui = null;
 
                             //Switch back to plot menu.
-                            u.deleteConfirm = new DeleteConfirm(plotID);
-                            u.deleteConfirm.open(u);
+                            u.mainGui = new DeleteConfirm(plotID);
+                            u.mainGui.open(u);
 
                         });
 
@@ -241,11 +241,11 @@ public class PlotInfo extends Gui {
 
                         //Delete this gui.
                         this.delete();
-                        u.plotInfo = null;
+                        u.mainGui = null;
 
                         //Switch back to plot menu.
-                        u.plotMembers = new PlotMembers(plotID);
-                        u.plotMembers.open(u);
+                        u.mainGui = new PlotMembers(plotID);
+                        u.mainGui.open(u);
 
                     });
 
@@ -258,11 +258,11 @@ public class PlotInfo extends Gui {
 
                         //Delete this gui.
                         this.delete();
-                        u.plotInfo = null;
+                        u.mainGui = null;
 
                         //Switch back to plot menu.
-                        u.invitePlotMembers = new InvitePlotMembers(plotID);
-                        u.invitePlotMembers.open(u);
+                        u.mainGui = new InvitePlotMembers(plotID);
+                        u.mainGui.open(u);
 
                     });
 
@@ -277,12 +277,12 @@ public class PlotInfo extends Gui {
 
                         //Delete this gui.
                         this.delete();
-                        u.plotInfo = null;
+                        u.mainGui = null;
 
                         //Switch back to plot menu.
                         Bukkit.getScheduler().scheduleSyncDelayedTask(Network.getInstance(), () -> {
-                            u.plotMenu = new PlotMenu(u);
-                            u.plotMenu.open(u);
+                            u.mainGui = new PlotMenu(u);
+                            u.mainGui.open(u);
                         }, 20L);
 
 
@@ -304,11 +304,11 @@ public class PlotInfo extends Gui {
 
                     //Delete this gui.
                     this.delete();
-                    u.plotInfo = null;
+                    u.mainGui = null;
 
                     //Switch back to plot menu.
-                    u.plotMenu = new PlotMenu(u);
-                    u.plotMenu.open(u);
+                    u.mainGui = new PlotMenu(u);
+                    u.mainGui.open(u);
 
                 });
     }

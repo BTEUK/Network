@@ -119,11 +119,11 @@ public class DeniedPlotFeedback extends Gui {
 
                     //Delete this gui.
                     this.delete();
-                    u.deniedPlotFeedback = null;
+                    u.mainGui = null;
 
                     //Switch back to plot menu.
-                    u.plotInfo = new PlotInfo(plotID, u.player.getUniqueId().toString());
-                    u.plotInfo.open(u);
+                    u.mainGui = new PlotInfo(plotID, u.player.getUniqueId().toString());
+                    u.mainGui.open(u);
 
                 });
     }

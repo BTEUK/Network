@@ -10,8 +10,6 @@ import me.bteuk.network.utils.regions.Inactivity;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Timers {
 

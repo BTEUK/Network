@@ -1,13 +1,7 @@
 package me.bteuk.network.utils;
 
 import me.bteuk.network.Network;
-import me.bteuk.network.gui.BuildGui;
-import me.bteuk.network.gui.navigation.AddLocation;
-import me.bteuk.network.gui.navigation.ExploreGui;
-import me.bteuk.network.gui.navigation.LocationMenu;
-import me.bteuk.network.gui.navigation.SelectCounty;
-import me.bteuk.network.gui.plotsystem.*;
-import me.bteuk.network.gui.regions.*;
+import me.bteuk.network.gui.Gui;
 import me.bteuk.network.utils.regions.Region;
 import org.bukkit.entity.Player;
 
@@ -16,33 +10,10 @@ public class NetworkUser {
     //Player instance.
     public Player player;
 
-    //Gui's
-    public BuildGui buildGui;
-    public PlotServerLocations plotServerLocations;
-    public PlotMenu plotMenu;
-    public PlotInfo plotInfo;
-    public AcceptedPlotFeedback acceptedPlotFeedback;
-    public DeniedPlotFeedback deniedPlotFeedback;
+    //Main gui, includes everything that is part of the navigator.
+    public Gui mainGui;
 
-    public DeleteConfirm deleteConfirm;
-
-    public PlotMembers plotMembers;
-    public InvitePlotMembers invitePlotMembers;
-
-    public RegionMenu regionMenu;
-    public RegionInfo regionInfo;
-
-    public InviteRegionMembers inviteRegionMembers;
-    public RegionMembers regionMembers;
-
-    public RegionRequests regionRequests;
-    public RegionRequest regionRequest;
-
-    public ExploreGui exploreGui;
-    public AddLocation addLocation;
-    public SelectCounty selectCounty;
-    public LocationMenu locationMenu;
-
+    //Lights out, a gui game.
     public LightsOut lightsOut;
 
     //Staff user.

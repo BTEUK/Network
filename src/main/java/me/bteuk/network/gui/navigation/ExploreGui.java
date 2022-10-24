@@ -36,11 +36,11 @@ public class ExploreGui extends Gui {
                     u -> {
 
                         this.delete();
-                        u.exploreGui = null;
+                        u.mainGui = null;
 
                         //Switch to the location add menu.
-                        //u.addLocation = new AddLocation(u);
-                        //u.addLocation.open(u);
+                        u.mainGui = new AddLocation(u);
+                        u.mainGui.open(u);
 
                     });
 
@@ -92,7 +92,7 @@ public class ExploreGui extends Gui {
 
                     //Delete this gui.
                     this.delete();
-                    u.exploreGui = null;
+                    u.mainGui = null;
 
                     //Switch to navigation menu.
                     Network.getInstance().navigatorGui.open(u);

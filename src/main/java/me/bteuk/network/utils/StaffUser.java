@@ -7,6 +7,8 @@ import me.bteuk.network.staff.*;
 
 public class StaffUser {
 
+    //TODO: Similarly to NetworkUser, attempt to merge the guis.
+
     public StaffGui staffGui;
 
     public RegionRequests regionRequests;

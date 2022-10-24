@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public abstract class Gui {
+public abstract class Gui implements GuiInterface {
 
     public static Map<UUID, Gui> inventoriesByUUID = new HashMap<>();
     public static Map<UUID, UUID> openInventories = new HashMap<>();
@@ -80,6 +80,8 @@ public abstract class Gui {
         inventoriesByUUID.remove(getUuid());
     }
 
+    //TODO: Refresh gui method in this class, which is then overwritten all unique guis.
+
     public UUID getUuid() {
         return uuid;
     }
@@ -99,42 +101,8 @@ public abstract class Gui {
     //Remove any existing guis.
     public static void deleteGuis(NetworkUser u) {
 
-        if (u.buildGui != null) {
-
-            u.buildGui.delete();
-
-        } else if (u.plotServerLocations != null) {
-
-            u.plotServerLocations.delete();
-
-        } else if (u.plotMenu != null) {
-
-            u.plotMenu.delete();
-
-        } else if (u.plotInfo != null) {
-
-            u.plotInfo.delete();
-
-        } else if (u.acceptedPlotFeedback != null) {
-
-            u.acceptedPlotFeedback.delete();
-
-        } else if (u.deniedPlotFeedback != null) {
-
-            u.deniedPlotFeedback.delete();
-
-        } else if (u.deleteConfirm != null) {
-
-            u.deleteConfirm.delete();
-
-        } else if (u.plotMembers != null) {
-
-            u.plotMembers.delete();
-
-        } else if (u.invitePlotMembers != null) {
-
-            u.invitePlotMembers.delete();
-
+        if (u.mainGui != null) {
+            u.mainGui.delete();
         }
     }
 }

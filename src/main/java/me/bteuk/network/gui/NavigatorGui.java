@@ -22,8 +22,8 @@ public class NavigatorGui extends Gui {
                 u -> {
 
                     //Switch to the build menu.
-                    u.buildGui = new BuildGui(u);
-                    u.buildGui.open(u);
+                    u.mainGui = new BuildGui(u);
+                    u.mainGui.open(u);
 
                 });
 
@@ -70,11 +70,7 @@ public class NavigatorGui extends Gui {
                         Utils.chat("&b&lToggle Nightvision"),
                         Utils.chat("&fClick to toggle nightvision."),
                         Utils.chat("&fYou can also use the command &7/nightvision &for &7/nv&f.")),
-                u -> {
-
-                    Nightvision.toggleNightvision(u.player);
-
-                });
+                u -> Nightvision.toggleNightvision(u.player));
 
         setItem(0, Utils.createItem(Material.REDSTONE_LAMP, 1,
                         Utils.chat("&b&lLights Out"),
@@ -94,5 +90,10 @@ public class NavigatorGui extends Gui {
                 });
 
 
+    }
+
+    //This methods is not needed in this class, so it is empty.
+    @Override
+    public void refresh() {
     }
 }

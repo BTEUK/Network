@@ -214,11 +214,11 @@ public class AddLocation extends Gui {
 
                     //Delete this gui.
                     this.delete();
-                    u.addLocation = null;
+                    u.mainGui = null;
 
                     //Switch to navigation menu.
-                    u.exploreGui = new ExploreGui(u);
-                    u.exploreGui.open(u);
+                    u.mainGui = new ExploreGui(u);
+                    u.mainGui.open(u);
 
                 });
     }
