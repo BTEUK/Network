@@ -97,12 +97,4 @@ public abstract class Gui implements GuiInterface {
     public Map<Integer, guiAction> getActions() {
         return actions;
     }
-
-    //Remove any existing guis.
-    public static void deleteGuis(NetworkUser u) {
-
-        if (u.mainGui != null) {
-            u.mainGui.delete();
-        }
-    }
 }
