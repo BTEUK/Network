@@ -52,3 +52,6 @@ commands:
   warp:
     usage: /<command>
     description: Warp to locations in the exploration menu.
+  addlocation:
+    usage: /<command>
+    description: Opens AddLocation gui.
