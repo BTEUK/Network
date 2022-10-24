@@ -88,7 +88,7 @@ public class LocationSearch implements Listener {
                         u.mainGui.delete();
                         u.mainGui = null;
 
-                        u.mainGui = new LocationMenu(u, "Search: " + e.getMessage(), searchLocations);
+                        u.mainGui = new LocationMenu("Search: " + e.getMessage(), searchLocations, false);
                         u.mainGui.open(u);
 
                     });

@@ -2,7 +2,6 @@ package me.bteuk.network.listeners;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
-import me.bteuk.network.gui.navigation.AddLocation;
 import me.bteuk.network.utils.NetworkUser;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

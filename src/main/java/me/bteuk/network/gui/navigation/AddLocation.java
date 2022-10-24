@@ -93,8 +93,7 @@ public class AddLocation extends Gui {
                         Utils.line("Current category is:"),
                         Utils.chat("&b&7" + category.label),
                         Utils.line("Available categories are:"),
-                        Utils.line("England, Scotland, Wales, Northern Ireland"),
-                        Utils.line("and Overseas Territories & Crown Dependencies")),
+                        Utils.line("England, Scotland, Wales, Northern Ireland and Other")),
 
                 u -> {
 
@@ -231,7 +230,7 @@ public class AddLocation extends Gui {
                     "VALUES('" + name + "','" + category + "','" + coordinate_id + ";");
         } else {
             globalSQL.update("INSERT INTO location_requests(location,category,subcategory,coordinate) " +
-                    "VALUES('" + name + "','" + category + "','" + county.region + "," + coordinate_id + ";");
+                    "VALUES('" + name + "','" + category + "','" + region + "," + coordinate_id + ";");
         }
 
         u.player.sendMessage(Utils.success("Location &7" + name + " &aadded to exploration menu."));

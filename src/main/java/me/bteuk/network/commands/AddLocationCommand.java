@@ -4,8 +4,6 @@ import me.bteuk.network.Network;
 import me.bteuk.network.gui.navigation.AddLocation;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

@@ -2,7 +2,6 @@ package me.bteuk.network.gui.navigation;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
-import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
@@ -15,17 +14,18 @@ import java.util.HashSet;
 
 public class LocationMenu extends Gui {
 
-    private final NetworkUser u;
     private final HashSet<String> locations;
 
     private int page;
+    private boolean england;
 
-    public LocationMenu(NetworkUser u, String title, HashSet<String> locations) {
+    public LocationMenu(String title, HashSet<String> locations, boolean england) {
 
         super(45, Component.text(title, NamedTextColor.AQUA, TextDecoration.BOLD));
 
-        this.u = u;
         this.locations = locations;
+
+        this.england = england;
 
         //On initialization the page is always 1.
         page = 1;
@@ -147,10 +147,14 @@ public class LocationMenu extends Gui {
 
                     //Delete this gui.
                     this.delete();
-                    u.mainGui = null;
 
                     //Switch to navigation menu.
-                    u.mainGui = new ExploreGui(u);
+                    //If england is true then return to the england menu.
+                    if (england) {
+                        u.mainGui = new EnglandMenu();
+                    } else {
+                        u.mainGui = new ExploreGui(u);
+                    }
                     u.mainGui.open(u);
 
                 });

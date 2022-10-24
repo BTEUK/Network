@@ -9,6 +9,9 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+
 public class ExploreGui extends Gui {
 
     private final NetworkUser u;
@@ -28,10 +31,10 @@ public class ExploreGui extends Gui {
         //If the player is Jr.Builder+ show the 'add location' button.
         if (u.player.hasPermission("group.jrbuilder")) {
 
-            setItem(8, Utils.createItem(Material.LIME_CONCRETE, 1,
-                            Utils.chat("&b&lAdd Location"),
-                            Utils.chat("&fRequest a new location to add"),
-                            Utils.chat("&fto the exploration menu.")),
+            setItem(18, Utils.createItem(Material.MAGENTA_GLAZED_TERRACOTTA, 1,
+                            Utils.title("Add Location"),
+                            Utils.line("Request a new location to add"),
+                            Utils.line("to the exploration menu.")),
                     u -> {
 
                         this.delete();
@@ -47,7 +50,7 @@ public class ExploreGui extends Gui {
         }
 
         /*
-        Create a button for each main category, if the category only has 1 location then show the location directly.
+        Create a button for each main category.
 
         The main categories are:
 
@@ -55,7 +58,7 @@ public class ExploreGui extends Gui {
         - Scotland
         - Wales
         - Northern Ireland
-        - Overseas Territories & Crown Dependencies
+        - Other
 
         - Suggested Locations
         - Nearby Locations
@@ -80,11 +83,86 @@ public class ExploreGui extends Gui {
 
          */
 
+        //England
+        setItem(2, Utils.createItem(Material.ORANGE_CONCRETE_POWDER, 1,
+                        Utils.title("England"),
+                        Utils.line("Click to pick from"),
+                        Utils.line("locations in England.")),
+                u -> {
+
+                    //Switch to england menu to select region.
+                    this.delete();
+                    u.mainGui = new EnglandMenu();
+                    u.mainGui.open(u);
+
+                }
+
+        );
+
+        //Scotland
+        setItem(3, Utils.createItem(Material.LIGHT_BLUE_CONCRETE_POWDER, 1,
+                        Utils.title("Scotland"),
+                        Utils.line("Click to pick from"),
+                        Utils.line("locations in Scotland.")),
+                u -> {
+
+                    openLocation("Scotland", Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='SCOTLAND';"));
+
+                }
+        );
+
+        //Wales
+        setItem(4, Utils.createItem(Material.RED_CONCRETE_POWDER, 1,
+                        Utils.title("Wales"),
+                        Utils.line("Click to pick from"),
+                        Utils.line("locations in Wales.")),
+                u -> {
+
+                    openLocation("Wales", Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='WALES';"));
+
+                }
+        );
+
+        //Northern Ireland
+        setItem(5, Utils.createItem(Material.LIME_CONCRETE_POWDER, 1,
+                        Utils.title("Northern Ireland"),
+                        Utils.line("Click to pick from"),
+                        Utils.line("locations in Norther Ireland.")),
+                u -> {
+
+                    openLocation("Northern Ireland", Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='NORTHERN IRELAND';"));
+
+                }
+        );
+
+        //Other
+        setItem(3, Utils.createItem(Material.LIGHT_BLUE_CONCRETE_POWDER, 1,
+                        Utils.title("Other"),
+                        Utils.line("Click to pick from locations"),
+                        Utils.line("not in the 4 countries of the UK.")),
+                u -> {
+
+                    openLocation("Other", Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='OTHER';"));
+
+                }
+        );
+
+        //Suggested Locations
+        setItem(21, Utils.createItem(Material.GOLD_BLOCK, 1,
+                );
+
+        //Nearby Locations
+        setItem(22, Utils.createItem(Material.COMPASS, 1,
+                ));
+
+        //Find Locations
+        setItem(23, Utils.createItem(Material.OAK_SIGN, 1,
+                ));
 
         //Return
         setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        Utils.chat("&b&lReturn"),
-                        Utils.chat("&fOpen the navigator main menu.")),
+                        Utils.title("Return"),
+                        Utils.line("Open the navigator main menu.")),
                 u ->
 
                 {
@@ -103,6 +181,20 @@ public class ExploreGui extends Gui {
 
         this.clearGui();
         createGui();
+
+    }
+
+    private void openLocation(String name, ArrayList<String> locations) {
+
+        if (locations.isEmpty()) {
+            u.player.sendMessage(Utils.error("No locations added to the menu in &4" + name + "&c."));
+            return;
+        }
+
+        //Switch to location menu with all scotland locations.
+        this.delete();
+        u.mainGui = new LocationMenu(name, new HashSet<>(locations), false);
+        u.mainGui.open(u);
 
     }
 }

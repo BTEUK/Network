@@ -5,7 +5,7 @@ public enum Categories {
     SCOTLAND("Scotland"),
     WALES("Wales"),
     NORTHERN_IRELAND("Northern Ireland"),
-    OVERSEAS_TERRITORIES("Overseas Territories & Crown Dependencies");
+    OTHER("Other");
 
     public final String label;
 
