@@ -2,6 +2,7 @@ package me.bteuk.network.listeners;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
+import me.bteuk.network.gui.navigation.AddLocation;
 import me.bteuk.network.utils.NetworkUser;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -59,13 +60,6 @@ public class GuiListener implements Listener {
 
         //Remove the player from the list of open inventories.
         Gui.openInventories.remove(playerUUID);
-
-        //If player has an instance of SelectCounty, remove it, as we want the player to keep their instance of the AddLocation gui.
-        NetworkUser u = Network.getInstance().getUser(p);
-        if (u.selectCounty != null) {
-            u.selectCounty.delete();
-            u.selectCounty = null;
-        }
 
     }
 }

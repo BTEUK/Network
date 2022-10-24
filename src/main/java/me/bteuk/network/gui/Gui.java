@@ -98,11 +98,4 @@ public abstract class Gui implements GuiInterface {
         return actions;
     }
 
-    //Remove any existing guis.
-    public static void deleteGuis(NetworkUser u) {
-
-        if (u.mainGui != null) {
-            u.mainGui.delete();
-        }
-    }
 }

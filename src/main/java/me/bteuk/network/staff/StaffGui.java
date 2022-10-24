@@ -59,10 +59,10 @@ public class StaffGui extends Gui {
 
                         //Open the LocationRequest gui.
                         this.delete();
-                        u.staffUser.staffGui = null;
+                        u.staffGui = null;
 
-                        u.staffUser.locationRequests = new LocationRequests();
-                        u.staffUser.locationRequests.open(u);
+                        u.staffGui = new LocationRequests();
+                        u.staffGui.open(u);
 
                     }
                 });

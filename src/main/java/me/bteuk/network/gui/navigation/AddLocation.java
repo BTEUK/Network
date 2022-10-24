@@ -20,6 +20,8 @@ public class AddLocation extends Gui {
     private Categories category;
     private Counties county;
 
+    public SelectCounty selectCounty;
+
     private LocationNameListener locationNameListener;
 
     public AddLocation() {
@@ -129,9 +131,8 @@ public class AddLocation extends Gui {
                     u -> {
 
                         //Open select county menu.
-                        //Don't delete this gui however.
-                        u.selectCounty = new SelectCounty();
-                        u.selectCounty.open(u);
+                        selectCounty = new SelectCounty(this);
+                        selectCounty.open(u);
 
                     });
         }
@@ -237,9 +238,9 @@ public class AddLocation extends Gui {
 
         //Delete gui.
         this.delete();
-        u.addLocation = null;
+        u.mainGui = null;
 
-        u.exploreGui = new ExploreGui(u);
+        u.mainGui = new ExploreGui(u);
         u.player.closeInventory();
 
     }
@@ -261,9 +262,9 @@ public class AddLocation extends Gui {
 
         //Delete gui.
         this.delete();
-        u.addLocation = null;
+        u.mainGui = null;
 
-        u.exploreGui = new ExploreGui(u);
+        u.mainGui = new ExploreGui(u);
         u.player.closeInventory();
     }
 
@@ -272,5 +273,17 @@ public class AddLocation extends Gui {
         this.clearGui();
         createGui();
 
+    }
+
+    //Override delete method to make sure selectCounty is also deleted.
+    @Override
+    public void delete() {
+        super.delete();
+
+        //If selectCounty exists, delete it.
+        if (selectCounty != null) {
+            selectCounty.delete();
+            selectCounty = null;
+        }
     }
 }

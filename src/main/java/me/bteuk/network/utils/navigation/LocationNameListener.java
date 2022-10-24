@@ -35,8 +35,10 @@ public class LocationNameListener implements Listener {
                 //Also check if player is actually still online.
                 if (p.isOnline()) {
                     NetworkUser u = Network.getInstance().getUser(p);
-                    if (u.addLocation != null) {
-                        u.addLocation.open(u);
+                    if (u.mainGui != null) {
+                        if (u.mainGui instanceof AddLocation) {
+                            u.mainGui.open(u);
+                        }
                     }
                 }
 
@@ -71,8 +73,10 @@ public class LocationNameListener implements Listener {
 
                 //If AddLocation gui still exists, reopen it.
                 NetworkUser u = Network.getInstance().getUser(p);
-                if (u.addLocation != null) {
-                    u.addLocation.open(u);
+                if (u.mainGui != null) {
+                    if (u.mainGui instanceof AddLocation) {
+                        u.mainGui.open(u);
+                    }
                 }
 
             }

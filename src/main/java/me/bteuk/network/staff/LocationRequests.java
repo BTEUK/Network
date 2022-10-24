@@ -39,10 +39,10 @@ public class LocationRequests extends Gui {
 
                         //Opens location request.
                         this.delete();
-                        u.staffUser.locationRequests = null;
+                        u.staffGui = null;
 
-                        u.staffUser.locationRequest = new LocationRequest(location);
-                        u.staffUser.locationRequest.open(u);
+                        u.staffGui = new LocationRequest(location);
+                        u.staffGui.open(u);
 
                     });
 
@@ -58,11 +58,11 @@ public class LocationRequests extends Gui {
 
                     //Delete this gui.
                     this.delete();
-                    u.staffUser.locationRequests = null;
+                    u.staffGui = null;
 
                     //Switch to staff menu.
-                    u.staffUser.staffGui = new StaffGui(u);
-                    u.staffUser.staffGui.open(u);
+                    u.staffGui = new StaffGui(u);
+                    u.staffGui.open(u);
 
                 });
 

@@ -1,7 +1,6 @@
 package me.bteuk.network.gui.navigation;
 
 import me.bteuk.network.Network;
-import me.bteuk.network.gui.BuildGui;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
@@ -39,7 +38,7 @@ public class ExploreGui extends Gui {
                         u.mainGui = null;
 
                         //Switch to the location add menu.
-                        u.mainGui = new AddLocation(u);
+                        u.mainGui = new AddLocation();
                         u.mainGui.open(u);
 
                     });

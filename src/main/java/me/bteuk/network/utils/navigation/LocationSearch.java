@@ -85,11 +85,11 @@ public class LocationSearch implements Listener {
                     //Open the location menu with these locations.
                     Bukkit.getScheduler().runTask(Network.getInstance(), () -> {
 
-                        u.exploreGui.delete();
-                        u.exploreGui = null;
+                        u.mainGui.delete();
+                        u.mainGui = null;
 
-                        u.locationMenu = new LocationMenu(u, "Search: " + e.getMessage(), searchLocations);
-                        u.locationMenu.open(u);
+                        u.mainGui = new LocationMenu(u, "Search: " + e.getMessage(), searchLocations);
+                        u.mainGui.open(u);
 
                     });
                 }

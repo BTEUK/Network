@@ -117,9 +117,9 @@ public class LocationRequest extends Gui {
     public void previousGui(NetworkUser u) {
         //Delete gui and return to previous menu.
         this.delete();
-        u.staffUser.locationRequest = null;
+        u.staffGui = null;
 
-        u.staffUser.locationRequests = new LocationRequests();
-        u.staffUser.locationRequests.open(u);
+        u.staffGui = new LocationRequests();
+        u.staffGui.open(u);
     }
 }

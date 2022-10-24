@@ -6,6 +6,7 @@ import me.bteuk.network.utils.enums.Counties;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.royawesome.jlibnoise.module.combiner.Add;
 import org.bukkit.Material;
 
 import java.util.Arrays;
@@ -13,10 +14,13 @@ import java.util.Comparator;
 
 public class SelectCounty extends Gui {
 
-    public SelectCounty() {
+    private AddLocation addLocation;
+
+    public SelectCounty(AddLocation addLocation) {
 
         super(54, Component.text("Select County", NamedTextColor.AQUA, TextDecoration.BOLD));
 
+        this.addLocation = addLocation;
         createGui();
 
     }
@@ -38,14 +42,14 @@ public class SelectCounty extends Gui {
                     u -> {
 
                         //Set the county.
-                        u.addLocation.setCounty(county);
+                        addLocation.setCounty(county);
 
                         //Delete this gui.
                         this.delete();
-                        u.selectCounty = null;
+                        addLocation.selectCounty = null;
 
                         //Return to addlocation.
-                        u.addLocation.open(u);
+                        u.mainGui.open(u);
 
                     });
         }
@@ -60,12 +64,19 @@ public class SelectCounty extends Gui {
 
                     //Delete this gui.
                     this.delete();
-                    u.selectCounty = null;
+                    addLocation.selectCounty = null;
 
                     //Switch to navigation menu.
-                    u.addLocation.open(u);
+                    u.mainGui.open(u);
 
                 });
+    }
+
+    public void refresh() {
+
+        this.createGui();
+        createGui();
+
     }
 }
 
