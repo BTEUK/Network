@@ -34,89 +34,14 @@ public class Navigator implements CommandExecutor {
 
     public static void openNavigator(NetworkUser u) {
 
-        //Check if any of the guis are not null.
-        //If not then open the first inventory found after refreshing its contents.
+        //Check if the mainGui is not null.
+        //If not then open it after refreshing its contents.
         //If no gui exists open the navigator.
 
-        if (u.buildGui != null) {
+        if (u.mainGui != null) {
 
-            u.buildGui.refresh();
-            u.buildGui.open(u);
-
-        } else if (u.plotServerLocations != null) {
-
-            u.plotServerLocations.refresh();
-            u.plotServerLocations.open(u);
-
-        } else if (u.plotMenu != null) {
-
-            u.plotMenu.refresh();
-            u.plotMenu.open(u);
-
-        } else if (u.plotInfo != null) {
-
-            u.plotInfo.refresh();
-            u.plotInfo.open(u);
-
-        } else if (u.acceptedPlotFeedback != null) {
-
-            u.acceptedPlotFeedback.refresh();
-            u.acceptedPlotFeedback.open(u);
-
-        } else if (u.deniedPlotFeedback != null) {
-
-            u.deniedPlotFeedback.refresh();
-            u.deniedPlotFeedback.open(u);
-
-        } else if (u.deleteConfirm != null) {
-
-            u.deleteConfirm.refresh();
-            u.deleteConfirm.open(u);
-
-        } else if (u.plotMembers != null) {
-
-            u.plotMembers.refresh();
-            u.plotMembers.open(u);
-
-        } else if (u.invitePlotMembers != null) {
-
-            u.invitePlotMembers.refresh();
-            u.invitePlotMembers.open(u);
-
-        } else if (u.regionMenu != null) {
-
-            u.regionMenu.refresh();
-            u.regionMenu.open(u);
-
-        } else if (u.regionInfo != null) {
-
-            u.regionInfo.refresh();
-            u.regionInfo.open(u);
-
-        } else if (u.inviteRegionMembers != null) {
-
-            u.inviteRegionMembers.refresh();
-            u.inviteRegionMembers.open(u);
-
-        } else if (u.regionMembers != null) {
-
-            u.regionMembers.refresh();
-            u.regionMembers.open(u);
-
-        } else if (u.regionRequests != null) {
-
-            u.regionRequests.refresh();
-            u.regionRequests.open(u);
-
-        } else if (u.regionRequest != null) {
-
-            u.regionRequest.refresh();
-            u.regionRequest.open(u);
-
-        } else if (u.exploreGui != null) {
-
-            u.exploreGui.refresh();
-            u.exploreGui.open(u);
+            u.mainGui.refresh();
+            u.mainGui.open(u);
 
         } else {
 

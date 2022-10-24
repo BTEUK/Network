@@ -151,10 +151,10 @@ public class RegionMembers extends Gui {
 
                             //Return to region info.
                             this.delete();
-                            u.regionMembers = null;
+                            u.mainGui = null;
 
-                            u.regionInfo = new RegionInfo(region, u.player.getUniqueId().toString());
-                            u.regionInfo.open(u);
+                            u.mainGui = new RegionInfo(region, u.player.getUniqueId().toString());
+                            u.mainGui.open(u);
 
                         });
             } else {

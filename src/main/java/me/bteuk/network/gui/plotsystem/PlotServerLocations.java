@@ -323,11 +323,11 @@ public class PlotServerLocations extends Gui {
                     //Switch back to build menu.
                     //Delete this gui.
                     this.delete();
-                    u.plotServerLocations = null;
+                    u.mainGui = null;
 
                     //Create build menu.
-                    u.buildGui = new BuildGui(u);
-                    u.buildGui.open(u);
+                    u.mainGui = new BuildGui(u);
+                    u.mainGui.open(u);
 
                 });
     }

@@ -177,11 +177,11 @@ public class AcceptedPlotFeedback extends Gui {
 
                     //Delete this gui.
                     this.delete();
-                    u.acceptedPlotFeedback = null;
+                    u.mainGui = null;
 
                     //Switch tback the plot menu.
-                    u.plotMenu = new PlotMenu(u);
-                    u.plotMenu.open(u);
+                    u.mainGui = new PlotMenu(u);
+                    u.mainGui.open(u);
 
                 });
     }

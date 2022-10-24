@@ -127,11 +127,11 @@ public class BuildGui extends Gui {
 
                     //Delete this gui.
                     this.delete();
-                    u.buildGui = null;
+                    u.mainGui = null;
 
                     //Switch to the plot location gui.
-                    u.plotServerLocations = new PlotServerLocations();
-                    u.plotServerLocations.open(u);
+                    u.mainGui = new PlotServerLocations();
+                    u.mainGui.open(u);
 
                 });
 
@@ -325,11 +325,11 @@ public class BuildGui extends Gui {
 
                     //Delete this gui.
                     this.delete();
-                    u.buildGui = null;
+                    u.mainGui = null;
 
                     //Switch to plot menu.
-                    u.plotMenu = new PlotMenu(u);
-                    u.plotMenu.open(u);
+                    u.mainGui = new PlotMenu(u);
+                    u.mainGui.open(u);
 
                 });
 
@@ -343,11 +343,11 @@ public class BuildGui extends Gui {
 
                     //Delete this gui.
                     this.delete();
-                    u.buildGui = null;
+                    u.mainGui = null;
 
                     //Switch to plot menu.
-                    u.regionMenu = new RegionMenu(u);
-                    u.regionMenu.open(u);
+                    u.mainGui = new RegionMenu(u);
+                    u.mainGui.open(u);
 
                 });
 
@@ -375,7 +375,7 @@ public class BuildGui extends Gui {
 
                     //Delete this gui.
                     this.delete();
-                    u.buildGui = null;
+                    u.mainGui = null;
 
                     //Switch to navigation menu.
                     Network.getInstance().navigatorGui.open(u);

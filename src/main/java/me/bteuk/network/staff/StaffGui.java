@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 public class StaffGui extends Gui {
 
-    private NetworkUser user;
+    private final NetworkUser user;
 
     public StaffGui(NetworkUser user) {
 
