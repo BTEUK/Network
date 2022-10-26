@@ -28,8 +28,8 @@ public class ExploreGui extends Gui {
 
     private void createGui() {
 
-        //If the player is Jr.Builder+ show the 'add location' button.
-        if (u.player.hasPermission("group.jrbuilder")) {
+        //If the player has the correct permission allow them to request a location.
+        if (u.player.hasPermission("uknet.navigation.request")) {
 
             setItem(18, Utils.createItem(Material.MAGENTA_GLAZED_TERRACOTTA, 1,
                             Utils.title("Add Location"),
@@ -104,11 +104,7 @@ public class ExploreGui extends Gui {
                         Utils.title("Scotland"),
                         Utils.line("Click to pick from"),
                         Utils.line("locations in Scotland.")),
-                u -> {
-
-                    openLocation("Scotland", Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='SCOTLAND';"));
-
-                }
+                u -> openLocation("Scotland", Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='SCOTLAND';"))
         );
 
         //Wales
@@ -116,11 +112,7 @@ public class ExploreGui extends Gui {
                         Utils.title("Wales"),
                         Utils.line("Click to pick from"),
                         Utils.line("locations in Wales.")),
-                u -> {
-
-                    openLocation("Wales", Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='WALES';"));
-
-                }
+                u -> openLocation("Wales", Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='WALES';"))
         );
 
         //Northern Ireland
@@ -128,11 +120,7 @@ public class ExploreGui extends Gui {
                         Utils.title("Northern Ireland"),
                         Utils.line("Click to pick from"),
                         Utils.line("locations in Norther Ireland.")),
-                u -> {
-
-                    openLocation("Northern Ireland", Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='NORTHERN IRELAND';"));
-
-                }
+                u -> openLocation("Northern Ireland", Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='NORTHERN_IRELAND';"))
         );
 
         //Other
@@ -140,11 +128,7 @@ public class ExploreGui extends Gui {
                         Utils.title("Other"),
                         Utils.line("Click to pick from locations"),
                         Utils.line("not in the 4 countries of the UK.")),
-                u -> {
-
-                    openLocation("Other", Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='OTHER';"));
-
-                }
+                u -> openLocation("Other", Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='OTHER';"))
         );
 
         //Suggested Locations

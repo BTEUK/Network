@@ -55,7 +55,7 @@ public class StaffGui extends Gui {
                 u -> {
 
                     //Check if the user has the relevant permissions.
-                    if (u.player.hasPermission("uknet.navigation.request")) {
+                    if (u.player.hasPermission("uknet.navigation.review")) {
 
                         //Open the LocationRequest gui.
                         this.delete();

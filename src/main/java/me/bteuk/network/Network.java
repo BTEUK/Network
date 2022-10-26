@@ -216,7 +216,7 @@ public final class Network extends JavaPlugin {
         getCommand("warp").setExecutor(new Warp());
         getCommand("warp").setTabCompleter(new LocationSelector());
 
-        getCommand("addlocation").setExecutor(new AddLocationCommand());
+        getCommand("navigation").setExecutor(new Navigation());
 
     }
 
