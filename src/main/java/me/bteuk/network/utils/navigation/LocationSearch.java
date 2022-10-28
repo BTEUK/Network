@@ -60,7 +60,7 @@ public class LocationSearch implements Listener {
                 for (Counties county : Counties.values()) {
                     if (StringUtils.containsIgnoreCase(county.label, e.getMessage())) {
 
-                        locations.addAll(Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE subcategory='" + county.region.toString() + "';"));
+                        locations.addAll(Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE subcategory='" + county.region + "';"));
 
                     }
                 }

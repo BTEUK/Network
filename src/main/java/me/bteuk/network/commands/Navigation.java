@@ -66,7 +66,35 @@ public class Navigation implements CommandExecutor {
             }
         }
 
-        //TODO:Suggested <location> (adds/removes location from suggested menu)
+        //Suggested <location>
+        if (args[0].equalsIgnoreCase("suggested")) {
+            if (p.hasPermission("uknet.navigation.suggested")) {
+                if (args.length > 1) {
+                    //Combine all args excluding the first, with spaces, since the name can be multiple words.
+                    String location = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
+
+                    //Check if the location exists.
+                    if (Network.getInstance().globalSQL.hasRow("SELECT location FROM location_data WHERE location='" + location + "';")) {
+                        //Change suggested status of location.
+                        if (Network.getInstance().globalSQL.hasRow("SELECT location FROM location_data WHERE location='" + location + " AND suggested=1';")) {
+                            //Location is already suggested, remove that.
+                            Network.getInstance().globalSQL.update("UPDATE location_data SET suggested=0 WHERE location='" + location + "';");
+                            p.sendMessage(Utils.success("The location &3" + location + " &awill no longer be suggested."));
+                        } else {
+                            //Set location as suggested.
+                            Network.getInstance().globalSQL.update("UPDATE location_data SET suggested=1 WHERE location='" + location + "';");
+                            p.sendMessage(Utils.success("The location &3" + location + " &awill now be suggested."));
+                        }
+                    } else {
+                        p.sendMessage(Utils.error("The location &4" + location + " &cdoes not exist."));
+                    }
+                } else {
+                    p.sendMessage(Utils.error("/navigation suggested <location>"));
+                }
+            } else {
+                p.sendMessage(Utils.error("You do not have permission to use this command."));
+            }
+        }
 
         return false;
     }

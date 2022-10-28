@@ -96,6 +96,7 @@ CREATE TABLE IF NOT EXISTS location_data
     category    VARCHAR(128)    NOT NULL,
     subcategory VARCHAR(128)    NULL DEFAULT NULL,
     coordinate  INT             NOT NULL,
+    suggested   TINYINT(1)      NULL DEFAULT 0,
     PRIMARY KEY(location)
 );
 

@@ -132,11 +132,24 @@ public class ExploreGui extends Gui {
         );
 
         //Suggested Locations
+        //Gets all locations which have suggested=1 in database.
         setItem(21, Utils.createItem(Material.GOLD_BLOCK, 1,
-                );
+                        Utils.title("Suggested Locations"),
+                        Utils.line("Click to view locations"),
+                        Utils.line("that are recommended to view.")),
+                u -> openLocation("Suggested Locations", Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE suggested=1;"))
+        );
 
-        //Nearby Locations
+        //Nearby Locations (radius set in config under navigation_radius)
         setItem(22, Utils.createItem(Material.COMPASS, 1,
+                        Utils.title("Nearby Locations"),
+                        Utils.line("Click to view locations"),
+                        Utils.line("in a " + Network.getInstance().globalSQL.getInt("navigation_radius") + "km radius.")),
+                u -> openLocation("Nearby Locations", Network.getInstance().globalSQL.getStringList("SELECT location_data.location FROM location_data " +
+                        "INNER JOIN coordinates ON location_data.coordinate=coordinates.id " +
+                        "WHERE (((coordinates.x-" + u.player.getLocation().getX() + ")*(coordinates.x-" + u.player.getLocation().getX() + ")) + " +
+                        "((coordinates.z-" + u.player.getLocation().getZ() + ")*(coordinates.z-" + u.player.getLocation().getZ() + "))) < " +
+                        (Network.getInstance().globalSQL.getInt("navigation_radius") * Network.getInstance().globalSQL.getInt("navigation_radius")) + ";")
                 ));
 
         //Find Locations
