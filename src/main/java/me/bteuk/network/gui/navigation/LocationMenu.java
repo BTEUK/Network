@@ -87,14 +87,13 @@ public class LocationMenu extends Gui {
             }
 
             //Create location teleport button.
-            setItem(24, Utils.createItem(Material.ENDER_PEARL, 1,
-                            Utils.chat("&b&l" + location),
-                            Utils.chat("&fClick to teleport here.")),
+            setItem(slot, Utils.createItem(Material.ENDER_PEARL, 1,
+                            Utils.title(location),
+                            Utils.line("Click to teleport here.")),
 
                     u -> {
 
                         //Get the coordinate id.
-                        //TODO: If the location is on a plot server, get the location transformation and convert the coordinate to take that into account.
                         int coordinate_id = Network.getInstance().globalSQL.getInt("SELECT coordinate FROM location_data WHERE location='" + location + "';");
 
                         //Get the server of the location.
@@ -107,7 +106,16 @@ public class LocationMenu extends Gui {
                             //Close inventory.
                             u.player.closeInventory();
 
+                            //Get location from coordinate id.
                             Location l = Network.getInstance().globalSQL.getCoordinate(coordinate_id);
+
+                            //If world is in plot system add coordinate transform.
+                            String world = Network.getInstance().globalSQL.getString("SELECT world FROM coordinates WHERE id=" + coordinate_id + ";");
+                            if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + world + "';")) {
+                                l.setX(l.getX() + Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + world + "';"));
+                                l.setZ(l.getZ() + Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + world + "';"));
+                            }
+
                             u.player.teleport(l);
                             u.player.sendMessage(Utils.chat("&aTeleported to &3" + location));
 
@@ -124,9 +132,6 @@ public class LocationMenu extends Gui {
 
                     });
 
-
-
-
             //Increase slot accordingly.
             if (slot % 9 == 7) {
                 //Increase row, basically add 3.
@@ -139,7 +144,7 @@ public class LocationMenu extends Gui {
         }
 
         //Return
-        setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
+        setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
                         Utils.chat("&b&lReturn"),
                         Utils.chat("&fOpen the exploration menu.")),
                 u ->

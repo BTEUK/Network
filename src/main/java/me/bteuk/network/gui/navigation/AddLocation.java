@@ -8,10 +8,12 @@ import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.Categories;
 import me.bteuk.network.utils.enums.Counties;
 import me.bteuk.network.utils.enums.Regions;
+import me.bteuk.network.utils.enums.ServerType;
 import me.bteuk.network.utils.navigation.LocationNameListener;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Location;
 import org.bukkit.Material;
 
 public class AddLocation extends Gui {
@@ -173,9 +175,19 @@ public class AddLocation extends Gui {
 
                     } else {
 
-                        //TODO: If the location is on a plot server, get the location transformation and convert the coordinate to take that into account.
+                        Location l = u.player.getLocation();
+
+                        //If the location is on a plot server, get the location transformation and convert the coordinate to take that into account.
+                        if (Network.SERVER_TYPE == ServerType.PLOT) {
+                            //If world is in database.
+                            if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + u.player.getWorld().getName() + "';")) {
+                                //Apply negative coordinate transform to location.
+                                l.setX(l.getX() - Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + l.getWorld().getName() + "';"));
+                                l.setZ(l.getZ() - Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + l.getWorld().getName() + "';"));
+                            }
+                        }
                         //Create location coordinate.
-                        int coordinate_id = Network.getInstance().globalSQL.addCoordinate(u.player.getLocation());
+                        int coordinate_id = Network.getInstance().globalSQL.addCoordinate(l);
 
                         //If category is england.
                         if (category == Categories.ENGLAND) {
@@ -228,10 +240,10 @@ public class AddLocation extends Gui {
 
         if (region == null) {
             globalSQL.update("INSERT INTO location_data(location,category,coordinate) " +
-                    "VALUES('" + name + "','" + category + "'," + coordinate_id + ";");
+                    "VALUES('" + name + "','" + category + "'," + coordinate_id + ");");
         } else {
             globalSQL.update("INSERT INTO location_data(location,category,subcategory,coordinate) " +
-                    "VALUES('" + name + "','" + category + "','" + region + "'," + coordinate_id + ";");
+                    "VALUES('" + name + "','" + category + "','" + region + "'," + coordinate_id + ");");
         }
 
         u.player.sendMessage(Utils.success("Location &3" + name + " &aadded to exploration menu."));
@@ -249,10 +261,10 @@ public class AddLocation extends Gui {
 
         if (region ==  null) {
             globalSQL.update("INSERT INTO location_requests(location,category,coordinate) " +
-                    "VALUES('" + name + "','" + category + "'," + coordinate_id + ";");
+                    "VALUES('" + name + "','" + category + "'," + coordinate_id + ");");
         } else {
             globalSQL.update("INSERT INTO location_requests(location,category,subcategory,coordinate) " +
-                    "VALUES('" + name + "','" + category + "','" + region + "'," + coordinate_id + ";");
+                    "VALUES('" + name + "','" + category + "','" + region + "'," + coordinate_id + ");");
         }
 
         //Notify reviewers.

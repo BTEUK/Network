@@ -4,6 +4,7 @@ import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.utils.NetworkUser;
+import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -45,15 +46,29 @@ public class LocationRequest extends Gui {
                         Utils.line("of the request.")),
                 u -> {
 
-                    //Get location from coordinate id.
-                    //TODO: If the location is on a plot server, get the location transformation and convert the coordinate to take that into account.
-                    Location l = globalSQL.getCoordinate(coordinate_id);
-
                     //Close inventory.
                     u.player.closeInventory();
 
+                    //If location is on this server teleport the player, else switch server.
                     //Teleport to location.
-                    u.player.teleport(l);
+                    String server = Network.getInstance().globalSQL.getString("SELECT server FROM coordinates WHERE id=" + coordinate_id + ";");
+                    if (Network.SERVER_NAME.equalsIgnoreCase(server)) {
+                        //Get location from coordinate id.
+                        Location l = globalSQL.getCoordinate(coordinate_id);
+
+                        //If world is in plot system add coordinate transform.
+                        String world = Network.getInstance().globalSQL.getString("SELECT world FROM coordinates WHERE id=" + coordinate_id + ";");
+                        if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + world + "';")) {
+                            l.setX(l.getX() + Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + world + "';"));
+                            l.setZ(l.getZ() + Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + world + "';"));
+                        }
+
+                        u.player.teleport(l);
+                    } else {
+                        //Create teleport event and switch server.
+                        Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('" + u.player.getUniqueId() + "','network','" + "teleport location_request " + name + "');");
+                        SwitchServer.switchServer(u.player, server);
+                    }
 
                 });
 

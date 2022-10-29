@@ -53,7 +53,7 @@ public class LocationSearch implements Listener {
             } else {
 
                 //Search for locations that include this phrase.
-                ArrayList<String> locations = Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE location LIKE '%{" + e.getMessage() + "}%';");
+                ArrayList<String> locations = Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE location LIKE '%" + e.getMessage() + "%';");
 
                 //Also search for any regions or counties.
                 for (Counties county : Counties.values()) {
@@ -65,9 +65,9 @@ public class LocationSearch implements Listener {
                 }
 
                 for (Categories category : Categories.values()) {
-                    if (StringUtils.containsIgnoreCase(category.toString(), e.getMessage())) {
+                    if (StringUtils.containsIgnoreCase(category.label, e.getMessage())) {
 
-                        locations.addAll(Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE subcategory='" + category + "';"));
+                        locations.addAll(Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='" + category + "';"));
 
                     }
                 }

@@ -293,6 +293,7 @@ public class GlobalSQL {
                 "SELECT * FROM coordinates WHERE id=" + coordinateID + ";"
         ); ResultSet results = statement.executeQuery()) {
 
+            results.next();
             return (new Location(Bukkit.getWorld(results.getString("world")),
                     results.getDouble("x"),
                     results.getDouble("y"),

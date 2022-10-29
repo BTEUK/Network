@@ -20,9 +20,6 @@ public class LocationSelector implements TabCompleter {
         ArrayList<String> locations = Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data;");
         ArrayList<String> returns = new ArrayList<>();
 
-        //Combine multi-word locations with underscores.
-        locations.replaceAll(str -> str.replace(" ", "_"));
-
         //If args is empty then return full array.
         //If args length is 1 then return any matching names with the existing characters.
         //Else return null, the tp command only has 1 valid arg.

@@ -76,7 +76,7 @@ public class Navigation implements CommandExecutor {
                     //Check if the location exists.
                     if (Network.getInstance().globalSQL.hasRow("SELECT location FROM location_data WHERE location='" + location + "';")) {
                         //Change suggested status of location.
-                        if (Network.getInstance().globalSQL.hasRow("SELECT location FROM location_data WHERE location='" + location + " AND suggested=1';")) {
+                        if (Network.getInstance().globalSQL.hasRow("SELECT location FROM location_data WHERE location='" + location + "' AND suggested=1;")) {
                             //Location is already suggested, remove that.
                             Network.getInstance().globalSQL.update("UPDATE location_data SET suggested=0 WHERE location='" + location + "';");
                             p.sendMessage(Utils.success("The location &3" + location + " &awill no longer be suggested."));
@@ -96,7 +96,7 @@ public class Navigation implements CommandExecutor {
             }
         }
 
-        return false;
+        return true;
     }
 
     public void error(Player p) {

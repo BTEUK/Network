@@ -10,6 +10,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
+
 public class Warp implements CommandExecutor {
 
     @Override
@@ -31,8 +33,8 @@ public class Warp implements CommandExecutor {
             //TODO /warp list
         } else {
 
-            //Remove underscores from name.
-            String location = args[0].replace("_", " ");
+            //Get location name from all remaining args.
+            String location = String.join(" ", Arrays.copyOfRange(args, 0, args.length));
 
             //Find a location.
             if (Network.getInstance().globalSQL.hasRow("SELECT location FROM location_data WHERE location='" + location + "';")) {
