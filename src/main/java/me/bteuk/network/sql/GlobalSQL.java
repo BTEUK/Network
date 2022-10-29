@@ -225,6 +225,42 @@ public class GlobalSQL {
         }
     }
 
+    //Add new coordinate using values, rather than location.
+    public int addCoordinate(String server, String world, double x, double y, double z, float yaw, float pitch) {
+
+        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
+                "INSERT INTO coordinates(server,world, x, y, z, yaw, pitch) VALUES(?, ?, ?, ?, ?, ?, ?);",
+                Statement.RETURN_GENERATED_KEYS
+        )) {
+            statement.setString(1, server);
+            statement.setString(2, world);
+            statement.setDouble(3, x);
+            statement.setDouble(4, y);
+            statement.setDouble(5, z);
+            statement.setFloat(6, yaw);
+            statement.setFloat(7, pitch);
+            statement.executeUpdate();
+
+            //If the id does not exist return 0.
+            ResultSet results = statement.getGeneratedKeys();
+            if (results.next()) {
+
+                return results.getInt(1);
+
+            } else {
+
+                return 0;
+
+            }
+
+        } catch (SQLException sql) {
+
+            sql.printStackTrace();
+            return 0;
+
+        }
+    }
+
     //Update an existing coordinate.
     public void updateCoordinate(int coordinateID, Location l) {
 
@@ -257,6 +293,7 @@ public class GlobalSQL {
                 "SELECT * FROM coordinates WHERE id=" + coordinateID + ";"
         ); ResultSet results = statement.executeQuery()) {
 
+            results.next();
             return (new Location(Bukkit.getWorld(results.getString("world")),
                     results.getDouble("x"),
                     results.getDouble("y"),

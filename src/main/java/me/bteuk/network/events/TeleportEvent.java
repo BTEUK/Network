@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
 import java.util.UUID;
 
 public class TeleportEvent {
@@ -45,6 +46,31 @@ public class TeleportEvent {
 
             p.teleport(Network.getInstance().globalSQL.getCoordinate(Integer.parseInt(event[2])));
             p.sendMessage(Utils.chat("&aTeleported to previous location."));
+
+        } else if (event[1].equals("location") || event[1].equals("location_request")) {
+
+            //Get location name from all remaining args.
+            String location = String.join(" ", Arrays.copyOfRange(event, 2, event.length));
+
+            //Get the coordinate id.
+            int coordinate_id;
+            if (event[1].equals("location")) {
+                coordinate_id = Network.getInstance().globalSQL.getInt("SELECT coordinate FROM location_data WHERE location='" + location + "';");
+            } else {
+                coordinate_id = Network.getInstance().globalSQL.getInt("SELECT coordinate FROM location_requests WHERE location='" + location + "';");
+            }
+
+            Location l = Network.getInstance().globalSQL.getCoordinate(coordinate_id);
+
+            //If world is in plot system add coordinate transform.
+            String world = Network.getInstance().globalSQL.getString("SELECT world FROM coordinates WHERE id=" + coordinate_id + ";");
+            if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + world + "';")) {
+                l.setX(l.getX() + Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + world + "';"));
+                l.setZ(l.getZ() + Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + world + "';"));
+            }
+
+            p.teleport(l);
+            p.sendMessage(Utils.chat("&aTeleported to &3" + location));
 
         }
 

@@ -54,10 +54,10 @@ public class RegionRequest extends Gui {
 
                     //Return to request menu.
                     this.delete();
-                    u.staffUser.regionRequest = null;
+                    u.staffGui = null;
 
-                    u.staffUser.regionRequests = new RegionRequests(staff);
-                    u.staffUser.regionRequests.open(u);
+                    u.staffGui = new RegionRequests(staff);
+                    u.staffGui.open(u);
 
 
                 });
@@ -76,10 +76,10 @@ public class RegionRequest extends Gui {
 
                     //Return to request menu.
                     this.delete();
-                    u.staffUser.regionRequest = null;
+                    u.staffGui = null;
 
-                    u.staffUser.regionRequests = new RegionRequests(staff);
-                    u.staffUser.regionRequests.open(u);
+                    u.staffGui = new RegionRequests(staff);
+                    u.staffGui.open(u);
 
                 });
 
@@ -127,10 +127,10 @@ public class RegionRequest extends Gui {
 
                     //Return to request menu.
                     this.delete();
-                    u.staffUser.regionRequest = null;
+                    u.staffGui = null;
 
-                    u.staffUser.regionRequests = new RegionRequests(staff);
-                    u.staffUser.regionRequests.open(u);
+                    u.staffGui = new RegionRequests(staff);
+                    u.staffGui.open(u);
 
                 });
     }

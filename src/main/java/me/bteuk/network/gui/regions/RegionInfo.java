@@ -54,9 +54,9 @@ public class RegionInfo extends Gui {
 
                     //Return to region menu and close inventory.
                     this.delete();
-                    u.regionInfo = null;
+                    u.mainGui = null;
 
-                    u.regionMenu = new RegionMenu(u);
+                    u.mainGui = new RegionMenu(u);
 
                 });
 
@@ -109,7 +109,7 @@ public class RegionInfo extends Gui {
                                 + region + "');");
 
                         //Switch server.
-                        SwitchServer.switchServer(u.player, globalSQL.getString("SELECT name FROM server_data WHERE type='PLOT'"));
+                        SwitchServer.switchServer(u.player, globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH'"));
 
                     }
                 });
@@ -193,10 +193,10 @@ public class RegionInfo extends Gui {
 
                         //Open the invite member menu.
                         this.delete();
-                        u.regionInfo = null;
+                        u.mainGui = null;
 
-                        u.inviteRegionMembers = new InviteRegionMembers(region);
-                        u.inviteRegionMembers.open(u);
+                        u.mainGui = new InviteRegionMembers(region);
+                        u.mainGui.open(u);
 
                     });
 
@@ -208,10 +208,10 @@ public class RegionInfo extends Gui {
 
                         //Open the invite member menu.
                         this.delete();
-                        u.regionInfo = null;
+                        u.mainGui = null;
 
-                        u.regionMembers = new RegionMembers(region);
-                        u.regionMembers.open(u);
+                        u.mainGui = new RegionMembers(region);
+                        u.mainGui.open(u);
 
                     });
         }

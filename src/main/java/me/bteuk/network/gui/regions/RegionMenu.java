@@ -54,7 +54,7 @@ public class RegionMenu extends Gui {
         if (page > 1) {
             setItem(18, Utils.createItem(Material.ARROW, 1,
                             Utils.chat("&b&lPrevious Page"),
-                            Utils.chat("&fOpen the previous page of online users.")),
+                            Utils.chat("&fOpen the previous page of regions.")),
                     u ->
 
                     {
@@ -108,11 +108,11 @@ public class RegionMenu extends Gui {
 
                             //Delete this gui.
                             this.delete();
-                            u.regionMenu = null;
+                            u.mainGui = null;
 
                             //Switch to region info.
-                            u.regionInfo = new RegionInfo(Network.getInstance().getRegionManager().getRegion(owner.get(finalI)), u.player.getUniqueId().toString());
-                            u.regionInfo.open(u);
+                            u.mainGui = new RegionInfo(Network.getInstance().getRegionManager().getRegion(owner.get(finalI)), u.player.getUniqueId().toString());
+                            u.mainGui.open(u);
 
                         });
 
@@ -126,11 +126,11 @@ public class RegionMenu extends Gui {
 
                             //Delete this gui.
                             this.delete();
-                            u.regionMenu = null;
+                            u.mainGui = null;
 
                             //Switch to plot info.
-                            u.regionInfo = new RegionInfo(Network.getInstance().getRegionManager().getRegion(member.get((finalI - owner.size()))), u.player.getUniqueId().toString());
-                            u.regionInfo.open(u);
+                            u.mainGui = new RegionInfo(Network.getInstance().getRegionManager().getRegion(member.get((finalI - owner.size()))), u.player.getUniqueId().toString());
+                            u.mainGui.open(u);
 
                         });
 
@@ -158,10 +158,10 @@ public class RegionMenu extends Gui {
 
                         //Delete this gui and switch to region requests.
                         this.delete();
-                        u.regionMenu = null;
+                        u.mainGui = null;
 
-                        u.regionRequests = new RegionRequests(false);
-                        u.regionRequests.open(u);
+                        u.mainGui = new RegionRequests(false);
+                        u.mainGui.open(u);
 
                     });
         }
@@ -175,11 +175,11 @@ public class RegionMenu extends Gui {
 
                     //Delete this gui.
                     this.delete();
-                    u.regionMenu = null;
+                    u.mainGui = null;
 
                     //Switch to plot info.
-                    u.buildGui = new BuildGui(u);
-                    u.buildGui.open(u);
+                    u.mainGui = new BuildGui(u);
+                    u.mainGui.open(u);
 
                 });
     }

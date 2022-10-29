@@ -109,19 +109,19 @@ public class RegionRequests extends Gui {
                         this.delete();
                         if (staff) {
 
-                            u.staffUser.regionRequests = null;
+                            u.staffGui = null;
 
                             //Switch to region request.
-                            u.staffUser.regionRequest = new RegionRequest(requests.get(finalI), true);
-                            u.staffUser.regionRequest.open(u);
+                            u.staffGui = new RegionRequest(requests.get(finalI), true);
+                            u.staffGui.open(u);
 
                         } else {
 
-                            u.regionRequests = null;
+                            u.mainGui = null;
 
                             //Switch to region request.
-                            u.regionRequest = new RegionRequest(requests.get(finalI), false);
-                            u.regionRequest.open(u);
+                            u.mainGui = new RegionRequest(requests.get(finalI), false);
+                            u.mainGui.open(u);
 
                         }
 
@@ -149,11 +149,11 @@ public class RegionRequests extends Gui {
 
                         //Delete this gui.
                         this.delete();
-                        u.staffUser.regionRequests = null;
+                        u.staffGui = null;
 
                         //Switch to staff menu.
-                        u.staffUser.staffGui = new StaffGui(u);
-                        u.staffUser.staffGui.open(u);
+                        u.staffGui = new StaffGui(u);
+                        u.staffGui.open(u);
 
                     });
         } else {
@@ -167,11 +167,11 @@ public class RegionRequests extends Gui {
 
                         //Delete this gui.
                         this.delete();
-                        u.regionRequests = null;
+                        u.mainGui = null;
 
                         //Switch to staff menu.
-                        u.regionMenu = new RegionMenu(u);
-                        u.regionMenu.open(u);
+                        u.mainGui = new RegionMenu(u);
+                        u.mainGui.open(u);
 
                     });
         }
