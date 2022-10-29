@@ -54,7 +54,7 @@ public class RegionMenu extends Gui {
         if (page > 1) {
             setItem(18, Utils.createItem(Material.ARROW, 1,
                             Utils.chat("&b&lPrevious Page"),
-                            Utils.chat("&fOpen the previous page of online users.")),
+                            Utils.chat("&fOpen the previous page of regions.")),
                     u ->
 
                     {

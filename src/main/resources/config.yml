@@ -41,6 +41,9 @@ regions_enabled: true
 global_teleport: true
 earth_world: earth
 
+#Radius to search in the nearby locations tab of the exploration menu, distance in kilometres.
+navigation_radius: 200
+
 #When staff approval is needed for Jr.Builder region requests.
 #These values are only relevant if regions are enabled.
 #Always means that staff approval is always required.
@@ -66,7 +69,7 @@ database_uknet: minecraft_uknet
 #Version warnings
 version:
   earth: '&cThe Earth world is currently still using Minecraft 1.12.2 due to mod requirements, it is highly recommended to connect using this version with the BTE modpack. You can install the modpack by running the command &4/modpack&c.'
-  plot: '&cThe plotsystem is running on Minecraft 1.18.2. Connecting with older versions will limit your access to available blocks and any blocks adding in newer versions will not display correctly.'
+  plot: '&cThe plotsystem is running on Minecraft 1.18.2. Connecting with older versions will limit your access to available blocks and any blocks added in newer versions will not display correctly.'
 
 #Modpack links
 modpack:

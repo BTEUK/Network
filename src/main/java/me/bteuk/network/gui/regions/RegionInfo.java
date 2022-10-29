@@ -109,7 +109,7 @@ public class RegionInfo extends Gui {
                                 + region + "');");
 
                         //Switch server.
-                        SwitchServer.switchServer(u.player, globalSQL.getString("SELECT name FROM server_data WHERE type='PLOT'"));
+                        SwitchServer.switchServer(u.player, globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH'"));
 
                     }
                 });

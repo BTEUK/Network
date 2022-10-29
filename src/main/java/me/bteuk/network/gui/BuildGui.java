@@ -138,6 +138,7 @@ public class BuildGui extends Gui {
         //Join region (Jr.Builder+ only)
         //If region is claimable.
         //Check if the player is in a region.
+        //TODO: If the player is not able to claim a region change the icon.
         if (user.inRegion) {
 
             //Check if region is claimable.
@@ -361,7 +362,11 @@ public class BuildGui extends Gui {
 
                     //Connect to the lobby server.
                     u.player.closeInventory();
-                    SwitchServer.switchServer(u.player, Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='LOBBY';"));
+                    if (!Network.SERVER_NAME.equalsIgnoreCase(Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='LOBBY';"))) {
+                        SwitchServer.switchServer(u.player, Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='LOBBY';"));
+                    } else {
+                        u.player.sendMessage(Utils.error("You are already in Spawn."));
+                    }
 
                 });
 

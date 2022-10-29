@@ -1,5 +1,7 @@
 package me.bteuk.network.utils.enums;
 
+import java.util.Comparator;
+
 public enum Counties {
 
     GREATER_LONDON("Greater London", Regions.LONDON),
@@ -68,3 +70,4 @@ public enum Counties {
     }
 
 }
+

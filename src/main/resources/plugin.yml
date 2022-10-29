@@ -49,3 +49,12 @@ commands:
   help:
     usage: /<command>
     description: Help menu for information on commands and server features.
+  warp:
+    usage: /<command>
+    description: Warp to locations in the exploration menu.
+  navigation:
+    usage: /<command>
+    description: Adds commands to do with navigation.
+  database:
+    usage: /<command>
+    description: Adds all database conversions.

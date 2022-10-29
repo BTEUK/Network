@@ -2,6 +2,7 @@ package me.bteuk.network.gui;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.commands.Nightvision;
+import me.bteuk.network.gui.navigation.ExploreGui;
 import me.bteuk.network.utils.LightsOut;
 import me.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
@@ -33,13 +34,15 @@ public class NavigatorGui extends Gui {
                 u -> {
 
                     //Click Action
+                    u.mainGui = new ExploreGui(u);
+                    u.mainGui.open(u);
 
                 });
 
         setItem(8, Utils.createItem(Material.NETHER_STAR, 1,
                         Utils.chat("&b&lToggle Navigator"),
                         Utils.chat("&fClick to toggle the navigator in your inventory."),
-                        Utils.chat("&fYou can always open this menu with /navigator")),
+                        Utils.chat("&fYou can always open this menu with &7/navigator")),
                 u -> {
 
                     if (u.navigator) {
