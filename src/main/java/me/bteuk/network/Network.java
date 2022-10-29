@@ -218,6 +218,8 @@ public final class Network extends JavaPlugin {
 
         getCommand("navigation").setExecutor(new Navigation());
 
+        getCommand("database").setExecutor(new Database());
+
     }
 
     @Override

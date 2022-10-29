@@ -105,6 +105,7 @@ public class Navigation_database {
             }
         }
 
+        Network.getInstance().getLogger().info("Converted navigation database successfully!");
 
     }
 
