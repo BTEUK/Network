@@ -4,6 +4,7 @@ import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.navigation.LocationSearch;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -154,7 +155,14 @@ public class ExploreGui extends Gui {
 
         //Find Locations
         setItem(23, Utils.createItem(Material.OAK_SIGN, 1,
-                ));
+                        Utils.title("Find Locations"),
+                        Utils.line("Click to search for locations"),
+                        Utils.line("based on chat input.")),
+                u -> {
+                    u.player.sendMessage(Utils.success("Type a word or phrase in chat to search for locations."));
+                    new LocationSearch(u);
+                    u.player.closeInventory();
+                });
 
         //Return
         setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,

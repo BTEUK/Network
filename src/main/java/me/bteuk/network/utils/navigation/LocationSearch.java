@@ -23,7 +23,7 @@ public class LocationSearch implements Listener {
 
     private final BukkitTask task;
 
-    public LocationSearch(NetworkUser u, AddLocation gui) {
+    public LocationSearch(NetworkUser u) {
 
         Bukkit.getServer().getPluginManager().registerEvents(this, Network.getInstance());
 
@@ -86,8 +86,6 @@ public class LocationSearch implements Listener {
                     Bukkit.getScheduler().runTask(Network.getInstance(), () -> {
 
                         u.mainGui.delete();
-                        u.mainGui = null;
-
                         u.mainGui = new LocationMenu("Search: " + e.getMessage(), searchLocations, false);
                         u.mainGui.open(u);
 
