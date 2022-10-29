@@ -1,6 +1,6 @@
 package me.bteuk.network.commands;
 
-import me.bteuk.network.database_conversion.Navigation_database;
+import me.bteuk.network.server_conversion.Navigation_database;
 import me.bteuk.network.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

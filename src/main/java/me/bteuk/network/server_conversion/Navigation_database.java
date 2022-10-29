@@ -1,4 +1,4 @@
-package me.bteuk.network.database_conversion;
+package me.bteuk.network.server_conversion;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.sql.GlobalSQL;
