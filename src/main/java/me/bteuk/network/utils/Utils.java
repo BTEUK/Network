@@ -1,5 +1,6 @@
 package me.bteuk.network.utils;
 
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.*;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
@@ -17,8 +18,6 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.bukkit.ChatColor.COLOR_CHAR;
-
 public class Utils {
 
     public static String chat(String message) {
@@ -27,10 +26,26 @@ public class Utils {
 
         while (matcher.find()) {
             String color = message.substring(matcher.start(), matcher.end());
-            message = message.replace(color, ChatColor.valueOf(color) + "");
+            message = message.replace(color, ChatColor.of(color) + "");
             matcher = pattern.matcher(message);
         }
         return ChatColor.translateAlternateColorCodes('&', message);
+    }
+
+    public static String title(String message) {
+        return chat("&b&l" + message);
+    }
+
+    public static String line(String message) {
+        return chat("&f" + message);
+    }
+
+    public static String error(String message) {
+        return chat("&c" + message);
+    }
+
+    public static String success(String message) {
+        return chat("&a" + message);
     }
 
     public static ItemStack createItem(Material material, int amount, String displayName, String... loreString) {

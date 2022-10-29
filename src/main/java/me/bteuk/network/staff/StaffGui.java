@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 public class StaffGui extends Gui {
 
-    private NetworkUser user;
+    private final NetworkUser user;
 
     public StaffGui(NetworkUser user) {
 
@@ -34,11 +34,41 @@ public class StaffGui extends Gui {
         Staff menu for regions.
         Staff menu for region join requests.
 
-        Staff menu for navigation menu requests.
+        //TODO: Staff menu for navigation menu requests.
+        uknet.navigation.review
+        */
 
-        Staff menu for moderation.
+        //Check if any location requests exist.
+        //To make sure the string makes grammatical sense we check if the number is 1, in this case we change 'are' to 'is'.
+        int requestCount = Network.getInstance().globalSQL.getInt("SELECT location FROM location_requests");
+        String requestString = "There are currently &7" + requestCount + " &flocation requests.";
+        if (requestCount == 1) {
+            requestString = requestString.replace("are", "is");
+            requestString = requestString.replace("requests", "request");
+        }
 
-         */
+        //Create item.
+        setItem(14, Utils.createItem(Material.ENDER_CHEST, 1,
+                        Utils.title("Location Requests"),
+                        Utils.line("Opens a menu to view all location requests for navigation."),
+                        Utils.line(requestString)),
+                u -> {
+
+                    //Check if the user has the relevant permissions.
+                    if (u.player.hasPermission("uknet.navigation.review")) {
+
+                        //Open the LocationRequest gui.
+                        this.delete();
+                        u.staffGui = null;
+
+                        u.staffGui = new LocationRequests();
+                        u.staffGui.open(u);
+
+                    }
+                });
+
+
+        //Staff menu for moderation.
 
         /*
         Click to open menu to edit region details.
@@ -61,11 +91,11 @@ public class StaffGui extends Gui {
 
                     {
 
-                        //Check if user has the relevant permissions.
+                        //Check if the user has the relevant permissions.
                         if (u.player.hasPermission("uknet.regions.manage")) {
 
                             if (u.inRegion) {
-
+                                //TODO: COMPLETE THIS
                                 //Open manage region menu
 
                             }
@@ -87,6 +117,7 @@ public class StaffGui extends Gui {
 
         //Click to open menu to deal with region join requests.
         //Can only click on this if requests exist and player is a reviewer.
+        //TODO: Fix formatting for 1 request, see location requests for template.
         setItem(11, Utils.createItem(Material.CHEST_MINECART, 1,
                         Utils.chat("&b&lReview Region Requests"),
                         Utils.chat("&fOpens a menu to review active region join requests by Jr.Builders."),
@@ -99,10 +130,10 @@ public class StaffGui extends Gui {
 
                             //Open region request menu.
                             this.delete();
-                            u.staffUser.staffGui = null;
+                            u.staffGui = null;
 
-                            u.staffUser.regionRequests = new RegionRequests(true);
-                            u.staffUser.regionRequests.open(u);
+                            u.staffGui = new RegionRequests(true);
+                            u.staffGui.open(u);
 
                         } else {
                             u.player.sendMessage(Utils.chat("&cYou must be a reviewer to review region requests."));
@@ -115,6 +146,7 @@ public class StaffGui extends Gui {
 
         //Click to review plot.
         //Show review plot button in gui.
+        //TODO: Fix formatting for 1 request, see location requests for template.
         setItem(13, Utils.createItem(Material.WRITABLE_BOOK, 1,
                         Utils.chat("&b&lReview Plot"),
                         Utils.chat("&fClick to review a submitted plot."),

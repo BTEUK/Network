@@ -46,9 +46,12 @@ public class CustomChat implements Listener, PluginMessageListener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerChatEvent(AsyncPlayerChatEvent e) {
 
-        e.setCancelled(true);
-        broadcastPlayerMessage(e.getPlayer(), e.getMessage(), "uknet:globalchat");
-
+        if (e.isCancelled()) {
+            //If chat is already cancelled, don't broadcast.
+        } else {
+            e.setCancelled(true);
+            broadcastPlayerMessage(e.getPlayer(), e.getMessage(), "uknet:globalchat");
+        }
     }
 
     @Override

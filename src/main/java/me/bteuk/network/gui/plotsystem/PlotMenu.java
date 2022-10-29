@@ -47,11 +47,11 @@ public class PlotMenu extends Gui {
 
                         //Delete this gui.
                         this.delete();
-                        u.plotMenu = null;
+                        u.mainGui = null;
 
                         //Switch to plot info.
-                        u.plotInfo = new PlotInfo(plots.get(finalI), u.player.getUniqueId().toString());
-                        u.plotInfo.open(u);
+                        u.mainGui = new PlotInfo(plots.get(finalI), u.player.getUniqueId().toString());
+                        u.mainGui.open(u);
 
                     });
 
@@ -77,11 +77,11 @@ public class PlotMenu extends Gui {
 
                         //Delete this gui.
                         this.delete();
-                        u.plotMenu = null;
+                        u.mainGui = null;
 
                         //Switch to plot info.
-                        u.acceptedPlotFeedback = new AcceptedPlotFeedback(u);
-                        u.acceptedPlotFeedback.open(u);
+                        u.mainGui = new AcceptedPlotFeedback(u);
+                        u.mainGui.open(u);
 
                     });
         }
@@ -94,11 +94,11 @@ public class PlotMenu extends Gui {
 
                     //Delete this gui.
                     this.delete();
-                    u.plotMenu = null;
+                    u.mainGui = null;
 
                     //Switch to plot info.
-                    u.buildGui = new BuildGui(u);
-                    u.buildGui.open(u);
+                    u.mainGui = new BuildGui(u);
+                    u.mainGui.open(u);
 
                 });
     }

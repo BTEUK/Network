@@ -2,7 +2,6 @@ package me.bteuk.network.gui.navigation;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
-import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
@@ -15,17 +14,18 @@ import java.util.HashSet;
 
 public class LocationMenu extends Gui {
 
-    private final NetworkUser u;
     private final HashSet<String> locations;
 
     private int page;
+    private boolean england;
 
-    public LocationMenu(NetworkUser u, String title, HashSet<String> locations) {
+    public LocationMenu(String title, HashSet<String> locations, boolean england) {
 
         super(45, Component.text(title, NamedTextColor.AQUA, TextDecoration.BOLD));
 
-        this.u = u;
         this.locations = locations;
+
+        this.england = england;
 
         //On initialization the page is always 1.
         page = 1;
@@ -87,9 +87,9 @@ public class LocationMenu extends Gui {
             }
 
             //Create location teleport button.
-            setItem(24, Utils.createItem(Material.ENDER_PEARL, 1,
-                            Utils.chat("&b&l" + location),
-                            Utils.chat("&fClick to teleport here.")),
+            setItem(slot, Utils.createItem(Material.ENDER_PEARL, 1,
+                            Utils.title(location),
+                            Utils.line("Click to teleport here.")),
 
                     u -> {
 
@@ -106,7 +106,16 @@ public class LocationMenu extends Gui {
                             //Close inventory.
                             u.player.closeInventory();
 
+                            //Get location from coordinate id.
                             Location l = Network.getInstance().globalSQL.getCoordinate(coordinate_id);
+
+                            //If world is in plot system add coordinate transform.
+                            String world = Network.getInstance().globalSQL.getString("SELECT world FROM coordinates WHERE id=" + coordinate_id + ";");
+                            if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + world + "';")) {
+                                l.setX(l.getX() + Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + world + "';"));
+                                l.setZ(l.getZ() + Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + world + "';"));
+                            }
+
                             u.player.teleport(l);
                             u.player.sendMessage(Utils.chat("&aTeleported to &3" + location));
 
@@ -123,9 +132,6 @@ public class LocationMenu extends Gui {
 
                     });
 
-
-
-
             //Increase slot accordingly.
             if (slot % 9 == 7) {
                 //Increase row, basically add 3.
@@ -138,7 +144,7 @@ public class LocationMenu extends Gui {
         }
 
         //Return
-        setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
+        setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
                         Utils.chat("&b&lReturn"),
                         Utils.chat("&fOpen the exploration menu.")),
                 u ->
@@ -147,11 +153,15 @@ public class LocationMenu extends Gui {
 
                     //Delete this gui.
                     this.delete();
-                    u.locationMenu = null;
 
                     //Switch to navigation menu.
-                    u.exploreGui = new ExploreGui(u);
-                    u.exploreGui.open(u);
+                    //If england is true then return to the england menu.
+                    if (england) {
+                        u.mainGui = new EnglandMenu();
+                    } else {
+                        u.mainGui = new ExploreGui(u);
+                    }
+                    u.mainGui.open(u);
 
                 });
     }

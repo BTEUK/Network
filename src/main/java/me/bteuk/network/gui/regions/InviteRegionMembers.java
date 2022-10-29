@@ -161,11 +161,11 @@ public class InviteRegionMembers extends Gui {
 
                     //Delete this gui.
                     this.delete();
-                    u.inviteRegionMembers = null;
+                    u.mainGui = null;
 
                     //Switch back to plot info.
-                    u.regionInfo = new RegionInfo(region, u.player.getUniqueId().toString());
-                    u.regionInfo.open(u);
+                    u.mainGui = new RegionInfo(region, u.player.getUniqueId().toString());
+                    u.mainGui.open(u);
 
                 });
     }

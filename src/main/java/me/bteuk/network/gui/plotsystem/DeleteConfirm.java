@@ -40,10 +40,10 @@ public class DeleteConfirm extends Gui {
 
                     //Delete this inventory.
                     this.delete();
-                    u.deleteConfirm = null;
+                    u.mainGui = null;
 
                     //Create plot menu, so the next time you open the navigator you return to that.
-                    u.plotMenu = new PlotMenu(u);
+                    u.mainGui = new PlotMenu(u);
 
                     //Add server event to delete plot.
                     globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + u.player.getUniqueId() + "','plotsystem','" +
@@ -63,11 +63,11 @@ public class DeleteConfirm extends Gui {
 
                     //Delete this inventory.
                     this.delete();
-                    u.deleteConfirm = null;
+                    u.mainGui = null;
 
                     //Switch back to plot info.
-                    u.plotInfo = new PlotInfo(plotID, u.player.getUniqueId().toString());
-                    u.plotInfo.open(u);
+                    u.mainGui = new PlotInfo(plotID, u.player.getUniqueId().toString());
+                    u.mainGui.open(u);
 
                 });
     }

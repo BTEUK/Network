@@ -2,9 +2,7 @@ package me.bteuk.network.staff;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
-import me.bteuk.network.gui.regions.RegionInfo;
 import me.bteuk.network.sql.GlobalSQL;
-import me.bteuk.network.staff.ManageRegion;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.regions.Region;
 import net.kyori.adventure.text.Component;
@@ -136,11 +134,11 @@ public class KickMembers extends Gui {
 
                     //Delete this gui.
                     this.delete();
-                    u.staffUser.kickMembers = null;
+                    u.staffGui = null;
 
                     //Switch back to plot info.
-                    u.staffUser.manageRegion = new ManageRegion(u, region);
-                    u.staffUser.manageRegion.open(u);
+                    u.staffGui = new ManageRegion(u, region);
+                    u.staffGui.open(u);
 
                 });
     }

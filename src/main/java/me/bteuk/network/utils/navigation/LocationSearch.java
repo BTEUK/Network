@@ -1,7 +1,6 @@
 package me.bteuk.network.utils.navigation;
 
 import me.bteuk.network.Network;
-import me.bteuk.network.gui.navigation.AddLocation;
 import me.bteuk.network.gui.navigation.LocationMenu;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
@@ -23,7 +22,7 @@ public class LocationSearch implements Listener {
 
     private final BukkitTask task;
 
-    public LocationSearch(NetworkUser u, AddLocation gui) {
+    public LocationSearch(NetworkUser u) {
 
         Bukkit.getServer().getPluginManager().registerEvents(this, Network.getInstance());
 
@@ -54,21 +53,21 @@ public class LocationSearch implements Listener {
             } else {
 
                 //Search for locations that include this phrase.
-                ArrayList<String> locations = Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE location LIKE '%{" + e.getMessage() + "}%';");
+                ArrayList<String> locations = Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE location LIKE '%" + e.getMessage() + "%';");
 
                 //Also search for any regions or counties.
                 for (Counties county : Counties.values()) {
                     if (StringUtils.containsIgnoreCase(county.label, e.getMessage())) {
 
-                        locations.addAll(Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE subcategory='" + county.region.toString() + "';"));
+                        locations.addAll(Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE subcategory='" + county.region + "';"));
 
                     }
                 }
 
                 for (Categories category : Categories.values()) {
-                    if (StringUtils.containsIgnoreCase(category.toString(), e.getMessage())) {
+                    if (StringUtils.containsIgnoreCase(category.label, e.getMessage())) {
 
-                        locations.addAll(Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE subcategory='" + category + "';"));
+                        locations.addAll(Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='" + category + "';"));
 
                     }
                 }
@@ -85,11 +84,9 @@ public class LocationSearch implements Listener {
                     //Open the location menu with these locations.
                     Bukkit.getScheduler().runTask(Network.getInstance(), () -> {
 
-                        u.exploreGui.delete();
-                        u.exploreGui = null;
-
-                        u.locationMenu = new LocationMenu(u, "Search: " + e.getMessage(), searchLocations);
-                        u.locationMenu.open(u);
+                        u.mainGui.delete();
+                        u.mainGui = new LocationMenu("Search: " + e.getMessage(), searchLocations, false);
+                        u.mainGui.open(u);
 
                     });
                 }

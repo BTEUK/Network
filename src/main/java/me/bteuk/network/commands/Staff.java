@@ -3,7 +3,6 @@ package me.bteuk.network.commands;
 import me.bteuk.network.Network;
 import me.bteuk.network.staff.StaffGui;
 import me.bteuk.network.utils.NetworkUser;
-import me.bteuk.network.utils.StaffUser;
 import me.bteuk.network.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -45,51 +44,19 @@ public class Staff implements CommandExecutor {
 
     public static void openStaffMenu(NetworkUser u) {
 
-        //Check if the user has a staff instance, if not create it.
-        if (u.staffUser == null) {
-
-            u.staffUser = new StaffUser();
-
-        }
-
-        //Check if any of the guis are not null.
-        //If not then open the first inventory found after refreshing its contents.
+        //Check if the gui exists.
+        //If it does refresh and open it.
         //If no gui exists open the staff menu.
 
-        if (u.staffUser.staffGui != null) {
+        if (u.staffGui != null) {
 
-            u.staffUser.staffGui.refresh();
-            u.staffUser.staffGui.open(u);
-
-        } else if (u.staffUser.regionRequests != null) {
-
-            u.staffUser.regionRequests.refresh();
-            u.staffUser.regionRequests.open(u);
-
-        } else if (u.staffUser.regionRequest != null) {
-
-            u.staffUser.regionRequest.refresh();
-            u.staffUser.regionRequest.open(u);
-
-        } else if (u.staffUser.manageRegion != null) {
-
-            u.staffUser.manageRegion.refresh();
-            u.staffUser.manageRegion.open(u);
-
-        } else if (u.staffUser.transferOwner != null) {
-
-            u.staffUser.transferOwner.refresh();
-            u.staffUser.transferOwner.open(u);
-
-        } else if (u.staffUser.kickMembers != null) {
-
-            u.staffUser.kickMembers.refresh();
-            u.staffUser.kickMembers.open(u);
+            u.staffGui.refresh();
+            u.staffGui.open(u);
 
         } else {
 
-            u.staffUser.staffGui = new StaffGui(u);
-            u.staffUser.staffGui.open(u);
+            u.staffGui = new StaffGui(u);
+            u.staffGui.open(u);
 
         }
     }

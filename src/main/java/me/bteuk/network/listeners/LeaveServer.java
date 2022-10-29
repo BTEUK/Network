@@ -45,7 +45,15 @@ public class LeaveServer implements Listener {
         Gui.openInventories.remove(playerUUID);
 
         //Delete any guis that may exist.
-        Gui.deleteGuis(u);
+        if (u.mainGui != null) {
+            u.mainGui.delete();
+        }
+        if (u.staffGui != null) {
+            u.staffGui.delete();
+        }
+        if (u.lightsOut != null) {
+            u.lightsOut.delete();
+        }
 
         //If the player is not in the server_switch table they have disconnected from the network.
         if (!globalSQL.hasRow("SELECT uuid FROM server_switch WHERE uuid='" + e.getPlayer().getUniqueId()
