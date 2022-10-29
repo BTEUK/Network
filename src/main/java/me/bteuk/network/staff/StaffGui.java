@@ -40,7 +40,7 @@ public class StaffGui extends Gui {
 
         //Check if any location requests exist.
         //To make sure the string makes grammatical sense we check if the number is 1, in this case we change 'are' to 'is'.
-        int requestCount = Network.getInstance().globalSQL.getInt("SELECT location FROM location_requests");
+        int requestCount = Network.getInstance().globalSQL.getInt("SELECT COUNT(location) FROM location_requests");
         String requestString = "There are currently &7" + requestCount + " &flocation requests.";
         if (requestCount == 1) {
             requestString = requestString.replace("are", "is");

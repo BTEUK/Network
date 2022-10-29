@@ -53,8 +53,8 @@ public class RegionInfo extends Gui {
                             + globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';") + "','region leave " + region.regionName() + "');");
 
                     //Return to region menu and close inventory.
+                    u.player.closeInventory();
                     this.delete();
-                    u.mainGui = null;
 
                     u.mainGui = new RegionMenu(u);
 
@@ -193,7 +193,6 @@ public class RegionInfo extends Gui {
 
                         //Open the invite member menu.
                         this.delete();
-                        u.mainGui = null;
 
                         u.mainGui = new InviteRegionMembers(region);
                         u.mainGui.open(u);
@@ -208,9 +207,23 @@ public class RegionInfo extends Gui {
 
                         //Open the invite member menu.
                         this.delete();
-                        u.mainGui = null;
 
                         u.mainGui = new RegionMembers(region);
+                        u.mainGui.open(u);
+
+                    });
+
+            //Return
+            setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
+                            Utils.chat("&b&lReturn"),
+                            Utils.chat("&fOpen the region menu.")),
+                    u -> {
+
+                        //Delete this gui.
+                        this.delete();
+
+                        //Switch to plot info.
+                        u.mainGui = new RegionMenu(u);
                         u.mainGui.open(u);
 
                     });

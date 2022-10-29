@@ -108,7 +108,6 @@ public class RegionMenu extends Gui {
 
                             //Delete this gui.
                             this.delete();
-                            u.mainGui = null;
 
                             //Switch to region info.
                             u.mainGui = new RegionInfo(Network.getInstance().getRegionManager().getRegion(owner.get(finalI)), u.player.getUniqueId().toString());
@@ -126,7 +125,6 @@ public class RegionMenu extends Gui {
 
                             //Delete this gui.
                             this.delete();
-                            u.mainGui = null;
 
                             //Switch to plot info.
                             u.mainGui = new RegionInfo(Network.getInstance().getRegionManager().getRegion(member.get((finalI - owner.size()))), u.player.getUniqueId().toString());
@@ -158,8 +156,6 @@ public class RegionMenu extends Gui {
 
                         //Delete this gui and switch to region requests.
                         this.delete();
-                        u.mainGui = null;
-
                         u.mainGui = new RegionRequests(false);
                         u.mainGui.open(u);
 
@@ -175,7 +171,6 @@ public class RegionMenu extends Gui {
 
                     //Delete this gui.
                     this.delete();
-                    u.mainGui = null;
 
                     //Switch to plot info.
                     u.mainGui = new BuildGui(u);
