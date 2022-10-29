@@ -1,7 +1,6 @@
 package me.bteuk.network.utils.navigation;
 
 import me.bteuk.network.Network;
-import me.bteuk.network.gui.navigation.AddLocation;
 import me.bteuk.network.gui.navigation.LocationMenu;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;

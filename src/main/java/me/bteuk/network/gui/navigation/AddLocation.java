@@ -53,7 +53,7 @@ public class AddLocation extends Gui {
             setItem(11, Utils.createItem(Material.SPRUCE_SIGN, 1,
                             Utils.chat("&b&lUpdate Location Name"),
                             Utils.chat("&fEdit the location name."),
-                            Utils.chat("&fThe current name is '" + name + "'."),
+                            Utils.chat("&fThe current name is &7" + name + "&f."),
                             Utils.chat("&fYou can type the name in chat.")),
 
                     u -> {
@@ -91,7 +91,7 @@ public class AddLocation extends Gui {
                         Utils.title("Select Category"),
                         Utils.line("Click to cycle through categories."),
                         Utils.line("Current category is:"),
-                        Utils.chat("&b&7" + category.label),
+                        Utils.chat("&7" + category.label),
                         Utils.line("Available categories are:"),
                         Utils.line("England, Scotland, Wales, Northern Ireland and Other")),
 
@@ -125,7 +125,7 @@ public class AddLocation extends Gui {
                             Utils.title("Select County"),
                             Utils.line("Click to select a county."),
                             Utils.line("Current county is:"),
-                            Utils.chat("&b&7" + county)),
+                            Utils.chat("&7" + county.label)),
 
                     u -> {
 
@@ -161,7 +161,7 @@ public class AddLocation extends Gui {
                         u.player.closeInventory();
 
                         //Name isn't duplicate
-                    } else if (globalSQL.hasRow("SELECT location FROM location_data WHERE location='" + name)) {
+                    } else if (globalSQL.hasRow("SELECT location FROM location_data WHERE location='" + name + "';")) {
 
                         u.player.sendMessage(Utils.error("A location with this name already exists."));
                         u.player.closeInventory();
@@ -173,6 +173,7 @@ public class AddLocation extends Gui {
 
                     } else {
 
+                        //TODO: If the location is on a plot server, get the location transformation and convert the coordinate to take that into account.
                         //Create location coordinate.
                         int coordinate_id = Network.getInstance().globalSQL.addCoordinate(u.player.getLocation());
 
@@ -227,13 +228,13 @@ public class AddLocation extends Gui {
 
         if (region == null) {
             globalSQL.update("INSERT INTO location_data(location,category,coordinate) " +
-                    "VALUES('" + name + "','" + category + "','" + coordinate_id + ";");
+                    "VALUES('" + name + "','" + category + "'," + coordinate_id + ";");
         } else {
-            globalSQL.update("INSERT INTO location_requests(location,category,subcategory,coordinate) " +
-                    "VALUES('" + name + "','" + category + "','" + region + "," + coordinate_id + ";");
+            globalSQL.update("INSERT INTO location_data(location,category,subcategory,coordinate) " +
+                    "VALUES('" + name + "','" + category + "','" + region + "'," + coordinate_id + ";");
         }
 
-        u.player.sendMessage(Utils.success("Location &7" + name + " &aadded to exploration menu."));
+        u.player.sendMessage(Utils.success("Location &3" + name + " &aadded to exploration menu."));
 
         //Delete gui.
         this.delete();
@@ -248,16 +249,16 @@ public class AddLocation extends Gui {
 
         if (region ==  null) {
             globalSQL.update("INSERT INTO location_requests(location,category,coordinate) " +
-                    "VALUES('" + name + "','" + category + "','" + coordinate_id + ";");
+                    "VALUES('" + name + "','" + category + "'," + coordinate_id + ";");
         } else {
             globalSQL.update("INSERT INTO location_requests(location,category,subcategory,coordinate) " +
-                    "VALUES('" + name + "','" + category + "','" + county.region + "," + coordinate_id + ";");
+                    "VALUES('" + name + "','" + category + "','" + region + "'," + coordinate_id + ";");
         }
 
         //Notify reviewers.
         Network.getInstance().chat.broadcastMessage("&aA new location has been requested.", "uknet:reviewer");
 
-        u.player.sendMessage(Utils.success("Location &7" + name + " &arequested."));
+        u.player.sendMessage(Utils.success("Location &3" + name + " &arequested."));
 
         //Delete gui.
         this.delete();

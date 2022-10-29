@@ -94,6 +94,7 @@ public class LocationMenu extends Gui {
                     u -> {
 
                         //Get the coordinate id.
+                        //TODO: If the location is on a plot server, get the location transformation and convert the coordinate to take that into account.
                         int coordinate_id = Network.getInstance().globalSQL.getInt("SELECT coordinate FROM location_data WHERE location='" + location + "';");
 
                         //Get the server of the location.

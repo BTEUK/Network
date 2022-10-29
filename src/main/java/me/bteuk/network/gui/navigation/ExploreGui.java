@@ -125,7 +125,7 @@ public class ExploreGui extends Gui {
         );
 
         //Other
-        setItem(3, Utils.createItem(Material.LIGHT_BLUE_CONCRETE_POWDER, 1,
+        setItem(6, Utils.createItem(Material.YELLOW_CONCRETE_POWDER, 1,
                         Utils.title("Other"),
                         Utils.line("Click to pick from locations"),
                         Utils.line("not in the 4 countries of the UK.")),
@@ -145,7 +145,7 @@ public class ExploreGui extends Gui {
         setItem(22, Utils.createItem(Material.COMPASS, 1,
                         Utils.title("Nearby Locations"),
                         Utils.line("Click to view locations"),
-                        Utils.line("in a " + Network.getInstance().globalSQL.getInt("navigation_radius") + "km radius.")),
+                        Utils.line("in a " + Network.getInstance().getConfig().getInt("navigation_radius") + "km radius.")),
                 u -> openLocation("Nearby Locations", Network.getInstance().globalSQL.getStringList("SELECT location_data.location FROM location_data " +
                         "INNER JOIN coordinates ON location_data.coordinate=coordinates.id " +
                         "WHERE (((coordinates.x-" + u.player.getLocation().getX() + ")*(coordinates.x-" + u.player.getLocation().getX() + ")) + " +

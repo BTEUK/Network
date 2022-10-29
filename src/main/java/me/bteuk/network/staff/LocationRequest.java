@@ -46,6 +46,7 @@ public class LocationRequest extends Gui {
                 u -> {
 
                     //Get location from coordinate id.
+                    //TODO: If the location is on a plot server, get the location transformation and convert the coordinate to take that into account.
                     Location l = globalSQL.getCoordinate(coordinate_id);
 
                     //Close inventory.

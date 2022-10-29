@@ -48,13 +48,16 @@ public class SelectCounty extends Gui {
                         addLocation.selectCounty = null;
 
                         //Return to addlocation.
+                        u.mainGui.refresh();
                         u.mainGui.open(u);
 
                     });
+
+            slot++;
         }
 
         //Return
-        setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
+        setItem(53, Utils.createItem(Material.SPRUCE_DOOR, 1,
                         Utils.chat("&b&lReturn"),
                         Utils.chat("&fOpen the add location menu.")),
                 u ->

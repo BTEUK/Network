@@ -362,7 +362,11 @@ public class BuildGui extends Gui {
 
                     //Connect to the lobby server.
                     u.player.closeInventory();
-                    SwitchServer.switchServer(u.player, Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='LOBBY';"));
+                    if (!Network.SERVER_NAME.equalsIgnoreCase(Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='LOBBY';"))) {
+                        SwitchServer.switchServer(u.player, Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='LOBBY';"));
+                    } else {
+                        u.player.sendMessage(Utils.error("You are already in Spawn."));
+                    }
 
                 });
 

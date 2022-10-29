@@ -65,7 +65,7 @@ public class LocationNameListener implements Listener {
                 gui.setName(e.getMessage());
 
                 //Send message to player.
-                p.sendMessage(Utils.chat("&aSet location name to" + e.getMessage()));
+                p.sendMessage(Utils.chat("&aSet location name to &3" + e.getMessage()));
 
                 //Unregister listener and task.
                 task.cancel();
@@ -75,10 +75,12 @@ public class LocationNameListener implements Listener {
                 NetworkUser u = Network.getInstance().getUser(p);
                 if (u.mainGui != null) {
                     if (u.mainGui instanceof AddLocation) {
-                        u.mainGui.open(u);
+                        Bukkit.getScheduler().runTask(Network.getInstance(), () -> {
+                            u.mainGui.refresh();
+                            u.mainGui.open(u);
+                        });
                     }
                 }
-
             }
         }
     }
