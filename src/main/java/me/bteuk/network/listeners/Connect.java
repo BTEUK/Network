@@ -64,7 +64,7 @@ public class Connect {
         }
 
         //Send global connect message.
-        instance.chat.broadcastMessage(joinMessage.replace("%player%", p.getName()), "uknet:globalchat");
+        instance.chat.broadcastMessage(joinMessage.replace("%player%", p.getName()), "uknet:connect");
 
     }
 
@@ -86,7 +86,7 @@ public class Connect {
 
         //Get the player name and send global disconnect message.
         String name = globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
-        instance.chat.broadcastMessage(leaveMessage.replace("%player%", name), "uknet:globalchat");
+        instance.chat.broadcastMessage(leaveMessage.replace("%player%", name), "uknet:disconnect");
 
         //Remove player from online_users.
         globalSQL.update("DELETE FROM online_users WHERE uuid='" + uuid + "';");

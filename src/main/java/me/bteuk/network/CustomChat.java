@@ -57,7 +57,7 @@ public class CustomChat implements Listener, PluginMessageListener {
     @Override
     public void onPluginMessageReceived(String channel, Player player, byte[] message) {
 
-        if (!channel.equals("uknet:globalchat") && !channel.equals("uknet:reviewer")) {
+        if (!channel.equals("uknet:globalchat") && !channel.equals("uknet:reviewer") && !channel.equals("uknet:connect") && !channel.equals("uknet:disconnect")) {
 
             return;
 
