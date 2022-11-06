@@ -57,37 +57,51 @@ public class CustomChat implements Listener, PluginMessageListener {
     @Override
     public void onPluginMessageReceived(String channel, Player player, byte[] message) {
 
-        if (!channel.equals("uknet:globalchat") && !channel.equals("uknet:reviewer") && !channel.equals("uknet:connect") && !channel.equals("uknet:disconnect")) {
+        switch (channel) {
 
-            return;
+            case "uknet:globalchat":
+            case "uknet:connect":
+            case "uknet:disconnect":
 
-        }
-
-        DataInputStream in = new DataInputStream(new ByteArrayInputStream(message));
-
-        try {
-
-            if (channel.equals("uknet:reviewer")) {
-
-                //Send only to reviewers.
-                for (Player p : instance.getServer().getOnlinePlayers()) {
-                    if (p.hasPermission("group.reviewer")) {
-                        p.sendMessage(Utils.chat(in.readUTF()));
-                    }
+                try {
+                    DataInputStream in = new DataInputStream(new ByteArrayInputStream(message));
+                    Bukkit.broadcastMessage(Utils.chat(in.readUTF()));
+                } catch (IOException ex) {
+                    instance.getLogger().log(Level.SEVERE, "Could not broadcast received socket message!", ex);
                 }
+                break;
 
-            } else {
+            case "uknet:reviewer":
 
-                Bukkit.broadcastMessage(Utils.chat(in.readUTF()));
+                try {
+                    DataInputStream in = new DataInputStream(new ByteArrayInputStream(message));
+                    //Send only to reviewers.
+                    for (Player p : instance.getServer().getOnlinePlayers()) {
+                        if (p.hasPermission("group.reviewer")) {
+                            p.sendMessage(Utils.chat(in.readUTF()));
+                        }
+                    }
+                } catch (IOException ex) {
+                    instance.getLogger().log(Level.SEVERE, "Could not broadcast received socket message!", ex);
+                }
+                break;
 
-            }
+            case "uknet:staff":
 
-        } catch (IOException ex) {
-
-            instance.getLogger().log(Level.SEVERE, "Could not broadcast received socket message!", ex);
+                try {
+                    DataInputStream in = new DataInputStream(new ByteArrayInputStream(message));
+                    //Send only to staff.
+                    for (Player p : instance.getServer().getOnlinePlayers()) {
+                        if (p.hasPermission("uknet.staff")) {
+                            p.sendMessage(Utils.chat(in.readUTF()));
+                        }
+                    }
+                } catch (IOException ex) {
+                    instance.getLogger().log(Level.SEVERE, "Could not broadcast received socket message!", ex);
+                }
+                break;
 
         }
-
     }
 
     public void broadcastPlayerMessage(Player player, String message, String channel) {
