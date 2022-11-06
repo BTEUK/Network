@@ -19,6 +19,9 @@ public class NetworkUser {
     //Staff gui.
     public Gui staffGui;
 
+    //Staff chat
+    public boolean staffChat;
+
     //Region information.
     public boolean inRegion;
     public Region region;
