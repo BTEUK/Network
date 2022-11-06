@@ -99,7 +99,7 @@ public class CustomChat implements Listener, PluginMessageListener {
                 //Send only to staff.
                 for (Player p : instance.getServer().getOnlinePlayers()) {
                     if (p.hasPermission("uknet.staff")) {
-                        p.sendMessage(Utils.chat(sMessage));
+                        p.sendMessage(Utils.chat("&c[Staff]&r" + sMessage));
                     }
                 }
                 break;
