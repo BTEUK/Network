@@ -41,8 +41,10 @@ public class Staff implements CommandExecutor {
             if (args[0].equalsIgnoreCase("chat")) {
                 if (u.staffChat) {
                     u.player.sendMessage(Utils.success("Disabled staff chat."));
+                    Network.getInstance().globalSQL.update("UPDATE player_data SET staff_chat=1 WHERE uuid='"+ p.getUniqueId() + "';");
                 } else {
                     u.player.sendMessage(Utils.success("Enabled staff chat."));
+                    Network.getInstance().globalSQL.update("UPDATE player_data SET staff_chat=0 WHERE uuid='"+ p.getUniqueId() + "';");
                 }
                 //Invert enabled/disabled of staff chat.
                 u.staffChat = !u.staffChat;
