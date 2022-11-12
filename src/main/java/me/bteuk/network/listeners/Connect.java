@@ -5,6 +5,7 @@ import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 //This class deals with players joining and leaving the network.
@@ -64,7 +65,8 @@ public class Connect {
         }
 
         //Send global connect message.
-        instance.chat.broadcastMessage(joinMessage.replace("%player%", p.getName()), "uknet:globalchat");
+        //Add a slight delay so message can be seen by player joining.
+        Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> instance.chat.broadcastMessage(joinMessage.replace("%player%", p.getName()), "uknet:connect"),1L);
 
     }
 
@@ -86,7 +88,7 @@ public class Connect {
 
         //Get the player name and send global disconnect message.
         String name = globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
-        instance.chat.broadcastMessage(leaveMessage.replace("%player%", name), "uknet:globalchat");
+        instance.chat.broadcastMessage(leaveMessage.replace("%player%", name), "uknet:disconnect");
 
         //Remove player from online_users.
         globalSQL.update("DELETE FROM online_users WHERE uuid='" + uuid + "';");

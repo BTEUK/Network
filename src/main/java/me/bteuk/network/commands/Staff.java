@@ -36,6 +36,21 @@ public class Staff implements CommandExecutor {
 
         if (u == null) {return true;}
 
+        //If first arg is chat, switch the player to and from staff chat.
+        if (args.length > 0) {
+            if (args[0].equalsIgnoreCase("chat")) {
+                if (u.staffChat) {
+                    u.player.sendMessage(Utils.success("Disabled staff chat."));
+                } else {
+                    u.player.sendMessage(Utils.success("Enabled staff chat."));
+                }
+                //Invert enabled/disabled of staff chat.
+                u.staffChat = !u.staffChat;
+                Network.getInstance().globalSQL.update("UPDATE player_data SET staff_chat=1-staff_chat WHERE uuid='"+ p.getUniqueId() + "';");
+                return true;
+            }
+        }
+
         //If the player has a previous gui, open that.
         openStaffMenu(u);
 
