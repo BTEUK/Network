@@ -6,6 +6,7 @@ import me.bteuk.network.gui.Gui;
 import me.bteuk.network.sql.RegionSQL;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.regions.Region;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -20,6 +21,8 @@ public class RegionMenu extends Gui {
     private final RegionSQL regionSQL;
 
     private int page;
+
+    private Region region;
 
     public RegionMenu(NetworkUser user) {
 
@@ -100,8 +103,10 @@ public class RegionMenu extends Gui {
             //If i is less than owner.size it means that we are still iterating through the owners, else we are iterating through the members.
             if (i < owner.size()) {
 
+                region = Network.getInstance().getRegionManager().getRegion(owner.get(i));
+
                 setItem(slot, Utils.createItem(Material.LIME_CONCRETE, 1,
-                                Utils.chat("&b&lRegion " + owner.get(i)),
+                                Utils.chat("&b&lRegion " + region.getTag(user.player.getUniqueId().toString())),
                                 Utils.chat("&fYou are the owner of this region."),
                                 Utils.chat("&fClick to open the menu of this region.")),
                         u -> {
@@ -117,8 +122,10 @@ public class RegionMenu extends Gui {
 
             } else {
 
+                region = Network.getInstance().getRegionManager().getRegion(member.get((finalI - owner.size())));
+
                 setItem(slot, Utils.createItem(Material.YELLOW_CONCRETE, 1,
-                                Utils.chat("&b&lRegion " + member.get((i - owner.size()))),
+                                Utils.chat("&b&lRegion " + region.getTag(user.player.getUniqueId().toString())),
                                 Utils.chat("&fYou are a member of this region."),
                                 Utils.chat("&fClick to open the menu of this plot.")),
                         u -> {

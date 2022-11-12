@@ -74,9 +74,9 @@ public class RegionEvent {
                 //Leave region.
                 region.leaveRegion(uuid);
 
-                //If the region has members after you've left.
+                //If the region has members after you've left but no owner.
                 //Find the most recent member and make them owner.
-                if (region.hasMember()) {
+                if (region.hasMember() && !region.hasOwner()) {
 
                     String member = region.getRecentMember();
 
@@ -85,6 +85,11 @@ public class RegionEvent {
                     //Send message to member that they are now the owner.
                     Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + member + "','&aTransferred ownership of region "
                             + region.getTag(member) + " to you due to the previous owner leaving the region.');");
+
+                } else if (!region.hasOwner() && !region.hasMember()) {
+
+                    //The region is has no owner and members, set the status to default.
+                    region.setDefault();
 
                 }
                 break;

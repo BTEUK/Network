@@ -1,6 +1,8 @@
 package me.bteuk.network.utils.regions;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.gui.regions.RegionInfo;
+import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -51,11 +53,16 @@ public class RegionTagListener implements Listener {
                 region.setTag(p.getUniqueId().toString(), e.getMessage());
 
                 //Send message to player.
-                p.sendMessage(Utils.chat("&aSet tag for region " + region.regionName() + " to " + e.getMessage()));
+                p.sendMessage(Utils.chat("&aSet tag for region &3" + region.regionName() + "&a to &3" + e.getMessage()));
 
                 //Unregister listener and task.
                 task.cancel();
                 unregister();
+
+                //Reset the regionInfo gui
+                NetworkUser u = Network.getInstance().getUser(p);
+                u.mainGui.delete();
+                u.mainGui = new RegionInfo(region, p.getUniqueId().toString());
 
             }
         }

@@ -38,10 +38,19 @@ public class RegionInfo extends Gui {
     private void createGui() {
 
         //Region info.
-        setItem(4, Utils.createItem(Material.BOOK, 1,
-                Utils.chat("&b&lRegion " + region.getTag(uuid)),
-                Utils.chat("&fRegion Owner &7" + region.ownerName()),
-                Utils.chat("&fRegion Members &7" + region.memberCount())));
+        //If region has tag set then show both name and tag.
+        if (region.regionName().equals(region.getTag(uuid))) {
+            setItem(4, Utils.createItem(Material.BOOK, 1,
+                    Utils.chat("&b&lRegion " + region.regionName()),
+                    Utils.chat("&fRegion Owner &7" + region.ownerName()),
+                    Utils.chat("&fRegion Members &7" + region.memberCount())));
+        } else {
+            setItem(4, Utils.createItem(Material.BOOK, 1,
+                    Utils.chat("&b&lRegion " + region.regionName()),
+                    Utils.chat("&fRegion Tag &7" + region.getTag(uuid)),
+                    Utils.chat("&fRegion Owner &7" + region.ownerName()),
+                    Utils.chat("&fRegion Members &7" + region.memberCount())));
+        }
 
         //Leave Region.
         setItem(8, Utils.createItem(Material.RED_CONCRETE, 1,
@@ -106,7 +115,7 @@ public class RegionInfo extends Gui {
 
                         //Create teleport region event.
                         Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('" + u.player.getUniqueId() + "','network'," + "'region teleport "
-                                + region + "');");
+                                + region.regionName() + "');");
 
                         //Switch server.
                         SwitchServer.switchServer(u.player, globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH'"));
@@ -214,7 +223,7 @@ public class RegionInfo extends Gui {
                     });
 
             //Return
-            setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
+            setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
                             Utils.chat("&b&lReturn"),
                             Utils.chat("&fOpen the region menu.")),
                     u -> {
