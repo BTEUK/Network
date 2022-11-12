@@ -37,8 +37,8 @@ public class ll implements CommandExecutor {
 
                 double[] coords = bteGeneratorSettings.projection().toGeo(p.getLocation().getX() + u.dx, p.getLocation().getZ() + u.dz);
 
-                p.sendMessage(Utils.chat("&cYour coordinates are &7" + coords[1] + "," + coords[0]));
-                TextComponent message = new TextComponent(Utils.chat("&cClick here to view the coordinates in Google Maps."));
+                p.sendMessage(Utils.chat("&aYour coordinates are &4" + coords[1] + "," + coords[0]));
+                TextComponent message = new TextComponent(Utils.chat("&aClick here to view the coordinates in Google Maps."));
                 message.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.google.com/maps/@?api=1&map_action=map&basemap=satellite&zoom=21&center=" + coords[1] + "," + coords[0]));
                 p.spigot().sendMessage(message);
                 return true;
@@ -46,7 +46,6 @@ public class ll implements CommandExecutor {
             } catch (OutOfProjectionBoundsException e) {
 
                 p.sendMessage(Utils.chat("&cYou must be standing in a region to get the coordinates."));
-                e.printStackTrace();
                 return true;
 
             }

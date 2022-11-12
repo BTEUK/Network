@@ -203,7 +203,8 @@ public final class Network extends JavaPlugin {
 
         getCommand("back").setExecutor(new Back());
 
-        getCommand("modpack").setExecutor(new Modpack());
+        //Modpack will no longer be used.
+        //getCommand("modpack").setExecutor(new Modpack());
         getCommand("discord").setExecutor(new Discord());
 
         getCommand("ll").setExecutor(new ll());

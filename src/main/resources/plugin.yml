@@ -33,9 +33,6 @@ commands:
   back:
     usage: /<command>
     description: Teleports the player to the previous teleported location.
-  modpack:
-    usage: /<command>
-    description: Sends links to the BTE modpack download, can be configured in the plugin config.
   discord:
     usage: /<command>
     description: Sends a link to our discord server.

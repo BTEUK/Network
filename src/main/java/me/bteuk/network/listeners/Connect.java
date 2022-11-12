@@ -5,6 +5,7 @@ import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 //This class deals with players joining and leaving the network.
@@ -64,7 +65,8 @@ public class Connect {
         }
 
         //Send global connect message.
-        instance.chat.broadcastMessage(joinMessage.replace("%player%", p.getName()), "uknet:connect");
+        //Add a slight delay so message can be seen by player joining.
+        Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> instance.chat.broadcastMessage(joinMessage.replace("%player%", p.getName()), "uknet:connect"),1L);
 
     }
 
