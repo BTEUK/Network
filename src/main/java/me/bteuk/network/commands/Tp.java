@@ -1,6 +1,7 @@
 package me.bteuk.network.commands;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.events.EventManager;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
 import org.bukkit.Bukkit;
@@ -65,7 +66,7 @@ public class Tp implements CommandExecutor {
 
                     } else {
 
-                        Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('" + p.getUniqueId() + "','network'," + "'teleport player " + uuid + "');");
+                        EventManager.createJoinEvent(p.getUniqueId().toString(), "network", "teleport player " + uuid + " " + Network.SERVER_NAME);
                         SwitchServer.switchServer(p, Network.getInstance().globalSQL.getString("SELECT server FROM online_users WHERE uuid='" + uuid + "';"));
 
                     }

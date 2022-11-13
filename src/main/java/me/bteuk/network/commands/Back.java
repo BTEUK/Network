@@ -1,6 +1,7 @@
 package me.bteuk.network.commands;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.events.EventManager;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
 import org.bukkit.Location;
@@ -48,8 +49,7 @@ public class Back implements CommandExecutor {
         } else {
 
             //Teleport the player to the correct server with a join event to teleport to the coordinate id.
-            Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('" + p.getUniqueId() + "','network','teleport coordinateID "
-                    + coordinateID + "');");
+            EventManager.createJoinEvent(p.getUniqueId().toString(), "network", "teleport coordinateID " + coordinateID + " " + Network.SERVER_NAME);
 
             //Switch server.
             SwitchServer.switchServer(p, server);

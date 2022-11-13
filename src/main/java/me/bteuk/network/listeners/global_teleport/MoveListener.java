@@ -1,6 +1,7 @@
 package me.bteuk.network.listeners.global_teleport;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.events.EventManager;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
@@ -112,8 +113,8 @@ public class MoveListener implements Listener {
                                     int zTransform = Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
 
                                     //Set join event to teleport there.
-                                    Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('" + p.getUniqueId() + "','network','teleport "
-                                            + location + " " + (l.getX() + xTransform) + " " + (l.getZ() + zTransform) + " " + l.getYaw() + " " + l.getPitch() + "');");
+                                    EventManager.createJoinEvent(u.player.getUniqueId().toString(), "network", "teleport " +
+                                            location + " " + (l.getX() + xTransform) + " " + (l.getZ() + zTransform) + " " + l.getYaw() + " " + l.getPitch() + Network.SERVER_NAME);
 
                                 } else {
 
@@ -121,8 +122,8 @@ public class MoveListener implements Listener {
                                     server = Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';");
 
                                     //Set join event to teleport there.
-                                    Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('" + p.getUniqueId() + "','network','teleport "
-                                            + earthWorld + " " + l.getX() + " " + l.getZ() + " " + l.getYaw() + " " + l.getPitch() + "');");
+                                    EventManager.createJoinEvent(u.player.getUniqueId().toString(), "network", "teleport " +
+                                            earthWorld + " " + l.getX() + " " + l.getZ() + " " + l.getYaw() + " " + l.getPitch() + Network.SERVER_NAME);
 
                                 }
 

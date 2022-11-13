@@ -1,6 +1,7 @@
 package me.bteuk.network.staff;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.events.EventManager;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.utils.NetworkUser;
@@ -66,7 +67,7 @@ public class LocationRequest extends Gui {
                         u.player.teleport(l);
                     } else {
                         //Create teleport event and switch server.
-                        Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('" + u.player.getUniqueId() + "','network','" + "teleport location_request " + name + "');");
+                        EventManager.createJoinEvent(u.player.getUniqueId().toString(), "network", "teleport location_request " + name + Network.SERVER_NAME);
                         SwitchServer.switchServer(u.player, server);
                     }
 

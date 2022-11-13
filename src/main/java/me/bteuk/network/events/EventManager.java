@@ -21,10 +21,10 @@ public class EventManager {
 
     public static void createEvent(String uuid, String type, String server, String event) {
         if (uuid == null) {
-            Network.getInstance().globalSQL.update("INSERT INTO join_events(type,server,event) " +
+            Network.getInstance().globalSQL.update("INSERT INTO server_events(type,server,event) " +
                     "VALUES('" + type + "','" + server + "','" + event + "');");
         } else {
-            Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,server,event) " +
+            Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) " +
                     "VALUES('" + uuid + "','" + type + "','" + server + "','" + event + "');");
         }
     }

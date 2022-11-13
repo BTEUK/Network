@@ -53,7 +53,7 @@ public class Warp implements CommandExecutor {
                 } else {
                     //Server is different.
                     EventManager.createJoinEvent(p.getUniqueId().toString(),"network",
-                            "teleport location " + location);
+                            "teleport location " + location + " " + Network.SERVER_NAME);
                     SwitchServer.switchServer(p, server);
                 }
 

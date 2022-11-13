@@ -1,6 +1,7 @@
 package me.bteuk.network.gui.regions;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.events.EventManager;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.utils.SwitchServer;
@@ -105,8 +106,7 @@ public class RegionInfo extends Gui {
                     } else {
 
                         //Create teleport region event.
-                        Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('" + u.player.getUniqueId() + "','network'," + "'region teleport "
-                                + region + "');");
+                        EventManager.createJoinEvent(u.player.getUniqueId().toString(), "network", "teleport region " + region.regionName() + " " + Network.SERVER_NAME);
 
                         //Switch server.
                         SwitchServer.switchServer(u.player, globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH'"));

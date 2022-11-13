@@ -1,6 +1,7 @@
 package me.bteuk.network.gui;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.events.EventManager;
 import me.bteuk.network.gui.plotsystem.PlotMenu;
 import me.bteuk.network.gui.plotsystem.PlotServerLocations;
 import me.bteuk.network.gui.regions.RegionMenu;
@@ -81,8 +82,7 @@ public class BuildGui extends Gui {
                         } else {
 
                             //Set the server join event.
-                            Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('"
-                                    + u.player.getUniqueId() + "','plotsystem','teleport plot " + id + "');");
+                            EventManager.createJoinEvent(u.player.getUniqueId().toString(), "plotsystem", "teleport plot " + id + " " + Network.SERVER_NAME);
 
                             //Teleport them to another server.
                             u.player.closeInventory();

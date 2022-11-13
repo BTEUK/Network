@@ -1,6 +1,7 @@
 package me.bteuk.network.gui.navigation;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.events.EventManager;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
@@ -122,8 +123,7 @@ public class LocationMenu extends Gui {
                         } else {
 
                             //Create teleport event.
-                            Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('" + u.player.getUniqueId() + "','network'," + "'teleport location "
-                                    + location + "');");
+                            EventManager.createJoinEvent(u.player.getUniqueId().toString(), "network", "teleport location " + location + " " + Network.SERVER_NAME);
 
                             //Switch server.
                             SwitchServer.switchServer(u.player, server);

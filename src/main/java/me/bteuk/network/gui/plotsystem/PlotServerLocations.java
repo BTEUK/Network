@@ -3,6 +3,7 @@ package me.bteuk.network.gui.plotsystem;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import me.bteuk.network.Network;
+import me.bteuk.network.events.EventManager;
 import me.bteuk.network.gui.BuildGui;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.sql.PlotSQL;
@@ -286,8 +287,7 @@ public class PlotServerLocations extends Gui {
                             } else {
 
                                 //Set the server join event.
-                                Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('"
-                                        + u.player.getUniqueId() + "','plotsystem','teleport plot " + id + "');");
+                                EventManager.createJoinEvent(u.player.getUniqueId().toString(), "plotsystem", "teleport plot " + id + " " + Network.SERVER_NAME);
 
                                 //Teleport them to another server.
                                 this.delete();

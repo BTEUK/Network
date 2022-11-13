@@ -1,6 +1,7 @@
 package me.bteuk.network.commands;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.events.EventManager;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.regions.Region;
@@ -226,8 +227,9 @@ public class Tpll implements CommandExecutor {
                     } else {
 
                         //Set join event to teleport there.
-                        Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('" + p.getUniqueId() + "','network'," + "'teleport "
-                                + location + " " + (proj[0] + xTransform) + " " + (proj[1] + zTransform) + " " + p.getLocation().getYaw() + " " + p.getLocation().getPitch() + "');");
+                        EventManager.createJoinEvent(p.getUniqueId().toString(), "network", "teleport "
+                                + location + " " + (proj[0] + xTransform) + " " + (proj[1] + zTransform) + " "
+                                + p.getLocation().getYaw() + " " + p.getLocation().getPitch() + " " + Network.SERVER_NAME);
 
                         //Switch server.
                         SwitchServer.switchServer(p, server);
@@ -252,8 +254,9 @@ public class Tpll implements CommandExecutor {
                         } else {
 
                             //Set join event to teleport there.
-                            Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('" + p.getUniqueId() + "','network'," + "'teleport "
-                                    + earthWorld + " " + (proj[0]) + " " + (proj[1]) + " " + p.getLocation().getYaw() + " " + p.getLocation().getPitch() + "');");
+                            EventManager.createJoinEvent(p.getUniqueId().toString(), "network", "teleport "
+                                    + earthWorld + " " + (proj[0]) + " " + (proj[1]) + " "
+                                    + p.getLocation().getYaw() + " " + p.getLocation().getPitch() + " " + Network.SERVER_NAME);
 
                             //Switch server.
                             SwitchServer.switchServer(p, earthServer);
