@@ -1,6 +1,7 @@
 package me.bteuk.network.gui.regions;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.commands.Back;
 import me.bteuk.network.events.EventManager;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.sql.GlobalSQL;
@@ -102,6 +103,9 @@ public class RegionRequest extends Gui {
                         //Close inventory.
                         u.player.closeInventory();
 
+                        //Set current location for /back
+                        Back.setPreviousCoordinate(u.player.getUniqueId().toString(), u.player.getLocation());
+
                         //Teleport player.
                         u.player.teleport(l);
                         u.player.sendMessage(Utils.chat("&aTeleported to region &3" + request.region));
@@ -109,9 +113,9 @@ public class RegionRequest extends Gui {
                     } else {
 
                         //Create teleport event.
-                        EventManager.createJoinEvent(u.player.getUniqueId().toString(), "network", "teleport " +
+                        EventManager.createTeleportEvent(true, u.player.getUniqueId().toString(), "network", "teleport " +
                                 Network.getInstance().getConfig().getString("earth_world") + " " + l.getX() + " " + l.getZ() + " " +
-                                l.getYaw() + " " + l.getPitch() + Network.SERVER_NAME);
+                                l.getYaw() + " " + l.getPitch(), u.player.getLocation());
 
                         //Switch server.
                         SwitchServer.switchServer(u.player, globalSQL.getString("SELECT name FROM server_data WHERE type='PLOT'"));

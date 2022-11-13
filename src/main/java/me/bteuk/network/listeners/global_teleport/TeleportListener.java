@@ -119,41 +119,6 @@ public class TeleportListener implements Listener {
                                 //Update the region the player is in.
                                 u.region = region;
 
-                                //Save location in database for /back.
-                                if (Network.getInstance().globalSQL.getInt("SELECT previous_coordinate FROM player_data WHERE uuid='" + p.getUniqueId() + "';") == 0) {
-
-                                    //No coordinate exists, create new.
-                                    int coordinateID;
-
-                                    if (u.previousServer != null) {
-                                        coordinateID = Network.getInstance().globalSQL.addCoordinate(u.previousServer, e.getFrom());
-                                    } else {
-                                        coordinateID = Network.getInstance().globalSQL.addCoordinate(e.getFrom());
-                                    }
-
-                                    //Set previousServer to null.
-                                    u.previousServer = null;
-
-                                    //Set coordinate id in player data.
-                                    Network.getInstance().globalSQL.update("UPDATE player_data SET previous_coordinate=" + coordinateID + " WHERE uuid='" + u.player.getUniqueId() + "';");
-
-                                } else {
-
-                                    //Get coordinate id.
-                                    int coordinateID = Network.getInstance().globalSQL.getInt("SELECT previous_coordinate FROM player_data WHERE uuid='" + p.getUniqueId() + "';");
-
-                                    //Update existing coordinate.
-                                    if (u.previousServer != null) {
-                                        Network.getInstance().globalSQL.updateCoordinate(coordinateID, u.previousServer, e.getFrom());
-                                    } else {
-                                        Network.getInstance().globalSQL.updateCoordinate(coordinateID, e.getFrom());
-                                    }
-
-                                    //Set previousServer to null.
-                                    u.previousServer = null;
-
-                                }
-
                             } else {
 
                                 //You can't enter this region.
@@ -196,41 +161,6 @@ public class TeleportListener implements Listener {
 
                             //Update the region the player is in.
                             u.region = region;
-
-                            //Save location in database for /back.
-                            if (Network.getInstance().globalSQL.getInt("SELECT previous_coordinate FROM player_data WHERE uuid='" + p.getUniqueId() + "';") == 0) {
-
-                                //No coordinate exists, create new.
-                                int coordinateID;
-
-                                if (u.previousServer != null) {
-                                    coordinateID = Network.getInstance().globalSQL.addCoordinate(u.previousServer, e.getFrom());
-                                } else {
-                                    coordinateID = Network.getInstance().globalSQL.addCoordinate(e.getFrom());
-                                }
-
-                                //Set previousServer to null.
-                                u.previousServer = null;
-
-                                //Set coordinate id in player data.
-                                Network.getInstance().globalSQL.update("UPDATE player_data SET previous_coordinate=" + coordinateID + " WHERE uuid='" + u.player.getUniqueId() + "';");
-
-                            } else {
-
-                                //Get coordinate id.
-                                int coordinateID = Network.getInstance().globalSQL.getInt("SELECT previous_coordinate FROM player_data WHERE uuid='" + p.getUniqueId() + "';");
-
-                                //Update existing coordinate.
-                                if (u.previousServer != null) {
-                                    Network.getInstance().globalSQL.updateCoordinate(coordinateID, u.previousServer, e.getFrom());
-                                } else {
-                                    Network.getInstance().globalSQL.updateCoordinate(coordinateID, e.getFrom());
-                                }
-
-                                //Set previousServer to null.
-                                u.previousServer = null;
-
-                            }
 
                         } else {
 
@@ -288,41 +218,6 @@ public class TeleportListener implements Listener {
 
                         //Update the region the player is in.
                         u.region = region;
-
-                    }
-
-                    //Save location in database for /back.
-                    if (Network.getInstance().globalSQL.getInt("SELECT previous_coordinate FROM player_data WHERE uuid='" + p.getUniqueId() + "';") == 0) {
-
-                        //No coordinate exists, create new.
-                        int coordinateID;
-
-                        if (u.previousServer != null) {
-                            coordinateID = Network.getInstance().globalSQL.addCoordinate(u.previousServer, e.getFrom());
-                        } else {
-                            coordinateID = Network.getInstance().globalSQL.addCoordinate(e.getFrom());
-                        }
-
-                        //Set previousServer to null.
-                        u.previousServer = null;
-
-                        //Set coordinate id in player data.
-                        Network.getInstance().globalSQL.update("UPDATE player_data SET previous_coordinate=" + coordinateID + " WHERE uuid='" + u.player.getUniqueId() + "';");
-
-                    } else {
-
-                        //Get coordinate id.
-                        int coordinateID = Network.getInstance().globalSQL.getInt("SELECT previous_coordinate FROM player_data WHERE uuid='" + p.getUniqueId() + "';");
-
-                        //Update existing coordinate.
-                        if (u.previousServer != null) {
-                            Network.getInstance().globalSQL.updateCoordinate(coordinateID, u.previousServer, e.getFrom());
-                        } else {
-                            Network.getInstance().globalSQL.updateCoordinate(coordinateID, e.getFrom());
-                        }
-
-                        //Set previousServer to null.
-                        u.previousServer = null;
 
                     }
 

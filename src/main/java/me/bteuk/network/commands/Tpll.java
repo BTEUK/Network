@@ -219,6 +219,9 @@ public class Tpll implements CommandExecutor {
                     //If they are on the correct server, teleport them directly, else switch their server.
                     if (server.equals(Network.SERVER_NAME)) {
 
+                        //Set current location for /back
+                        Back.setPreviousCoordinate(p.getUniqueId().toString(), p.getLocation());
+
                         Location loc = new Location(Bukkit.getWorld(location), (proj[0] + xTransform), s, (proj[1] + zTransform), p.getLocation().getYaw(), p.getLocation().getPitch());
 
                         p.sendMessage(Utils.chat("&7Teleporting to &9" + DECIMAL_FORMATTER.format(finalDefaultCoords.getLat()) + "&7, &9" + DECIMAL_FORMATTER.format(finalDefaultCoords.getLng())));
@@ -227,9 +230,9 @@ public class Tpll implements CommandExecutor {
                     } else {
 
                         //Set join event to teleport there.
-                        EventManager.createJoinEvent(p.getUniqueId().toString(), "network", "teleport "
+                        EventManager.createTeleportEvent(true, p.getUniqueId().toString(), "network","teleport "
                                 + location + " " + (proj[0] + xTransform) + " " + (proj[1] + zTransform) + " "
-                                + p.getLocation().getYaw() + " " + p.getLocation().getPitch() + " " + Network.SERVER_NAME);
+                                + p.getLocation().getYaw() + " " + p.getLocation().getPitch(), p.getLocation());
 
                         //Switch server.
                         SwitchServer.switchServer(p, server);
@@ -245,6 +248,9 @@ public class Tpll implements CommandExecutor {
                         //If the player is already on the Earth server teleport them directly.
                         if (isEarth) {
 
+                            //Set current location for /back
+                            Back.setPreviousCoordinate(p.getUniqueId().toString(), p.getLocation());
+
                             Location loc = new Location(Bukkit.getWorld(earthWorld), (proj[0]), s, (proj[1]), p.getLocation().getYaw(), p.getLocation().getPitch());
 
                             p.sendMessage(Utils.chat("&7Teleporting to &9" + DECIMAL_FORMATTER.format(finalDefaultCoords.getLat()) + "&7, &9" + DECIMAL_FORMATTER.format(finalDefaultCoords.getLng())));
@@ -254,9 +260,9 @@ public class Tpll implements CommandExecutor {
                         } else {
 
                             //Set join event to teleport there.
-                            EventManager.createJoinEvent(p.getUniqueId().toString(), "network", "teleport "
-                                    + earthWorld + " " + (proj[0]) + " " + (proj[1]) + " "
-                                    + p.getLocation().getYaw() + " " + p.getLocation().getPitch() + " " + Network.SERVER_NAME);
+                            EventManager.createTeleportEvent(true, p.getUniqueId().toString(), "network", "teleport "
+                                    + earthWorld + " " + proj[0] + " " + proj[1] + " "
+                                    + p.getLocation().getYaw() + " " + p.getLocation().getPitch(), p.getLocation());
 
                             //Switch server.
                             SwitchServer.switchServer(p, earthServer);

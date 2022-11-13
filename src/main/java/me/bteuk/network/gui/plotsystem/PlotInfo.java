@@ -68,15 +68,12 @@ public class PlotInfo extends Gui {
                     if (server.equals(Network.SERVER_NAME)) {
 
                         u.player.closeInventory();
-                        Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('"
-                                + u.player.getUniqueId()
-                                + "','plotsystem','" + Network.SERVER_NAME
-                                + "','teleport plot " + plotID + "');");
+                        EventManager.createTeleportEvent(false, u.player.getUniqueId().toString(), "plotsystem", "teleport plot " + plotID, u.player.getLocation());
 
                     } else {
 
                         //Set the server join event.
-                        EventManager.createJoinEvent(u.player.getUniqueId().toString(), "plotsystem", "teleport plot " + plotID + " " + Network.SERVER_NAME);
+                        EventManager.createTeleportEvent(true, u.player.getUniqueId().toString(), "plotsystem", "teleport plot " + plotID, u.player.getLocation());
 
                         //Teleport them to another server.
                         u.player.closeInventory();

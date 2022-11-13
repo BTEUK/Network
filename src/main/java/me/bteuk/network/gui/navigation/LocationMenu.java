@@ -1,6 +1,7 @@
 package me.bteuk.network.gui.navigation;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.commands.Back;
 import me.bteuk.network.events.EventManager;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.utils.SwitchServer;
@@ -117,13 +118,16 @@ public class LocationMenu extends Gui {
                                 l.setZ(l.getZ() + Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + world + "';"));
                             }
 
+                            //Set current location for /back
+                            Back.setPreviousCoordinate(u.player.getUniqueId().toString(), u.player.getLocation());
+
                             u.player.teleport(l);
                             u.player.sendMessage(Utils.chat("&aTeleported to &3" + location));
 
                         } else {
 
                             //Create teleport event.
-                            EventManager.createJoinEvent(u.player.getUniqueId().toString(), "network", "teleport location " + location + " " + Network.SERVER_NAME);
+                            EventManager.createTeleportEvent(true, u.player.getUniqueId().toString(), "network", "teleport location " + location, u.player.getLocation());
 
                             //Switch server.
                             SwitchServer.switchServer(u.player, server);

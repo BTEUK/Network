@@ -42,6 +42,9 @@ public class Back implements CommandExecutor {
             //Get location.
             Location l = Network.getInstance().globalSQL.getCoordinate(coordinateID);
 
+            //Set current location to previous location.
+            setPreviousCoordinate(p.getUniqueId().toString(), p.getLocation());
+
             //Teleport player to the coordinate.
             p.teleport(l);
             p.sendMessage(Utils.chat("&aTeleported to previous location."));
@@ -49,7 +52,7 @@ public class Back implements CommandExecutor {
         } else {
 
             //Teleport the player to the correct server with a join event to teleport to the coordinate id.
-            EventManager.createJoinEvent(p.getUniqueId().toString(), "network", "teleport coordinateID " + coordinateID + " " + Network.SERVER_NAME);
+            EventManager.createTeleportEvent(true, p.getUniqueId().toString(), "network", "teleport coordinateID " + coordinateID, p.getLocation());
 
             //Switch server.
             SwitchServer.switchServer(p, server);
@@ -57,6 +60,29 @@ public class Back implements CommandExecutor {
         }
 
         return true;
+    }
+
+    //Sets the location as the previous location in the database.
+    public static void setPreviousCoordinate(String uuid, Location l) {
+
+        //Set previous location for /back.
+        if (Network.getInstance().globalSQL.getInt("SELECT previous_coordinate FROM player_data WHERE uuid='" + uuid + "';") == 0) {
+
+            //No coordinate exists, create new.
+            int coordinateID = Network.getInstance().globalSQL.addCoordinate(Network.SERVER_NAME, l);
+
+            //Set coordinate id in player data.
+            Network.getInstance().globalSQL.update("UPDATE player_data SET previous_coordinate=" + coordinateID + " WHERE uuid='" + uuid + "';");
+
+        } else {
+
+            //Get coordinate id.
+            int coordinateID = Network.getInstance().globalSQL.getInt("SELECT previous_coordinate FROM player_data WHERE uuid='" + uuid + "';");
+
+            //Update existing coordinate.
+            Network.getInstance().globalSQL.updateCoordinate(coordinateID, Network.SERVER_NAME, l);
+
+        }
     }
 }
 

@@ -56,6 +56,9 @@ public class Tp implements CommandExecutor {
 
                         if (player != null) {
 
+                            //Set current location for /back
+                            Back.setPreviousCoordinate(p.getUniqueId().toString(), p.getLocation());
+
                             p.teleport(player.getLocation());
                             p.sendMessage(Utils.chat("&aTeleported to " +
                                     args[0] + "';"));
@@ -66,7 +69,7 @@ public class Tp implements CommandExecutor {
 
                     } else {
 
-                        EventManager.createJoinEvent(p.getUniqueId().toString(), "network", "teleport player " + uuid + " " + Network.SERVER_NAME);
+                        EventManager.createTeleportEvent(true, p.getUniqueId().toString(), "network", "teleport player " + uuid, p.getLocation());
                         SwitchServer.switchServer(p, Network.getInstance().globalSQL.getString("SELECT server FROM online_users WHERE uuid='" + uuid + "';"));
 
                     }

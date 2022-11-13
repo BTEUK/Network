@@ -6,6 +6,7 @@ import me.bteuk.network.utils.regions.Region;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
@@ -31,9 +32,6 @@ public class TeleportEvent {
 
             if (player != null) {
 
-                //Set previous server.
-                Network.getInstance().getUser(p).previousServer = event[event.length-1];
-
                 p.teleport(player.getLocation());
                 p.sendMessage(Utils.chat("&aTeleported to &3" +
                         Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + event[2] + "';")));
@@ -46,9 +44,6 @@ public class TeleportEvent {
 
             //Check if the teleport is to a specific coordinate ID.
         } else if (event[1].equals("coordinateID")) {
-
-            //Set previous server.
-            Network.getInstance().getUser(p).previousServer = event[event.length-1];
 
             p.teleport(Network.getInstance().globalSQL.getCoordinate(Integer.parseInt(event[2])));
             p.sendMessage(Utils.chat("&aTeleported to previous location."));
@@ -75,9 +70,6 @@ public class TeleportEvent {
                 l.setZ(l.getZ() + Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + world + "';"));
             }
 
-            //Set previous server.
-            Network.getInstance().getUser(p).previousServer = event[event.length-1];
-
             p.teleport(l);
             p.sendMessage(Utils.chat("&aTeleported to &3" + location));
 
@@ -93,9 +85,6 @@ public class TeleportEvent {
                 Network.getInstance().getLogger().warning("Location is null for coodinate id " + region.getCoordinateID(uuid));
                 return;
             }
-
-            //Set previous server.
-            Network.getInstance().getUser(p).previousServer = event[event.length-1];
 
             //Teleport player.
             p.teleport(l);
@@ -125,9 +114,6 @@ public class TeleportEvent {
 
             //Create location.
             Location l = new Location(world, x, y, z, yaw, pitch);
-
-            //Set previous server.
-            Network.getInstance().getUser(p).previousServer = event[event.length-1];
 
             //Teleport player.
             p.teleport(l);

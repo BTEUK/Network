@@ -1,6 +1,8 @@
 package me.bteuk.network.events;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.commands.Back;
+import org.bukkit.Location;
 
 public class EventManager {
 
@@ -26,6 +28,18 @@ public class EventManager {
         } else {
             Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) " +
                     "VALUES('" + uuid + "','" + type + "','" + server + "','" + event + "');");
+        }
+    }
+
+    public static void createTeleportEvent(boolean join, String uuid, String type, String event, Location previousLocation) {
+
+        Back.setPreviousCoordinate(uuid, previousLocation);
+
+        //Create event
+        if (join) {
+            createJoinEvent(uuid, type, event);
+        } else {
+            createEvent(uuid, type, Network.SERVER_NAME, event);
         }
     }
 }

@@ -34,10 +34,6 @@ public class NetworkUser {
     //If the player is switching server.
     public boolean switching;
 
-    //The server from which the player teleported from.
-    //This value is set on any teleport event, so the correct server can be given for /back.
-    public String previousServer;
-
     public NetworkUser(Player player) {
 
         this.player = player;

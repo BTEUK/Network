@@ -47,13 +47,19 @@ public class Warp implements CommandExecutor {
                 String server = Network.getInstance().globalSQL.getString("SELECT server FROM coordinates WHERE id=" + coordinate_id + ";");
                 if (server.equals(Network.SERVER_NAME)) {
                     //Server is equal.
+
+                    //Set current location for /back
+                    Back.setPreviousCoordinate(p.getUniqueId().toString(), p.getLocation());
+
                     //Teleport to location.
                     p.teleport(Network.getInstance().globalSQL.getCoordinate(coordinate_id));
                     p.sendMessage(Utils.success("Teleported to &3" + location));
                 } else {
+
                     //Server is different.
-                    EventManager.createJoinEvent(p.getUniqueId().toString(),"network",
-                            "teleport location " + location + " " + Network.SERVER_NAME);
+                    EventManager.createTeleportEvent(true, p.getUniqueId().toString(),"network",
+                            "teleport location " + location, p.getLocation());
+
                     SwitchServer.switchServer(p, server);
                 }
 

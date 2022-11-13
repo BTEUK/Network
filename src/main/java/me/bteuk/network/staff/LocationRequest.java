@@ -1,6 +1,7 @@
 package me.bteuk.network.staff;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.commands.Back;
 import me.bteuk.network.events.EventManager;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.sql.GlobalSQL;
@@ -64,10 +65,13 @@ public class LocationRequest extends Gui {
                             l.setZ(l.getZ() + Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + world + "';"));
                         }
 
+                        //Set current location for /back
+                        Back.setPreviousCoordinate(u.player.getUniqueId().toString(), u.player.getLocation());
+
                         u.player.teleport(l);
                     } else {
                         //Create teleport event and switch server.
-                        EventManager.createJoinEvent(u.player.getUniqueId().toString(), "network", "teleport location_request " + name + Network.SERVER_NAME);
+                        EventManager.createTeleportEvent(true, u.player.getUniqueId().toString(), "network", "teleport location_request " + name, u.player.getLocation());
                         SwitchServer.switchServer(u.player, server);
                     }
 
