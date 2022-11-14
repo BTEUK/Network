@@ -2,6 +2,7 @@ package me.bteuk.network.commands;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.events.EventManager;
+import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
 import org.bukkit.Location;
@@ -52,7 +53,17 @@ public class Back implements CommandExecutor {
         } else {
 
             //Teleport the player to the correct server with a join event to teleport to the coordinate id.
-            EventManager.createTeleportEvent(true, p.getUniqueId().toString(), "network", "teleport coordinateID " + coordinateID, p.getLocation());
+            GlobalSQL globalSQL = Network.getInstance().globalSQL;
+
+            //Create teleport event for location of coordinate id
+            EventManager.createTeleportEvent(true, p.getUniqueId().toString(), "network", "teleport " +
+                            globalSQL.getString("SELECT world FROM coordinates WHERE id=" + coordinateID + ";") + " " +
+                            globalSQL.getDouble("SELECT x FROM coordinates WHERE id=" + coordinateID + ";") + " " +
+                            globalSQL.getDouble("SELECT y FROM coordinates WHERE id=" + coordinateID + ";") + " " +
+                            globalSQL.getDouble("SELECT z FROM coordinates WHERE id=" + coordinateID + ";") + " " +
+                            globalSQL.getFloat("SELECT yaw FROM coordinates WHERE id=" + coordinateID + ";") + " " +
+                            globalSQL.getFloat("SELECT pitch FROM coordinates WHERE id=" + coordinateID + ";"),
+                    "&aTeleport to previous location.", p.getLocation());
 
             //Switch server.
             SwitchServer.switchServer(p, server);
@@ -69,7 +80,7 @@ public class Back implements CommandExecutor {
         if (Network.getInstance().globalSQL.getInt("SELECT previous_coordinate FROM player_data WHERE uuid='" + uuid + "';") == 0) {
 
             //No coordinate exists, create new.
-            int coordinateID = Network.getInstance().globalSQL.addCoordinate(Network.SERVER_NAME, l);
+            int coordinateID = Network.getInstance().globalSQL.addCoordinate(l);
 
             //Set coordinate id in player data.
             Network.getInstance().globalSQL.update("UPDATE player_data SET previous_coordinate=" + coordinateID + " WHERE uuid='" + uuid + "';");
@@ -80,7 +91,7 @@ public class Back implements CommandExecutor {
             int coordinateID = Network.getInstance().globalSQL.getInt("SELECT previous_coordinate FROM player_data WHERE uuid='" + uuid + "';");
 
             //Update existing coordinate.
-            Network.getInstance().globalSQL.updateCoordinate(coordinateID, Network.SERVER_NAME, l);
+            Network.getInstance().globalSQL.updateCoordinate(coordinateID, l);
 
         }
     }

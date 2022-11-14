@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS join_events
     type        ENUM('plotsystem',
                 'network')      NOT NULL,
     event       VARCHAR(256)    NOT NULL,
+    message     VARCHAR(256)    NULL DEFAULT NULL,
     PRIMARY KEY(uuid)
 );
 
@@ -35,6 +36,7 @@ CREATE TABLE IF NOT EXISTS server_events
                 'network')      NOT NULL,
     server      VARCHAR(64)     NOT NULL,
     event       VARCHAR(256)    NOT NULL,
+    message     VARCHAR(256)    NULL DEFAULT NULL,
     UNIQUE(uuid,event)
 );
 

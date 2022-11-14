@@ -89,11 +89,11 @@ public class JoinServer implements Listener {
             //Split the event by word.
             String[] aEvent = event.split(" ");
 
-            //Send the event to the event handler.
-            EventManager.event(u.player.getUniqueId().toString(), aEvent);
-
             //Clear the events.
             globalSQL.update("DELETE FROM join_events WHERE uuid='" + u.player.getUniqueId() + "' AND type='network';");
+
+            //Send the event to the event handler.
+            EventManager.event(u.player.getUniqueId().toString(), aEvent);
 
         }
 
