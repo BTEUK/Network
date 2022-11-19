@@ -4,6 +4,7 @@ import me.bteuk.network.Network;
 import me.bteuk.network.events.EventManager;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.SwitchServer;
+import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.regions.Region;
 import me.bteuk.network.utils.regions.RegionManager;
@@ -54,6 +55,14 @@ public class MoveListener implements Listener {
         if (u.switching) {
             e.setCancelled(true);
             return;
+        }
+
+        //Reset last movement of player, if they're afk unset that.
+        u.last_movement = Time.currentTime();
+
+        if (u.afk) {
+            u.afk = false;
+            Network.getInstance().chat.broadcastMessage("&7" + u.player.getName() + " is no longer afk.", "uknet:global");
         }
 
         if (!(p.hasPermission("uknet.network.elevation.bypass"))) {

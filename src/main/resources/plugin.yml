@@ -55,3 +55,6 @@ commands:
   database:
     usage: /<command>
     description: Adds all database conversions.
+  afk:
+    usage: /<command>
+    description: Toggles afk status.

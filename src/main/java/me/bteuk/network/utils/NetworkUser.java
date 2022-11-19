@@ -34,6 +34,10 @@ public class NetworkUser {
     //If the player is switching server.
     public boolean switching;
 
+    //If the player is afk.
+    public boolean afk;
+    public long last_movement;
+
     public NetworkUser(Player player) {
 
         this.player = player;

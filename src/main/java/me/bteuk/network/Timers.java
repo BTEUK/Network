@@ -46,6 +46,9 @@ public class Timers {
     private ArrayList<Inactivity> inactive_owners;
     private String uuid;
 
+    //Afk time
+    private final long afk;
+
     public Timers(Network instance, GlobalSQL globalSQL, Connect connect) {
 
         this.instance = instance;
@@ -62,6 +65,9 @@ public class Timers {
         //days * 24 hours * 60 minutes * 60 seconds * 1000 milliseconds
         inactivity = instance.getConfig().getInt("region_inactivity") * 24L * 60L * 60L * 1000L;
         inactive_owners = new ArrayList<>();
+
+        //Minutes * 60 seconds * 1000 milliseconds
+        afk = instance.getConfig().getInt("afk") * 60L * 1000L;
 
     }
 
@@ -91,7 +97,7 @@ public class Timers {
                         String[] aEvent = event[1].split(" ");
 
                         //Send the event to the event handler.
-                        EventManager.event(event[0], aEvent);
+                        EventManager.event(event[0], aEvent, null);
 
                     }
 
@@ -140,6 +146,17 @@ public class Timers {
 
                     //Delete messages.
                     instance.globalSQL.update("DELETE FROM messages WHERE recipient='" + user.player.getUniqueId() + "'");
+                }
+
+                //Check if the player is afk.
+                if (user.last_movement < (time - afk)) {
+
+                    //Set player as AFK
+                    user.afk = true;
+
+                    //Send message to chat and discord.
+                    Network.getInstance().chat.broadcastMessage("&7" + user.player.getName() + " is now afk.", "uknet:global");
+
                 }
             }
 

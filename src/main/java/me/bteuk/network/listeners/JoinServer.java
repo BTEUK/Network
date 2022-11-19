@@ -93,7 +93,7 @@ public class JoinServer implements Listener {
             globalSQL.update("DELETE FROM join_events WHERE uuid='" + u.player.getUniqueId() + "' AND type='network';");
 
             //Send the event to the event handler.
-            EventManager.event(u.player.getUniqueId().toString(), aEvent);
+            EventManager.event(u.player.getUniqueId().toString(), aEvent, null);
 
         }
 

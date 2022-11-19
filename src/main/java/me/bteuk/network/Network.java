@@ -221,6 +221,8 @@ public final class Network extends JavaPlugin {
 
         getCommand("database").setExecutor(new Database());
 
+        getCommand("afk").setExecutor(new AFK());
+
     }
 
     @Override

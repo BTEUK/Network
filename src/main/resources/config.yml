@@ -41,6 +41,9 @@ regions_enabled: true
 global_teleport: true
 earth_world: earth
 
+#Time before player is set to AFK (minutes).
+afk: 5
+
 #Radius to search in the nearby locations tab of the exploration menu, distance in kilometres.
 navigation_radius: 200
 
