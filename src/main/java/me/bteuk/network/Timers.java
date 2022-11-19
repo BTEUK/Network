@@ -7,6 +7,7 @@ import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.regions.Inactivity;
+import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -18,6 +19,9 @@ public class Timers {
 
     //Users
     private final ArrayList<NetworkUser> users;
+
+    //Timers
+    private final ArrayList<Integer> timers;
 
     //Server name
     private final String SERVER_NAME;
@@ -58,6 +62,8 @@ public class Timers {
 
         this.connect = connect;
 
+        this.timers = new ArrayList<>();
+
         SERVER_NAME = Network.SERVER_NAME;
 
         events = new ArrayList<>();
@@ -74,7 +80,7 @@ public class Timers {
     public void startTimers() {
 
         //1 tick timer.
-        instance.getServer().getScheduler().scheduleSyncRepeatingTask(instance, () -> {
+        timers.add(instance.getServer().getScheduler().scheduleSyncRepeatingTask(instance, () -> {
 
             //Check for new server_events.
             if (globalSQL.hasRow("SELECT uuid FROM server_events WHERE server='" + SERVER_NAME + "' AND type='network';")) {
@@ -107,10 +113,10 @@ public class Timers {
                 }
             }
 
-        }, 0L, 1L);
+        }, 0L, 1L));
 
         //1 second timer.
-        instance.getServer().getScheduler().scheduleSyncRepeatingTask(instance, () -> {
+        timers.add(instance.getServer().getScheduler().scheduleSyncRepeatingTask(instance, () -> {
 
             //Get current time.
             long time = Time.currentTime();
@@ -188,10 +194,10 @@ public class Timers {
 
             }
 
-        }, 0L, 20L);
+        }, 0L, 20L));
 
         //1 minute timer.
-        instance.getServer().getScheduler().scheduleSyncRepeatingTask(instance, () -> {
+        timers.add(instance.getServer().getScheduler().scheduleSyncRepeatingTask(instance, () -> {
 
             //Check for inactive owners.
             //If the region has members then make another member the new owner,
@@ -223,6 +229,15 @@ public class Timers {
                 }
             }
 
-        }, 0L, 1200L);
+        }, 0L, 1200L));
+    }
+
+    public void close() {
+
+        //Cancel all timers.
+        for (int timer : timers) {
+            Bukkit.getScheduler().cancelTask(timer);
+        }
+
     }
 }

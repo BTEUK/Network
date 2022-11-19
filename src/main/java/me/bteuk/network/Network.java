@@ -10,6 +10,7 @@ import me.bteuk.network.listeners.global_teleport.TeleportListener;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.sql.RegionSQL;
+import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.ServerType;
@@ -235,6 +236,14 @@ public final class Network extends JavaPlugin {
             //Remove all players from network.
             for (NetworkUser u : networkUsers) {
 
+                //Switch all players to the lobby server.
+                //If this is the lobby server then run global disconnect.
+                if (SERVER_TYPE == ServerType.LOBBY) {
+                    connect.leaveEvent(u.player.getUniqueId().toString());
+                } else {
+                    SwitchServer.switchServer(u.player, globalSQL.getString("SELECT name FROM server_data WHERE type='LOBBY';"));
+                }
+
                 //Uuid
                 String uuid = u.player.getUniqueId().toString();
 
@@ -253,8 +262,11 @@ public final class Network extends JavaPlugin {
             }
         }
 
-
+        //Shut down chat.
         if (chat != null) {chat.onDisable();}
+
+        //Close timers.
+        if (timers != null) {timers.close();}
 
     }
 
