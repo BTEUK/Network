@@ -2,7 +2,9 @@ package me.bteuk.network.commands;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.events.EventManager;
+import me.bteuk.network.utils.Statistics;
 import me.bteuk.network.utils.SwitchServer;
+import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.regions.Region;
 import me.bteuk.network.utils.regions.RegionManager;
@@ -224,6 +226,9 @@ public class Tpll implements CommandExecutor {
 
                         Location loc = new Location(Bukkit.getWorld(location), (proj[0] + xTransform), s, (proj[1] + zTransform), p.getLocation().getYaw(), p.getLocation().getPitch());
 
+                        //Add tpll to statistics.
+                        Statistics.addTpll(p.getUniqueId().toString(), Time.getDate(Time.currentTime()));
+
                         p.sendMessage(Utils.chat("&7Teleporting to &9" + DECIMAL_FORMATTER.format(finalDefaultCoords.getLat()) + "&7, &9" + DECIMAL_FORMATTER.format(finalDefaultCoords.getLng())));
                         p.teleport(loc);
 
@@ -233,6 +238,9 @@ public class Tpll implements CommandExecutor {
                         EventManager.createTeleportEvent(true, p.getUniqueId().toString(), "network","teleport "
                                 + location + " " + (proj[0] + xTransform) + " " + (proj[1] + zTransform) + " "
                                 + p.getLocation().getYaw() + " " + p.getLocation().getPitch(), p.getLocation());
+
+                        //Add tpll to statistics.
+                        Statistics.addTpll(p.getUniqueId().toString(), Time.getDate(Time.currentTime()));
 
                         //Switch server.
                         SwitchServer.switchServer(p, server);
@@ -253,6 +261,9 @@ public class Tpll implements CommandExecutor {
 
                             Location loc = new Location(Bukkit.getWorld(earthWorld), (proj[0]), s, (proj[1]), p.getLocation().getYaw(), p.getLocation().getPitch());
 
+                            //Add tpll to statistics.
+                            Statistics.addTpll(p.getUniqueId().toString(), Time.getDate(Time.currentTime()));
+
                             p.sendMessage(Utils.chat("&7Teleporting to &9" + DECIMAL_FORMATTER.format(finalDefaultCoords.getLat()) + "&7, &9" + DECIMAL_FORMATTER.format(finalDefaultCoords.getLng())));
                             p.teleport(loc);
 
@@ -263,6 +274,9 @@ public class Tpll implements CommandExecutor {
                             EventManager.createTeleportEvent(true, p.getUniqueId().toString(), "network", "teleport "
                                     + earthWorld + " " + proj[0] + " " + proj[1] + " "
                                     + p.getLocation().getYaw() + " " + p.getLocation().getPitch(), p.getLocation());
+
+                            //Add tpll to statistics.
+                            Statistics.addTpll(p.getUniqueId().toString(), Time.getDate(Time.currentTime()));
 
                             //Switch server.
                             SwitchServer.switchServer(p, earthServer);
@@ -278,6 +292,9 @@ public class Tpll implements CommandExecutor {
                 }
             } else {
                 Location loc = new Location(p.getWorld(), (proj[0]), s, (proj[1]), p.getLocation().getYaw(), p.getLocation().getPitch());
+
+                //Add tpll to statistics.
+                Statistics.addTpll(p.getUniqueId().toString(), Time.getDate(Time.currentTime()));
 
                 p.sendMessage(Utils.chat("&7Teleporting to &9" + DECIMAL_FORMATTER.format(finalDefaultCoords.getLat()) + "&7, &9" + DECIMAL_FORMATTER.format(finalDefaultCoords.getLng())));
                 p.teleport(loc);

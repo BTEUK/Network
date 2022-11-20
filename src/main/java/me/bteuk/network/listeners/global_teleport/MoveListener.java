@@ -61,6 +61,7 @@ public class MoveListener implements Listener {
         u.last_movement = Time.currentTime();
 
         if (u.afk) {
+            u.last_time_log = u.last_movement;
             u.afk = false;
             Network.getInstance().chat.broadcastMessage("&7" + u.player.getName() + " is no longer afk.", "uknet:global");
         }

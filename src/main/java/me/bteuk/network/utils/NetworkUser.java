@@ -38,6 +38,12 @@ public class NetworkUser {
     public boolean afk;
     public long last_movement;
 
+    //Information for online-time logging.
+    //Records when the player online-time was last logged.
+    public long last_time_log;
+    //Total active time in current session.
+    public long active_time;
+
     public NetworkUser(Player player) {
 
         this.player = player;
@@ -78,5 +84,8 @@ public class NetworkUser {
                 inRegion = true;
             }
         }
+
+        last_time_log = Time.currentTime();
+        active_time = 0;
     }
 }

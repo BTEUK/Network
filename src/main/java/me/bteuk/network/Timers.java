@@ -4,6 +4,7 @@ import me.bteuk.network.events.EventManager;
 import me.bteuk.network.listeners.Connect;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.utils.NetworkUser;
+import me.bteuk.network.utils.Statistics;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.regions.Inactivity;
@@ -228,6 +229,9 @@ public class Timers {
 
                 }
             }
+
+            //Update online time of all players.
+            Statistics.saveAll();
 
         }, 0L, 1200L));
     }

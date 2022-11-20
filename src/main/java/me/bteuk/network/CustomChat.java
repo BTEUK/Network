@@ -1,6 +1,8 @@
 package me.bteuk.network;
 
 import me.bteuk.network.utils.NetworkUser;
+import me.bteuk.network.utils.Statistics;
+import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
@@ -58,6 +60,7 @@ public class CustomChat implements Listener, PluginMessageListener {
             if (u.staffChat) {
                 broadcastPlayerMessage(e.getPlayer(), e.getMessage(), "uknet:staff");
             } else {
+                Statistics.addMessage(e.getPlayer().getUniqueId().toString(), Time.getDate(Time.currentTime()));
                 broadcastPlayerMessage(e.getPlayer(), e.getMessage(), "uknet:globalchat");
             }
         }
