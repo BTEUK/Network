@@ -40,26 +40,14 @@ CREATE TABLE IF NOT EXISTS server_events
     UNIQUE(uuid,event)
 );
 
-CREATE TABLE IF NOT EXISTS points_data
+CREATE TABLE IF NOT EXISTS statistics
 (
     uuid        CHAR(36)        NOT NULL,
-    points      INT             NOT NULL,
-    points_weekly   INT         NOT NULL,
-    building_points INT         NOT NULL,
-    building_points_monthly INT NOT NULL,
-    messages    INT             NOT NULL,
-    online_time INT             NOT NULL,
-    PRIMARY KEY(uuid)
-);
-
-CREATE TABLE IF NOT EXISTS points_info
-(
-    uuid        CHAR(36)        NOT NULL,
-    type        ENUM('POINTS',
-    'BUILDING_POINTS')          NOT NULL,
-    on_date        DATE            NOT NULL,
-    points       INT             NOT NULL,
-    PRIMARY KEY(uuid,type,on_date)
+    on_date     DATE            NOT NULL,
+    playtime    LONG            NULL DEFAULT 0,
+    messages    INT             NULL DEFAULT 0,
+    tpll        INT             NULL DEFAULT 0,
+    PRIMARY KEY(uuid,on_date)
 );
 
 CREATE TABLE IF NOT EXISTS online_users
@@ -114,8 +102,19 @@ CREATE TABLE IF NOT EXISTS location_requests
 
 CREATE TABLE IF NOT EXISTS server_data
 (
-    name          VARCHAR(64)   NOT NULL,
+    name        VARCHAR(64)     NOT NULL,
     type        ENUM('PLOT','EARTH',
-    'LOBBY','TUTORIAL')     NOT NULL,
+    'LOBBY','TUTORIAL')         NOT NULL,
     PRIMARY KEY(name)
+);
+
+CREATE TABLE IF NOT EXISTS moderation
+(
+    uuid        VARCHAR(36)     NOT NULL,
+    start_time  LONG            NOT NULL,
+    end_time    LONG            NULL DEFAULT 9223372036854775807,
+    reason      VARCHAR(256)    NOT NULL,
+    type        ENUM('ban',
+    'mute')                     NOT NULL,
+    PRIMARY KEY(uuid,start_time)
 );

@@ -1,5 +1,6 @@
 package me.bteuk.network;
 
+import me.bteuk.network.staff.Moderation;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Statistics;
 import me.bteuk.network.utils.Time;
@@ -23,11 +24,15 @@ public class CustomChat implements Listener, PluginMessageListener {
     private final String IP;
     private final int port;
 
+    private final Moderation moderation;
+
     public CustomChat(Network instance, String IP, int port) {
 
         this.instance = instance;
         this.IP = IP;
         this.port = port;
+
+        moderation = new Moderation();
 
         instance.getServer().getPluginManager().registerEvents(this, instance);
 
@@ -50,6 +55,14 @@ public class CustomChat implements Listener, PluginMessageListener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerChatEvent(AsyncPlayerChatEvent e) {
+
+        //If player is muted cancel.
+        if (moderation.isMuted(e.getPlayer().getUniqueId().toString())) {
+            e.setCancelled(true);
+            e.getPlayer().sendMessage("&cYou are currently muted for &4" +
+                    moderation.getMutedReason(e.getPlayer().getUniqueId().toString() + " &cuntil &4" +
+                            moderation.getMuteDuration(e.getPlayer().getUniqueId().toString())));
+        }
 
         if (e.isCancelled()) {
             //If chat is already cancelled, don't broadcast.
