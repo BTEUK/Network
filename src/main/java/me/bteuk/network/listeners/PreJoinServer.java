@@ -23,7 +23,9 @@ public class PreJoinServer implements Listener {
     public void preJoin(AsyncPlayerPreLoginEvent e) {
         //If player is banned, stop them from logging in.
         if (moderation.isBanned(e.getUniqueId().toString())) {
-            e.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, Component.text(moderation.getBannedReason(e.getUniqueId().toString())));
+            e.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, Component.text("You are banned for " +
+                    moderation.getBannedReason(e.getUniqueId().toString()) + " until " +
+                    moderation.getBanDuration(e.getUniqueId().toString())));
         }
     }
 }

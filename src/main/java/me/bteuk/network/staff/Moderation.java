@@ -12,8 +12,8 @@ import me.bteuk.network.utils.Time;
 
 public class Moderation {
 
-    //Ban the player permanently.
-    public void permBan(String uuid, String reason) {
+    //Ban the player.
+    public void ban(String uuid, long end_time, String reason) {
 
         //Get time.
         long time = Time.currentTime();
@@ -22,11 +22,11 @@ public class Moderation {
         if (isBanned(uuid)) {
             Network.getInstance().globalSQL.update("UPDATE moderation SET end_time=" + time + " WHERE uuid='" + uuid + "' AND end_time>" + time + " AND type='ban';");
         }
-        Network.getInstance().globalSQL.update("INSERT INTO moderation(uuid,start_time,reason,type) VALUES('" + uuid + "'," + time + ",'" + reason + "','ban');");
+        Network.getInstance().globalSQL.update("INSERT INTO moderation(uuid,start_time,end_time,reason,type) VALUES('" + uuid + "'," + time + "," + end_time + ",'" + reason + "','ban');");
     }
 
-    //Mute the player permanently.
-    public void permMute(String uuid, String reason) {
+    //Mute the player.
+    public void mute(String uuid, long end_time, String reason) {
 
         //Get time.
         long time = Time.currentTime();
@@ -35,24 +35,20 @@ public class Moderation {
         if (isBanned(uuid)) {
             Network.getInstance().globalSQL.update("UPDATE moderation SET end_time=" + time + " WHERE uuid='" + uuid + "' AND end_time>" + time + " AND type='mute';");
         }
-        Network.getInstance().globalSQL.update("INSERT INTO moderation(uuid,start_time,reason,type) VALUES('" + uuid + "'," + time + ",'" + reason + "','mute');");
+        Network.getInstance().globalSQL.update("INSERT INTO moderation(uuid,start_time,end_time,reason,type) VALUES('" + uuid + "'," + time + "," + end_time + ",'" + reason + "','mute');");
     }
 
     //Unban the player.
     public void unban(String uuid) {
-
         //Get time.
         long time = Time.currentTime();
-
         Network.getInstance().globalSQL.update("UPDATE moderation SET end_time=" + time + " WHERE uuid='" + uuid + "' AND end_time>" + time + " AND type='ban';");
-
     }
 
     //Unmute the player.
     public void unmute(String uuid) {
         //Get time.
         long time = Time.currentTime();
-
         Network.getInstance().globalSQL.update("UPDATE moderation SET end_time=" + time + " WHERE uuid='" + uuid + "' AND end_time>" + time + " AND type='mute';");
     }
 
@@ -78,11 +74,13 @@ public class Moderation {
 
     //Get duration of ban.
     public String getBanDuration(String uuid) {
-
+        long time = Network.getInstance().globalSQL.getLong("SELECT end_time FROM moderation WHERE uuid='" + uuid + "' AND end_time>" + Time.currentTime() + " AND type='ban';");
+        return Time.getDateTime(time);
     }
 
     //Get duration of mute.
     public String getMuteDuration(String uuid) {
-
+        long time = Network.getInstance().globalSQL.getLong("SELECT end_time FROM moderation WHERE uuid='" + uuid + "' AND end_time>" + Time.currentTime() + " AND type='mute';");
+        return Time.getDateTime(time);
     }
 }
