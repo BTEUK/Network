@@ -58,3 +58,9 @@ commands:
   afk:
     usage: /<command>
     description: Toggles afk status.
+  ban:
+    usage: /<command>
+    description: Bans a player for a specific duration and reason.
+  mute:
+    usage: /<command>
+    description: Mutes a player for a specific duration and reason.

@@ -1,4 +1,4 @@
-package me.bteuk.network.commands;
+package me.bteuk.network.commands.staff;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.staff.StaffGui;

@@ -23,6 +23,9 @@ public class Moderation {
             Network.getInstance().globalSQL.update("UPDATE moderation SET end_time=" + time + " WHERE uuid='" + uuid + "' AND end_time>" + time + " AND type='ban';");
         }
         Network.getInstance().globalSQL.update("INSERT INTO moderation(uuid,start_time,end_time,reason,type) VALUES('" + uuid + "'," + time + "," + end_time + ",'" + reason + "','ban');");
+
+        //If the player is currently online, ban them.
+        //TODO Ban if online!
     }
 
     //Mute the player.

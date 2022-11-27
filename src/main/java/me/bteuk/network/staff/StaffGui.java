@@ -33,10 +33,7 @@ public class StaffGui extends Gui {
         /*TODO:
 
         Staff menu for regions.
-        Staff menu for region join requests.
 
-        //TODO: Staff menu for navigation menu requests.
-        uknet.navigation.review
         */
 
         //Check if any location requests exist.
@@ -73,9 +70,6 @@ public class StaffGui extends Gui {
                         u.player.sendMessage(Utils.chat("&cThere are currently no location requests."));
                     }
                 });
-
-
-        //Staff menu for moderation.
 
         /*
         Click to open menu to edit region details.

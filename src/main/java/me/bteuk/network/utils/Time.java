@@ -56,14 +56,4 @@ public class Time {
             return "seconds";
         }
     }
-
-    //Format moderation time string to time in milliseconds added to current time.
-    public static long getFormattedTime(String input) {
-        long time = currentTime();
-
-
-
-
-        return time;
-    }
 }
