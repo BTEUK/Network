@@ -1,10 +1,7 @@
 package me.bteuk.network;
 
 import me.bteuk.network.staff.Moderation;
-import me.bteuk.network.utils.NetworkUser;
-import me.bteuk.network.utils.Statistics;
-import me.bteuk.network.utils.Time;
-import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.*;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -16,6 +13,8 @@ import org.bukkit.plugin.messaging.PluginMessageListener;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Level;
 
 public class CustomChat implements Listener, PluginMessageListener {
@@ -40,6 +39,9 @@ public class CustomChat implements Listener, PluginMessageListener {
         instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:globalchat", this);
         instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:reviewer", this);
         instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:staff", this);
+        instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:connect", this);
+        instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:disconnect", this);
+        instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord", this);
 
         instance.getLogger().info("Successfully enabled Global Chat!");
 
@@ -50,6 +52,9 @@ public class CustomChat implements Listener, PluginMessageListener {
         instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:globalchat");
         instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:reviewer");
         instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:staff");
+        instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:connect");
+        instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:disconnect");
+        instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord");
 
     }
 
@@ -119,6 +124,44 @@ public class CustomChat implements Listener, PluginMessageListener {
                     }
                 }
                 break;
+
+            case "uknet:discord":
+
+                //This is for account linking.
+                String[] args = sMessage.split(" ");
+
+                if (args[0].equalsIgnoreCase("link")) {
+
+                    //Check if player is online.
+                    Player p = Bukkit.getPlayer(UUID.fromString(args[1]));
+                    if (!(p == null)) {
+                        if (p.isOnline()) {
+
+                            //Link account.
+                            instance.globalSQL.update("INSERT INTO discord(uuid,discord_id) VALUES('" + args[1] + "','" + args[2] + "');");
+                            NetworkUser u = Network.getInstance().getUser(p);
+                            u.isLinked = true;
+                            u.discord_id = Long.parseLong(args[2]);
+
+                            //Get the highest role for syncing and sync it, except for guest.
+                            String role = Roles.builderRole(p);
+
+                            //Remove all roles except current role.
+                            for (Map.Entry<String, Long> entry : Network.getInstance().timers.getRoles().entrySet()) {
+
+                                if (role.equals(entry.getKey())) {
+                                    broadcastMessage("addrole " + args[2] + " " + entry.getValue(), "uknet:discord");
+                                } else {
+                                    broadcastMessage("removerole " + args[2] + " " + entry.getValue(), "uknet:discord");
+                                }
+
+                            }
+
+                            p.sendMessage(Utils.success("Your discord has been linked!"));
+
+                        }
+                    }
+                }
 
         }
     }

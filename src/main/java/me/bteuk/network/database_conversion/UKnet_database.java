@@ -64,24 +64,11 @@ public class UKnet_database {
 
         for (Player p : players) {
 
-            try (Connection conn = conn();
-                 PreparedStatement statement = conn.prepareStatement("SELECT uuid FROM migrate_list WHERE uuid='" + p.uuid + "';");
-                 ResultSet results = statement.executeQuery()) {
+            command = "lp user " + p.name + " parent add " + p.role;
+            Bukkit.getServer().dispatchCommand(console, command);
 
-                //Player opted into the role migration.
-                if (results.next()) {
-
-                    command = "lp user " + p.name + " parent add " + p.role;
-                    Bukkit.getServer().dispatchCommand(console, command);
-
-                    globalSQL.update("INSERT INTO player_data(uuid,name,last_online,last_submit) VALUES('" +
-                            p.uuid + "','" + p.name + "'," + p.last_join + "," + 0 + ");");
-
-                }
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            globalSQL.update("INSERT INTO player_data(uuid,name,last_online,last_submit) VALUES('" +
+                    p.uuid + "','" + p.name + "'," + p.last_join + "," + 0 + ");");
 
         }
 

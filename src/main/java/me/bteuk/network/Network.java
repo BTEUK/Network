@@ -68,7 +68,7 @@ public final class Network extends JavaPlugin {
     public int socketPort;
 
     //Timers
-    private Timers timers;
+    public Timers timers;
 
     //Network connect
     private Connect connect;

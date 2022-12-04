@@ -3,15 +3,16 @@ package me.bteuk.network;
 import me.bteuk.network.events.EventManager;
 import me.bteuk.network.listeners.Connect;
 import me.bteuk.network.sql.GlobalSQL;
-import me.bteuk.network.utils.NetworkUser;
-import me.bteuk.network.utils.Statistics;
-import me.bteuk.network.utils.Time;
-import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.*;
 import me.bteuk.network.utils.regions.Inactivity;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Timers {
 
@@ -54,9 +55,13 @@ public class Timers {
     //Afk time
     private final long afk;
 
+    //Discord roles
+    private HashMap<String, Long> roles;
+
     public Timers(Network instance, GlobalSQL globalSQL, Connect connect) {
 
         this.instance = instance;
+        FileConfiguration config = instance.getConfig();
         this.users = instance.getUsers();
 
         this.globalSQL = globalSQL;
@@ -70,11 +75,18 @@ public class Timers {
         events = new ArrayList<>();
 
         //days * 24 hours * 60 minutes * 60 seconds * 1000 milliseconds
-        inactivity = instance.getConfig().getInt("region_inactivity") * 24L * 60L * 60L * 1000L;
+        inactivity = config.getInt("region_inactivity") * 24L * 60L * 60L * 1000L;
         inactive_owners = new ArrayList<>();
 
         //Minutes * 60 seconds * 1000 milliseconds
-        afk = instance.getConfig().getInt("afk") * 60L * 1000L;
+        afk = config.getInt("afk") * 60L * 1000L;
+
+        //Get roles from config.
+        roles.put("architect", config.getLong("role_id.architect"));
+        roles.put("builder", config.getLong("role_id.builder"));
+        roles.put("jrbuilder", config.getLong("role_id.jrbuilder"));
+        roles.put("apprentice", config.getLong("role_id.apprentice"));
+        roles.put("applicant", config.getLong("role_id.applicant"));
 
     }
 
@@ -230,6 +242,26 @@ public class Timers {
                 }
             }
 
+            //For all online players sync the roles.
+            for (NetworkUser u : instance.getUsers()) {
+
+                if (u.isLinked) {
+                    //Get the highest role for syncing and sync it, except for guest.
+                    String role = Roles.builderRole(u.player);
+
+                    //Remove all roles except current role.
+                    for (Map.Entry<String, Long> entry : Network.getInstance().timers.getRoles().entrySet()) {
+
+                        if (role.equals(entry.getKey())) {
+                            instance.chat.broadcastMessage("addrole " + u.discord_id + " " + entry.getValue(), "uknet:discord");
+                        } else {
+                            instance.chat.broadcastMessage("removerole " + u.discord_id + " " + entry.getValue(), "uknet:discord");
+                        }
+
+                    }
+                }
+            }
+
             //Update online time of all players.
             Statistics.saveAll();
 
@@ -243,5 +275,9 @@ public class Timers {
             Bukkit.getScheduler().cancelTask(timer);
         }
 
+    }
+
+    public HashMap<String, Long> getRoles() {
+        return roles;
     }
 }

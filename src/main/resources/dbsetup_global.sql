@@ -118,3 +118,17 @@ CREATE TABLE IF NOT EXISTS moderation
     'mute')                     NOT NULL,
     PRIMARY KEY(uuid,start_time)
 );
+
+CREATE TABLE IF NOT EXISTS coins
+(
+    uuid        VARCHAR(36)     NOT NULL,
+    coins       INT             NULL DEFAULT 0,
+    PRIMARY KEY(uuid)
+);
+
+CREATE TABLE IF NOT EXISTS discord
+(
+    uuid        VARCHAR(36)     NOT NULL,
+    discord_id  LONG            NOT NULL,
+    PRIMARY KEY(uuid)
+);

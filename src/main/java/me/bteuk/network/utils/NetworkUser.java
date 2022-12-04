@@ -44,11 +44,22 @@ public class NetworkUser {
     //Total active time in current session.
     public long active_time;
 
+    //If linked to discord.
+    public boolean isLinked;
+    public long discord_id;
+
     public NetworkUser(Player player) {
 
         this.player = player;
 
         switching = false;
+
+        //Get discord linked status.
+        //If they're linked get discord id.
+        isLinked = Network.getInstance().globalSQL.hasRow("SELECT uuid FROM discord WHERE uuid='" + player.getUniqueId() + "';");
+        if (isLinked) {
+            discord_id = Network.getInstance().globalSQL.getLong("SELECT discord_id FROM discord WHERE uuid='" + player.getUniqueId() + "';");
+        }
 
         navigator = Network.getInstance().globalSQL.hasRow("SELECT navigator FROM player_data WHERE uuid='" + player.getUniqueId() + "' AND navigator=1;");
 

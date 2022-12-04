@@ -83,3 +83,11 @@ modpack:
 
 #Discord link
 discord: 'https://discord.gg/5m56EgEVW6'
+
+#Discord role ids
+role_id:
+  architect:
+  builder:
+  jrbuilder:
+  apprentice:
+  applicant:

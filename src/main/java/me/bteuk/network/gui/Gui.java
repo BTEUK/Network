@@ -80,8 +80,6 @@ public abstract class Gui implements GuiInterface {
         inventoriesByUUID.remove(getUuid());
     }
 
-    //TODO: Refresh gui method in this class, which is then overwritten all unique guis.
-
     public UUID getUuid() {
         return uuid;
     }
