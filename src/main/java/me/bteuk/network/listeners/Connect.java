@@ -64,6 +64,10 @@ public class Connect {
 
         }
 
+        //Log playercount in database
+        globalSQL.update("INSERT INTO player_count(current_time,players) VALUES(" + Time.currentTime() + "," +
+                globalSQL.getInt("SELECT count(uuid) FROM online_users;") + ");");
+
         //Send global connect message.
         //Add a slight delay so message can be seen by player joining.
         Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> instance.chat.broadcastMessage(joinMessage.replace("%player%", p.getName()), "uknet:connect"),1L);
@@ -92,6 +96,10 @@ public class Connect {
 
         //Remove player from online_users.
         globalSQL.update("DELETE FROM online_users WHERE uuid='" + uuid + "';");
+
+        //Log playercount in database
+        globalSQL.update("INSERT INTO player_count(current_time,players) VALUES(" + Time.currentTime() + "," +
+                globalSQL.getInt("SELECT count(uuid) FROM online_users;") + ");");
 
     }
 

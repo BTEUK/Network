@@ -132,3 +132,10 @@ CREATE TABLE IF NOT EXISTS discord
     discord_id  LONG            NOT NULL,
     PRIMARY KEY(uuid)
 );
+
+CREATE TABLE IF NOT EXISTS player_count
+(
+    current_time    LONG        NOT NULL,
+    players         INT         NOT NULL,
+    PRIMARY KEY(current_time)
+);
