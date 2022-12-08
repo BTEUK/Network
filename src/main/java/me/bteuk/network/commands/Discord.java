@@ -52,6 +52,9 @@ public class Discord implements CommandExecutor {
                         return true;
                     }
 
+                    //Get linked discord id.
+                    long discord_id = Network.getInstance().globalSQL.getLong("SELECT discord_id FROM discord WHERE uuid='" + user.player.getUniqueId() + "';");
+
                     //Remove linked roles from discord, then unlink.
                     //Since discord connections are handled via the proxy, get all the roles that must be unlinked and send that to the proxy with the chat socket.
                     Network.getInstance().globalSQL.update("DELETE FROM discord WHERE uuid='" + user.player.getUniqueId() + "';");
@@ -59,7 +62,7 @@ public class Discord implements CommandExecutor {
 
                     for (Map.Entry<String, Long> entry : Network.getInstance().timers.getRoles().entrySet()) {
 
-                        Network.getInstance().chat.broadcastMessage("removerole " + args[2] + " " + entry.getValue(), "uknet:discord");
+                        Network.getInstance().chat.broadcastMessage("removerole " + discord_id + " " + entry.getValue(), "uknet:discord");
 
                     }
 

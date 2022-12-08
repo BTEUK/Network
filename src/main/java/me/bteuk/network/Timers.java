@@ -82,6 +82,7 @@ public class Timers {
         afk = config.getInt("afk") * 60L * 1000L;
 
         //Get roles from config.
+        roles = new HashMap<>();
         roles.put("architect", config.getLong("role_id.architect"));
         roles.put("builder", config.getLong("role_id.builder"));
         roles.put("jrbuilder", config.getLong("role_id.jrbuilder"));
@@ -259,6 +260,9 @@ public class Timers {
                         }
 
                     }
+
+                    //Update role in online_players table.
+                    globalSQL.update("UPDATE online_users SET primary_role='" + Roles.getPrimaryRole(u.player) + "' WHERE uuid='" + u.player.getUniqueId() + "';");
                 }
             }
 

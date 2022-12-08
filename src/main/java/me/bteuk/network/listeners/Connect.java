@@ -65,7 +65,7 @@ public class Connect {
         }
 
         //Log playercount in database
-        globalSQL.update("INSERT INTO player_count(current_time,players) VALUES(" + Time.currentTime() + "," +
+        globalSQL.update("INSERT INTO player_count(log_time,players) VALUES(" + Time.currentTime() + "," +
                 globalSQL.getInt("SELECT count(uuid) FROM online_users;") + ");");
 
         //Send global connect message.
@@ -98,7 +98,7 @@ public class Connect {
         globalSQL.update("DELETE FROM online_users WHERE uuid='" + uuid + "';");
 
         //Log playercount in database
-        globalSQL.update("INSERT INTO player_count(current_time,players) VALUES(" + Time.currentTime() + "," +
+        globalSQL.update("INSERT INTO player_count(log_time,players) VALUES(" + Time.currentTime() + "," +
                 globalSQL.getInt("SELECT count(uuid) FROM online_users;") + ");");
 
     }

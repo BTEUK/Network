@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS statistics
 (
     uuid        CHAR(36)        NOT NULL,
     on_date     DATE            NOT NULL,
-    playtime    LONG            NULL DEFAULT 0,
+    playtime    BIGINT          NULL DEFAULT 0,
     messages    INT             NULL DEFAULT 0,
     tpll        INT             NULL DEFAULT 0,
     PRIMARY KEY(uuid,on_date)
@@ -56,6 +56,7 @@ CREATE TABLE IF NOT EXISTS online_users
     join_time   BIGINT          NOT NULL,
     last_ping   BIGINT          NOT NULL,
     server      VARCHAR(64)     NOT NULL,
+    primary_role    VARCHAR(64) NOT NULL,
     PRIMARY KEY(uuid)
 );
 
@@ -111,8 +112,8 @@ CREATE TABLE IF NOT EXISTS server_data
 CREATE TABLE IF NOT EXISTS moderation
 (
     uuid        VARCHAR(36)     NOT NULL,
-    start_time  LONG            NOT NULL,
-    end_time    LONG            NULL DEFAULT 9223372036854775807,
+    start_time  BIGINT          NOT NULL,
+    end_time    BIGINT          NULL DEFAULT 9223372036854775807,
     reason      VARCHAR(256)    NOT NULL,
     type        ENUM('ban',
     'mute')                     NOT NULL,
@@ -129,13 +130,13 @@ CREATE TABLE IF NOT EXISTS coins
 CREATE TABLE IF NOT EXISTS discord
 (
     uuid        VARCHAR(36)     NOT NULL,
-    discord_id  LONG            NOT NULL,
+    discord_id  BIGINT          NOT NULL,
     PRIMARY KEY(uuid)
 );
 
 CREATE TABLE IF NOT EXISTS player_count
 (
-    current_time    LONG        NOT NULL,
+    log_time    BIGINT      NOT NULL,
     players         INT         NOT NULL,
-    PRIMARY KEY(current_time)
+    PRIMARY KEY(log_time)
 );

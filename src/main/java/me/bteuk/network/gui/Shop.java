@@ -22,9 +22,7 @@ public class Shop extends Gui {
         setItem(10, Utils.createItem(Material.PINK_CONCRETE_POWDER, 1,
                         Utils.title("2023 Card Pack"),
                         Utils.line("Price: 1000")),
-                u -> openLocation(u, "Yorkshire",
-                        Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='YORKSHIRE';"))
-
+                u -> {}
         );
 
         //Return

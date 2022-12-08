@@ -5,6 +5,7 @@ import me.bteuk.network.commands.Nightvision;
 import me.bteuk.network.events.EventManager;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.utils.NetworkUser;
+import me.bteuk.network.utils.Roles;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.ServerType;
@@ -51,8 +52,8 @@ public class JoinServer implements Listener {
         } else {
 
             //Add user to table and run network connect.
-            globalSQL.update("INSERT INTO online_users(uuid,join_time,last_ping,server) VALUES('" + e.getPlayer().getUniqueId() +
-                    "'," + Time.currentTime() + "," + Time.currentTime() + ",'" + Network.SERVER_NAME + "');");
+            globalSQL.update("INSERT INTO online_users(uuid,join_time,last_ping,server,primary_role) VALUES('" + e.getPlayer().getUniqueId() +
+                    "'," + Time.currentTime() + "," + Time.currentTime() + ",'" + Network.SERVER_NAME + "','" + Roles.getPrimaryRole(e.getPlayer()) + "');");
             connect.joinEvent(e.getPlayer());
         }
 

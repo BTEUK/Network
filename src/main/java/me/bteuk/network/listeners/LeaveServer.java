@@ -4,6 +4,8 @@ import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.utils.NetworkUser;
+import me.bteuk.network.utils.Statistics;
+import me.bteuk.network.utils.Time;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -34,6 +36,10 @@ public class LeaveServer implements Listener {
         e.setQuitMessage(null);
 
         NetworkUser u = instance.getUser(e.getPlayer());
+
+        //Update statistics
+        long time = Time.currentTime();
+        Statistics.save(u, Time.getDate(time), time);
 
         //Remove user from list.
         instance.removeUser(u);

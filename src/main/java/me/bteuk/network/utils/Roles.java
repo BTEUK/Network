@@ -33,4 +33,34 @@ public final class Roles {
             return "guest";
         }
     }
+
+    public static String getPrimaryRole(Player p) {
+        if (p.hasPermission("group.administrator")) {
+            return "Admin";
+        } else if (p.hasPermission("group.moderator")) {
+            return "Mod";
+        } else if (p.hasPermission("group.support")) {
+            return "Support";
+        } else if (p.hasPermission("group.developer")) {
+            return "Dev";
+        } else if (p.hasPermission("group.eventsteam")) {
+            return "Events";
+        } else if (p.hasPermission("group.publicrelations")) {
+            return "PR";
+        } else if (p.hasPermission("group.reviewer")) {
+            return "Reviewer";
+        } else if (p.hasPermission("group.architect")) {
+            return "Architect";
+        } else if (p.hasPermission("group.builder")) {
+            return "Builder";
+        } else if (p.hasPermission("group.jrbuilder")) {
+            return "Jr.Builder";
+        } else if (p.hasPermission("group.apprentice")) {
+            return "Apprentice";
+        } else if (p.hasPermission("group.applicant")) {
+            return "Applicant";
+        } else {
+            return "Guest";
+        }
+    }
 }
