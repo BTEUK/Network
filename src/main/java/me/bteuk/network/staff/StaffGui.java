@@ -147,13 +147,19 @@ public class StaffGui extends Gui {
 
         //Click to review plot.
         //Show review plot button in gui.
-        //TODO: Fix formatting for 1 request, see location requests for template.
+        int plot_count = Network.getInstance().plotSQL.getInt("SELECT count(id) FROM plot_data WHERE status='submitted';");
+        String message = "";
+
+        if (plot_count == 1) {
+            message = "&fThere is currently &71 &fsubmitted plot.";
+        } else {
+            message = "&fThere are currently &7" + plot_count + " &fsubmitted plots.";
+        }
+
         setItem(13, Utils.createItem(Material.WRITABLE_BOOK, 1,
                         Utils.chat("&b&lReview Plot"),
                         Utils.chat("&fClick to review a submitted plot."),
-                        Utils.chat("&fThere are currently &7" +
-                                Network.getInstance().plotSQL.getInt("SELECT COUNT(id) FROM plot_data WHERE status='submitted';") +
-                                " &fsubmitted plots.")),
+                        Utils.chat(message)),
                 u -> {
 
                     //Check if there is a plot available to review,
