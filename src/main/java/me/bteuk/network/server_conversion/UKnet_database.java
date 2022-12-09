@@ -56,34 +56,22 @@ public class UKnet_database {
         //Add the players to the new database.
         GlobalSQL globalSQL = Network.getInstance().globalSQL;
 
-        //Iterate through all players.
-        //If the user is in the new role list then keep their role.
-        //Else downgrade it by 1.
+        //Iterate through all players and add their role and playerdata.
         ConsoleCommandSender console = Bukkit.getServer().getConsoleSender();
         String command;
 
         for (Player p : players) {
 
-            try (Connection conn = conn();
-                 PreparedStatement statement = conn.prepareStatement("SELECT uuid FROM migrate_list WHERE uuid='" + p.uuid + "';");
-                 ResultSet results = statement.executeQuery()) {
 
-                //Player opted into the role migration.
-                if (results.next()) {
+            command = "lp user " + p.name + " parent add " + p.role;
+            Bukkit.getServer().dispatchCommand(console, command);
 
-                    command = "lp user " + p.name + " parent add " + p.role;
-                    Bukkit.getServer().dispatchCommand(console, command);
-
-                    globalSQL.update("INSERT INTO player_data(uuid,name,last_online,last_submit) VALUES('" +
-                            p.uuid + "','" + p.name + "'," + p.last_join + "," + 0 + ");");
-
-                }
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            globalSQL.update("INSERT INTO player_data(uuid,name,last_online,last_submit) VALUES('" +
+                    p.uuid + "','" + p.name + "'," + p.last_join + "," + 0 + ");");
 
         }
+
+        console.sendMessage("Converted playerdata successfully!");
 
 
     }

@@ -14,7 +14,7 @@ import org.bukkit.Bukkit;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class wgRegions {
+public class WGRegions {
 
     /*
 

@@ -1,10 +1,8 @@
 package me.bteuk.network.server_conversion.regions;
 
 import me.bteuk.network.Network;
-import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.regions.Region;
 import me.bteuk.network.utils.regions.RegionManager;
-import net.buildtheearth.terraminusminus.TerraConstants;
 import net.buildtheearth.terraminusminus.dataset.IScalarDataset;
 import net.buildtheearth.terraminusminus.generator.EarthGeneratorPipelines;
 import net.buildtheearth.terraminusminus.generator.EarthGeneratorSettings;
@@ -21,7 +19,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
 
-public class databaseRegions {
+public class DatabaseRegions {
 
     private final EarthGeneratorSettings bteGeneratorSettings = EarthGeneratorSettings.parse(EarthGeneratorSettings.BTE_DEFAULT_SETTINGS);
     private final World world = Bukkit.getWorld(Network.getInstance().getConfig().getString("earth_world"));
@@ -174,6 +172,30 @@ public class databaseRegions {
     }
 
     public void convertLogs() {
+
+        int is_owner;
+
+        try (Connection conn = conn();
+             PreparedStatement statement = conn.prepareStatement("SELECT * FROM logs;");
+             ResultSet results = statement.executeQuery()) {
+
+            while (results.next()) {
+
+                if (results.getString("role").equalsIgnoreCase("owner")) {
+                    is_owner = 1;
+                } else {
+                    is_owner = 0;
+                }
+
+                //Add log to new database.
+                Network.getInstance().regionSQL.update("INSERT INTO region_logs(region,uuid,is_owner,start_time,end_time) VAULES('" +
+                        results.getString("region") + "','" + results.getString("uuid") + "'," + is_owner + "," +
+                        results.getLong("start_time") + "," + results.getLong("end_time") + ");");
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
     }
 }
