@@ -91,7 +91,7 @@ public class Help implements CommandExecutor {
     private void building(Player p) {
 
         //Building is partially role-specific.
-        p.sendMessage(Utils.chat("You currently have the builder role " + PlaceholderAPI.setPlaceholders(p, "%luckperms_prefix_highest_on_track_builder%")));
+        p.sendMessage(Utils.chat("You currently have the builder role " + PlaceholderAPI.setPlaceholders(p, "%luckperms_current_group_on_track_builder%")));
 
         switch (Roles.builderRole(p)) {
 
@@ -200,7 +200,6 @@ public class Help implements CommandExecutor {
         p.sendMessage(Utils.chat("&7/nv &f- Toggle night vision, also removes glitched shadows."));
 
         p.sendMessage(Utils.chat("\n&7/discord &f- Sends you a link to our Discord server."));
-        p.sendMessage(Utils.chat("&7/modpack &f- Sends you links for the modpack download, makes the 1.12.2 world more stable."));
 
     }
 
