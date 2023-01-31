@@ -78,34 +78,35 @@ public class TeleportEvent {
             //Switch to server.
             SwitchServer.switchServer(p, event[2]);
 
+        } else {
+
+            //Get world.
+            World world = Bukkit.getWorld(event[1]);
+
+            if (world == null) {
+                p.sendMessage(Utils.chat("&cWorld can not be found."));
+                return;
+            }
+
+            //Get x and z.
+            double x = Double.parseDouble(event[2]);
+            double z = Double.parseDouble(event[3]);
+
+            //Get y elevation for teleport.
+            int y = world.getHighestBlockYAt((int) x, (int) z);
+            y++;
+
+            //Get pitch and yaw.
+            float yaw = Float.parseFloat(event[4]);
+            float pitch = Float.parseFloat(event[5]);
+
+            //Create location.
+            Location l = new Location(world, x, y, z, yaw, pitch);
+
+            //Teleport player.
+            p.teleport(l);
+            p.sendMessage(Utils.chat("&aTeleport to &3" + x + ", " + y + ", " + z));
+
         }
-
-        //Get world.
-        World world = Bukkit.getWorld(event[1]);
-
-        if (world == null) {
-            p.sendMessage(Utils.chat("&cWorld can not be found."));
-            return;
-        }
-
-        //Get x and z.
-        double x = Double.parseDouble(event[2]);
-        double z = Double.parseDouble(event[3]);
-
-        //Get y elevation for teleport.
-        int y = world.getHighestBlockYAt((int) x, (int) z);
-        y++;
-
-        //Get pitch and yaw.
-        float yaw = Float.parseFloat(event[4]);
-        float pitch = Float.parseFloat(event[5]);
-
-        //Create location.
-        Location l = new Location(world, x, y, z, yaw, pitch);
-
-        //Teleport player.
-        p.teleport(l);
-        p.sendMessage(Utils.chat("&aTeleport to &3" + x + ", " + y + ", " + z));
-
     }
 }

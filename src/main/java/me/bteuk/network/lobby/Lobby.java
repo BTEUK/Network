@@ -75,7 +75,7 @@ public class Lobby {
         Set<String> portalNames = portalsConfig.getConfigurationSection("portals").getKeys(false);
 
         //Create the portal from the config.
-        for (String portalName: portalNames) {
+        for (String portalName : portalNames) {
 
             //Create new portal with given values from config.
             try {
@@ -105,26 +105,37 @@ public class Lobby {
 
         portalTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(Network.getInstance(), () -> {
 
-            for (Portal portal: portals) {
+            //Check if any players are in the area of the portal.
+            for (NetworkUser user : instance.getUsers()) {
 
-                //Check if any players are in the area of the portal.
-                for (NetworkUser user : instance.getUsers()) {
+                user.inPortal = false;
+
+                for (Portal portal : portals) {
+
                     if (portal.in(user.player.getLocation())) {
-                        if (!user.inPortal) {
+                        if (!user.wasInPortal) {
 
                             //Set user to in portal.
                             user.inPortal = true;
+                            user.wasInPortal = true;
 
                             //If they are run the portal events.
                             portal.event(user.player);
+                            break;
 
+                        } else {
+                            //User is still in a portal, but don't execute the portal event.
+                            user.inPortal = true;
+                            break;
                         }
-                    } else if (user.inPortal) {
-
-                        //Set user to not in portal.
-                        user.inPortal = false;
-
                     }
+                }
+
+                if (user.wasInPortal && !user.inPortal) {
+
+                    //Set user to not in portal.
+                    user.wasInPortal = false;
+
                 }
             }
 

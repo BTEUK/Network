@@ -23,7 +23,7 @@ public class SwitchServer {
         }
 
         //Check if server exists and is online.
-        if (Network.getInstance().globalSQL.hasRow("SELECT name FROM server_data WHERE name='" + server + "';")) {
+        if (!Network.getInstance().globalSQL.hasRow("SELECT name FROM server_data WHERE name='" + server + "';")) {
             p.sendMessage(Utils.error("The server " + server + " does not exist."));
 
             //Remove any join events that the player may have.

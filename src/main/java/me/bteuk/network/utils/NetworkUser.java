@@ -37,6 +37,7 @@ public class NetworkUser {
     //If the player is currently in a portal,
     //This is to prevent continuous execution of portal events.
     public boolean inPortal;
+    public boolean wasInPortal;
 
     public NetworkUser(Player player) {
 
@@ -44,6 +45,7 @@ public class NetworkUser {
 
         switching = false;
         inPortal = false;
+        wasInPortal = false;
 
         navigator = Network.getInstance().globalSQL.hasRow("SELECT navigator FROM player_data WHERE uuid='" + player.getUniqueId() + "' AND navigator=1;");
 
