@@ -41,19 +41,27 @@ public class BuildGui extends Gui {
 
                     int id;
 
-                    if (u.player.hasPermission("group.jrbuilder")) {
+                    if (u.player.hasPermission("group.builder")) {
 
                         //Select a random plot of any difficulty.
                         id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE status='unclaimed' ORDER BY RAND() LIMIT 1;");
 
+                    } else if (u.player.hasPermission("group.jrbuilder")) {
+
+                        //Select a random plot of the hard difficulty.
+                        //Since this is the next plot difficulty to get Builder.
+                        id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE status='unclaimed' AND difficulty=3 ORDER BY RAND() LIMIT 1;");
+
                     } else if (u.player.hasPermission("group.apprentice")) {
 
-                        //Select a random plot of difficulty easy and normal.
-                        id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE status='unclaimed' AND (difficulty=1 OR difficulty=2) ORDER BY RAND() LIMIT 1;");
+                        //Select a random plot of the normal difficulty.
+                        //Since this is the next plot difficulty to get Jr.Builder.
+                        id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE status='unclaimed' AND difficulty=2 ORDER BY RAND() LIMIT 1;");
 
                     } else {
 
-                        //Select a random plot of difficulty easy.
+                        //Select a random plot of the easy difficulty.
+                        //Since this is the next plot difficulty to get Apprentice.
                         id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE status='unclaimed' AND difficulty=1 ORDER BY RAND() LIMIT 1;");
 
                     }
@@ -132,7 +140,7 @@ public class BuildGui extends Gui {
                     u.mainGui = null;
 
                     //Switch to the plot location gui.
-                    u.mainGui = new PlotServerLocations();
+                    u.mainGui = new PlotServerLocations(u);
                     u.mainGui.open(u);
 
                 });
