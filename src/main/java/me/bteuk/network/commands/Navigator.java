@@ -1,6 +1,8 @@
 package me.bteuk.network.commands;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.gui.BuildGui;
+import me.bteuk.network.gui.navigation.ExploreGui;
 import me.bteuk.network.utils.NetworkUser;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -26,8 +28,21 @@ public class Navigator implements CommandExecutor {
 
         if (u == null) {return true;}
 
-        //If the player has a previous gui, open that.
-        openNavigator(u);
+        //Check args, allows the player to open a specific menu directly.
+        if (args.length > 0) {
+            switch (args[0]) {
+
+                case "explore" -> openExplore(u);
+                case "building" -> openBuilding(u);
+                default -> openNavigator(u);
+
+            }
+        } else {
+
+            //If the player has a previous gui, open that.
+            openNavigator(u);
+
+        }
 
         return true;
     }
@@ -48,5 +63,25 @@ public class Navigator implements CommandExecutor {
             Network.getInstance().navigatorGui.open(u);
 
         }
+    }
+
+    private void openExplore(NetworkUser u) {
+
+        u.mainGui.delete();
+        u.mainGui = null;
+
+        u.mainGui = new ExploreGui(u);
+        u.mainGui.open(u);
+
+    }
+
+    private void openBuilding(NetworkUser u) {
+
+        u.mainGui.delete();
+        u.mainGui = null;
+
+        u.mainGui = new BuildGui(u);
+        u.mainGui.open(u);
+
     }
 }
