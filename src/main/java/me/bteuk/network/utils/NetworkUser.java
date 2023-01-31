@@ -61,6 +61,7 @@ public class NetworkUser {
         inPortal = false;
         wasInPortal = false;
         afk = false;
+        last_movement = Time.currentTime();
 
         //Get discord linked status.
         //If they're linked get discord id.

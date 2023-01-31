@@ -175,7 +175,7 @@ public class Timers {
                     user.afk = true;
 
                     //Send message to chat and discord.
-                    Network.getInstance().chat.broadcastMessage("&7" + user.player.getName() + " is now afk.", "uknet:global");
+                    Network.getInstance().chat.broadcastMessage("&7" + user.player.getName() + " is now afk.", "uknet:globalchat");
 
                 }
             }
