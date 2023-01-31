@@ -16,15 +16,24 @@ public class SwitchServer {
         if (server == null) {
             p.sendMessage(Utils.chat("&cAn error occured, server does not exist."));
             Network.getInstance().getLogger().warning("Player attempting to switch to non-existing server.");
+
+            //Remove any join events that the player may have.
+            Network.getInstance().globalSQL.update("DELETE FROM join_events WHERE uuid='" + p.getUniqueId() + "';");
             return;
         }
 
         //Check if server exists and is online.
         if (Network.getInstance().globalSQL.hasRow("SELECT name FROM server_data WHERE name='" + server + "';")) {
             p.sendMessage(Utils.error("The server " + server + " does not exist."));
+
+            //Remove any join events that the player may have.
+            Network.getInstance().globalSQL.update("DELETE FROM join_events WHERE uuid='" + p.getUniqueId() + "';");
             return;
         } else if (Network.getInstance().globalSQL.hasRow("SELECT online FROM server_data WHERE name='" + server + "' AND online=0;")) {
             p.sendMessage(Utils.error("The server " + server + " is currently offline."));
+
+            //Remove any join events that the player may have.
+            Network.getInstance().globalSQL.update("DELETE FROM join_events WHERE uuid='" + p.getUniqueId() + "';");
             return;
         }
 
