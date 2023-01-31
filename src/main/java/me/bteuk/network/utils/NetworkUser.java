@@ -19,6 +19,9 @@ public class NetworkUser {
     //Staff gui.
     public Gui staffGui;
 
+    //Staff chat
+    public boolean staffChat;
+
     //Region information.
     public boolean inRegion;
     public Region region;
@@ -38,6 +41,19 @@ public class NetworkUser {
         switching = false;
 
         navigator = Network.getInstance().globalSQL.hasRow("SELECT navigator FROM player_data WHERE uuid='" + player.getUniqueId() + "' AND navigator=1;");
+
+        //Set staff chat value, if user is no longer staff, auto-disable.
+        if (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM player_data WHERE uuid='" + player.getUniqueId() + "' AND staff_chat=1;")) {
+            if (player.hasPermission("uknet.staff")) {
+                staffChat = true;
+            } else {
+                staffChat = false;
+                //And remove staff from database.
+                Network.getInstance().globalSQL.update("UPDATE player_data SET staff_chat=0 WHERE uuid='" + player.getUniqueId() + "';");
+            }
+        } else {
+            staffChat = false;
+        }
 
         //Check if the player is in a region.
         if (Network.SERVER_NAME.equals(Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH'"))) {

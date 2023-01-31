@@ -38,14 +38,14 @@ public class Speed implements CommandExecutor {
 
         speed = getRealMoveSpeed(speed, isFly);
 
-        p.setFlySpeed(speed);
-
         if (isFly) {
 
+            p.setFlySpeed(speed);
             p.sendMessage(Utils.chat("&aSet flying speed to &7" + args[0] + "&a."));
 
         } else {
 
+            p.setWalkSpeed(speed);
             p.sendMessage(Utils.chat("&aSet walking speed to &7" + args[0] + "&a."));
 
         }
