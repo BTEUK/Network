@@ -12,10 +12,11 @@ The reason the lobby functions have been separated is to prevent unnecessary res
  */
 
 import me.bteuk.network.Network;
+import me.bteuk.network.utils.NetworkUser;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -26,7 +27,6 @@ public class Lobby {
     private final Network instance;
 
     private final ArrayList<Portal> portals;
-    private File portalsFile;
     private int portalTask;
 
     public Lobby(Network instance) {
@@ -57,7 +57,7 @@ public class Lobby {
 
         //Create portals.yml if not exists.
         //The data folder should already exist since the plugin will always create config.yml first.
-        portalsFile = new File(instance.getDataFolder(), "portals.yml");
+        File portalsFile = new File(instance.getDataFolder(), "portals.yml");
         if (!portalsFile.exists()) {
             instance.saveResource("portals.yml", false);
         }
@@ -66,10 +66,16 @@ public class Lobby {
 
         //Gets all the portal names from the config.
         //This will allow us to query the config for portals.
+        ConfigurationSection section = portalsConfig.getConfigurationSection("portals");
+        //No portals have yet been added.
+        if (section == null) {
+            return;
+        }
+
         Set<String> portalNames = portalsConfig.getConfigurationSection("portals").getKeys(false);
 
         //Create the portal from the config.
-        for (String portalName: portalNames) {
+        for (String portalName : portalNames) {
 
             //Create new portal with given values from config.
             try {
@@ -99,20 +105,41 @@ public class Lobby {
 
         portalTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(Network.getInstance(), () -> {
 
-            for (Portal portal: portals) {
+            //Check if any players are in the area of the portal.
+            for (NetworkUser user : instance.getUsers()) {
 
-                //Check if any players are in the area of the portal.
-                for (Player p: Bukkit.getOnlinePlayers()) {
-                    if (portal.in(p.getLocation())) {
+                user.inPortal = false;
 
-                        //If they are run the portal events.
-                        portal.event(p);
+                for (Portal portal : portals) {
 
+                    if (portal.in(user.player.getLocation())) {
+                        if (!user.wasInPortal) {
+
+                            //Set user to in portal.
+                            user.inPortal = true;
+                            user.wasInPortal = true;
+
+                            //If they are run the portal events.
+                            portal.event(user.player);
+                            break;
+
+                        } else {
+                            //User is still in a portal, but don't execute the portal event.
+                            user.inPortal = true;
+                            break;
+                        }
                     }
+                }
+
+                if (user.wasInPortal && !user.inPortal) {
+
+                    //Set user to not in portal.
+                    user.wasInPortal = false;
+
                 }
             }
 
-        }, 0L, 20L);
+        }, 0L, 1L);
     }
 
     private void runLeaderboards() {

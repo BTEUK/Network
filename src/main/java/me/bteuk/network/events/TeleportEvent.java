@@ -1,6 +1,7 @@
 package me.bteuk.network.events;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.regions.Region;
 import org.bukkit.Bukkit;
@@ -77,7 +78,6 @@ public class TeleportEvent {
 
                 //Get the region.
                 Region region = Network.getInstance().getRegionManager().getRegion(event[2]);
-
                 Location l = Network.getInstance().globalSQL.getCoordinate(region.getCoordinateID(uuid));
 
                 if (l == null) {
@@ -91,6 +91,13 @@ public class TeleportEvent {
                 p.sendMessage(Utils.chat("&aTeleported to region &3" + region.getTag(uuid)));
 
             }
+			case "server" -> {
+				
+				//Switch to server.
+				SwitchServer.switchServer(p, event[2]);
+			
+			}
+				
             default -> {
 
                 //Get world.

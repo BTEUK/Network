@@ -64,3 +64,6 @@ commands:
   mute:
     usage: /<command>
     description: Mutes a player for a specific duration and reason.
+  portals:
+    usage: /<command>
+    description: Command to reload portals.

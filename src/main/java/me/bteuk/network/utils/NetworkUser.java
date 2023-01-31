@@ -48,11 +48,18 @@ public class NetworkUser {
     public boolean isLinked;
     public long discord_id;
 
+    //If the player is currently in a portal,
+    //This is to prevent continuous execution of portal events.
+    public boolean inPortal;
+    public boolean wasInPortal;
+
     public NetworkUser(Player player) {
 
         this.player = player;
 
         switching = false;
+        inPortal = false;
+        wasInPortal = false;
 
         //Get discord linked status.
         //If they're linked get discord id.
