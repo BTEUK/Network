@@ -249,21 +249,11 @@ public class Timers {
                 if (u.isLinked) {
                     //Get the highest role for syncing and sync it, except for guest.
                     String role = Roles.builderRole(u.player);
-
-                    //Remove all roles except current role.
-                    for (Map.Entry<String, Long> entry : Network.getInstance().timers.getRoles().entrySet()) {
-
-                        if (role.equals(entry.getKey())) {
-                            instance.chat.broadcastMessage("addrole " + u.discord_id + " " + entry.getValue(), "uknet:discord");
-                        } else {
-                            instance.chat.broadcastMessage("removerole " + u.discord_id + " " + entry.getValue(), "uknet:discord");
-                        }
-
-                    }
-
-                    //Update role in online_players table.
-                    globalSQL.update("UPDATE online_users SET primary_role='" + Roles.getPrimaryRole(u.player) + "' WHERE uuid='" + u.player.getUniqueId() + "';");
+                    discordSync(u.discord_id, role);
                 }
+
+                //Update role in online_players table.
+                globalSQL.update("UPDATE online_users SET primary_role='" + Roles.getPrimaryRole(u.player) + "' WHERE uuid='" + u.player.getUniqueId() + "';");
             }
 
             //Update online time of all players.
@@ -283,5 +273,17 @@ public class Timers {
 
     public HashMap<String, Long> getRoles() {
         return roles;
+    }
+
+    public void discordSync(long discord_id, String role) {
+        //Remove all roles except current role.
+        for (Map.Entry<String, Long> entry : Network.getInstance().timers.getRoles().entrySet()) {
+
+            if (role.equals(entry.getKey())) {
+                instance.chat.broadcastMessage("addrole " + discord_id + " " + entry.getValue(), "uknet:discord");
+            } else {
+                instance.chat.broadcastMessage("removerole " + discord_id + " " + entry.getValue(), "uknet:discord");
+            }
+        }
     }
 }

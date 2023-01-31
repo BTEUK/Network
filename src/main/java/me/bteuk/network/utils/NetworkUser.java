@@ -76,6 +76,9 @@ public class NetworkUser {
             staffChat = false;
         }
 
+        //Update builder role in database.
+        Network.getInstance().globalSQL.update("UPDATE player_data SET builder_role='" + Roles.builderRole(player) + "' WHERE uuid='" + player.getUniqueId() + "';");
+
         //Check if the player is in a region.
         if (Network.SERVER_NAME.equals(Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH'"))) {
             //Check if they are in the earth world.

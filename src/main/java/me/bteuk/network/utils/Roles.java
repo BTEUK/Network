@@ -1,5 +1,8 @@
 package me.bteuk.network.utils;
 
+import me.bteuk.network.Network;
+import org.bukkit.Bukkit;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 public final class Roles {
@@ -61,6 +64,31 @@ public final class Roles {
             return "Applicant";
         } else {
             return "Guest";
+        }
+    }
+
+    public static void promoteBuilder(String uuid, String pRole, String nRole) {
+
+        //Get console sender.
+        ConsoleCommandSender console = Network.getInstance().getServer().getConsoleSender();
+
+        //Remove current builder role.
+        Bukkit.getServer().dispatchCommand(console, "lp user " + uuid + " parent remove " + pRole);
+
+        //Add new builder role.
+        Bukkit.getServer().dispatchCommand(console, "lp user " + uuid + " parent add " + nRole);
+
+        //Update database.
+        Network.getInstance().globalSQL.update("UPDATE player_data SET builder_role='" + nRole + "' WHERE uuid='" + uuid + "';");
+
+        //Sync with discord if linked.
+        if (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM discord WHERE uuid='" + uuid + "';")) {
+            //Get discord id.
+            long discord_id = Network.getInstance().globalSQL.getLong("SELECT discord_id FROM discord WHERE uuid='" + uuid + "';");
+
+            //Sync roles.
+            Network.getInstance().timers.discordSync(discord_id, nRole);
+
         }
     }
 }

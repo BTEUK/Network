@@ -1,15 +1,18 @@
 CREATE TABLE IF NOT EXISTS player_data
 (
-	uuid		CHAR(36)		NOT NULL,
-	name		VARCHAR(16)		NOT NULL,
-	last_online	BIGINT			NOT NULL,
-	last_submit	BIGINT			NOT NULL,
-	navigator   TINYINT(1)      NOT NULL DEFAULT 1,
-	teleport_enabled    TINYINT(1)  NOT NULL DEFAULT 1,
-	nightvision_enabled TINYINT(1)  NOT NULL DEFAULT 0,
-	staff_chat          TINYINT(1)  NOT NULL DEFAULT 0,
-	previous_coordinate INT     NOT NULL DEFAULT 0,
-	PRIMARY KEY (uuid)
+	uuid       CHAR(36)      NOT NULL,
+    name      VARCHAR(16)       NOT NULL,
+    last_online    BIGINT       NOT NULL,
+    last_submit    BIGINT       NOT NULL,
+    builder_role    ENUM('guest','apprentice',
+    'jrbuilder','builder','architect',
+    'reviewer') NULL DEFAULT "guest",
+    navigator   TINYINT(1)      NOT NULL DEFAULT 1,
+    teleport_enabled    TINYINT(1)  NOT NULL DEFAULT 1,
+    nightvision_enabled TINYINT(1)  NOT NULL DEFAULT 0,
+    staff_chat          TINYINT(1)  NOT NULL DEFAULT 0,
+    previous_coordinate INT     NOT NULL DEFAULT 0,
+    PRIMARY KEY (uuid)
 );
 
 CREATE TABLE IF NOT EXISTS messages
