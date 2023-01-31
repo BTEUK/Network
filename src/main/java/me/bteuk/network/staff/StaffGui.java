@@ -40,7 +40,7 @@ public class StaffGui extends Gui {
 
         //Check if any location requests exist.
         //To make sure the string makes grammatical sense we check if the number is 1, in this case we change 'are' to 'is'.
-        int requestCount = Network.getInstance().globalSQL.getInt("SELECT location FROM location_requests");
+        int requestCount = Network.getInstance().globalSQL.getInt("SELECT COUNT(location) FROM location_requests");
         String requestString = "There are currently &7" + requestCount + " &flocation requests.";
         if (requestCount == 1) {
             requestString = requestString.replace("are", "is");
@@ -55,15 +55,21 @@ public class StaffGui extends Gui {
                 u -> {
 
                     //Check if the user has the relevant permissions.
-                    if (u.player.hasPermission("uknet.navigation.review")) {
+                    if (Network.getInstance().globalSQL.getInt("SELECT COUNT(location) FROM location_requests") > 0) {
+                        if (u.player.hasPermission("uknet.navigation.review")) {
 
-                        //Open the LocationRequest gui.
-                        this.delete();
-                        u.staffGui = null;
+                            //Open the LocationRequest gui.
+                            this.delete();
+                            u.staffGui = null;
 
-                        u.staffGui = new LocationRequests();
-                        u.staffGui.open(u);
+                            u.staffGui = new LocationRequests();
+                            u.staffGui.open(u);
 
+                        } else {
+                            u.player.sendMessage(Utils.chat("&cYou must be a reviewer to review location requests."));
+                        }
+                    } else {
+                        u.player.sendMessage(Utils.chat("&cThere are currently no location requests."));
                     }
                 });
 
@@ -119,7 +125,7 @@ public class StaffGui extends Gui {
         //Can only click on this if requests exist and player is a reviewer.
         //TODO: Fix formatting for 1 request, see location requests for template.
         setItem(11, Utils.createItem(Material.CHEST_MINECART, 1,
-                        Utils.chat("&b&lReview Region Requests"),
+                        Utils.chat("&b&lRegion Requests"),
                         Utils.chat("&fOpens a menu to review active region join requests by Jr.Builders."),
                         Utils.chat("&fThere are currently &7" +
                                 Network.getInstance().regionSQL.getInt("SELECT COUNT(*) FROM region_requests WHERE staff_accept=0;") + " &fregion requests.")),
@@ -217,16 +223,6 @@ public class StaffGui extends Gui {
                         u.player.sendMessage(Utils.chat("&cThere are currently no submitted plots."));
                     }
                 });
-
-        //Click to open menu of navigation menu requests.
-        if (true/*request exists*/) {
-            setItem(15, Utils.createItem(Material.ENDER_EYE, 1,
-                            Utils.chat("&b&lReview Navigation Menu Requests"),
-                            Utils.chat("&fOpens a menu to review navigation menu requests.")),
-                    u -> {
-
-                    });
-        }
 
         //Click to open moderation menu.
         setItem(16, Utils.createItem(Material.REDSTONE_BLOCK, 1,

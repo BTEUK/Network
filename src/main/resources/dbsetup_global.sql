@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS player_data
 	navigator   TINYINT(1)      NOT NULL DEFAULT 1,
 	teleport_enabled    TINYINT(1)  NOT NULL DEFAULT 1,
 	nightvision_enabled TINYINT(1)  NOT NULL DEFAULT 0,
+	staff_chat          TINYINT(1)  NOT NULL DEFAULT 0,
 	previous_coordinate INT     NOT NULL DEFAULT 0,
 	PRIMARY KEY (uuid)
 );
