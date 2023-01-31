@@ -112,8 +112,9 @@ CREATE TABLE IF NOT EXISTS location_requests
 
 CREATE TABLE IF NOT EXISTS server_data
 (
-    name          VARCHAR(64)   NOT NULL,
+    name        VARCHAR(64)   NOT NULL,
     type        ENUM('PLOT','EARTH',
     'LOBBY','TUTORIAL')     NOT NULL,
+    online      TINYINT(1)      NULL DEFAULT 0,
     PRIMARY KEY(name)
 );

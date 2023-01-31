@@ -1,6 +1,7 @@
 package me.bteuk.network.events;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -71,6 +72,11 @@ public class TeleportEvent {
 
             p.teleport(l);
             p.sendMessage(Utils.chat("&aTeleported to &3" + location));
+
+        } else if (event[1].equals("server")) {
+
+            //Switch to server.
+            SwitchServer.switchServer(p, event[2]);
 
         }
 

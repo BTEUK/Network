@@ -67,8 +67,10 @@ public class Navigator implements CommandExecutor {
 
     private void openExplore(NetworkUser u) {
 
-        u.mainGui.delete();
-        u.mainGui = null;
+        if (u.mainGui != null) {
+            u.mainGui.delete();
+            u.mainGui = null;
+        }
 
         u.mainGui = new ExploreGui(u);
         u.mainGui.open(u);
@@ -77,8 +79,10 @@ public class Navigator implements CommandExecutor {
 
     private void openBuilding(NetworkUser u) {
 
-        u.mainGui.delete();
-        u.mainGui = null;
+        if (u.mainGui != null) {
+            u.mainGui.delete();
+            u.mainGui = null;
+        }
 
         u.mainGui = new BuildGui(u);
         u.mainGui.open(u);

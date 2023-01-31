@@ -34,11 +34,16 @@ public class NetworkUser {
     //If the player is switching server.
     public boolean switching;
 
+    //If the player is currently in a portal,
+    //This is to prevent continuous execution of portal events.
+    public boolean inPortal;
+
     public NetworkUser(Player player) {
 
         this.player = player;
 
         switching = false;
+        inPortal = false;
 
         navigator = Network.getInstance().globalSQL.hasRow("SELECT navigator FROM player_data WHERE uuid='" + player.getUniqueId() + "' AND navigator=1;");
 
