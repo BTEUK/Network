@@ -63,7 +63,7 @@ public class MoveListener implements Listener {
         if (u.afk) {
             u.last_time_log = u.last_movement;
             u.afk = false;
-            Network.getInstance().chat.broadcastMessage("&7" + u.player.getName() + " is no longer afk.", "uknet:global");
+            Network.getInstance().chat.broadcastMessage("&7" + u.player.getName() + " is no longer afk.", "uknet:globalchat");
         }
 
         if (!(p.hasPermission("uknet.network.elevation.bypass"))) {

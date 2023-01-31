@@ -91,13 +91,9 @@ public class TeleportEvent {
                 p.sendMessage(Utils.chat("&aTeleported to region &3" + region.getTag(uuid)));
 
             }
-			case "server" -> {
-				
-				//Switch to server.
-				SwitchServer.switchServer(p, event[2]);
-			
-			}
-				
+            case "server" -> //Switch to server.
+                    SwitchServer.switchServer(p, event[2]);
+
             default -> {
 
                 //Get world.

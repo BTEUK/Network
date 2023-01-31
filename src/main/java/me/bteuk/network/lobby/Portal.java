@@ -62,7 +62,7 @@ public class Portal {
                 p.chat(event);
 
             } else {
-                EventManager.event(p.getUniqueId().toString(), event.split(" "));
+                EventManager.event(p.getUniqueId().toString(), event.split(" "), null);
             }
         }
     }

@@ -60,6 +60,7 @@ public class NetworkUser {
         switching = false;
         inPortal = false;
         wasInPortal = false;
+        afk = false;
 
         //Get discord linked status.
         //If they're linked get discord id.

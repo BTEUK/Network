@@ -33,7 +33,7 @@ public class AFK implements CommandExecutor {
             //Reset last logged time.
             u.last_time_log = u.last_movement = Time.currentTime();
             u.afk = false;
-            Network.getInstance().chat.broadcastMessage("&7" + u.player.getName() + " is no longer afk.", "uknet:global");
+            Network.getInstance().chat.broadcastMessage("&7" + u.player.getName() + " is no longer afk.", "uknet:globalchat");
 
         } else {
 
@@ -43,7 +43,7 @@ public class AFK implements CommandExecutor {
             Statistics.save(u, Time.getDate(time), time);
 
             u.afk = true;
-            Network.getInstance().chat.broadcastMessage("&7" + u.player.getName() + " is now afk.", "uknet:global");
+            Network.getInstance().chat.broadcastMessage("&7" + u.player.getName() + " is now afk.", "uknet:globalchat");
 
         }
 
