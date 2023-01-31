@@ -21,7 +21,10 @@ public class Portals implements CommandExecutor {
 
         //Check permission if player.
         if (sender instanceof Player p) {
-            if (!p.hasPermission("uknet.lobby.portals.reload"));
+            if (!p.hasPermission("uknet.lobby.portals.reload")) {
+                sender.sendMessage(Utils.error("You do not have permission to use this command."));
+                return true;
+            }
         }
 
         if (args.length > 0) {
