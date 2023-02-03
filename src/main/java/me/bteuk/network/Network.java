@@ -241,6 +241,8 @@ public final class Network extends JavaPlugin {
 
         getCommand("afk").setExecutor(new AFK());
 
+        getCommand("sethome").setExecutor(new Sethome(globalSQL));
+
         //Enable server in server table.
         globalSQL.update("UPDATE server_data SET online=1 WHERE name='" + SERVER_NAME + "';");
 

@@ -144,3 +144,11 @@ CREATE TABLE IF NOT EXISTS player_count
     players         INT         NOT NULL,
     PRIMARY KEY(log_time)
 );
+
+CREATE TABLE IF NOT EXISTS home
+(
+    coordinate_id   INT     NOT NULL,
+    uuid        VARCHAR(36) NOT NULL,
+    name        VARCHAR(64) NULL,
+    PRIMARY KEY(coordinate_id)
+);

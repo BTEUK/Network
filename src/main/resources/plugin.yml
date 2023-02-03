@@ -67,3 +67,6 @@ commands:
   portals:
     usage: /<command>
     description: Command to reload portals.
+  sethome:
+    usage: /<command>
+    description: Set a home to your current location.
