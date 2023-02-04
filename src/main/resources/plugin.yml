@@ -70,3 +70,9 @@ commands:
   sethome:
     usage: /<command>
     description: Set a home to your current location.
+  home:
+    usage: /<command>
+    description: Teleport to your home.
+  delhome:
+    usage: /<command>
+    description: Delete a home.
