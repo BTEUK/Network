@@ -38,9 +38,15 @@ public class Delhome implements CommandExecutor {
                 return true;
             }
 
+            //Get coordinate ID.
+            int coordinate_id = globalSQL.getInt("SELECT coordinate_id FROM home WHERE uuid='" + p.getUniqueId() + "' AND name IS NULL;");
+
             //Delete default home.
             globalSQL.update("DELETE FROM home WHERE uuid='" + p.getUniqueId() + "' AND name IS NULL;");
             p.sendMessage(Utils.success("Default home removed."));
+
+            //Delete coordinate id.
+            globalSQL.update("DELETE FROM coordinates WHERE id=" + coordinate_id + ";");
 
         } else {
 
@@ -51,7 +57,10 @@ public class Delhome implements CommandExecutor {
             }
 
             //Get the name.
-            String name = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
+            String name = String.join(" ", Arrays.copyOfRange(args, 0, args.length));
+
+            //Get coordinate ID.
+            int coordinate_id = globalSQL.getInt("SELECT coordinate_id FROM home WHERE uuid='" + p.getUniqueId() + "' AND name='" + name + "';");
 
             //Check is home with this name exists.
             if (!globalSQL.hasRow("SELECT uuid FROM home WHERE uuid='" + p.getUniqueId() + "' AND name='" + name + "';")) {
@@ -62,6 +71,9 @@ public class Delhome implements CommandExecutor {
             //Delete home
             globalSQL.update("DELETE FROM home WHERE uuid='" + p.getUniqueId() + "' AND name='" + name + "';");
             p.sendMessage(Utils.success("&3" + name + " &ahome removed."));
+
+            //Delete coordinate id.
+            globalSQL.update("DELETE FROM coordinates WHERE id=" + coordinate_id + ";");
 
         }
 

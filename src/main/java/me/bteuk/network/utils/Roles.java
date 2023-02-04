@@ -1,6 +1,7 @@
 package me.bteuk.network.utils;
 
 import me.bteuk.network.Network;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -22,19 +23,7 @@ public final class Roles {
      */
 
     public static String builderRole(Player p) {
-        if (p.hasPermission("group.architect")) {
-            return "architect";
-        } else if (p.hasPermission("group.builder")) {
-            return "builder";
-        } else if (p.hasPermission("group.jrbuilder")) {
-            return "jrbuilder";
-        } else if (p.hasPermission("group.apprentice")) {
-            return "apprentice";
-        } else if (p.hasPermission("group.applicant")) {
-            return "applicant";
-        } else {
-            return "guest";
-        }
+        return PlaceholderAPI.setPlaceholders(p, "%luckperms_current_group_on_track_builder%");
     }
 
     public static String getPrimaryRole(Player p) {
@@ -63,7 +52,7 @@ public final class Roles {
         } else if (p.hasPermission("group.applicant")) {
             return "Applicant";
         } else {
-            return "Guest";
+            return "Default";
         }
     }
 

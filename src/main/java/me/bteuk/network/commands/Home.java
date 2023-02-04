@@ -78,7 +78,7 @@ public class Home implements CommandExecutor {
             }
 
             //Check if a home with this name already exists.
-            String name = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
+            String name = String.join(" ", Arrays.copyOfRange(args, 0, args.length));
 
             //Check if home with this name exists.
             if (!globalSQL.hasRow("SELECT uuid FROM home WHERE uuid='" + p.getUniqueId() + "' AND name='" + name + "';")) {

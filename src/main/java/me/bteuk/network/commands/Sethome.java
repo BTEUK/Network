@@ -43,7 +43,7 @@ public class Sethome implements CommandExecutor {
 
             globalSQL.update("INSERT INTO home(coordinate_id,uuid) VALUES(" + coordinate_id + ",'" + p.getUniqueId() + "');");
 
-            p.sendMessage(Utils.success("Default home set to current location, to teleport here type &4/home"));
+            p.sendMessage(Utils.success("Default home set to current location, to teleport here type &3/home"));
 
         } else {
 
@@ -54,7 +54,7 @@ public class Sethome implements CommandExecutor {
             }
 
             //Check if a home with this name already exists.
-            String name = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
+            String name = String.join(" ", Arrays.copyOfRange(args, 0, args.length));
 
             //Check name length.
             if (name.length() > 64) {
@@ -72,7 +72,7 @@ public class Sethome implements CommandExecutor {
 
             globalSQL.update("INSERT INTO home(coordinate_id,uuid,name) VALUES(" + coordinate_id + ",'" + p.getUniqueId() + "','" + name + "');");
 
-            p.sendMessage("Home set to current location, to teleport here type &4/home " + name);
+            p.sendMessage(Utils.success("Home set to current location, to teleport here type &3/home " + name));
 
         }
 

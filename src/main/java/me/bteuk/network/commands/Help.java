@@ -91,9 +91,9 @@ public class Help implements CommandExecutor {
     private void building(Player p) {
 
         //Building is partially role-specific.
-        p.sendMessage(Utils.chat("You currently have the builder role " + PlaceholderAPI.setPlaceholders(p, "%luckperms_prefix_highest_on_track_builder%")));
+        p.sendMessage(Utils.chat("You currently have the builder role " + PlaceholderAPI.setPlaceholders(p, "%luckperms_current_group_on_track_builder%")));
 
-        switch (Roles.builderRole(p)) {
+        switch (PlaceholderAPI.setPlaceholders(p, "%luckperms_current_group_on_track_builder%")) {
 
             case "architect" -> p.sendMessage(Utils.chat("The highest obtainable builder role, you can claim regions without needing staff approval, " +
                     "claim plots of all difficulties in the plot system and allows you to create new plots."));
@@ -110,7 +110,7 @@ public class Help implements CommandExecutor {
             /*case "applicant" -> p.sendMessage(Utils.chat("Achieved by completed the required steps in the tutorial, you now have access to the plot system. " +
                     "Complete 1 easy plot to be promoted to &7Apprentice&f."));*/
 
-            case "guest" -> p.sendMessage(Utils.chat("The role you start with when you first join the server. Complete 1 easy plot to be promoted to &7Apprentice&f."));
+            case "default" -> p.sendMessage(Utils.chat("The role you start with when you first join the server. Complete 1 easy plot to be promoted to &7Apprentice&f."));
             //case "guest" -> p.sendMessage(Utils.chat("The role you start with when you first join the server. To start your path towards becoming a builder just hop into the tutorial."));
 
         }
