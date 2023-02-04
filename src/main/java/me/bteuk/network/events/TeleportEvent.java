@@ -45,8 +45,15 @@ public class TeleportEvent {
 
             //Check if the teleport is to a specific coordinate ID.
             case "coordinateID" -> {
+
                 p.teleport(Network.getInstance().globalSQL.getCoordinate(Integer.parseInt(event[2])));
-                p.sendMessage(Utils.chat("&aTeleported to previous location."));
+
+                //Check if a message is set.
+                if (message == null) {
+                    p.sendMessage(Utils.chat("&aTeleported to previous location."));
+                } else {
+                    p.sendMessage(Utils.chat(message));
+                }
             }
             case "location", "location_request" -> {
 
