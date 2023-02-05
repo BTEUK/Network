@@ -169,10 +169,13 @@ public class Timers {
                 }
 
                 //Check if the player is afk.
-                if (user.last_movement < (time - afk)) {
+                if (user.last_movement < (time - afk) && !user.afk) {
 
                     //Set player as AFK
                     user.afk = true;
+
+                    //Save statistics.
+                    Statistics.save(user, Time.getDate(time), time);
 
                     //Send message to chat and discord.
                     Network.getInstance().chat.broadcastMessage("&7" + user.player.getName() + " is now afk.", "uknet:globalchat");

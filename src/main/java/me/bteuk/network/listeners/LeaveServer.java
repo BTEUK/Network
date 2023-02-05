@@ -37,6 +37,12 @@ public class LeaveServer implements Listener {
 
         NetworkUser u = instance.getUser(e.getPlayer());
 
+        //Reset last logged time.
+        if (u.afk) {
+            u.last_time_log = u.last_movement = Time.currentTime();
+            u.afk = false;
+        }
+
         //Update statistics
         long time = Time.currentTime();
         Statistics.save(u, Time.getDate(time), time);

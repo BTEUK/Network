@@ -53,21 +53,6 @@ public class TeleportListener implements Listener {
             return;
         }
 
-        if (!(p.hasPermission("uknet.network.elevation.bypass"))) {
-
-            if (e.getTo().getY() > yMax) {
-                e.setCancelled(true);
-                p.sendMessage(Utils.chat("&cYou may not go above y " + yMax + ", please contact staff if you need to bypass it."));
-                return;
-            }
-
-            if (e.getTo().getY() < yMin) {
-                e.setCancelled(true);
-                p.sendMessage(Utils.chat("&cYou may not go below y " + yMin + ", please contact staff if you need to bypass it."));
-                return;
-            }
-        }
-
         //If regions are enabled, check for movement between regions.
         if (regionsEnabled) {
 

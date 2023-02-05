@@ -7,6 +7,7 @@ import me.bteuk.network.gui.plotsystem.PlotMenu;
 import me.bteuk.network.gui.plotsystem.PlotServerLocations;
 import me.bteuk.network.gui.regions.RegionMenu;
 import me.bteuk.network.utils.NetworkUser;
+import me.bteuk.network.utils.Roles;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.enums.ServerType;
 import me.bteuk.network.utils.Utils;
@@ -41,28 +42,28 @@ public class BuildGui extends Gui {
 
                     int id;
 
-                    if (u.player.hasPermission("group.builder")) {
-
-                        //Select a random plot of any difficulty.
-                        id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE status='unclaimed' ORDER BY RAND() LIMIT 1;");
-
-                    } else if (u.player.hasPermission("group.jrbuilder")) {
+                    if (Roles.builderRole(u.player).equals("jrbuilder")) {
 
                         //Select a random plot of the hard difficulty.
                         //Since this is the next plot difficulty to get Builder.
                         id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE status='unclaimed' AND difficulty=3 ORDER BY RAND() LIMIT 1;");
 
-                    } else if (u.player.hasPermission("group.apprentice")) {
+                    } else if (Roles.builderRole(u.player).equals("apprentice")) {
 
                         //Select a random plot of the normal difficulty.
                         //Since this is the next plot difficulty to get Jr.Builder.
                         id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE status='unclaimed' AND difficulty=2 ORDER BY RAND() LIMIT 1;");
 
-                    } else {
+                    } else if (Roles.builderRole(u.player).equals("default")) {
 
                         //Select a random plot of the easy difficulty.
                         //Since this is the next plot difficulty to get Apprentice.
                         id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE status='unclaimed' AND difficulty=1 ORDER BY RAND() LIMIT 1;");
+
+                    } else {
+
+                        //Select a random plot of any difficulty.
+                        id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE status='unclaimed' ORDER BY RAND() LIMIT 1;");
 
                     }
 
