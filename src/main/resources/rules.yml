@@ -1,0 +1,21 @@
+#The rules book, which will be available in spawn and the gui.
+#Set the coordinates of the lectern with the rules here also.
+location:
+  x:
+  y:
+  z:
+#This is where the rules are stored, each page much have it's own identifier, which is the page number.
+#Keep in mind the page limit, if it doens't fit it'll be cut off ingame.
+#Use \n for line breaks.
+author: "ELgamer"
+rules:
+  1: "Rules:\n\nGameplay Rules\nPage 2-4\n\nChat Rules\nPage 5-10"
+  2: "No Griefing:\n\nAltering or removing a build of another person without consent is prohibited.\n\nIf the original builder is no longer active please consult a staff member."
+  3: "Do not annoy people:\n\nTry and be considerate of others. That can be anything as small as flying around someone constantly when they've asked you not to."
+  4: "Do not generate/fly into unnecessary unloaded areas:\n\nTry to only generate terrain in areas that you are planning to build in.\n\nTeleporting outside of the UK is not allowed."
+  5: "All forms of racism, sexism, homophobia and other forms of prejudice are prohibited."
+  6: "Sending links to websites that contain erotic/sexual or gore content is forbidden."
+  7: "Criminal behaviour (death threats, blackmailing, ect) is not allowed."
+  8: "Disrupting and baiting the chat is not allowed.\n\nThis includes text spam, copy-pasted text walls among other things."
+  9: "Unsolicited advertising is prohibited.\n\nOne exception is BTE content, or content that is relevant to what you're currently doing on the server."
+  10: "Try and keep politics and other heavy topics to a minimum.\n\nIf you are discussing such a topic keep it civil and if anyone takes offence the the conversation should be dropped."

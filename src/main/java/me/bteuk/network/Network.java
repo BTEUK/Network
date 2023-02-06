@@ -69,6 +69,9 @@ public final class Network extends JavaPlugin {
     //Network connect
     private Connect connect;
 
+    //Lobby
+    private Lobby lobby;
+
     @Override
     public void onEnable() {
 
@@ -189,14 +192,19 @@ public final class Network extends JavaPlugin {
         //Create bungeecord channel
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 
-        //If this server is the lobby, create the lobby.
+        //Setup the lobby, most features are only enabled in the lobby server.
+        lobby = new Lobby(this);
+        //Create the rules book.
+        lobby.loadRules();
         if (SERVER_TYPE == ServerType.LOBBY) {
-            Lobby lobby = new Lobby(this);
             lobby.reloadPortals();
 
             //Create portals reload command.
             getCommand("portals").setExecutor(new Portals(lobby));
+
+            //Set the rules lectern.
         }
+
 
         //Setup tpll if enabled in config.
         if (config.getBoolean("tpll.enabled")) {
@@ -265,7 +273,9 @@ public final class Network extends JavaPlugin {
         }
 
 
-        if (chat != null) {chat.onDisable();}
+        if (chat != null) {
+            chat.onDisable();
+        }
 
         //Disable server in server table.
         globalSQL.update("UPDATE server_data SET online=0 WHERE name='" + SERVER_NAME + "';");
@@ -367,5 +377,10 @@ public final class Network extends JavaPlugin {
 
         networkUsers.remove(u);
 
+    }
+
+    //Get lobby.
+    public Lobby getLobby() {
+        return lobby;
     }
 }

@@ -92,6 +92,17 @@ public class NavigatorGui extends Gui {
                     }
                 });
 
+        //Set rules.
+        setItem(26, Utils.createItem(Material.ENCHANTED_BOOK, 1,
+                        Utils.title("Rules"),
+                        Utils.line("Click to view the rules.")),
+                u -> {
+
+                    u.player.closeInventory();
+                    u.player.openBook(Network.getInstance().getLobby().getRules());
+
+                });
+
 
     }
 
