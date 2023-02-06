@@ -58,6 +58,8 @@ public class PlotInfo extends Gui {
 
                 u -> {
 
+                    u.player.closeInventory();
+
                     //Get the server of the plot.
                     String server = Network.getInstance().plotSQL.getString("SELECT server FROM location_data WHERE name='"
                             + Network.getInstance().plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";")
@@ -67,7 +69,6 @@ public class PlotInfo extends Gui {
                     //Else teleport them to the correct server and them teleport them to the plot.
                     if (server.equals(Network.SERVER_NAME)) {
 
-                        u.player.closeInventory();
                         EventManager.createTeleportEvent(false, u.player.getUniqueId().toString(), "plotsystem", "teleport plot " + plotID, u.player.getLocation());
 
                     } else {
@@ -76,7 +77,6 @@ public class PlotInfo extends Gui {
                         EventManager.createTeleportEvent(true, u.player.getUniqueId().toString(), "plotsystem", "teleport plot " + plotID, u.player.getLocation());
 
                         //Teleport them to another server.
-                        u.player.closeInventory();
                         SwitchServer.switchServer(u.player, server);
 
                     }
@@ -88,6 +88,8 @@ public class PlotInfo extends Gui {
                         Utils.chat("&fClick to be linked to the plot in Google Maps.")),
 
                 u -> {
+
+                    u.player.closeInventory();
 
                     //Get corners of the plot.
                     int[][] corners = plotSQL.getPlotCorners(plotID);
@@ -119,8 +121,6 @@ public class PlotInfo extends Gui {
                         double[] coords = bteGeneratorSettings.projection().toGeo(x, z);
 
                         //Generate link to google maps.
-                        u.player.closeInventory();
-
                         TextComponent message = new TextComponent("Click here to open the plot in Google Maps");
                         message.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.google.com/maps/@?api=1&map_action=map&basemap=satellite&zoom=21&center=" + coords[1] + "," + coords[0]));
 
@@ -163,15 +163,7 @@ public class PlotInfo extends Gui {
                                 Utils.chat("&fReviewing may take over 24 hours.")),
                         u -> {
 
-                            //Refresh the gui page after a second.
-                            //The delay is so the plotsystem has time to submit the plot.
-                            Bukkit.getScheduler().scheduleSyncDelayedTask(Network.getInstance(), () -> {
-
-                                //Update the gui.
-                                this.refresh();
-                                u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
-
-                            }, 20L);
+                            u.player.closeInventory();
 
                             //Add server event to submit plot.
                             globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + u.player.getUniqueId() + "','plotsystem','"
@@ -191,15 +183,7 @@ public class PlotInfo extends Gui {
                                 Utils.chat("&fYour plot will no longer be submitted.")),
                         u -> {
 
-                            //Refresh the gui page after a second.
-                            //The delay is so the plotsystem has time to retract the submission.
-                            Bukkit.getScheduler().scheduleSyncDelayedTask(Network.getInstance(), () -> {
-
-                                //Update the gui.
-                                this.refresh();
-                                u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
-
-                            }, 20L);
+                            u.player.closeInventory();
 
                             //Add server event to retract plot submission.
                             globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + u.player.getUniqueId() + "','plotsystem','"
