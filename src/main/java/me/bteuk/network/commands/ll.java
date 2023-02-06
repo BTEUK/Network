@@ -13,9 +13,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.text.DecimalFormat;
+
 public class ll implements CommandExecutor {
 
     private final EarthGeneratorSettings bteGeneratorSettings = EarthGeneratorSettings.parse(EarthGeneratorSettings.BTE_DEFAULT_SETTINGS);
+    private static final DecimalFormat DECIMAL_FORMATTER = new DecimalFormat("##.#####");
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
@@ -37,7 +40,7 @@ public class ll implements CommandExecutor {
 
                 double[] coords = bteGeneratorSettings.projection().toGeo(p.getLocation().getX() + u.dx, p.getLocation().getZ() + u.dz);
 
-                p.sendMessage(Utils.chat("&aYour coordinates are &4" + coords[1] + "," + coords[0]));
+                p.sendMessage(Utils.chat("&aYour coordinates are &3" + DECIMAL_FORMATTER.format(coords[1]) + "," + DECIMAL_FORMATTER.format(coords[0])));
                 TextComponent message = new TextComponent(Utils.chat("&aClick here to view the coordinates in Google Maps."));
                 message.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.google.com/maps/@?api=1&map_action=map&basemap=satellite&zoom=21&center=" + coords[1] + "," + coords[0]));
                 p.spigot().sendMessage(message);

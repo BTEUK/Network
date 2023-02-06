@@ -107,7 +107,7 @@ public class BuildGui extends Gui {
         //Claim plot
         setItem(2, Utils.createItem(Material.EMERALD, 1,
                         Utils.chat("&b&lClaim Plot"),
-                        Utils.chat("&fClick to claim the plot your are currently standing in.")),
+                        Utils.chat("&fClick to claim the plot you are currently standing in.")),
                 u -> {
 
                     //If server type is plot, then send a plot claim event to the database.
