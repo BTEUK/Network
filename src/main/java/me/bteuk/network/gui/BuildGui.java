@@ -5,6 +5,7 @@ import me.bteuk.network.commands.Back;
 import me.bteuk.network.events.EventManager;
 import me.bteuk.network.gui.plotsystem.PlotMenu;
 import me.bteuk.network.gui.plotsystem.PlotServerLocations;
+import me.bteuk.network.gui.plotsystem.PlotsystemLocations;
 import me.bteuk.network.gui.regions.RegionMenu;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Roles;
@@ -258,8 +259,8 @@ public class BuildGui extends Gui {
                                                 RegionManager regionManager = Network.getInstance().getRegionManager();
 
                                                 //Iterate through all regions in the radius.
-                                                for (int i = x; i <= x + radius*2; i++) {
-                                                    for (int j = z; j <= z + radius*2; j++) {
+                                                for (int i = x; i <= x + radius * 2; i++) {
+                                                    for (int j = z; j <= z + radius * 2; j++) {
 
                                                         String regionName = i + "," + j;
 
@@ -359,6 +360,21 @@ public class BuildGui extends Gui {
 
                     //Switch to plot menu.
                     u.mainGui = new RegionMenu(u);
+                    u.mainGui.open(u);
+
+                });
+
+        //Menu to teleport to plotsystem locations without going through a plot selection process.
+        setItem(8, Utils.createItem(Material.MINECART, 1,
+                        Utils.title("Plotsystem Locations"),
+                        Utils.line("Teleport to a location"),
+                        Utils.line("used by the Plotsystem.")),
+                u -> {
+
+                    this.delete();
+                    u.mainGui = null;
+
+                    u.mainGui = new PlotsystemLocations(u);
                     u.mainGui.open(u);
 
                 });

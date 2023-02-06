@@ -204,12 +204,12 @@ public class GlobalSQL {
 
         //Try and get all events for this server.
         try (Connection conn = conn();
-             PreparedStatement statement = conn.prepareStatement("SELECT uuid,event FROM server_events WHERE server='" + serverName + "' AND type='network';");
+             PreparedStatement statement = conn.prepareStatement("SELECT uuid,event,message FROM server_events WHERE server='" + serverName + "' AND type='network';");
              ResultSet results = statement.executeQuery()) {
 
             while (results.next()) {
 
-                list.add(new String[]{results.getString(1), results.getString(2)});
+                list.add(new String[]{results.getString(1), results.getString(2), results.getString(3)});
 
             }
         } catch (SQLException e) {

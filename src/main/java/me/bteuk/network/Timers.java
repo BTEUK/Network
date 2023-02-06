@@ -56,7 +56,7 @@ public class Timers {
     private final long afk;
 
     //Discord roles
-    private HashMap<String, Long> roles;
+    private final HashMap<String, Long> roles;
 
     public Timers(Network instance, GlobalSQL globalSQL, Connect connect) {
 
@@ -117,7 +117,7 @@ public class Timers {
                         String[] aEvent = event[1].split(" ");
 
                         //Send the event to the event handler.
-                        EventManager.event(event[0], aEvent, null);
+                        EventManager.event(event[0], aEvent, event[2]);
 
                     }
 

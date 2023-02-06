@@ -82,21 +82,27 @@ public class JoinServer implements Listener {
         */
 
         //Check if the player has any join events, if try run them.
-        if (globalSQL.hasRow("SELECT uuid FROM join_events WHERE uuid='" + u.player.getUniqueId() + "' AND type='network';")) {
+        //Delay by 1 second for all plugins to run their join events.
+        Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> {
+            if (globalSQL.hasRow("SELECT uuid FROM join_events WHERE uuid='" + u.player.getUniqueId() + "' AND type='network';")) {
 
-            //Get the event from the database.
-            String event = globalSQL.getString("SELECT event FROM join_events WHERE uuid='" + u.player.getUniqueId() + "' AND type='network'");
+                //Get the event from the database.
+                String event = globalSQL.getString("SELECT event FROM join_events WHERE uuid='" + u.player.getUniqueId() + "' AND type='network'");
 
-            //Split the event by word.
-            String[] aEvent = event.split(" ");
+                //Get message.
+                String message = globalSQL.getString("SELECT message FROM join_events WHERE uuid='" + u.player.getUniqueId() + "' AND type='network'");
 
-            //Clear the events.
-            globalSQL.update("DELETE FROM join_events WHERE uuid='" + u.player.getUniqueId() + "' AND type='network';");
+                //Split the event by word.
+                String[] aEvent = event.split(" ");
 
-            //Send the event to the event handler.
-            EventManager.event(u.player.getUniqueId().toString(), aEvent, null);
+                //Clear the events.
+                globalSQL.update("DELETE FROM join_events WHERE uuid='" + u.player.getUniqueId() + "' AND type='network';");
 
-        }
+                //Send the event to the event handler.
+                EventManager.event(u.player.getUniqueId().toString(), aEvent, message);
+
+            }
+        }, 20L);
 
         //Give the player nightvision if enabled or remove it if disabled.
         if (globalSQL.hasRow("SELECT nightvision_enabled FROM player_data WHERE nightvision_enabled=1 AND uuid='" + u.player.getUniqueId() + "';")) {
