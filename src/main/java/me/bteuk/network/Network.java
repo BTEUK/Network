@@ -221,8 +221,8 @@ public final class Network extends JavaPlugin {
         //Setup tpll if enabled in config.
         if (config.getBoolean("tpll.enabled")) {
             //Set max and min y.
-            MIN_Y = config.getInt("min_y");
-            MAX_Y = config.getInt("max_y");
+            MIN_Y = config.getInt("tpll.min_y");
+            MAX_Y = config.getInt("tpll.max_y");
 
             getCommand("tpll").setExecutor(new Tpll(config.getBoolean("requires_permission")));
         }

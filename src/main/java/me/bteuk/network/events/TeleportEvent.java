@@ -9,10 +9,13 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.UUID;
 
 public class TeleportEvent {
+
+    private static final DecimalFormat DECIMAL_FORMATTER = new DecimalFormat("##.#####");
 
     public static void event(String uuid, String[] event, String message) {
 
@@ -151,7 +154,7 @@ public class TeleportEvent {
 
                 //If custom message is set, send that to player, else send default message.
                 if (message == null) {
-                    p.sendMessage(Utils.success("Teleported to &3" + x + ", " + y + ", " + z));
+                    p.sendMessage(Utils.success("Teleported to &3" + DECIMAL_FORMATTER.format(x) + ", " + y + ", " + DECIMAL_FORMATTER.format(z)));
                 } else {
                     p.sendMessage(Utils.chat(message));
                 }
