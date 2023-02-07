@@ -23,7 +23,6 @@ commands:
     usage: /<command>
     description: Opens the Staff Menu.
   region:
-    aliases: [region]
     usage: /<command>
     description: Allows players to manipulate regions without using the gui.
   teleport:

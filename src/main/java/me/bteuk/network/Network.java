@@ -3,6 +3,7 @@ package me.bteuk.network;
 import me.bteuk.network.commands.*;
 import me.bteuk.network.commands.tabcompleter.LocationSelector;
 import me.bteuk.network.commands.tabcompleter.PlayerSelector;
+import me.bteuk.network.events.CommandPreProcess;
 import me.bteuk.network.gui.NavigatorGui;
 import me.bteuk.network.listeners.*;
 import me.bteuk.network.listeners.global_teleport.MoveListener;
@@ -241,6 +242,10 @@ public final class Network extends JavaPlugin {
         getCommand("navigation").setExecutor(new Navigation());
 
         getCommand("database").setExecutor(new Database());
+
+        //Register commandpreprocess to make sure /network:region runs and not that of another plugin.
+        new CommandPreProcess(this);
+        getCommand("region").setExecutor(new RegionCommand());
 
         //Enable server in server table.
         globalSQL.update("UPDATE server_data SET online=1 WHERE name='" + SERVER_NAME + "';");

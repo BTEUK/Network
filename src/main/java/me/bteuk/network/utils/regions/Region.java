@@ -27,7 +27,7 @@ public record Region(String regionName) {
 
     //Set the tag of the region for a specific player.
     public void setTag(String uuid, String tag) {
-        Network.getInstance().regionSQL.update("UPDATE region_members SET tag='" + tag + "' WHERE region='" + regionName + "' AND uuid='" + uuid + "';");
+        Network.getInstance().regionSQL.update("UPDATE region_members SET tag='" + tag.replace("'", "\\'")+ "' WHERE region='" + regionName + "' AND uuid='" + uuid + "';");
     }
 
     //Return whether the region has a tag for the specified uuid.
