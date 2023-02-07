@@ -7,6 +7,7 @@ import me.bteuk.network.gui.NavigatorGui;
 import me.bteuk.network.listeners.*;
 import me.bteuk.network.listeners.global_teleport.MoveListener;
 import me.bteuk.network.listeners.global_teleport.TeleportListener;
+import me.bteuk.network.lobby.Lobby;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.sql.RegionSQL;
@@ -67,6 +68,9 @@ public final class Network extends JavaPlugin {
 
     //Network connect
     private Connect connect;
+
+    //Lobby
+    private Lobby lobby;
 
     @Override
     public void onEnable() {
@@ -188,6 +192,23 @@ public final class Network extends JavaPlugin {
         //Create bungeecord channel
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 
+        //Setup the lobby, most features are only enabled in the lobby server.
+        lobby = new Lobby(this);
+        //Create the rules book.
+        lobby.loadRules();
+        //Command to view the rules.
+        getCommand("rules").setExecutor(new Rules());
+        if (SERVER_TYPE == ServerType.LOBBY) {
+            lobby.reloadPortals();
+
+            //Create portals reload command.
+            getCommand("portals").setExecutor(new Portals(lobby));
+
+            //Set the rules lectern.
+            lobby.setLectern();
+        }
+
+
         //Setup tpll if enabled in config.
         if (config.getBoolean("tpll.enabled")) {
             getCommand("tpll").setExecutor(new Tpll(config.getBoolean("requires_permission")));
@@ -221,6 +242,9 @@ public final class Network extends JavaPlugin {
 
         getCommand("database").setExecutor(new Database());
 
+        //Enable server in server table.
+        globalSQL.update("UPDATE server_data SET online=1 WHERE name='" + SERVER_NAME + "';");
+
     }
 
     @Override
@@ -252,7 +276,12 @@ public final class Network extends JavaPlugin {
         }
 
 
-        if (chat != null) {chat.onDisable();}
+        if (chat != null) {
+            chat.onDisable();
+        }
+
+        //Disable server in server table.
+        globalSQL.update("UPDATE server_data SET online=0 WHERE name='" + SERVER_NAME + "';");
 
     }
 
@@ -351,5 +380,10 @@ public final class Network extends JavaPlugin {
 
         networkUsers.remove(u);
 
+    }
+
+    //Get lobby.
+    public Lobby getLobby() {
+        return lobby;
     }
 }

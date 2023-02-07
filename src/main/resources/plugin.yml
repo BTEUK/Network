@@ -55,3 +55,9 @@ commands:
   database:
     usage: /<command>
     description: Adds all database conversions.
+  portals:
+    usage: /<command>
+    description: Command to reload portals.
+  rules:
+    usage: /<command>
+    description: Get rules book.

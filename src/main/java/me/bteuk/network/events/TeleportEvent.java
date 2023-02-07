@@ -1,6 +1,7 @@
 package me.bteuk.network.events;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -72,34 +73,40 @@ public class TeleportEvent {
             p.teleport(l);
             p.sendMessage(Utils.chat("&aTeleported to &3" + location));
 
+        } else if (event[1].equals("server")) {
+
+            //Switch to server.
+            SwitchServer.switchServer(p, event[2]);
+
+        } else {
+
+            //Get world.
+            World world = Bukkit.getWorld(event[1]);
+
+            if (world == null) {
+                p.sendMessage(Utils.chat("&cWorld can not be found."));
+                return;
+            }
+
+            //Get x and z.
+            double x = Double.parseDouble(event[2]);
+            double z = Double.parseDouble(event[3]);
+
+            //Get y elevation for teleport.
+            int y = world.getHighestBlockYAt((int) x, (int) z);
+            y++;
+
+            //Get pitch and yaw.
+            float yaw = Float.parseFloat(event[4]);
+            float pitch = Float.parseFloat(event[5]);
+
+            //Create location.
+            Location l = new Location(world, x, y, z, yaw, pitch);
+
+            //Teleport player.
+            p.teleport(l);
+            p.sendMessage(Utils.chat("&aTeleport to &3" + x + ", " + y + ", " + z));
+
         }
-
-        //Get world.
-        World world = Bukkit.getWorld(event[1]);
-
-        if (world == null) {
-            p.sendMessage(Utils.chat("&cWorld can not be found."));
-            return;
-        }
-
-        //Get x and z.
-        double x = Double.parseDouble(event[2]);
-        double z = Double.parseDouble(event[3]);
-
-        //Get y elevation for teleport.
-        int y = world.getHighestBlockYAt((int) x, (int) z);
-        y++;
-
-        //Get pitch and yaw.
-        float yaw = Float.parseFloat(event[4]);
-        float pitch = Float.parseFloat(event[5]);
-
-        //Create location.
-        Location l = new Location(world, x, y, z, yaw, pitch);
-
-        //Teleport player.
-        p.teleport(l);
-        p.sendMessage(Utils.chat("&aTeleport to &3" + x + ", " + y + ", " + z));
-
     }
 }
