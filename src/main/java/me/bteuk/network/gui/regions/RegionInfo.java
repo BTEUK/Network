@@ -40,10 +40,19 @@ public class RegionInfo extends Gui {
     private void createGui() {
 
         //Region info.
-        setItem(4, Utils.createItem(Material.BOOK, 1,
-                Utils.chat("&b&lRegion " + region.getTag(uuid)),
-                Utils.chat("&fRegion Owner &7" + region.ownerName()),
-                Utils.chat("&fRegion Members &7" + region.memberCount())));
+        //If region has tag set then show both name and tag.
+        if (region.regionName().equals(region.getTag(uuid))) {
+            setItem(4, Utils.createItem(Material.BOOK, 1,
+                    Utils.chat("&b&lRegion " + region.regionName()),
+                    Utils.chat("&fRegion Owner &7" + region.ownerName()),
+                    Utils.chat("&fRegion Members &7" + region.memberCount())));
+        } else {
+            setItem(4, Utils.createItem(Material.BOOK, 1,
+                    Utils.chat("&b&lRegion " + region.regionName()),
+                    Utils.chat("&fRegion Tag &7" + region.getTag(uuid)),
+                    Utils.chat("&fRegion Owner &7" + region.ownerName()),
+                    Utils.chat("&fRegion Members &7" + region.memberCount())));
+        }
 
         //Leave Region.
         setItem(8, Utils.createItem(Material.RED_CONCRETE, 1,
@@ -55,8 +64,8 @@ public class RegionInfo extends Gui {
                             + globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';") + "','region leave " + region.regionName() + "');");
 
                     //Return to region menu and close inventory.
+                    u.player.closeInventory();
                     this.delete();
-                    u.mainGui = null;
 
                     u.mainGui = new RegionMenu(u);
 
@@ -197,7 +206,6 @@ public class RegionInfo extends Gui {
 
                         //Open the invite member menu.
                         this.delete();
-                        u.mainGui = null;
 
                         u.mainGui = new InviteRegionMembers(region);
                         u.mainGui.open(u);
@@ -212,9 +220,23 @@ public class RegionInfo extends Gui {
 
                         //Open the invite member menu.
                         this.delete();
-                        u.mainGui = null;
 
                         u.mainGui = new RegionMembers(region);
+                        u.mainGui.open(u);
+
+                    });
+
+            //Return
+            setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
+                            Utils.chat("&b&lReturn"),
+                            Utils.chat("&fOpen the region menu.")),
+                    u -> {
+
+                        //Delete this gui.
+                        this.delete();
+
+                        //Switch to plot info.
+                        u.mainGui = new RegionMenu(u);
                         u.mainGui.open(u);
 
                     });

@@ -30,26 +30,20 @@ public class StaffGui extends Gui {
 
     private void createGui() {
 
-        /*TODO:
-
-        Staff menu for regions.
-
-        */
-
         //Check if any location requests exist.
         //To make sure the string makes grammatical sense we check if the number is 1, in this case we change 'are' to 'is'.
-        int requestCount = Network.getInstance().globalSQL.getInt("SELECT COUNT(location) FROM location_requests");
-        String requestString = "There are currently &7" + requestCount + " &flocation requests.";
-        if (requestCount == 1) {
-            requestString = requestString.replace("are", "is");
-            requestString = requestString.replace("requests", "request");
+        int lRequestCount = Network.getInstance().globalSQL.getInt("SELECT COUNT(location) FROM location_requests");
+        String lRequestString = "There are currently &7" + lRequestCount + " &flocation requests.";
+        if (lRequestCount == 1) {
+            lRequestString = lRequestString.replace("are", "is");
+            lRequestString = lRequestString.replace("requests", "request");
         }
 
         //Create item.
         setItem(14, Utils.createItem(Material.ENDER_CHEST, 1,
                         Utils.title("Location Requests"),
                         Utils.line("Opens a menu to view all location requests for navigation."),
-                        Utils.line(requestString)),
+                        Utils.line(lRequestString)),
                 u -> {
 
                     //Check if the user has the relevant permissions.
@@ -96,8 +90,10 @@ public class StaffGui extends Gui {
                         if (u.player.hasPermission("uknet.regions.manage")) {
 
                             if (u.inRegion) {
-                                //TODO: COMPLETE THIS
                                 //Open manage region menu
+                                this.delete();
+                                u.staffGui = new ManageRegion(u, u.region);
+                                u.staffGui.open(u);
 
                             }
 
@@ -110,20 +106,27 @@ public class StaffGui extends Gui {
                     });
         } else {
 
-            setItem(10, Utils.createItem(Material.ANVIL, 1,
-                    Utils.chat("&b&lNo Region"),
-                    Utils.chat("&fYou are currently not in a region.")));
+            setItem(10, Utils.createItem(Material.STRUCTURE_VOID, 1,
+                    Utils.title("No Region"),
+                    Utils.line("You are currently not standing in a valid region."),
+                    Utils.line("This is likely due to being in a lobby.")));
 
         }
 
         //Click to open menu to deal with region join requests.
         //Can only click on this if requests exist and player is a reviewer.
-        //TODO: Fix formatting for 1 request, see location requests for template.
+        //Check if any location requests exist.
+        //To make sure the string makes grammatical sense we check if the number is 1, in this case we change 'are' to 'is'.
+        int rRequestCount = Network.getInstance().globalSQL.getInt("SELECT COUNT(region) FROM region_requests WHERE staff_accept=0");
+        String rRequestString = "There are currently &7" + rRequestCount + " &fregion join requests by Jr.Builders.";
+        if (rRequestCount == 1) {
+            rRequestString = rRequestString.replace("are", "is");
+            rRequestString = rRequestString.replace("requests", "request");
+        }
         setItem(11, Utils.createItem(Material.CHEST_MINECART, 1,
-                        Utils.chat("&b&lRegion Requests"),
-                        Utils.chat("&fOpens a menu to review active region join requests by Jr.Builders."),
-                        Utils.chat("&fThere are currently &7" +
-                                Network.getInstance().regionSQL.getInt("SELECT COUNT(*) FROM region_requests WHERE staff_accept=0;") + " &fregion requests.")),
+                        Utils.title("Review Region Requests"),
+                        Utils.line("Opens a menu to review active region join requests by Jr.Builders."),
+                        Utils.line(rRequestString)),
                 u -> {
 
                     if (Network.getInstance().regionSQL.hasRow("SELECT region FROM region_requests WHERE staff_accept=0;")) {

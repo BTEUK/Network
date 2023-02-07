@@ -7,6 +7,7 @@ import me.bteuk.network.commands.staff.Mute;
 import me.bteuk.network.commands.staff.Staff;
 import me.bteuk.network.commands.tabcompleter.LocationSelector;
 import me.bteuk.network.commands.tabcompleter.PlayerSelector;
+import me.bteuk.network.events.CommandPreProcess;
 import me.bteuk.network.gui.NavigatorGui;
 import me.bteuk.network.listeners.*;
 import me.bteuk.network.listeners.global_teleport.MoveListener;
@@ -73,6 +74,9 @@ public final class Network extends JavaPlugin {
 
     //Network connect
     private Connect connect;
+
+    //Lobby
+    private Lobby lobby;
 
     @Override
     public void onEnable() {
@@ -194,14 +198,22 @@ public final class Network extends JavaPlugin {
         //Create bungeecord channel
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 
-        //If this server is the lobby, create the lobby.
+        //Setup the lobby, most features are only enabled in the lobby server.
+        lobby = new Lobby(this);
+        //Create the rules book.
+        lobby.loadRules();
+        //Command to view the rules.
+        getCommand("rules").setExecutor(new Rules());
         if (SERVER_TYPE == ServerType.LOBBY) {
-            Lobby lobby = new Lobby(this);
             lobby.reloadPortals();
 
             //Create portals reload command.
             getCommand("portals").setExecutor(new Portals(lobby));
+
+            //Set the rules lectern.
+            lobby.setLectern();
         }
+
 
         //Setup tpll if enabled in config.
         if (config.getBoolean("tpll.enabled")) {
@@ -244,6 +256,10 @@ public final class Network extends JavaPlugin {
         getCommand("sethome").setExecutor(new Sethome(globalSQL));
         getCommand("home").setExecutor(new Home(globalSQL));
         getCommand("delhome").setExecutor(new Delhome(globalSQL));
+		
+        //Register commandpreprocess to make sure /network:region runs and not that of another plugin.
+        new CommandPreProcess(this);
+        getCommand("region").setExecutor(new RegionCommand());
 
         //Enable server in server table.
         globalSQL.update("UPDATE server_data SET online=1 WHERE name='" + SERVER_NAME + "';");
@@ -392,5 +408,10 @@ public final class Network extends JavaPlugin {
 
         networkUsers.remove(u);
 
+    }
+
+    //Get lobby.
+    public Lobby getLobby() {
+        return lobby;
     }
 }

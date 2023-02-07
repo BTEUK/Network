@@ -13,10 +13,16 @@ The reason the lobby functions have been separated is to prevent unnecessary res
 
 import me.bteuk.network.Network;
 import me.bteuk.network.utils.NetworkUser;
+import me.bteuk.network.utils.Utils;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -28,6 +34,10 @@ public class Lobby {
 
     private final ArrayList<Portal> portals;
     private int portalTask;
+
+    private TakeBookEvent takeBookEvent;
+
+    private ItemStack rulesBook;
 
     public Lobby(Network instance) {
 
@@ -140,6 +150,88 @@ public class Lobby {
             }
 
         }, 0L, 1L);
+    }
+
+    //Load the rules.
+    //The rules are stored in rules.yml.
+    public void loadRules() {
+
+        //Create rules.yml if not exists.
+        //The data folder should already exist since the plugin will always create config.yml first.
+        File rulesFile = new File(instance.getDataFolder(), "rules.yml");
+        if (!rulesFile.exists()) {
+            instance.saveResource("rules.yml", false);
+        }
+
+        FileConfiguration rulesConfig = YamlConfiguration.loadConfiguration(rulesFile);
+
+        //Gets all the portal names from the config.
+        //This will allow us to query the config for portals.
+        ConfigurationSection section = rulesConfig.getConfigurationSection("rules");
+        //No portals have yet been added.
+        if (section == null) {
+            return;
+        }
+
+        Set<String> rules = rulesConfig.getConfigurationSection("rules").getKeys(false);
+
+        //Set all the pages of the book.
+        rulesBook = new ItemStack(Material.WRITTEN_BOOK);
+        BookMeta bookMeta = (BookMeta) rulesBook.getItemMeta();
+        bookMeta.setTitle(Utils.title("Rules"));
+
+        //Get book author.
+        bookMeta.setAuthor(rulesConfig.getString("author"));
+
+        //Get pages of the book.
+        ArrayList<String> pages = new ArrayList<>();
+        rules.forEach(str -> {
+            pages.add(rulesConfig.getString("rules." + str));
+        });
+
+        //Set the pages of the book.
+        bookMeta.setPages(pages);
+        rulesBook.setItemMeta(bookMeta);
+
+    }
+
+    public ItemStack getRules() {
+        return rulesBook;
+    }
+
+    //Set the lectern with the rules in the world.
+    public void setLectern() {
+
+        //Load rules.yml, it is guaranteed to exist since that is check in loadRules(), which has to be run before this.
+        File rulesFile = new File(instance.getDataFolder(), "rules.yml");
+        FileConfiguration rulesConfig = YamlConfiguration.loadConfiguration(rulesFile);
+
+        String worldName = rulesConfig.getString("location.world");
+
+        if (worldName == null) {
+            instance.getLogger().warning("No world set in rules.yml, rules lectern can not be set.");
+            return;
+        }
+
+        World world = Bukkit.getWorld(worldName);
+
+        if (world == null) {
+            instance.getLogger().warning("Lobby world is null, rules lectern can not be set.");
+            return;
+        }
+
+        Location l = new Location(world, rulesConfig.getInt("location.x"),
+                rulesConfig.getInt("location.y"), rulesConfig.getInt("location.z"));
+
+        //Check if plot is lectern.
+        if (!(world.getType(l) == Material.LECTERN)) {
+            instance.getLogger().warning("There is no lectern at the specified coordinates in rules.yml.");
+            return;
+        }
+
+        //Add listener
+        takeBookEvent = new TakeBookEvent(instance, this);
+
     }
 
     private void runLeaderboards() {
