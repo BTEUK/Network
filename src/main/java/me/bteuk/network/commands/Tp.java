@@ -38,7 +38,7 @@ public class Tp implements CommandExecutor {
         if (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM player_data WHERE name='" + args[0] + "';")) {
 
             //Get the uuid of the player.
-            String uuid = Network.getInstance().globalSQL.getString("SELECT uuid FROM player_dat WHERE name='" + args[0] + "';");
+            String uuid = Network.getInstance().globalSQL.getString("SELECT uuid FROM player_data WHERE name='" + args[0] + "';");
 
             //Check if the player is online.
             if (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "';")) {
@@ -60,8 +60,8 @@ public class Tp implements CommandExecutor {
                             Back.setPreviousCoordinate(p.getUniqueId().toString(), p.getLocation());
 
                             p.teleport(player.getLocation());
-                            p.sendMessage(Utils.chat("&aTeleported to " +
-                                    args[0] + "';"));
+                            p.sendMessage(Utils.chat("&aTeleported to &3" +
+                                    args[0]));
 
                         } else {
                             p.sendMessage(Utils.chat("&c" + args[0] + " is no longer online."));

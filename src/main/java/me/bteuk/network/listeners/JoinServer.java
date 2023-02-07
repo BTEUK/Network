@@ -11,6 +11,7 @@ import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.ServerType;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
@@ -30,7 +31,7 @@ public class JoinServer implements Listener {
 
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void joinServerEvent(PlayerJoinEvent e) {
 
         //Cancel default join message to null.
