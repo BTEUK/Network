@@ -196,6 +196,8 @@ public final class Network extends JavaPlugin {
         lobby = new Lobby(this);
         //Create the rules book.
         lobby.loadRules();
+        //Command to view the rules.
+        getCommand("rules").setExecutor(new Rules());
         if (SERVER_TYPE == ServerType.LOBBY) {
             lobby.reloadPortals();
 
@@ -203,6 +205,7 @@ public final class Network extends JavaPlugin {
             getCommand("portals").setExecutor(new Portals(lobby));
 
             //Set the rules lectern.
+            lobby.setLectern();
         }
 
 

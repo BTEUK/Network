@@ -58,3 +58,6 @@ commands:
   portals:
     usage: /<command>
     description: Command to reload portals.
+  rules:
+    usage: /<command>
+    description: Get rules book.

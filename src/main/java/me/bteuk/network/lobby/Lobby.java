@@ -15,7 +15,9 @@ import me.bteuk.network.Network;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -32,6 +34,8 @@ public class Lobby {
 
     private final ArrayList<Portal> portals;
     private int portalTask;
+
+    private TakeBookEvent takeBookEvent;
 
     private ItemStack rulesBook;
 
@@ -169,7 +173,7 @@ public class Lobby {
             return;
         }
 
-        Set<String> rules = rulesConfig.getConfigurationSection("portals").getKeys(false);
+        Set<String> rules = rulesConfig.getConfigurationSection("rules").getKeys(false);
 
         //Set all the pages of the book.
         rulesBook = new ItemStack(Material.WRITTEN_BOOK);
@@ -193,6 +197,41 @@ public class Lobby {
 
     public ItemStack getRules() {
         return rulesBook;
+    }
+
+    //Set the lectern with the rules in the world.
+    public void setLectern() {
+
+        //Load rules.yml, it is guaranteed to exist since that is check in loadRules(), which has to be run before this.
+        File rulesFile = new File(instance.getDataFolder(), "rules.yml");
+        FileConfiguration rulesConfig = YamlConfiguration.loadConfiguration(rulesFile);
+
+        String worldName = rulesConfig.getString("location.world");
+
+        if (worldName == null) {
+            instance.getLogger().warning("No world set in rules.yml, rules lectern can not be set.");
+            return;
+        }
+
+        World world = Bukkit.getWorld(worldName);
+
+        if (world == null) {
+            instance.getLogger().warning("Lobby world is null, rules lectern can not be set.");
+            return;
+        }
+
+        Location l = new Location(world, rulesConfig.getInt("location.x"),
+                rulesConfig.getInt("location.y"), rulesConfig.getInt("location.z"));
+
+        //Check if plot is lectern.
+        if (!(world.getType(l) == Material.LECTERN)) {
+            instance.getLogger().warning("There is no lectern at the specified coordinates in rules.yml.");
+            return;
+        }
+
+        //Add listener
+        takeBookEvent = new TakeBookEvent(instance, this);
+
     }
 
     private void runLeaderboards() {
