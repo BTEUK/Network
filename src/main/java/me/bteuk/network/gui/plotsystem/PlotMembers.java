@@ -51,8 +51,8 @@ public class PlotMembers extends Gui {
         //If page is greater than 1 add a previous page button.
         if (page > 1) {
             setItem(18, Utils.createItem(Material.ARROW, 1,
-                            Utils.chat("&b&lPrevious Page"),
-                            Utils.chat("&fOpen the previous page of online users.")),
+                            Utils.title("Previous Page"),
+                            Utils.line("Open the previous page of online users.")),
                     u ->
 
                     {
@@ -73,8 +73,8 @@ public class PlotMembers extends Gui {
                 if (slot > 34) {
 
                     setItem(26, Utils.createItem(Material.ARROW, 1,
-                                    Utils.chat("&b&lNext Page"),
-                                    Utils.chat("&fOpen the next page of online users.")),
+                                    Utils.title("Next Page"),
+                                    Utils.line("Open the next page of online users.")),
                             u ->
 
                             {
@@ -96,9 +96,9 @@ public class PlotMembers extends Gui {
 
                 //Add player to gui.
                 setItem(slot, Utils.createPlayerSkull(uuid, 1,
-                                Utils.chat("&b&lKick " + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';" + " from your plot.")),
-                                Utils.chat("&fClick to remove them as member of your plot."),
-                                Utils.chat("&fThey will no longer be able to build in it.")),
+                                Utils.title("Kick " + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';" + " from your plot.")),
+                                Utils.line("Click to remove them as member of your plot."),
+                                Utils.line("They will no longer be able to build in it.")),
                         u ->
 
                         {
@@ -122,7 +122,7 @@ public class PlotMembers extends Gui {
                                 }, 20L);
 
                             } else {
-                                u.player.sendMessage(Utils.chat("&cThis player is not a member of your plot."));
+                                u.player.sendMessage(Utils.success("This player is not a member of your plot."));
                             }
                         });
 
@@ -140,8 +140,8 @@ public class PlotMembers extends Gui {
 
         //Return
         setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        Utils.chat("&b&lReturn"),
-                        Utils.chat("&fOpen the plot info for this plot.")),
+                        Utils.title("Return"),
+                        Utils.line("Open the plot info for this plot.")),
                 u -> {
 
                     //Delete this gui.

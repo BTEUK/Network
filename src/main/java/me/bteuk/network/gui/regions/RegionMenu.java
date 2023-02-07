@@ -56,8 +56,8 @@ public class RegionMenu extends Gui {
         //If page is greater than 1 add a previous page button.
         if (page > 1) {
             setItem(18, Utils.createItem(Material.ARROW, 1,
-                            Utils.chat("&b&lPrevious Page"),
-                            Utils.chat("&fOpen the previous page of regions.")),
+                            Utils.title("Previous Page"),
+                            Utils.line("Open the previous page of regions.")),
                     u ->
 
                     {
@@ -85,8 +85,8 @@ public class RegionMenu extends Gui {
             if (slot > 34) {
 
                 setItem(26, Utils.createItem(Material.ARROW, 1,
-                                Utils.chat("&b&lNext Page"),
-                                Utils.chat("&fOpen the next page of regions.")),
+                                Utils.title("Next Page"),
+                                Utils.line("Open the next page of regions.")),
                         u ->
 
                         {
@@ -106,9 +106,9 @@ public class RegionMenu extends Gui {
                 region = Network.getInstance().getRegionManager().getRegion(owner.get(i));
 
                 setItem(slot, Utils.createItem(Material.LIME_CONCRETE, 1,
-                                Utils.chat("&b&lRegion " + region.getTag(user.player.getUniqueId().toString())),
-                                Utils.chat("&fYou are the owner of this region."),
-                                Utils.chat("&fClick to open the menu of this region.")),
+                                Utils.title("Region " + region.getTag(user.player.getUniqueId().toString())),
+                                Utils.line("You are the owner of this region."),
+                                Utils.line("Click to open the menu of this region.")),
                         u -> {
 
                             //Delete this gui.
@@ -125,9 +125,9 @@ public class RegionMenu extends Gui {
                 region = Network.getInstance().getRegionManager().getRegion(member.get((finalI - owner.size())));
 
                 setItem(slot, Utils.createItem(Material.YELLOW_CONCRETE, 1,
-                                Utils.chat("&b&lRegion " + region.getTag(user.player.getUniqueId().toString())),
-                                Utils.chat("&fYou are a member of this region."),
-                                Utils.chat("&fClick to open the menu of this plot.")),
+                                Utils.title("Region " + region.getTag(user.player.getUniqueId().toString())),
+                                Utils.line("You are a member of this region."),
+                                Utils.line("Click to open the menu of this plot.")),
                         u -> {
 
                             //Delete this gui.
@@ -155,9 +155,9 @@ public class RegionMenu extends Gui {
         if (regionSQL.hasRow("SELECT region FROM region_requests WHERE owner='" + user.player.getUniqueId() + "' AND owner_accept=0;")) {
 
             setItem(40, Utils.createItem(Material.LIME_STAINED_GLASS_PANE, 1,
-                            Utils.chat("&b&lReview Region Requests"),
-                            Utils.chat("&fView all region join requests for"),
-                            Utils.chat("&fregions that you are the owner of.")),
+                            Utils.title("Review Region Requests"),
+                            Utils.line("View all region join requests for"),
+                            Utils.line("regions that you are the owner of.")),
 
                     u -> {
 
@@ -172,8 +172,8 @@ public class RegionMenu extends Gui {
 
         //Return
         setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        Utils.chat("&b&lReturn"),
-                        Utils.chat("&fOpen the building menu.")),
+                        Utils.title("Return"),
+                        Utils.line("Open the building menu.")),
                 u -> {
 
                     //Delete this gui.

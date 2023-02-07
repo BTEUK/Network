@@ -21,7 +21,7 @@ public class Tp implements CommandExecutor {
         //Sender must be a player.
         if (!(sender instanceof Player p)) {
 
-            sender.sendMessage(Utils.chat("&cYou must be a player to use this command."));
+            sender.sendMessage(Utils.error("You must be a player to use this command."));
             return true;
 
         }
@@ -29,7 +29,7 @@ public class Tp implements CommandExecutor {
         //Check if args exist.
         if (args.length == 0) {
 
-            p.sendMessage(Utils.chat("&cYou must specify a player to teleport to."));
+            p.sendMessage(Utils.error("You must specify a player to teleport to."));
             return true;
 
         }
@@ -60,11 +60,11 @@ public class Tp implements CommandExecutor {
                             Back.setPreviousCoordinate(p.getUniqueId().toString(), p.getLocation());
 
                             p.teleport(player.getLocation());
-                            p.sendMessage(Utils.chat("&aTeleported to &3" +
+                            p.sendMessage(Utils.success("Teleported to &3" +
                                     args[0]));
 
                         } else {
-                            p.sendMessage(Utils.chat("&c" + args[0] + " is no longer online."));
+                            p.sendMessage(Utils.error(args[0] + " is no longer online."));
                         }
 
                     } else {
@@ -76,15 +76,15 @@ public class Tp implements CommandExecutor {
 
 
                 } else {
-                    p.sendMessage(Utils.chat("&c" + args[0] + " has teleport disabled."));
+                    p.sendMessage(Utils.error(args[0] + " has teleport disabled."));
                 }
 
             } else {
-                p.sendMessage(Utils.chat("&c" + args[0] + " is not online."));
+                p.sendMessage(Utils.error(args[0] + " is not online."));
             }
 
         } else {
-            p.sendMessage(Utils.chat("&c" + args[0] + " does not exist."));
+            p.sendMessage(Utils.error(args[0] + " does not exist."));
         }
         return true;
     }

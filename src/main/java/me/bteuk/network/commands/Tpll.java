@@ -106,7 +106,7 @@ public class Tpll implements CommandExecutor {
     }
 
     private void usage(Player p) {
-        p.sendMessage(Utils.chat("&c/tpll <latitude> <longitude> [altitude]"));
+        p.sendMessage(Utils.error("/tpll <latitude> <longitude> [altitude]"));
     }
 
     @Override
@@ -116,7 +116,7 @@ public class Tpll implements CommandExecutor {
         //Only players can use /tpll.
         if (!(sender instanceof Player p)) {
 
-            sender.sendMessage(Utils.chat("&cThis command can only be used by players."));
+            sender.sendMessage(Utils.error("This command can only be used by players."));
             return true;
 
         }
@@ -126,7 +126,7 @@ public class Tpll implements CommandExecutor {
 
             if (!p.hasPermission("uknet.tpll")) {
 
-                p.sendMessage(Utils.chat("&cYou do not have permission to use this command."));
+                p.sendMessage(Utils.error("You do not have permission to use this command."));
                 return true;
 
             }
@@ -179,18 +179,46 @@ public class Tpll implements CommandExecutor {
             return true;
         }
 
-        //TODO Add method to check if terrain is already generated, if so then get highest block for teleport rather than using the dataset.
+        Location l = new Location(p.getWorld(), proj[0], 1, proj[1]);
 
+        //Get region.
+        Region region = regionManager.getRegion(l);
+
+        //If altitude wasn't specified in the command.
         CompletableFuture<Double> altFuture;
         if (Double.isNaN(altitude)) {
-            try {
-                altFuture = bteGeneratorSettings.datasets()
-                        .<IScalarDataset>getCustom(EarthGeneratorPipelines.KEY_DATASET_HEIGHTS)
-                        .getAsync(defaultCoords.getLng(), defaultCoords.getLat())
-                        .thenApply(a -> a + 1.0d);
-            } catch (OutOfProjectionBoundsException e) { //out of bounds, notify user
-                sender.sendMessage(Utils.chat("&c" + TerraConstants.MODID + ".error.numbers"));
-                return true;
+
+            int alt;
+
+            //Check if the region is on a plot server.
+            if (Network.getInstance().regionSQL.hasRow("SELECT region FROM regions WHERE region='" + region.regionName() + "' AND status='plot';")) {
+
+                //Get server and location of region.
+                String location = Network.getInstance().plotSQL.getString("SELECT location FROM regions WHERE region='" + region.regionName() + "';");
+
+                //Get the coordinate transformations.
+                int xTransform = Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + location + "';");
+                int zTransform = Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
+                alt = Utils.getHighestYAt(p.getWorld(), (int) proj[0] + xTransform, (int) proj[1] + zTransform);
+
+            } else {
+
+                alt = Utils.getHighestYAt(p.getWorld(), (int) proj[0], (int) proj[1]);
+
+            }
+
+            if (alt == Integer.MIN_VALUE) {
+                try {
+                    altFuture = bteGeneratorSettings.datasets()
+                            .<IScalarDataset>getCustom(EarthGeneratorPipelines.KEY_DATASET_HEIGHTS)
+                            .getAsync(defaultCoords.getLng(), defaultCoords.getLat())
+                            .thenApply(a -> a + 1.0d);
+                } catch (OutOfProjectionBoundsException e) { //out of bounds, notify user
+                    sender.sendMessage(Utils.error("These coordinates are out of the projection bounds."));
+                    return true;
+                }
+            } else {
+                altFuture = CompletableFuture.supplyAsync(() -> (double) alt);
             }
         } else {
             altFuture = CompletableFuture.completedFuture(altitude);
@@ -199,13 +227,7 @@ public class Tpll implements CommandExecutor {
         LatLng finalDefaultCoords = defaultCoords;
         altFuture.thenAccept(s -> Bukkit.getScheduler().runTask(Network.getInstance(), () -> {
 
-
-            Location l = new Location(p.getWorld(), proj[0], s, proj[1]);
-            Network.getInstance().getLogger().info(l.getX() + "," + l.getZ());
-
             if (regionsEnabled) {
-                //Get region.
-                Region region = regionManager.getRegion(l);
 
                 //Check if the region is on a plot server.
                 if (Network.getInstance().regionSQL.hasRow("SELECT region FROM regions WHERE region='" + region.regionName() + "' AND status='plot';")) {
@@ -235,7 +257,7 @@ public class Tpll implements CommandExecutor {
                     } else {
 
                         //Set join event to teleport there.
-                        EventManager.createTeleportEvent(true, p.getUniqueId().toString(), "network","teleport "
+                        EventManager.createTeleportEvent(true, p.getUniqueId().toString(), "network", "teleport "
                                 + location + " " + (proj[0] + xTransform) + " " + (proj[1] + zTransform) + " "
                                 + p.getLocation().getYaw() + " " + p.getLocation().getPitch(), p.getLocation());
 
@@ -286,7 +308,7 @@ public class Tpll implements CommandExecutor {
                     } else {
 
                         //You can't enter this region.
-                        p.sendMessage(Utils.chat("&cThe terrain for this region has not been generated, you must be Jr.Builder or higher to load new terrain."));
+                        p.sendMessage(Utils.error("The terrain for this region has not been generated, you must be Jr.Builder or higher to load new terrain."));
 
                     }
                 }

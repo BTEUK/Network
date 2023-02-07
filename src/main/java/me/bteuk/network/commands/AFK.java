@@ -19,7 +19,7 @@ public class AFK implements CommandExecutor {
         //Check if the sender is a player.
         if (!(sender instanceof Player p)) {
 
-            sender.sendMessage(Utils.chat("&cThis command can only be run by a player."));
+            sender.sendMessage(Utils.error("This command can only be run by a player."));
             return true;
 
         }

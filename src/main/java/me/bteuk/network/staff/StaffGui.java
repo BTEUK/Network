@@ -80,8 +80,8 @@ public class StaffGui extends Gui {
         if (user.inRegion) {
 
             setItem(10, Utils.createItem(Material.ANVIL, 1,
-                            Utils.chat("&b&lManage Region " + user.region.regionName()),
-                            Utils.chat("&fOpens a menu to manage details of the region you are currently in.")),
+                            Utils.title("Manage Region " + user.region.regionName()),
+                            Utils.line("Opens a menu to manage details of the region you are currently in.")),
                     u ->
 
                     {
@@ -160,8 +160,8 @@ public class StaffGui extends Gui {
         }
 
         setItem(13, Utils.createItem(Material.WRITABLE_BOOK, 1,
-                        Utils.chat("&b&lReview Plot"),
-                        Utils.chat("&fClick to review a submitted plot."),
+                        Utils.title("Review Plot"),
+                        Utils.line("Click to review a submitted plot."),
                         Utils.chat(message)),
                 u -> {
 
@@ -230,8 +230,8 @@ public class StaffGui extends Gui {
 
         //Click to open moderation menu.
         setItem(16, Utils.createItem(Material.REDSTONE_BLOCK, 1,
-                        Utils.chat("&b&lModeration Menu"),
-                        Utils.chat("&fOpens the moderation menu to deal with wrongdoers.")),
+                        Utils.title("Moderation Menu"),
+                        Utils.line("Opens the moderation menu to deal with wrongdoers.")),
                 u ->
 
                 {

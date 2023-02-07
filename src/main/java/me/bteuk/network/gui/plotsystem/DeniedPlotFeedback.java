@@ -63,9 +63,9 @@ public class DeniedPlotFeedback extends Gui {
             //Add player to gui.
             int finalI = i;
             setItem(slot, Utils.createItem(Material.WRITTEN_BOOK, 1,
-                            Utils.chat("&b&lFeedback for submission " + i),
-                            Utils.chat("&fClick to view feedback for this submission."),
-                            Utils.chat("&fReviewed by &7" + globalSQL.getString("SELECT name FROM player_data WHERE uuid='"
+                            Utils.title("Feedback for submission " + i),
+                            Utils.line("Click to view feedback for this submission."),
+                            Utils.line("Reviewed by &7" + globalSQL.getString("SELECT name FROM player_data WHERE uuid='"
                                     + plotSQL.getString("SELECT reviewer FROM deny_data WHERE id=" + plotID + " AND uuid='" + uuid + "' AND attempt=" + i + ";") + "';"))),
 
                     u ->
@@ -111,8 +111,8 @@ public class DeniedPlotFeedback extends Gui {
 
         //Return to plot info menu.
         setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        Utils.chat("&b&lReturn"),
-                        Utils.chat("&fReturn to the menu of plot " + plotID + ".")),
+                        Utils.title("Return"),
+                        Utils.line("Return to the menu of plot " + plotID + ".")),
                 u ->
 
                 {

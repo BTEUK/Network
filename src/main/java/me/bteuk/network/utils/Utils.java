@@ -1,5 +1,6 @@
 package me.bteuk.network.utils;
 
+import me.bteuk.network.Network;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.*;
 import org.bukkit.entity.Firework;
@@ -134,11 +135,11 @@ public class Utils {
 
     public static int getHighestYAt(World w, int x, int z) {
 
-        for (int i = 255; i >= 0; i--) {
+        for (int i = (Network.MAX_Y-1); i >= Network.MIN_Y; i--) {
             if (w.getBlockAt(x, i, z).getType() != Material.AIR) {
                 return i + 1;
             }
         }
-        return 0;
+        return Integer.MIN_VALUE;
     }
 }

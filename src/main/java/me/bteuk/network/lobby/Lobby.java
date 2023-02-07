@@ -35,8 +35,6 @@ public class Lobby {
     private final ArrayList<Portal> portals;
     private int portalTask;
 
-    private TakeBookEvent takeBookEvent;
-
     private ItemStack rulesBook;
 
     public Lobby(Network instance) {
@@ -230,7 +228,7 @@ public class Lobby {
         }
 
         //Add listener
-        takeBookEvent = new TakeBookEvent(instance, this);
+        new TakeBookEvent(instance, this);
 
     }
 

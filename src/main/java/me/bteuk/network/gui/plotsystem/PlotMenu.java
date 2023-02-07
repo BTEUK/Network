@@ -41,8 +41,8 @@ public class PlotMenu extends Gui {
 
             int finalI = i;
             setItem(slot, Utils.createItem(Material.LIME_CONCRETE, 1,
-                            Utils.chat("&b&lPlot " + plots.get(i)),
-                            Utils.chat("&fClick to open the menu of this plot.")),
+                            Utils.title("Plot " + plots.get(i)),
+                            Utils.line("Click to open the menu of this plot.")),
                     u -> {
 
                         //Delete this gui.
@@ -70,8 +70,8 @@ public class PlotMenu extends Gui {
         if (plotSQL.hasRow("SELECT uuid FROM accept_data WHERE uuid='" + user.player.getUniqueId() + "';")) {
 
             setItem(40, Utils.createItem(Material.CLOCK, 1,
-                            Utils.chat("&b&lAccepted Plots"),
-                            Utils.chat("&fClick to view your accepted plots.")),
+                            Utils.title("Accepted Plots"),
+                            Utils.line("Click to view your accepted plots.")),
 
                     u -> {
 
@@ -88,8 +88,8 @@ public class PlotMenu extends Gui {
 
         //Return
         setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        Utils.chat("&b&lReturn"),
-                        Utils.chat("&fOpen the building menu.")),
+                        Utils.title("Return"),
+                        Utils.line("Open the building menu.")),
                 u -> {
 
                     //Delete this gui.

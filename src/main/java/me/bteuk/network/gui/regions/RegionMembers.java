@@ -54,10 +54,10 @@ public class RegionMembers extends Gui {
         if (transfer) {
 
             setItem(8, Utils.createItem(Material.MAGENTA_GLAZED_TERRACOTTA, 1,
-                            Utils.chat("&b&lSwitch Mode"),
-                            Utils.chat("&fConverts gui to kick members."),
-                            Utils.chat("&fClicking on a player head"),
-                            Utils.chat("&fwill kick them from the region.")),
+                            Utils.title("Switch Mode"),
+                            Utils.line("Converts gui to kick members."),
+                            Utils.line("Clicking on a player head"),
+                            Utils.line("will kick them from the region.")),
 
                     u -> {
 
@@ -68,10 +68,10 @@ public class RegionMembers extends Gui {
         } else {
 
             setItem(8, Utils.createItem(Material.MAGENTA_GLAZED_TERRACOTTA, 1,
-                            Utils.chat("&b&lSwitch Mode"),
-                            Utils.chat("&fConverts gui to transfer ownership."),
-                            Utils.chat("&fClicking on a player head will"),
-                            Utils.chat("&fmake them the owner of the region.")),
+                            Utils.title("Switch Mode"),
+                            Utils.line("Converts gui to transfer ownership."),
+                            Utils.line("Clicking on a player head will"),
+                            Utils.line("make them the owner of the region.")),
 
                     u -> {
 
@@ -84,8 +84,8 @@ public class RegionMembers extends Gui {
         //If page is greater than 1 add a previous page button.
         if (page > 1) {
             setItem(18, Utils.createItem(Material.ARROW, 1,
-                            Utils.chat("&b&lPrevious Page"),
-                            Utils.chat("&fOpen the previous page of region members.")),
+                            Utils.title("Previous Page"),
+                            Utils.line("Open the previous page of region members.")),
                     u ->
 
                     {
@@ -105,8 +105,8 @@ public class RegionMembers extends Gui {
             if (slot > 34) {
 
                 setItem(26, Utils.createItem(Material.ARROW, 1,
-                                Utils.chat("&b&lNext Page"),
-                                Utils.chat("&fOpen the next page of region members.")),
+                                Utils.title("Next Page"),
+                                Utils.line("Open the next page of region members.")),
                         u ->
 
                         {
@@ -130,8 +130,8 @@ public class RegionMembers extends Gui {
             if (transfer) {
 
                 setItem(slot, Utils.createPlayerSkull(uuid, 1,
-                                Utils.chat("&b&lMake " + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " the region owner."),
-                                Utils.chat("&fYou will be demoted to region members.")),
+                                Utils.title("Make " + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " the region owner."),
+                                Utils.line("You will be demoted to region members.")),
                         u ->
 
                         {
@@ -146,7 +146,7 @@ public class RegionMembers extends Gui {
                             region.updateRequests();
 
                             //Send message to user.
-                            u.player.sendMessage(Utils.chat("&aTransferred ownership of the region to &3" +
+                            u.player.sendMessage(Utils.success("Transferred ownership of the region to &3" +
                                     globalSQL.getString("SELECT name FROM player_data WHERE uuid ='" + region.getOwner() + "';")));
 
                             //Return to region info.
@@ -160,7 +160,7 @@ public class RegionMembers extends Gui {
             } else {
 
                 setItem(slot, Utils.createPlayerSkull(uuid, 1,
-                                Utils.chat("&b&lKick " + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " from the region.")),
+                                Utils.title("Kick " + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " from the region.")),
                         u ->
 
                         {
@@ -168,7 +168,7 @@ public class RegionMembers extends Gui {
                             region.leaveRegion(uuid);
 
                             //Send message to user.
-                            u.player.sendMessage(Utils.chat("&aKicked &3" +
+                            u.player.sendMessage(Utils.success("Kicked &3" +
                                     globalSQL.getString("SELECT name FROM player_data WHERE uuid ='" + region.getOwner() + "';") + " &afrom the region"));
 
                             //Refresh the gui.
@@ -190,8 +190,8 @@ public class RegionMembers extends Gui {
 
         //Return to plot info menu.
         setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        Utils.chat("&b&lReturn"),
-                        Utils.chat("&fReturn to manage region &7" + region.regionName() + ".")),
+                        Utils.title("Return"),
+                        Utils.line("Return to manage region &7" + region.regionName() + ".")),
                 u ->
 
                 {

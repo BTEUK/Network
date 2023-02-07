@@ -33,7 +33,7 @@ public class Ban implements CommandExecutor {
         //Check player.
         //If uuid exists for name.
         if (!Network.getInstance().globalSQL.hasRow("SELECT uuid FROM player_data WHERE name='" + args[0] + "';")) {
-            sender.sendMessage(Utils.error(args[0] + " is not a valid player."));
+            sender.sendMessage(Utils.error("&4" + args[0] + " &cis not a valid player."));
             return true;
         }
 
@@ -127,7 +127,7 @@ public class Ban implements CommandExecutor {
         Moderation mod = new Moderation();
         mod.ban(uuid, end_time, reason);
 
-        sender.sendMessage(Utils.success("Banned " + args[0] + " until " + Time.getDateTime(end_time) + " for reason: " + reason));
+        sender.sendMessage(Utils.success("Banned &3" + args[0] + " &auntil &3" + Time.getDateTime(end_time) + " &afor reason: &3" + reason));
 
         return false;
     }

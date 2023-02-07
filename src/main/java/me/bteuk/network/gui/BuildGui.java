@@ -37,8 +37,8 @@ public class BuildGui extends Gui {
 
         //Teleport to random unclaimed plot.
         setItem(20, Utils.createItem(Material.ENDER_PEARL, 1,
-                        Utils.chat("&b&lRandom Plot"),
-                        Utils.chat("&fClick teleport to a random claimable plot.")),
+                        Utils.title("Random Plot"),
+                        Utils.line("Click teleport to a random claimable plot.")),
                 u -> {
 
                     int id;
@@ -70,7 +70,7 @@ public class BuildGui extends Gui {
 
                     if (id == 0) {
 
-                        u.player.sendMessage(Utils.chat("&cThere are no plots available, please wait for new plots to be added."));
+                        u.player.sendMessage(Utils.error("There are no plots available, please wait for new plots to be added."));
                         u.player.closeInventory();
 
                     } else {
@@ -106,8 +106,8 @@ public class BuildGui extends Gui {
 
         //Claim plot
         setItem(2, Utils.createItem(Material.EMERALD, 1,
-                        Utils.chat("&b&lClaim Plot"),
-                        Utils.chat("&fClick to claim the plot you are currently standing in.")),
+                        Utils.title("Claim Plot"),
+                        Utils.line("Click to claim the plot you are currently standing in.")),
                 u -> {
 
                     //If server type is plot, then send a plot claim event to the database.
@@ -123,7 +123,7 @@ public class BuildGui extends Gui {
                     } else {
 
                         u.player.closeInventory();
-                        u.player.sendMessage(Utils.chat("&cYou must be standing in a plot to claim it."));
+                        u.player.sendMessage(Utils.error("You must be standing in a plot to claim it."));
 
                     }
                 });
@@ -131,8 +131,8 @@ public class BuildGui extends Gui {
 
         //Choose location.
         setItem(19, Utils.createItem(Material.DIAMOND_PICKAXE, 1,
-                        Utils.chat("&b&lPlot Locations"),
-                        Utils.chat("&fClick to choose a location to build a plot.")),
+                        Utils.title("Plot Locations"),
+                        Utils.line("Click to choose a location to build a plot.")),
                 u ->
 
                 {
@@ -150,79 +150,57 @@ public class BuildGui extends Gui {
         //Join region (Jr.Builder+ only)
         //If region is claimable.
         //Check if the player is in a region.
-        //TODO: If the player is not able to claim a region change the icon.
         if (user.inRegion) {
 
-            //Check if region is claimable.
-            if (user.region.isClaimable()) {
+            //If the user is Jr.Builder+ go through the region joining process.
+            if (user.player.hasPermission("group.jrbuilder")) {
 
-                //If the region has an owner.
-                if (user.region.hasOwner()) {
+                //Check if region is claimable.
+                if (user.region.isClaimable()) {
 
-                    //Check if the region is public.
-                    if (user.region.isPublic()) {
+                    //If the region has an owner.
+                    if (user.region.hasOwner()) {
 
-                        setItem(5, Utils.createItem(Material.DARK_OAK_DOOR, 1,
-                                        Utils.chat("&b&lJoin Region"),
-                                        Utils.chat("&fClick to join the region you are standing in."),
-                                        Utils.chat("&fThe region is owned by " + user.region.ownerName() + "."),
-                                        Utils.chat("&fThe region is public, so they don't need to accept your request.")),
-                                u -> {
+                        //Check if the region is public.
+                        if (user.region.isPublic()) {
 
-                                    //If the user is Jr.Builder+ go through the region joining process.
-                                    if (u.player.hasPermission("group.jrbuilder")) {
+                            setItem(5, Utils.createItem(Material.DARK_OAK_DOOR, 1,
+                                            Utils.title("Join Region"),
+                                            Utils.line("Click to join the region you are standing in."),
+                                            Utils.line("The region is owned by " + user.region.ownerName() + "."),
+                                            Utils.line("The region is public, so they don't need to accept your request.")),
+                                    u -> {
 
                                         u.region.joinRegion(u);
                                         u.player.closeInventory();
 
-                                    } else {
+                                    });
 
-                                        //If they are not a Jr.Builder, cancel.
-                                        u.player.closeInventory();
-                                        u.player.sendMessage(Utils.chat("&cYou must be at least a Jr.Builder to join a region."));
+                        } else {
 
-                                    }
-                                });
-
-                    } else {
-
-                        //Join requires owner to approve request.
-                        setItem(5, Utils.createItem(Material.DARK_OAK_DOOR, 1,
-                                        Utils.chat("&b&lJoin Region"),
-                                        Utils.chat("&fClick to request to join the region you are standing in."),
-                                        Utils.chat("&fThe region is owned by " + user.region.ownerName() + "."),
-                                        Utils.chat("&fThey must accept the request for you to join.")),
-                                u -> {
-
-                                    //If the user is Jr.Builder+ go through the region joining process.
-                                    if (u.player.hasPermission("group.jrbuilder")) {
+                            //Join requires owner to approve request.
+                            setItem(5, Utils.createItem(Material.DARK_OAK_DOOR, 1,
+                                            Utils.title("Join Region"),
+                                            Utils.line("Click to request to join the region you are standing in."),
+                                            Utils.line("The region is owned by " + user.region.ownerName() + "."),
+                                            Utils.line("They must accept the request for you to join.")),
+                                    u -> {
 
                                         u.region.requestRegion(u, false);
                                         u.player.closeInventory();
 
-                                    } else {
+                                    });
+                        }
 
-                                        //If they are not a Jr.Builder, cancel.
-                                        u.player.closeInventory();
-                                        u.player.sendMessage(Utils.chat("&cYou must be at least a Jr.Builder to join a region."));
+                    } else
 
-                                    }
-                                });
-                    }
-
-                } else
-
-                    //Join region.
-                    setItem(5, Utils.createItem(Material.DARK_OAK_DOOR, 1,
-                                    Utils.chat("&b&lJoin Region"),
-                                    Utils.chat("&fClick to join the region you are standing in."),
-                                    Utils.chat("&fThe region currently has no active owner."),
-                                    Utils.chat("&fJoining the region will make you region owner.")),
-                            u -> {
-
-                                //If the user is Jr.Builder+ go through the region joining process.
-                                if (u.player.hasPermission("group.jrbuilder")) {
-
+                        //Join region.
+                        setItem(5, Utils.createItem(Material.DARK_OAK_DOOR, 1,
+                                        Utils.title("Join Region"),
+                                        Utils.line("Click to join the region you are standing in."),
+                                        Utils.line("The region currently has no active owner."),
+                                        Utils.line("Joining the region will make you region owner.")),
+                                u -> {
 
                                     //If the player is a Jr.Builder
                                     //Check if any nearby regions are claimed by someone else.
@@ -241,7 +219,7 @@ public class BuildGui extends Gui {
                                             int z = Integer.parseInt(u.region.regionName().split(",")[1]);
 
                                             //Get the radius.
-                                            int radius = Network.getInstance().getConfig().getInt("staff_request.always");
+                                            int radius = Network.getInstance().getConfig().getInt("staff_request.radius");
 
                                             //For zero radius, skip.
                                             if (radius == 0) {
@@ -290,48 +268,50 @@ public class BuildGui extends Gui {
                                         u.player.closeInventory();
 
                                     }
-
-                                } else {
-
-                                    //If they are not a Jr.Builder, cancel.
-                                    u.player.closeInventory();
-                                    u.player.sendMessage(Utils.chat("&cYou must be at least a Jr.Builder to join a region."));
-
-                                }
-                            });
-
-            } else {
-
-                //If the region is open.
-                if (user.region.isOpen()) {
-                    setItem(5, Utils.createItem(Material.END_GATEWAY, 1,
-                            Utils.chat("&b&lOpen Region"),
-                            Utils.chat("&fThis region is open to all Jr.Builder+."),
-                            Utils.chat("&fYou can build here without claiming.")));
+                                });
 
                 } else {
 
-                    //This region is not claimable.
-                    setItem(5, Utils.createItem(Material.IRON_DOOR, 1,
-                            Utils.chat("&b&lLocked Region"),
-                            Utils.chat("&fThis region can not be claimed."),
-                            Utils.chat("&fIt is either locked or used in the plot system.")));
+                    //If the region is open.
+                    if (user.region.isOpen()) {
+                        setItem(5, Utils.createItem(Material.END_GATEWAY, 1,
+                                Utils.title("Open Region"),
+                                Utils.line("This region is open to all Jr.Builder+."),
+                                Utils.line("You can build here without claiming.")));
+
+                    } else {
+
+                        //This region is not claimable.
+                        setItem(5, Utils.createItem(Material.IRON_DOOR, 1,
+                                Utils.title("Locked Region"),
+                                Utils.line("This region can not be claimed."),
+                                Utils.line("&fIt is either locked or used in the plot system.")));
+
+                    }
 
                 }
+            } else {
+
+                //Can't claim since you don't have jr.builder.
+                setItem(5, Utils.createItem(Material.STRUCTURE_VOID, 1,
+                        Utils.title("Unable to Join Region"),
+                        Utils.line("To be able to join a region you"),
+                        Utils.line("must gain at least Jr.Builder or above."),
+                        Utils.line("For more information type &7/help building")));
 
             }
         } else {
             //Show that the user is not in a region.
             setItem(5, Utils.createItem(Material.STRUCTURE_VOID, 1,
-                    Utils.chat("&b&lNo Region"),
-                    Utils.chat("&fYou are currently not standing in a valid region."),
-                    Utils.chat("&fThis is likely due to being in a lobby.")));
+                    Utils.title("No Region"),
+                    Utils.line("You are currently not standing in a valid region."),
+                    Utils.line("This is likely due to being in a lobby.")));
         }
 
         //Plot menu.
         setItem(21, Utils.createItem(Material.CHEST, 1,
-                        Utils.chat("&b&lPlot Menu"),
-                        Utils.chat("&fView all your active plots.")),
+                        Utils.title("Plot Menu"),
+                        Utils.line("View all your active plots.")),
                 u ->
 
                 {
@@ -348,8 +328,8 @@ public class BuildGui extends Gui {
 
         //Region menu.
         setItem(23, Utils.createItem(Material.CHEST, 1,
-                        Utils.chat("&b&lRegion Menu"),
-                        Utils.chat("&fView all regions you can build in.")),
+                        Utils.title("Region Menu"),
+                        Utils.line("View all regions you can build in.")),
                 u ->
 
                 {
@@ -381,8 +361,8 @@ public class BuildGui extends Gui {
 
         //Spawn
         setItem(17, Utils.createItem(Material.RED_BED, 1,
-                        Utils.chat("&b&lSpawn"),
-                        Utils.chat("&fTeleport to spawn.")),
+                        Utils.title("Spawn"),
+                        Utils.line("Teleport to spawn.")),
                 u ->
 
                 {
@@ -403,8 +383,8 @@ public class BuildGui extends Gui {
 
         //Return
         setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        Utils.chat("&b&lReturn"),
-                        Utils.chat("&fOpen the navigator main menu.")),
+                        Utils.title("Return"),
+                        Utils.line("Open the navigator main menu.")),
                 u ->
 
                 {

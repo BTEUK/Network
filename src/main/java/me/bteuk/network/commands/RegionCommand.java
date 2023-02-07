@@ -16,19 +16,19 @@ public class RegionCommand implements CommandExecutor {
 
         if (!(sender instanceof Player p)) {
 
-            sender.sendMessage(Utils.chat("&cYou must be a player to run this command."));
+            sender.sendMessage(Utils.error("You must be a player to run this command."));
             return true;
 
         }
 
         if (args.length < 2) {
-            p.sendMessage(Utils.chat("&c/region join <region>"));
+            p.sendMessage(Utils.error("/region join <region>"));
             return true;
         }
 
         //Check if the first arg is 'join'
         if (!args[0].equals("join")) {
-            p.sendMessage(Utils.chat("&c/region join <region>"));
+            p.sendMessage(Utils.error("/region join <region>"));
             return true;
         }
 
@@ -50,12 +50,12 @@ public class RegionCommand implements CommandExecutor {
                 region.removeInvite(p.getUniqueId().toString());
 
             } else {
-                p.sendMessage(Utils.chat("&cYou have not been invited to join this region."));
+                p.sendMessage(Utils.error("You have not been invited to join this region."));
             }
             return true;
         } else {
 
-            p.sendMessage(Utils.chat("&cThe region " + args[1] + " does not exist."));
+            p.sendMessage(Utils.error("The region " + args[1] + " does not exist."));
             return true;
 
         }

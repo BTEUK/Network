@@ -29,7 +29,7 @@ public class LocationNameListener implements Listener {
         task = Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
             //Send message to player telling them it's been timer out.
             if (p != null) {
-                p.sendMessage(Utils.chat("&c'Set Location Name' cancelled."));
+                p.sendMessage(Utils.error("'Set Location Name' cancelled."));
 
                 //If AddLocation gui still exists, reopen it.
                 //Also check if player is actually still online.
@@ -58,14 +58,14 @@ public class LocationNameListener implements Listener {
 
             //Check if message is under 64 character.
             if (e.getMessage().length() > 64) {
-                e.getPlayer().sendMessage(Utils.chat("&cThe location name can't be longer than 64 characters."));
+                e.getPlayer().sendMessage(Utils.error("The location name can't be longer than 64 characters."));
             } else {
 
                 //Set location name.
                 gui.setName(e.getMessage());
 
                 //Send message to player.
-                p.sendMessage(Utils.chat("&aSet location name to &3" + e.getMessage()));
+                p.sendMessage(Utils.success("Set location name to &3" + e.getMessage()));
 
                 //Unregister listener and task.
                 task.cancel();

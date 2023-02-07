@@ -56,9 +56,9 @@ public class Connect {
 
             if (plots != 0) {
                 if (plots == 1) {
-                    p.sendMessage(Utils.chat("&aThere is 1 plot available for review."));
+                    p.sendMessage(Utils.success("There is &31 &aplot available for review."));
                 } else {
-                    p.sendMessage(Utils.chat("&aThere are " + plots + " plots available for review."));
+                    p.sendMessage(Utils.success("There are &3" + plots + " &aplots available for review."));
                 }
             }
 

@@ -27,8 +27,8 @@ public class Shop extends Gui {
 
         //Return
         setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        Utils.chat("&b&lReturn"),
-                        Utils.chat("&fOpen the navigator main menu.")),
+                        Utils.title("Return"),
+                        Utils.line("Open the navigator main menu.")),
                 u ->
 
                 {

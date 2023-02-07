@@ -99,10 +99,10 @@ public class PlotServerLocations extends Gui {
 
         //Select plot difficulty.
         setItem(3, Utils.createItem(mDifficulty, 1,
-                        Utils.chat("&b&l" + sDifficulty),
-                        Utils.chat("&fClick to toggle the difficulty."),
-                        Utils.chat("&fYou will only be teleported to"),
-                        Utils.chat("&fplots of the selected difficulty.")),
+                        Utils.title(sDifficulty),
+                        Utils.line("Click to toggle the difficulty."),
+                        Utils.line("You will only be teleported to"),
+                        Utils.line("plots of the selected difficulty.")),
                 u ->
 
                 {
@@ -118,10 +118,10 @@ public class PlotServerLocations extends Gui {
 
         //Select plot size.
         setItem(5, Utils.createItem(mSize, 1,
-                        Utils.chat("&b&l" + sSize),
-                        Utils.chat("&fClick to toggle the size."),
-                        Utils.chat("&fYou will only be teleported to"),
-                        Utils.chat("&fplots of the selected size.")),
+                        Utils.title(sSize),
+                        Utils.line("Click to toggle the size."),
+                        Utils.line("You will only be teleported to"),
+                        Utils.line("plots of the selected size.")),
                 u ->
 
                 {
@@ -146,13 +146,13 @@ public class PlotServerLocations extends Gui {
 
             //Create location button.
             setItem(slot, Utils.createItem(Material.DIAMOND_PICKAXE, 1,
-                            Utils.chat("&b&l" + plotSQL.getString("SELECT alias FROM location_data WHERE name='" + location + "';")),
-                            Utils.chat("&fClick to teleport to a plot in this location"),
-                            Utils.chat("&fsubject to the settings shown above."),
-                            Utils.chat("&fAvailable plots of each difficulty:"),
-                            Utils.chat("&fEasy: &7" + plotSQL.getInt("SELECT count(id) FROM plot_data WHERE location='" + location + "' AND status='unclaimed' AND difficulty=1;")),
-                            Utils.chat("&fMedium: &7" + plotSQL.getInt("SELECT count(id) FROM plot_data WHERE location='" + location + "' AND status='unclaimed' AND difficulty=2;")),
-                            Utils.chat("&fHard: &7" + plotSQL.getInt("SELECT count(id) FROM plot_data WHERE location='" + location + "' AND status='unclaimed' AND difficulty=3;"))),
+                            Utils.title(plotSQL.getString("SELECT alias FROM location_data WHERE name='" + location + "';")),
+                            Utils.line("Click to teleport to a plot in this location"),
+                            Utils.line("subject to the settings shown above."),
+                            Utils.line("Available plots of each difficulty:"),
+                            Utils.line("Easy: &7" + plotSQL.getInt("SELECT count(id) FROM plot_data WHERE location='" + location + "' AND status='unclaimed' AND difficulty=1;")),
+                            Utils.line("Medium: &7" + plotSQL.getInt("SELECT count(id) FROM plot_data WHERE location='" + location + "' AND status='unclaimed' AND difficulty=2;")),
+                            Utils.line("Hard: &7" + plotSQL.getInt("SELECT count(id) FROM plot_data WHERE location='" + location + "' AND status='unclaimed' AND difficulty=3;"))),
                     u ->
 
                     {
@@ -241,8 +241,8 @@ public class PlotServerLocations extends Gui {
                         //If no plots fit the specified parameters the id will be 0.
                         if (id == 0) {
 
-                            u.player.sendMessage(Utils.chat("&cNo plots are available with the specified settings,"));
-                            u.player.sendMessage(Utils.chat("&ctry another location or change the settings."));
+                            u.player.sendMessage(Utils.error("No plots are available with the specified settings,"));
+                            u.player.sendMessage(Utils.error("try another location or change the settings."));
 
                         } else {
 
@@ -289,8 +289,8 @@ public class PlotServerLocations extends Gui {
 
         //Return
         setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        Utils.chat("&b&lReturn"),
-                        Utils.chat("&fOpen the build menu.")),
+                        Utils.title("Return"),
+                        Utils.line("Open the build menu.")),
                 u ->
 
                 {

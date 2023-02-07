@@ -29,9 +29,12 @@ chat:
   leave: '&e%player% has left UKnet'
 
 #Tpll config.
+#The min and max y are for searching altitude for teleport, set it to the same value as the world height.
 tpll:
   enabled: true
   requires_permission: false
+  min_y: 0
+  max_y: 255
 
 #Enable regions and cross-server teleport.
 #Regions must be enabled for cross-server teleport to function.
@@ -60,10 +63,6 @@ staff_request:
 #Number of days a region owner can be inactive before they are demoted to member.
 #If the region has no other members then the owner does not get demoted by the region becomes 'inactive'.
 region_inactivity: 30
-
-#Movement limits.
-max_y: 512
-min_y: -128
 
 #Old database details
 #These are only necessary for UKnet1.0 to UKnet2.0 conversions.

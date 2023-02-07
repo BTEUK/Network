@@ -37,14 +37,14 @@ public class RegionRequest extends Gui {
     private void createGui() {
 
         setItem(4, Utils.createItem(Material.BOOK, 1,
-                Utils.chat("&b&lRegion " + request.region),
-                Utils.chat("&fRequested by &7" +
+                Utils.title("Region " + request.region),
+                Utils.line("Requested by &7" +
                         Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
                                 request.uuid + "';") + ".")));
 
         setItem(11, Utils.createItem(Material.LIME_CONCRETE, 1,
-                        Utils.chat("&b&lAccept Request"),
-                        Utils.chat("&fThe user will be able to build in this region.")),
+                        Utils.title("Accept Request"),
+                        Utils.line("The user will be able to build in this region.")),
                 u ->
 
                 {
@@ -65,8 +65,8 @@ public class RegionRequest extends Gui {
                 });
 
         setItem(15, Utils.createItem(Material.RED_CONCRETE, 1,
-                        Utils.chat("&b&lDeny Request"),
-                        Utils.chat("&fThe user will not be able to build in this region.")),
+                        Utils.title("Deny Request"),
+                        Utils.line("The user will not be able to build in this region.")),
                 u ->
 
                 {
@@ -86,8 +86,8 @@ public class RegionRequest extends Gui {
                 });
 
         setItem(22, Utils.createItem(Material.ENDER_PEARL, 1,
-                        Utils.chat("&b&lTeleport to Region"),
-                        Utils.chat("&fTeleport to the location where the request was made.")),
+                        Utils.title("Teleport to Region"),
+                        Utils.line("Teleport to the location where the request was made.")),
                 u ->
 
                 {
@@ -108,7 +108,7 @@ public class RegionRequest extends Gui {
 
                         //Teleport player.
                         u.player.teleport(l);
-                        u.player.sendMessage(Utils.chat("&aTeleported to region &3" + request.region));
+                        u.player.sendMessage(Utils.success("Teleported to region &3" + request.region));
 
                     } else {
 
@@ -125,8 +125,8 @@ public class RegionRequest extends Gui {
                 });
 
         setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        Utils.chat("&b&lPrevious Page"),
-                        Utils.chat("&fOpen the region request menu.")),
+                        Utils.title("Previous Page"),
+                        Utils.line("Open the region request menu.")),
                 u ->
 
                 {

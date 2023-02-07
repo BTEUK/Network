@@ -63,9 +63,9 @@ public class LightsOut extends Gui {
         u.lightsOut = null;
         this.delete();
 
-        u.player.sendMessage(Utils.chat("&aCongratulations, you beat Lights Out!"));
-        u.player.sendMessage(Utils.chat("&aYou took &7" + Time.minutes(timeDiff) + " &a" + Time.minuteString(timeDiff)
-                + " and &7" + Time.seconds(timeDiff) + " &a" + Time.secondString(timeDiff) + "."));
+        u.player.sendMessage(Utils.success("Congratulations, you beat Lights Out!"));
+        u.player.sendMessage(Utils.success("You took &3" + Time.minutes(timeDiff) + " &a" + Time.minuteString(timeDiff)
+                + " and &3" + Time.seconds(timeDiff) + " &a" + Time.secondString(timeDiff) + "."));
 
     }
 

@@ -20,7 +20,7 @@ public class Back implements CommandExecutor {
         //Check if the sender is a player.
         if (!(sender instanceof Player p)) {
 
-            sender.sendMessage(Utils.chat("&cThis command can only be used by a player."));
+            sender.sendMessage(Utils.error("This command can only be used by a player."));
             return true;
 
         }
@@ -31,7 +31,7 @@ public class Back implements CommandExecutor {
         //Check if the player has a previous coordinate.
         if (coordinateID == 0) {
 
-            p.sendMessage(Utils.chat("&cYou have not teleported anywhere previously."));
+            p.sendMessage(Utils.error("You have not teleported anywhere previously."));
             return true;
 
         }
@@ -48,7 +48,7 @@ public class Back implements CommandExecutor {
 
             //Teleport player to the coordinate.
             p.teleport(l);
-            p.sendMessage(Utils.chat("&aTeleported to previous location."));
+            p.sendMessage(Utils.success("Teleported to previous location."));
 
         } else {
 

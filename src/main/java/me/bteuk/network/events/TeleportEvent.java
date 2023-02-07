@@ -33,12 +33,11 @@ public class TeleportEvent {
                 if (player != null) {
 
                     p.teleport(player.getLocation());
-                    p.sendMessage(Utils.chat("&aTeleported to &3" +
+                    p.sendMessage(Utils.success("Teleported to &3" +
                             Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + event[2] + "';")));
 
                 } else {
-                    p.sendMessage(Utils.chat("&c" +
-                            Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + event[2] + "';") +
+                    p.sendMessage(Utils.error(Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + event[2] + "';") +
                             " is not online."));
                 }
             }
@@ -50,7 +49,7 @@ public class TeleportEvent {
 
                 //Check if a message is set.
                 if (message == null) {
-                    p.sendMessage(Utils.chat("&aTeleported to previous location."));
+                    p.sendMessage(Utils.success("Teleported to previous location."));
                 } else {
                     p.sendMessage(Utils.chat(message));
                 }
@@ -78,7 +77,7 @@ public class TeleportEvent {
                 }
 
                 p.teleport(l);
-                p.sendMessage(Utils.chat("&aTeleported to &3" + location));
+                p.sendMessage(Utils.success("Teleported to &3" + location));
 
             }
             case "region" -> {
@@ -88,14 +87,14 @@ public class TeleportEvent {
                 Location l = Network.getInstance().globalSQL.getCoordinate(region.getCoordinateID(uuid));
 
                 if (l == null) {
-                    p.sendMessage(Utils.chat("&cAn error occurred while fetching the location to teleport."));
+                    p.sendMessage(Utils.error("An error occurred while fetching the location to teleport."));
                     Network.getInstance().getLogger().warning("Location is null for coodinate id " + region.getCoordinateID(uuid));
                     return;
                 }
 
                 //Teleport player.
                 p.teleport(l);
-                p.sendMessage(Utils.chat("&aTeleported to region &3" + region.getTag(uuid)));
+                p.sendMessage(Utils.success("Teleported to region &3" + region.getTag(uuid)));
 
             }
             case "server" -> //Switch to server.
@@ -107,7 +106,7 @@ public class TeleportEvent {
                 World world = Bukkit.getWorld(event[1]);
 
                 if (world == null) {
-                    p.sendMessage(Utils.chat("&cWorld can not be found."));
+                    p.sendMessage(Utils.error("World can not be found."));
                     return;
                 }
 
@@ -152,7 +151,7 @@ public class TeleportEvent {
 
                 //If custom message is set, send that to player, else send default message.
                 if (message == null) {
-                    p.sendMessage(Utils.chat("&aTeleported to &3" + x + ", " + y + ", " + z));
+                    p.sendMessage(Utils.success("Teleported to &3" + x + ", " + y + ", " + z));
                 } else {
                     p.sendMessage(Utils.chat(message));
                 }

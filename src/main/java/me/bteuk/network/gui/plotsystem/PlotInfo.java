@@ -45,16 +45,16 @@ public class PlotInfo extends Gui {
         GlobalSQL globalSQL = Network.getInstance().globalSQL;
 
         setItem(4, Utils.createItem(Material.BOOK, 1,
-                Utils.chat("&b&lPlot &7" + plotID),
-                Utils.chat("&fPlot Owner: &7" + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
+                Utils.title("Plot &7" + plotID),
+                Utils.line("Plot Owner: &7" + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
                         plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plotID + " AND is_owner=1;") + "';")),
-                Utils.chat("&fPlot Members: &7" + plotSQL.getInt("SELECT COUNT(uuid) FROM plot_members WHERE id=" + plotID + " AND is_owner=0;")),
-                Utils.chat("&fDifficulty: &7" + PlotValues.difficultyName(plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plotID + ";"))),
-                Utils.chat("&fSize: &7" + PlotValues.sizeName(plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + plotID + ";")))));
+                Utils.line("Plot Members: &7" + plotSQL.getInt("SELECT COUNT(uuid) FROM plot_members WHERE id=" + plotID + " AND is_owner=0;")),
+                Utils.line("Difficulty: &7" + PlotValues.difficultyName(plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plotID + ";"))),
+                Utils.line("Size: &7" + PlotValues.sizeName(plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + plotID + ";")))));
 
         setItem(24, Utils.createItem(Material.ENDER_PEARL, 1,
-                        Utils.chat("&b&lTeleport to Plot"),
-                        Utils.chat("&fClick to teleport to this plot.")),
+                        Utils.title("Teleport to Plot"),
+                        Utils.line("Click to teleport to this plot.")),
 
                 u -> {
 
@@ -84,8 +84,8 @@ public class PlotInfo extends Gui {
                 });
 
         setItem(23, Utils.createItem(Material.ENDER_EYE, 1,
-                        Utils.chat("&b&lView plot in Google Maps"),
-                        Utils.chat("&fClick to be linked to the plot in Google Maps.")),
+                        Utils.title("View plot in Google Maps"),
+                        Utils.line("Click to be linked to the plot in Google Maps.")),
 
                 u -> {
 
@@ -124,7 +124,7 @@ public class PlotInfo extends Gui {
                         TextComponent message = new TextComponent("Click here to open the plot in Google Maps");
                         message.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.google.com/maps/@?api=1&map_action=map&basemap=satellite&zoom=21&center=" + coords[1] + "," + coords[0]));
 
-                        u.player.sendMessage(message);
+                        u.player.spigot().sendMessage(message);
 
                     } catch (OutOfProjectionBoundsException e) {
                         e.printStackTrace();
@@ -136,8 +136,8 @@ public class PlotInfo extends Gui {
         if (plotSQL.hasRow("SELECT id FROM deny_data WHERE id=" + plotID + ";")) {
 
             setItem(22, Utils.createItem(Material.WRITABLE_BOOK, 1,
-                            Utils.chat("&b&lPlot Feedback"),
-                            Utils.chat("&fClick to show feedback for this plot.")),
+                            Utils.title("Plot Feedback"),
+                            Utils.line("Click to show feedback for this plot.")),
                     u -> {
 
                         //Delete this gui.
@@ -158,9 +158,9 @@ public class PlotInfo extends Gui {
             if (plotSQL.hasRow("SELECT id FROM plot_data WHERE id=" + plotID + " AND status='claimed';")) {
 
                 setItem(2, Utils.createItem(Material.LIGHT_BLUE_CONCRETE, 1,
-                                Utils.chat("&b&lSubmit Plot"),
-                                Utils.chat("&fSubmit your plot to be reviewed."),
-                                Utils.chat("&fReviewing may take over 24 hours.")),
+                                Utils.title("Submit Plot"),
+                                Utils.line("Submit your plot to be reviewed."),
+                                Utils.line("Reviewing may take over 24 hours.")),
                         u -> {
 
                             u.player.closeInventory();
@@ -179,8 +179,8 @@ public class PlotInfo extends Gui {
             if (plotSQL.hasRow("SELECT id FROM plot_data WHERE id=" + plotID + " AND status='submitted';")) {
 
                 setItem(2, Utils.createItem(Material.ORANGE_CONCRETE, 1,
-                                Utils.chat("&b&lRetract Submission"),
-                                Utils.chat("&fYour plot will no longer be submitted.")),
+                                Utils.title("Retract Submission"),
+                                Utils.line("Your plot will no longer be submitted.")),
                         u -> {
 
                             u.player.closeInventory();
@@ -198,8 +198,8 @@ public class PlotInfo extends Gui {
             if (plotSQL.hasRow("SELECT id FROM plot_data WHERE id=" + plotID + " AND (status='claimed' OR status='submitted');")) {
 
                 setItem(6, Utils.createItem(Material.RED_CONCRETE, 1,
-                                Utils.chat("&b&lDelete Plot"),
-                                Utils.chat("&fDelete the plot and all its contents.")),
+                                Utils.title("Delete Plot"),
+                                Utils.line("Delete the plot and all its contents.")),
                         u -> {
 
                             //Delete this gui.
@@ -216,8 +216,8 @@ public class PlotInfo extends Gui {
 
             //If plot has members, edit plot members.
             setItem(21, Utils.createItem(Material.PLAYER_HEAD, 1,
-                            Utils.chat("&b&lPlot Members"),
-                            Utils.chat("&fManage the members of your plot.")),
+                            Utils.title("Plot Members"),
+                            Utils.line("Manage the members of your plot.")),
                     u -> {
 
                         //Delete this gui.
@@ -232,9 +232,9 @@ public class PlotInfo extends Gui {
 
             //Invite new members to your plot.
             setItem(20, Utils.createItem(Material.OAK_BOAT, 1,
-                            Utils.chat("&b&lInvite Members"),
-                            Utils.chat("&fInvite a new member to your plot."),
-                            Utils.chat("&fYou can only invite online users.")),
+                            Utils.title("Invite Members"),
+                            Utils.line("Invite a new member to your plot."),
+                            Utils.line("You can only invite online users.")),
                     u -> {
 
                         //Delete this gui.
@@ -252,8 +252,8 @@ public class PlotInfo extends Gui {
 
             //Leave plot.
             setItem(20, Utils.createItem(Material.RED_CONCRETE, 1,
-                            Utils.chat("&b&lLeave Plot"),
-                            Utils.chat("&fYou will not be able to build in the plot once you leave.")),
+                            Utils.title("Leave Plot"),
+                            Utils.line("You will not be able to build in the plot once you leave.")),
                     u -> {
 
                         //Delete this gui.
@@ -279,8 +279,8 @@ public class PlotInfo extends Gui {
 
         //Return
         setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        Utils.chat("&b&lReturn"),
-                        Utils.chat("&fOpen the plot menu.")),
+                        Utils.title("Return"),
+                        Utils.line("Open the plot menu.")),
                 u -> {
 
                     //Delete this gui.

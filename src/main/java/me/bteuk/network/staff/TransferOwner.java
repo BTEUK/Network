@@ -48,8 +48,8 @@ public class TransferOwner extends Gui {
         //If page is greater than 1 add a previous page button.
         if (page > 1) {
             setItem(18, Utils.createItem(Material.ARROW, 1,
-                            Utils.chat("&b&lPrevious Page"),
-                            Utils.chat("&fOpen the previous page of region members.")),
+                            Utils.title("Previous Page"),
+                            Utils.line("Open the previous page of region members.")),
                     u ->
 
                     {
@@ -69,8 +69,8 @@ public class TransferOwner extends Gui {
             if (slot > 34) {
 
                 setItem(26, Utils.createItem(Material.ARROW, 1,
-                                Utils.chat("&b&lNext Page"),
-                                Utils.chat("&fOpen the next page of region members.")),
+                                Utils.title("Next Page"),
+                                Utils.line("Open the next page of region members.")),
                         u ->
 
                         {
@@ -92,8 +92,8 @@ public class TransferOwner extends Gui {
 
             //Add player to gui.
             setItem(slot, Utils.createPlayerSkull(uuid, 1,
-                            Utils.chat("&b&lMake " + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " the region owner."),
-                            Utils.chat("&fThe previous owner will be demoted to a member.")),
+                            Utils.title("Make " + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " the region owner."),
+                            Utils.line("The previous owner will be demoted to a member.")),
                     u ->
 
                     {
@@ -107,7 +107,7 @@ public class TransferOwner extends Gui {
                         region.updateRequests();
 
                         //Send message to user.
-                        u.player.sendMessage(Utils.chat("&aTransferred ownership of the region to &3" +
+                        u.player.sendMessage(Utils.success("Transferred ownership of the region to &3" +
                                 globalSQL.getString("SELECT name FROM player_data WHERE uuid ='" + region.getOwner() + "';")));
 
                         //Refresh the gui.
@@ -128,8 +128,8 @@ public class TransferOwner extends Gui {
 
         //Return to plot info menu.
         setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        Utils.chat("&b&lReturn"),
-                        Utils.chat("&fReturn to manage region &7" + region.regionName() + ".")),
+                        Utils.title("Return"),
+                        Utils.line("Return to manage region &7" + region.regionName() + ".")),
                 u ->
 
                 {

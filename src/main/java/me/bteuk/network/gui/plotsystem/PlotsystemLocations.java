@@ -51,7 +51,7 @@ public class PlotsystemLocations extends Gui {
 
             setItem(slot, Utils.createItem(nextIcon(), 1,
                             Utils.title(plotSQL.getString("SELECT alias FROM location_data WHERE name='" + name + "';")),
-                            Utils.chat("&fClick to open the menu of this plot.")),
+                            Utils.line("Click to open the menu of this plot.")),
                     u -> {
 
                         //Teleport to centre of the plotsystem location.
@@ -109,8 +109,8 @@ public class PlotsystemLocations extends Gui {
 
         //Return
         setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        Utils.chat("&b&lReturn"),
-                        Utils.chat("&fOpen the building menu.")),
+                        Utils.title("Return"),
+                        Utils.line("Open the building menu.")),
                 u -> {
 
                     //Delete this gui.

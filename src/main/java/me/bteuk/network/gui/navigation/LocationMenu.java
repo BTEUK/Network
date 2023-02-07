@@ -47,8 +47,8 @@ public class LocationMenu extends Gui {
         //If page is greater than 1 add a previous page button.
         if (page > 1) {
             setItem(18, Utils.createItem(Material.ARROW, 1,
-                            Utils.chat("&b&lPrevious Page"),
-                            Utils.chat("&fOpen the previous page of locations.")),
+                            Utils.title("Previous Page"),
+                            Utils.line("Open the previous page of locations.")),
                     u ->
 
                     {
@@ -74,8 +74,8 @@ public class LocationMenu extends Gui {
             if (slot > 34) {
 
                 setItem(26, Utils.createItem(Material.ARROW, 1,
-                                Utils.chat("&b&lNext Page"),
-                                Utils.chat("&fOpen the next page of locations.")),
+                                Utils.title("Next Page"),
+                                Utils.line("&fOpen the next page of locations.")),
                         u ->
 
                         {
@@ -122,7 +122,7 @@ public class LocationMenu extends Gui {
                             Back.setPreviousCoordinate(u.player.getUniqueId().toString(), u.player.getLocation());
 
                             u.player.teleport(l);
-                            u.player.sendMessage(Utils.chat("&aTeleported to &3" + location));
+                            u.player.sendMessage(Utils.success("Teleported to &3" + location));
 
                         } else {
 
@@ -149,8 +149,8 @@ public class LocationMenu extends Gui {
 
         //Return
         setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        Utils.chat("&b&lReturn"),
-                        Utils.chat("&fOpen the exploration menu.")),
+                        Utils.title("Return"),
+                        Utils.line("Open the exploration menu.")),
                 u ->
 
                 {

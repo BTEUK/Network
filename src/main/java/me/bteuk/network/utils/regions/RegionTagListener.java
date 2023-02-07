@@ -29,7 +29,7 @@ public class RegionTagListener implements Listener {
         task = Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
             //Send message to player telling them it's been timer out.
             if (p != null) {
-                p.sendMessage(Utils.chat("&c'Set Region Tag' cancelled."));
+                p.sendMessage(Utils.error("'Set Region Tag' cancelled."));
             }
             unregister();
         }, 1200L);
@@ -46,14 +46,14 @@ public class RegionTagListener implements Listener {
 
             //Check if message is under 64 character.
             if (e.getMessage().length() > 64) {
-                e.getPlayer().sendMessage(Utils.chat("&cThe region tag can't be longer than 64 characters."));
+                e.getPlayer().sendMessage(Utils.error("The region tag can't be longer than 64 characters."));
             } else {
 
                 //Set region tag.
                 region.setTag(p.getUniqueId().toString(), e.getMessage());
 
                 //Send message to player.
-                p.sendMessage(Utils.chat("&aSet tag for region &3" + region.regionName() + "&a to &3" + e.getMessage()));
+                p.sendMessage(Utils.success("Set tag for region &3" + region.regionName() + "&a to &3" + e.getMessage()));
 
                 //Unregister listener and task.
                 task.cancel();

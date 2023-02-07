@@ -28,10 +28,10 @@ public class ManageRegion extends Gui {
     private void createGui() {
 
         setItem(4, Utils.createItem(Material.BOOK, 1,
-                Utils.chat("&b&lRegion " + region.regionName()),
-                Utils.chat("&fCurrent owner: &7" + region.ownerName()),
-                Utils.chat("&fNumber of members: &7" + region.memberCount()),
-                Utils.chat("&fRegion status: &7" + region.getStatus())));
+                Utils.title("Region " + region.regionName()),
+                Utils.line("Current owner: &7" + region.ownerName()),
+                Utils.line("Number of members: &7" + region.memberCount()),
+                Utils.line("&fRegion status: &7" + region.getStatus())));
 
 
         //Set public if status is default or inactive.
@@ -40,10 +40,10 @@ public class ManageRegion extends Gui {
             if (region.isDefault() || region.isInactive()) {
 
                 setItem(11, Utils.createItem(Material.OAK_DOOR, 1,
-                                Utils.chat("&b&lMake region public"),
-                                Utils.chat("&fA public region allows members"),
-                                Utils.chat("&fto join without needing"),
-                                Utils.chat("&fthe owner to accept it.")),
+                                Utils.title("Make region public"),
+                                Utils.line("A public region allows members"),
+                                Utils.line("to join without needing"),
+                                Utils.line("the owner to accept it.")),
 
                         u -> {
 
@@ -55,10 +55,10 @@ public class ManageRegion extends Gui {
             } else if (region.isPublic()) {
 
                 setItem(11, Utils.createItem(Material.IRON_DOOR, 1,
-                                Utils.chat("&b&lMake region private"),
-                                Utils.chat("&fThe default region setting,"),
-                                Utils.chat("&fjoining requires the owner"),
-                                Utils.chat("&fto accept the request.")),
+                                Utils.title("Make region private"),
+                                Utils.line("The default region setting,"),
+                                Utils.line("joining requires the owner"),
+                                Utils.line("to accept the request.")),
 
                         u -> {
 
@@ -75,10 +75,10 @@ public class ManageRegion extends Gui {
 
                 //Slot 14
                 setItem(14, Utils.createItem(Material.MAGENTA_GLAZED_TERRACOTTA, 1,
-                                Utils.chat("&b&lTransfer Ownership"),
-                                Utils.chat("&fOpen the transfer ownership menu."),
-                                Utils.chat("&fAllows you to make a member"),
-                                Utils.chat("&fthe new region owner.")),
+                                Utils.title("Transfer Ownership"),
+                                Utils.line("Open the transfer ownership menu."),
+                                Utils.line("Allows you to make a member"),
+                                Utils.line("the new region owner.")),
 
                         u -> {
 
@@ -101,9 +101,9 @@ public class ManageRegion extends Gui {
 
                 //Slot 15
                 setItem(15, Utils.createItem(Material.BARRIER, 1,
-                                Utils.chat("&b&lKick Members"),
-                                Utils.chat("&fRemove any current members."),
-                                Utils.chat("&for the owner from the region.")),
+                                Utils.title("Kick Members"),
+                                Utils.line("Remove any current members."),
+                                Utils.line("or the owner from the region.")),
 
                         u -> {
 
@@ -126,11 +126,11 @@ public class ManageRegion extends Gui {
             if (region.isDefault() || region.isPublic() || region.isOpen() || region.isInactive()) {
 
                 setItem(12, Utils.createItem(Material.IRON_TRAPDOOR, 1,
-                                Utils.chat("&b&lLock Region"),
-                                Utils.chat("&fLocking a region stops anyone"),
-                                Utils.chat("&ffrom joining or building in the"),
-                                Utils.chat("&fregion, any existing members"),
-                                Utils.chat("&fwill be kicked")),
+                                Utils.title("Lock Region"),
+                                Utils.line("Locking a region stops anyone"),
+                                Utils.line("from joining or building in the"),
+                                Utils.line("region, any existing members"),
+                                Utils.line("will be kicked")),
 
                         u -> {
 
@@ -142,10 +142,10 @@ public class ManageRegion extends Gui {
             } else if (region.isLocked()) {
 
                 setItem(12, Utils.createItem(Material.OAK_TRAPDOOR, 1,
-                                Utils.chat("&b&lUnlock Region"),
-                                Utils.chat("&fThe default region setting,"),
-                                Utils.chat("&fpeople will be able to join"),
-                                Utils.chat("&fand building in the region again.")),
+                                Utils.title("Unlock Region"),
+                                Utils.line("The default region setting,"),
+                                Utils.line("people will be able to join"),
+                                Utils.line("and building in the region again.")),
 
                         u -> {
 
@@ -162,21 +162,21 @@ public class ManageRegion extends Gui {
             if (region.isDefault() || region.isPublic() || region.isInactive()) {
 
                 setItem(13, Utils.createItem(Material.OAK_FENCE_GATE, 1,
-                                Utils.chat("&b&lMake region open"),
-                                Utils.chat("&fAn open region allows all"),
-                                Utils.chat("&fJr.Builder+ to build without"),
-                                Utils.chat("&fneeding to join the region."),
-                                Utils.chat("&fAny existing members will be kicked.")),
+                                Utils.title("Make region open"),
+                                Utils.line("An open region allows all"),
+                                Utils.line("Jr.Builder+ to build without"),
+                                Utils.line("needing to join the region."),
+                                Utils.line("Any existing members will be kicked.")),
 
                         u -> region.setOpen());
 
             } else if (region.isOpen()) {
 
                 setItem(13, Utils.createItem(Material.OAK_FENCE, 1,
-                                Utils.chat("&b&lMake region closed"),
-                                Utils.chat("&fThe default region setting,"),
-                                Utils.chat("&fpeople will again be required"),
-                                Utils.chat("&fto join the region to build.")),
+                                Utils.title("Make region closed"),
+                                Utils.line("The default region setting,"),
+                                Utils.line("people will again be required"),
+                                Utils.line("to join the region to build.")),
 
                         u -> region.setDefault());
 
@@ -184,8 +184,8 @@ public class ManageRegion extends Gui {
         }
 
         setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        Utils.chat("&b&lPrevious Page"),
-                        Utils.chat("&fOpen the staff menu.")),
+                        Utils.title("Previous Page"),
+                        Utils.line("Open the staff menu.")),
                 u ->
 
                 {

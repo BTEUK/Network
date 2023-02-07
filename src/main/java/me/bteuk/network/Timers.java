@@ -7,7 +7,6 @@ import me.bteuk.network.utils.*;
 import me.bteuk.network.utils.regions.Inactivity;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;

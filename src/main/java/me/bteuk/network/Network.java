@@ -78,6 +78,9 @@ public final class Network extends JavaPlugin {
     //Lobby
     private Lobby lobby;
 
+    public static int MIN_Y;
+    public static int MAX_Y;
+
     @Override
     public void onEnable() {
 
@@ -217,6 +220,10 @@ public final class Network extends JavaPlugin {
 
         //Setup tpll if enabled in config.
         if (config.getBoolean("tpll.enabled")) {
+            //Set max and min y.
+            MIN_Y = config.getInt("min_y");
+            MAX_Y = config.getInt("max_y");
+
             getCommand("tpll").setExecutor(new Tpll(config.getBoolean("requires_permission")));
         }
 
