@@ -26,12 +26,16 @@ commands:
     usage: /<command>
     description: Allows players to manipulate regions without using the gui.
   teleport:
-    aliasses: [tp]
+    aliases: [tp]
     usage: /<command>
     description: Teleport to any online player.
   back:
     usage: /<command>
     description: Teleports the player to the previous teleported location.
+  teleporttoggle:
+    aliases: [tptoggle, toggleteleport, toggletp]
+    usage: /<command>
+    description: Enables/Disables the ability for other players to teleport to you.
   discord:
     usage: /<command>
     description: Sends a link to our discord server.

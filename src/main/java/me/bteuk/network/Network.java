@@ -230,6 +230,7 @@ public final class Network extends JavaPlugin {
 
         getCommand("teleport").setExecutor(new Tp());
         getCommand("teleport").setTabCompleter(new PlayerSelector());
+        getCommand("teleporttoggle").setExecutor(new TpToggle());
 
         getCommand("back").setExecutor(new Back());
 
@@ -256,7 +257,7 @@ public final class Network extends JavaPlugin {
         getCommand("sethome").setExecutor(new Sethome(globalSQL));
         getCommand("home").setExecutor(new Home(globalSQL));
         getCommand("delhome").setExecutor(new Delhome(globalSQL));
-		
+
         //Register commandpreprocess to make sure /network:region runs and not that of another plugin.
         new CommandPreProcess(this);
         getCommand("region").setExecutor(new RegionCommand());
@@ -303,10 +304,14 @@ public final class Network extends JavaPlugin {
         }
 
         //Shut down chat.
-        if (chat != null) {chat.onDisable();}
+        if (chat != null) {
+            chat.onDisable();
+        }
 
         //Close timers.
-        if (timers != null) {timers.close();}
+        if (timers != null) {
+            timers.close();
+        }
 
         //Disable server in server table.
         globalSQL.update("UPDATE server_data SET online=0 WHERE name='" + SERVER_NAME + "';");
