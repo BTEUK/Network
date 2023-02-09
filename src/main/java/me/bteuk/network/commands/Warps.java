@@ -52,7 +52,12 @@ public class Warps implements CommandExecutor {
 
         if (((page - 1) * 16) >= locations.size()){
 
-            p.sendMessage(Utils.error("There are only &4" + pages + " &cpages of warps."));
+            if (locations.size() <= 16) {
+                p.sendMessage(Utils.error("There is only &41 &cpage of warps."));
+            } else {
+                p.sendMessage(Utils.error("There are only &4" + pages + " &cpages of warps."));
+            }
+
             return true;
 
         }
