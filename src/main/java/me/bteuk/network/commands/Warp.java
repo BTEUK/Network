@@ -28,49 +28,44 @@ public class Warp implements CommandExecutor {
             return true;
         }
 
-        //Check if first arg is list.
-        if (args[0].equalsIgnoreCase("list")) {
-            //TODO /warp list
-        } else {
+        //Get location name from all remaining args.
+        String location = String.join(" ", Arrays.copyOfRange(args, 0, args.length));
 
-            //Get location name from all remaining args.
-            String location = String.join(" ", Arrays.copyOfRange(args, 0, args.length));
+        //Find a location.
+        if (Network.getInstance().globalSQL.hasRow("SELECT location FROM location_data WHERE location='" + location + "';")) {
 
-            //Find a location.
-            if (Network.getInstance().globalSQL.hasRow("SELECT location FROM location_data WHERE location='" + location + "';")) {
+            //Get coordinate id.
+            int coordinate_id = Network.getInstance().globalSQL.getInt("SELECT coordinate FROM location_data WHERE location='" + location + "';");
 
-                //Get coordinate id.
-                int coordinate_id = Network.getInstance().globalSQL.getInt("SELECT coordinate FROM location_data WHERE location='" + location + "';");
+            //Get server, if server is not current server,
+            // teleport the player to the correct server with join event to teleport them to the location.
+            String server = Network.getInstance().globalSQL.getString("SELECT server FROM coordinates WHERE id=" + coordinate_id + ";");
+            if (server.equals(Network.SERVER_NAME)) {
+                //Server is equal.
 
-                //Get server, if server is not current server,
-                // teleport the player to the correct server with join event to teleport them to the location.
-                String server = Network.getInstance().globalSQL.getString("SELECT server FROM coordinates WHERE id=" + coordinate_id + ";");
-                if (server.equals(Network.SERVER_NAME)) {
-                    //Server is equal.
+                //Set current location for /back
+                Back.setPreviousCoordinate(p.getUniqueId().toString(), p.getLocation());
 
-                    //Set current location for /back
-                    Back.setPreviousCoordinate(p.getUniqueId().toString(), p.getLocation());
-
-                    //Teleport to location.
-                    p.teleport(Network.getInstance().globalSQL.getCoordinate(coordinate_id));
-                    p.sendMessage(Utils.success("Teleported to &3" + location));
-                } else {
-
-                    //Server is different.
-                    EventManager.createTeleportEvent(true, p.getUniqueId().toString(),"network",
-                            "teleport location " + location, p.getLocation());
-
-                    SwitchServer.switchServer(p, server);
-                }
-
+                //Teleport to location.
+                p.teleport(Network.getInstance().globalSQL.getCoordinate(coordinate_id));
+                p.sendMessage(Utils.success("Teleported to &3" + location));
             } else {
-                p.sendMessage(Utils.error("The location &4" + location + " &cdoes not exist."));
+
+                //Server is different.
+                EventManager.createTeleportEvent(true, p.getUniqueId().toString(), "network",
+                        "teleport location " + location, p.getLocation());
+
+                SwitchServer.switchServer(p, server);
             }
+
+        } else {
+            p.sendMessage(Utils.error("The location &4" + location + " &cdoes not exist."));
         }
+
         return true;
     }
 
     private void help(Player p) {
-        p.sendMessage(Utils.error("/warp <location>/list"));
+        p.sendMessage(Utils.error("/warp <location>"));
     }
 }

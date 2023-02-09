@@ -52,6 +52,9 @@ commands:
   warp:
     usage: /<command>
     description: Warp to locations in the exploration menu.
+  warps:
+    usage: /<command>
+    description: List all warps on the server, 16 per page.
   navigation:
     usage: /<command>
     description: Adds commands to do with navigation.
