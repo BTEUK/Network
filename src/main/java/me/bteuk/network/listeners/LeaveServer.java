@@ -29,6 +29,10 @@ public class LeaveServer implements Listener {
 
     }
 
+    public void unregister() {
+        PlayerQuitEvent.getHandlerList().unregister(this);
+    }
+
     @EventHandler
     public void leaveServerEvent(PlayerQuitEvent e) {
 

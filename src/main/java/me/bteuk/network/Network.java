@@ -1,5 +1,7 @@
 package me.bteuk.network;
 
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
 import me.bteuk.network.commands.*;
 import me.bteuk.network.commands.staff.Ban;
 import me.bteuk.network.commands.staff.Database;
@@ -16,7 +18,7 @@ import me.bteuk.network.lobby.Lobby;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.sql.RegionSQL;
-import me.bteuk.network.utils.SwitchServer;
+import me.bteuk.network.utils.Statistics;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.ServerType;
@@ -49,6 +51,9 @@ public final class Network extends JavaPlugin {
     private static Network instance;
     private static FileConfiguration config;
 
+    //If the server can shutdown.
+    public boolean allow_shutdown;
+
     //RegionManager
     private RegionManager regionManager;
 
@@ -78,6 +83,9 @@ public final class Network extends JavaPlugin {
     //Lobby
     private Lobby lobby;
 
+    //Leave Server listener.
+    public LeaveServer leaveServer;
+
     public static int MIN_Y;
     public static int MAX_Y;
 
@@ -87,6 +95,8 @@ public final class Network extends JavaPlugin {
         //Config Setup
         Network.instance = this;
         Network.config = this.getConfig();
+
+        allow_shutdown = true;
 
         saveDefaultConfig();
 
@@ -181,7 +191,7 @@ public final class Network extends JavaPlugin {
 
         //Register events.
         new JoinServer(this, globalSQL, connect);
-        new LeaveServer(this, globalSQL, connect);
+        leaveServer = new LeaveServer(this, globalSQL, connect);
 
         new GuiListener(this);
         new PlayerInteract(this);
@@ -278,39 +288,6 @@ public final class Network extends JavaPlugin {
     @Override
     public void onDisable() {
 
-        //Disable bungeecord channel.
-        this.getServer().getMessenger().unregisterOutgoingPluginChannel(this);
-
-        if (networkUsers != null) {
-            //Remove all players from network.
-            for (NetworkUser u : networkUsers) {
-
-                //Switch all players to the lobby server.
-                //If this is the lobby server then run global disconnect.
-                if (SERVER_TYPE == ServerType.LOBBY) {
-                    connect.leaveEvent(u.player.getUniqueId().toString());
-                } else {
-                    SwitchServer.switchServer(u.player, globalSQL.getString("SELECT name FROM server_data WHERE type='LOBBY';"));
-                }
-
-                //Uuid
-                String uuid = u.player.getUniqueId().toString();
-
-                //Remove any outstanding invites that this player has sent.
-                plotSQL.update("DELETE FROM plot_invites WHERE owner='" + uuid + "';");
-
-                //Remove any outstanding invites that this player has received.
-                plotSQL.update("DELETE FROM plot_invites WHERE uuid='" + uuid + "';");
-
-                //Set last_online time in playerdata.
-                globalSQL.update("UPDATE player_data SET last_online=" + Time.currentTime() + " WHERE UUID='" + uuid + "';");
-
-                //Remove player from online_users.
-                globalSQL.update("DELETE FROM online_users WHERE uuid='" + uuid + "';");
-
-            }
-        }
-
         //Shut down chat.
         if (chat != null) {
             chat.onDisable();
@@ -321,8 +298,40 @@ public final class Network extends JavaPlugin {
             timers.close();
         }
 
-        //Disable server in server table.
-        globalSQL.update("UPDATE server_data SET online=0 WHERE name='" + SERVER_NAME + "';");
+        for (NetworkUser u : getUsers()) {
+
+            String uuid = u.player.getUniqueId().toString();
+
+            //Remove any outstanding invites that this player has sent.
+            instance.plotSQL.update("DELETE FROM plot_invites WHERE owner='" + uuid + "';");
+
+            //Remove any outstanding invites that this player has received.
+            instance.plotSQL.update("DELETE FROM plot_invites WHERE uuid='" + uuid + "';");
+
+            //Set last_online time in playerdata.
+            instance.globalSQL.update("UPDATE player_data SET last_online=" + Time.currentTime() + " WHERE UUID='" + uuid + "';");
+
+            //Remove player from online_users.
+            instance.globalSQL.update("DELETE FROM online_users WHERE uuid='" + uuid + "';");
+
+            //Log playercount in database
+            instance.globalSQL.update("INSERT INTO player_count(log_time,players) VALUES(" + Time.currentTime() + "," +
+                    instance.globalSQL.getInt("SELECT count(uuid) FROM online_users;") + ");");
+
+            //Reset last logged time.
+            if (u.afk) {
+                u.last_time_log = u.last_movement = Time.currentTime();
+                u.afk = false;
+            }
+
+            //Update statistics
+            long time = Time.currentTime();
+            Statistics.save(u, Time.getDate(time), time);
+
+        }
+
+        //Disable bungeecord channel.
+        instance.getServer().getMessenger().unregisterOutgoingPluginChannel(instance);
 
     }
 

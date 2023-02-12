@@ -60,7 +60,7 @@ public class TeleportEvent {
             case "location", "location_request" -> {
 
                 //Get location name from all remaining args.
-                String location = String.join(" ", Arrays.copyOfRange(event, 2, event.length - 1));
+                String location = String.join(" ", Arrays.copyOfRange(event, 2, event.length));
 
                 //Get the coordinate id.
                 int coordinate_id;

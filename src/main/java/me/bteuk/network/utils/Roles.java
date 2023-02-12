@@ -13,7 +13,7 @@ public final class Roles {
         Get the builder role of the player.
 
         Builder roles include:
-            Guest (Default)
+            Default (Guest)
             Applicant
             Apprentice
             Jr.Builder

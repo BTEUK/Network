@@ -27,5 +27,10 @@ public class PreJoinServer implements Listener {
                     moderation.getBannedReason(e.getUniqueId().toString()) + " until " +
                     moderation.getBanDuration(e.getUniqueId().toString())));
         }
+
+        //Check if server is restarting.
+        if (Network.getInstance().allow_shutdown) {
+            e.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, Component.text("The server is restarting!"));
+        }
     }
 }
