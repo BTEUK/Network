@@ -7,7 +7,6 @@ import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Statistics;
 import me.bteuk.network.utils.Time;
 import org.bukkit.Bukkit;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
@@ -42,9 +41,7 @@ public class CommandPreProcess implements Listener {
 
                 //Delay shutdown by 3 seconds to make sure players have switched server.
                 s.setCancelled(true);
-                Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> {
-                    Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "stop");
-                },60L);
+                Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "stop"),60L);
             }
         }
     }

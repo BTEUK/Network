@@ -96,7 +96,7 @@ public class PlotMembers extends Gui {
 
                 //Add player to gui.
                 setItem(slot, Utils.createPlayerSkull(uuid, 1,
-                                Utils.title("Kick " + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';" + " from your plot.")),
+                                Utils.title("Kick " + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " from your plot."),
                                 Utils.line("Click to remove them as member of your plot."),
                                 Utils.line("They will no longer be able to build in it.")),
                         u ->
@@ -111,15 +111,13 @@ public class PlotMembers extends Gui {
                                 globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + uuid + "','network','" +
                                         globalSQL.getString("SELECT server FROM online_users WHERE uuid=" + uuid + ";") + "','kick plot " + plotID + "')");
 
-                                //Refresh the gui page after a second.
-                                //The delay is so the plotsystem has time to update the members database.
-                                Bukkit.getScheduler().scheduleSyncDelayedTask(Network.getInstance(), () -> {
+                                //Return to the previous menu, since otherwise the gui won't have updated.
+                                this.delete();
+                                u.mainGui = null;
 
-                                    //Update the gui.
-                                    this.refresh();
-                                    u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
-
-                                }, 20L);
+                                //Switch back to plot info.
+                                u.mainGui = new PlotInfo(plotID, u.player.getUniqueId().toString());
+                                u.mainGui.open(u);
 
                             } else {
                                 u.player.sendMessage(Utils.success("This player is not a member of your plot."));
