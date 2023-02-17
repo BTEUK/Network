@@ -41,12 +41,12 @@ public class Speed implements CommandExecutor {
         if (isFly) {
 
             p.setFlySpeed(speed);
-            p.sendMessage(Utils.success("Set flying speed to &3" + args[0] + "&a."));
+            p.sendMessage(Utils.success("Set flying speed to &3" + args[0]));
 
         } else {
 
             p.setWalkSpeed(speed);
-            p.sendMessage(Utils.success("Set walking speed to &3" + args[0] + "&a."));
+            p.sendMessage(Utils.success("Set walking speed to &3" + args[0]));
 
         }
 

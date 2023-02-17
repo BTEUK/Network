@@ -23,7 +23,21 @@ public final class Roles {
      */
 
     public static String builderRole(Player p) {
-        return PlaceholderAPI.setPlaceholders(p, "%luckperms_current_group_on_track_builder%");
+        if (p.hasPermission("group.reviewer")) {
+            return "reviewer";
+        } else if (p.hasPermission("group.architect")) {
+            return "architect";
+        } else if (p.hasPermission("group.builder")) {
+            return "builder";
+        } else if (p.hasPermission("group.jrbuilder")) {
+            return "jrbuilder";
+        } else if (p.hasPermission("group.apprentice")) {
+            return "apprentice";
+        } else if (p.hasPermission("group.applicant")) {
+            return "applicant";
+        } else {
+            return "default";
+        }
     }
 
     public static String getPrimaryRole(Player p) {

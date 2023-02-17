@@ -103,13 +103,14 @@ public class PlotMembers extends Gui {
 
                         {
                             //Check if the player is not a member of the plot.
-                            if (!plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plotID + " AND uuid='" + uuid + "';")) {
+                            if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plotID + " AND uuid='" + uuid + "';")) {
 
                                 //Send invite via chat.
                                 //The invite will be active until they disconnect from the network.
                                 //They will need to run a command to actually join the plot.
-                                globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + uuid + "','network','" +
-                                        globalSQL.getString("SELECT server FROM online_users WHERE uuid=" + uuid + ";") + "','kick plot " + plotID + "')");
+                                globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + uuid + "','plotsystem','" +
+                                        plotSQL.getString("SELECT server FROM location_data WHERE name='" +
+                                                plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + "';") + "','kick plot " + plotID + "')");
 
                                 //Return to the previous menu, since otherwise the gui won't have updated.
                                 this.delete();
@@ -120,7 +121,7 @@ public class PlotMembers extends Gui {
                                 u.mainGui.open(u);
 
                             } else {
-                                u.player.sendMessage(Utils.success("This player is not a member of your plot."));
+                                u.player.sendMessage(Utils.error("This player is not a member of your plot."));
                             }
                         });
 

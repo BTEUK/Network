@@ -199,7 +199,7 @@ public class BuildGui extends Gui {
                                         Utils.title("Join Region"),
                                         Utils.line("Click to join the region you are standing in."),
                                         Utils.line("The region currently has no active owner."),
-                                        Utils.line("Joining the region will make you region owner.")),
+                                        Utils.line("Joining the region will make you the region owner.")),
                                 u -> {
 
                                     //If the player is a Jr.Builder

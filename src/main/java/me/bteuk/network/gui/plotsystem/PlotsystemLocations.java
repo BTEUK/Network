@@ -51,7 +51,8 @@ public class PlotsystemLocations extends Gui {
 
             setItem(slot, Utils.createItem(nextIcon(), 1,
                             Utils.title(plotSQL.getString("SELECT alias FROM location_data WHERE name='" + name + "';")),
-                            Utils.line("Click to open the menu of this plot.")),
+                            Utils.line("Click to teleport to the centre"),
+                            Utils.line("of this plotsystem location.")),
                     u -> {
 
                         //Teleport to centre of the plotsystem location.
@@ -61,11 +62,11 @@ public class PlotsystemLocations extends Gui {
 
                         //Get middle.
                         double x = ((globalSQL.getDouble("SELECT x FROM coordinates WHERE id=" + max + ";") +
-                                globalSQL.getDouble("SELECT x FROM coordinates WHERE id=" + min + ";"))/2) +
+                                globalSQL.getDouble("SELECT x FROM coordinates WHERE id=" + min + ";")) / 2) +
                                 plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + name + "';");
 
                         double z = ((globalSQL.getDouble("SELECT z FROM coordinates WHERE id=" + max + ";") +
-                                globalSQL.getDouble("SELECT z FROM coordinates WHERE id=" + min + ";"))/2) +
+                                globalSQL.getDouble("SELECT z FROM coordinates WHERE id=" + min + ";")) / 2) +
                                 plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + name + "';");
 
                         String server = plotSQL.getString("SELECT server FROM location_data WHERE name='" + name + "';");
