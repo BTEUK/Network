@@ -26,7 +26,7 @@ public class Database implements CommandExecutor {
 
         //Check args.
         if (args.length < 2) {
-            console.sendMessage(Utils.error("/database convert navigation|playerdata"));
+            console.sendMessage(Utils.error("/database convert navigation|playerdata|regions"));
             return true;
         }
 

@@ -53,16 +53,51 @@ public class UKnet_database {
             e.printStackTrace();
         }
 
-        //Add the players to the new database.
-        GlobalSQL globalSQL = Network.getInstance().globalSQL;
-
         //Iterate through all players and add their role and playerdata.
         ConsoleCommandSender console = Bukkit.getServer().getConsoleSender();
         String command;
 
         for (Player p : players) {
 
-            command = "lp user " + p.name + " parent add " + p.role;
+            //Skip guests since that's the default role anyway.
+            if (p.role.equals("guest")) {
+                continue;
+            }
+
+            //Remove all existing lower roles.
+            if (p.role.equals("apprentice")) {
+                command = "lp user " + p.uuid + " parent remove default";
+                Bukkit.getServer().dispatchCommand(console, command);
+            }
+
+            if (p.role.equals("jrbuilder")) {
+                command = "lp user " + p.uuid + " parent remove default";
+                Bukkit.getServer().dispatchCommand(console, command);
+                command = "lp user " + p.uuid + " parent remove apprentice";
+                Bukkit.getServer().dispatchCommand(console, command);
+            }
+
+            if (p.role.equals("builder")) {
+                command = "lp user " + p.uuid + " parent remove default";
+                Bukkit.getServer().dispatchCommand(console, command);
+                command = "lp user " + p.uuid + " parent remove apprentice";
+                Bukkit.getServer().dispatchCommand(console, command);
+                command = "lp user " + p.uuid + " parent remove jrbuilder";
+                Bukkit.getServer().dispatchCommand(console, command);
+            }
+
+            if (p.role.equals("architect")) {
+                command = "lp user " + p.uuid + " parent remove default";
+                Bukkit.getServer().dispatchCommand(console, command);
+                command = "lp user " + p.uuid + " parent remove apprentice";
+                Bukkit.getServer().dispatchCommand(console, command);
+                command = "lp user " + p.uuid + " parent remove jrbuilder";
+                Bukkit.getServer().dispatchCommand(console, command);
+                command = "lp user " + p.uuid + " parent remove builder";
+                Bukkit.getServer().dispatchCommand(console, command);
+            }
+
+            command = "lp user " + p.uuid + " parent add " + p.role;
             Bukkit.getServer().dispatchCommand(console, command);
 
         }
