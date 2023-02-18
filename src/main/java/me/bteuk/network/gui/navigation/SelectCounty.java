@@ -58,8 +58,8 @@ public class SelectCounty extends Gui {
 
         //Return
         setItem(53, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        Utils.chat("&b&lReturn"),
-                        Utils.chat("&fOpen the add location menu.")),
+                        Utils.title("Return"),
+                        Utils.line("Open the add location menu.")),
                 u ->
 
                 {

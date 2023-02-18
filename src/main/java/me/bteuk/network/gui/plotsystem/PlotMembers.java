@@ -39,8 +39,8 @@ public class PlotMembers extends Gui {
 
     private void createGui() {
 
-        //Get all online players in the network.
-        ArrayList<String> plot_members = plotSQL.getStringList("SELECT uuid FROM plot_members WHERE id=" + plotID + ";");
+        //Get members of the plot.
+        ArrayList<String> plot_members = plotSQL.getStringList("SELECT uuid FROM plot_members WHERE id=" + plotID + " AND is_owner=0;");
 
         //Slot count.
         int slot = 10;
@@ -51,8 +51,8 @@ public class PlotMembers extends Gui {
         //If page is greater than 1 add a previous page button.
         if (page > 1) {
             setItem(18, Utils.createItem(Material.ARROW, 1,
-                            Utils.chat("&b&lPrevious Page"),
-                            Utils.chat("&fOpen the previous page of online users.")),
+                            Utils.title("Previous Page"),
+                            Utils.line("Open the previous page of online users.")),
                     u ->
 
                     {
@@ -73,8 +73,8 @@ public class PlotMembers extends Gui {
                 if (slot > 34) {
 
                     setItem(26, Utils.createItem(Material.ARROW, 1,
-                                    Utils.chat("&b&lNext Page"),
-                                    Utils.chat("&fOpen the next page of online users.")),
+                                    Utils.title("Next Page"),
+                                    Utils.line("Open the next page of online users.")),
                             u ->
 
                             {
@@ -88,11 +88,6 @@ public class PlotMembers extends Gui {
 
                 }
 
-                //Check whether the player is not already the owner or member of the plot, if true skip them.
-                if (plotSQL.hasRow("SELECT uuid FROM plot_members WHERE id=" + plotID + " AND uuid='" + uuid + "';")) {
-                    continue;
-                }
-
                 //If skip is greater than 0, skip this iteration.
                 if (skip > 0) {
                     skip--;
@@ -101,33 +96,32 @@ public class PlotMembers extends Gui {
 
                 //Add player to gui.
                 setItem(slot, Utils.createPlayerSkull(uuid, 1,
-                                Utils.chat("&b&lKick " + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';" + " from your plot.")),
-                                Utils.chat("&fClick to remove them as member of your plot."),
-                                Utils.chat("&fThey will no longer be able to build in it.")),
+                                Utils.title("Kick " + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " from your plot."),
+                                Utils.line("Click to remove them as member of your plot."),
+                                Utils.line("They will no longer be able to build in it.")),
                         u ->
 
                         {
                             //Check if the player is not a member of the plot.
-                            if (!plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plotID + " AND uuid='" + uuid + "';")) {
+                            if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plotID + " AND uuid='" + uuid + "';")) {
 
                                 //Send invite via chat.
                                 //The invite will be active until they disconnect from the network.
                                 //They will need to run a command to actually join the plot.
-                                globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + uuid + "','network','" +
-                                        globalSQL.getString("SELECT server FROM online_users WHERE uuid=" + uuid + ";") + "','kick plot " + plotID + "')");
+                                globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + uuid + "','plotsystem','" +
+                                        plotSQL.getString("SELECT server FROM location_data WHERE name='" +
+                                                plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + "';") + "','kick plot " + plotID + "')");
 
-                                //Refresh the gui page after a second.
-                                //The delay is so the plotsystem has time to update the members database.
-                                Bukkit.getScheduler().scheduleSyncDelayedTask(Network.getInstance(), () -> {
+                                //Return to the previous menu, since otherwise the gui won't have updated.
+                                this.delete();
+                                u.mainGui = null;
 
-                                    //Update the gui.
-                                    this.refresh();
-                                    u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
-
-                                }, 20L);
+                                //Switch back to plot info.
+                                u.mainGui = new PlotInfo(plotID, u.player.getUniqueId().toString());
+                                u.mainGui.open(u);
 
                             } else {
-                                u.player.sendMessage(Utils.chat("&cThis player is not a member of your plot."));
+                                u.player.sendMessage(Utils.error("This player is not a member of your plot."));
                             }
                         });
 
@@ -145,8 +139,8 @@ public class PlotMembers extends Gui {
 
         //Return
         setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        Utils.chat("&b&lReturn"),
-                        Utils.chat("&fOpen the plot info for this plot.")),
+                        Utils.title("Return"),
+                        Utils.line("Open the plot info for this plot.")),
                 u -> {
 
                     //Delete this gui.

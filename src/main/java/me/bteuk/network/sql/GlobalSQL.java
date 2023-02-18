@@ -75,6 +75,50 @@ public class GlobalSQL {
         }
     }
 
+    public double getDouble(String sql) {
+
+        try (Connection conn = conn();
+             PreparedStatement statement = conn.prepareStatement(sql);
+             ResultSet results = statement.executeQuery()) {
+
+            if (results.next()) {
+
+                return results.getInt(1);
+
+            } else {
+
+                return 0;
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    public float getFloat(String sql) {
+
+        try (Connection conn = conn();
+             PreparedStatement statement = conn.prepareStatement(sql);
+             ResultSet results = statement.executeQuery()) {
+
+            if (results.next()) {
+
+                return results.getInt(1);
+
+            } else {
+
+                return 0;
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
     public long getLong(String sql) {
 
         try (Connection conn = conn();
@@ -160,12 +204,12 @@ public class GlobalSQL {
 
         //Try and get all events for this server.
         try (Connection conn = conn();
-             PreparedStatement statement = conn.prepareStatement("SELECT uuid,event FROM server_events WHERE server='" + serverName + "' AND type='network';");
+             PreparedStatement statement = conn.prepareStatement("SELECT uuid,event,message FROM server_events WHERE server='" + serverName + "' AND type='network';");
              ResultSet results = statement.executeQuery()) {
 
             while (results.next()) {
 
-                list.add(new String[]{results.getString(1), results.getString(2)});
+                list.add(new String[]{results.getString(1), results.getString(2), results.getString(3)});
 
             }
         } catch (SQLException e) {
@@ -192,37 +236,15 @@ public class GlobalSQL {
     //Add new coordinate to database and return the id.
     public int addCoordinate(Location l) {
 
-        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
-                "INSERT INTO coordinates(server,world, x, y, z, yaw, pitch) VALUES(?, ?, ?, ?, ?, ?, ?);",
-                Statement.RETURN_GENERATED_KEYS
-        )) {
-            statement.setString(1, Network.SERVER_NAME);
-            statement.setString(2, l.getWorld().getName());
-            statement.setDouble(3, l.getX());
-            statement.setDouble(4, l.getY());
-            statement.setDouble(5, l.getZ());
-            statement.setFloat(6, l.getYaw());
-            statement.setFloat(7, l.getPitch());
-            statement.executeUpdate();
+        return (addCoordinate(Network.SERVER_NAME, l.getWorld().getName(), l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch()));
 
-            //If the id does not exist return 0.
-            ResultSet results = statement.getGeneratedKeys();
-            if (results.next()) {
+    }
 
-                return results.getInt(1);
+    //Add new coordinate to database and return the id.
+    public int addCoordinate(String server, Location l) {
 
-            } else {
+        return (addCoordinate(server, l.getWorld().getName(), l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch()));
 
-                return 0;
-
-            }
-
-        } catch (SQLException sql) {
-
-            sql.printStackTrace();
-            return 0;
-
-        }
     }
 
     //Add new coordinate using values, rather than location.
@@ -262,12 +284,12 @@ public class GlobalSQL {
     }
 
     //Update an existing coordinate.
-    public void updateCoordinate(int coordinateID, Location l) {
+    public void updateCoordinate(int coordinateID, String server, Location l) {
 
         try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
                 "UPDATE coordinates SET server=?, world=?, x=?, y=?, z=?, yaw=?, pitch=? WHERE id=?;"
         )) {
-            statement.setString(1, Network.SERVER_NAME);
+            statement.setString(1, server);
             statement.setString(2, l.getWorld().getName());
             statement.setDouble(3, l.getX());
             statement.setDouble(4, l.getY());
@@ -282,6 +304,13 @@ public class GlobalSQL {
             sql.printStackTrace();
 
         }
+
+    }
+
+    //Update an existing coordinate.
+    public void updateCoordinate(int coordinateID, Location l) {
+
+        updateCoordinate(coordinateID, Network.SERVER_NAME, l);
 
     }
 

@@ -13,9 +13,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.text.DecimalFormat;
+
 public class ll implements CommandExecutor {
 
     private final EarthGeneratorSettings bteGeneratorSettings = EarthGeneratorSettings.parse(EarthGeneratorSettings.BTE_DEFAULT_SETTINGS);
+    private static final DecimalFormat DECIMAL_FORMATTER = new DecimalFormat("##.#####");
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
@@ -23,7 +26,7 @@ public class ll implements CommandExecutor {
         //Check if the sender is a player.
         if (!(sender instanceof Player p)) {
 
-            sender.sendMessage(Utils.chat("&cThis command can only be run by a player."));
+            sender.sendMessage(Utils.error("This command can only be run by a player."));
             return true;
 
         }
@@ -37,23 +40,22 @@ public class ll implements CommandExecutor {
 
                 double[] coords = bteGeneratorSettings.projection().toGeo(p.getLocation().getX() + u.dx, p.getLocation().getZ() + u.dz);
 
-                p.sendMessage(Utils.chat("&cYour coordinates are &7" + coords[1] + "," + coords[0]));
-                TextComponent message = new TextComponent(Utils.chat("&cClick here to view the coordinates in Google Maps."));
+                p.sendMessage(Utils.success("Your coordinates are &3" + DECIMAL_FORMATTER.format(coords[1]) + "," + DECIMAL_FORMATTER.format(coords[0])));
+                TextComponent message = new TextComponent(Utils.success("Click here to view the coordinates in Google Maps."));
                 message.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.google.com/maps/@?api=1&map_action=map&basemap=satellite&zoom=21&center=" + coords[1] + "," + coords[0]));
                 p.spigot().sendMessage(message);
                 return true;
 
             } catch (OutOfProjectionBoundsException e) {
 
-                p.sendMessage(Utils.chat("&cYou must be standing in a region to get the coordinates."));
-                e.printStackTrace();
+                p.sendMessage(Utils.error("You must be standing in a region to get the coordinates."));
                 return true;
 
             }
 
         } else {
 
-            p.sendMessage(Utils.chat("&cYou must be standing in a region to get the coordinates."));
+            p.sendMessage(Utils.error("You must be standing in a region to get the coordinates."));
             return true;
 
         }

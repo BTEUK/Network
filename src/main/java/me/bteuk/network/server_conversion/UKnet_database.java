@@ -62,12 +62,8 @@ public class UKnet_database {
 
         for (Player p : players) {
 
-
             command = "lp user " + p.name + " parent add " + p.role;
             Bukkit.getServer().dispatchCommand(console, command);
-
-            globalSQL.update("INSERT INTO player_data(uuid,name,last_online,last_submit) VALUES('" +
-                    p.uuid + "','" + p.name + "'," + p.last_join + "," + 0 + ");");
 
         }
 

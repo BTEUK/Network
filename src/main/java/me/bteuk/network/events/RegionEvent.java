@@ -74,9 +74,9 @@ public class RegionEvent {
                 //Leave region.
                 region.leaveRegion(uuid);
 
-                //If the region has members after you've left.
+                //If the region has members after you've left but no owner.
                 //Find the most recent member and make them owner.
-                if (region.hasMember()) {
+                if (region.hasMember() && !region.hasOwner()) {
 
                     String member = region.getRecentMember();
 
@@ -86,29 +86,12 @@ public class RegionEvent {
                     Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + member + "','&aTransferred ownership of region "
                             + region.getTag(member) + " to you due to the previous owner leaving the region.');");
 
+                } else if (!region.hasOwner() && !region.hasMember()) {
+
+                    //The region is has no owner and members, set the status to default.
+                    region.setDefault();
+
                 }
-                break;
-            }
-            case "teleport": {
-
-                //Get player.
-                Player p = Bukkit.getPlayer(UUID.fromString(uuid));
-
-                //Get the region.
-                Region region = Network.getInstance().getRegionManager().getRegion(event[2]);
-
-                Location l = Network.getInstance().globalSQL.getCoordinate(region.getCoordinateID(uuid));
-
-                if (l == null) {
-                    p.sendMessage(Utils.chat("&cAn error occurred while fetching the location to teleport."));
-                    Network.getInstance().getLogger().warning("Location is null for coodinate id " + region.getCoordinateID(uuid));
-                    return;
-                }
-
-                //Teleport player.
-                p.teleport(l);
-                p.sendMessage(Utils.chat("&aTeleported to region &3" + region.getTag(uuid)));
-
                 break;
             }
             case "join": {

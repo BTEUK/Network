@@ -50,8 +50,8 @@ public class InvitePlotMembers extends Gui {
         //If page is greater than 1 add a previous page button.
         if (page > 1) {
             setItem(18, Utils.createItem(Material.ARROW, 1,
-                            Utils.chat("&b&lPrevious Page"),
-                            Utils.chat("&fOpen the previous page of online users.")),
+                            Utils.title("Previous Page"),
+                            Utils.line("Open the previous page of online users.")),
                     u ->
 
                     {
@@ -71,8 +71,8 @@ public class InvitePlotMembers extends Gui {
             if (slot > 34) {
 
                 setItem(26, Utils.createItem(Material.ARROW, 1,
-                                Utils.chat("&b&lNext Page"),
-                                Utils.chat("&fOpen the next page of online users.")),
+                                Utils.title("Next Page"),
+                                Utils.line("Open the next page of online users.")),
                         u ->
 
                         {
@@ -99,8 +99,8 @@ public class InvitePlotMembers extends Gui {
 
             //Add player to gui.
             setItem(slot, Utils.createPlayerSkull(uuid, 1,
-                            Utils.chat("&b&lInvite " + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " to your plot."),
-                            Utils.chat("&fThey will receive an invitation in chat.")),
+                            Utils.title("Invite " + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " to your plot."),
+                            Utils.line("They will receive an invitation in chat.")),
                     u ->
 
                     {
@@ -123,18 +123,18 @@ public class InvitePlotMembers extends Gui {
                                     globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + uuid + "','network','" +
                                             globalSQL.getString("SELECT server FROM online_users WHERE uuid='" + uuid + "';") + "','invite plot " + plotID + "')");
 
-                                    u.player.sendMessage(Utils.chat("&aInvited &3" + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "'") + " &ato your plot."));
+                                    u.player.sendMessage(Utils.success("Invited &3" + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "'") + " &ato your plot."));
 
                                 } else {
-                                    u.player.sendMessage(Utils.chat("&cYou've already invited this player to your plot."));
+                                    u.player.sendMessage(Utils.error("You've already invited this player to your plot."));
                                 }
 
                             } else {
-                                u.player.sendMessage(Utils.chat("&cThis player is already a member of your plot."));
+                                u.player.sendMessage(Utils.error("This player is already a member of your plot."));
                             }
 
                         } else {
-                            u.player.sendMessage(Utils.chat("&cThis player is no longer online."));
+                            u.player.sendMessage(Utils.error("This player is no longer online."));
                         }
 
                     });
@@ -152,8 +152,8 @@ public class InvitePlotMembers extends Gui {
 
         //Return to plot info menu.
         setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        Utils.chat("&b&lReturn"),
-                        Utils.chat("&fReturn to the menu of plot " + plotID + ".")),
+                        Utils.title("Return"),
+                        Utils.line("Return to the menu of plot " + plotID + ".")),
                 u ->
 
                 {

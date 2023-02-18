@@ -1,8 +1,10 @@
 package me.bteuk.network.listeners.global_teleport;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.events.EventManager;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.SwitchServer;
+import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.regions.Region;
 import me.bteuk.network.utils.regions.RegionManager;
@@ -18,9 +20,6 @@ import org.bukkit.event.player.PlayerMoveEvent;
 
 public class MoveListener implements Listener {
 
-    private final double yMax;
-    private final double yMin;
-
     private final boolean regionsEnabled;
     private final boolean teleportEnabled;
     private final String earthWorld;
@@ -32,8 +31,6 @@ public class MoveListener implements Listener {
         Bukkit.getServer().getPluginManager().registerEvents(this, instance);
 
         FileConfiguration config = instance.getConfig();
-        yMax = config.getDouble("max_y");
-        yMin = config.getDouble("min_y");
 
         regionsEnabled = config.getBoolean("regions_enabled");
         teleportEnabled = config.getBoolean("global_teleport");
@@ -55,20 +52,13 @@ public class MoveListener implements Listener {
             return;
         }
 
-        if (!(p.hasPermission("uknet.network.elevation.bypass"))) {
+        //Reset last movement of player, if they're afk unset that.
+        u.last_movement = Time.currentTime();
 
-            if (e.getTo().getY() > yMax) {
-                e.setCancelled(true);
-                p.sendMessage(Utils.chat("&cYou may not go above y " + yMax + ", please contact staff if you need to bypass it."));
-                return;
-            }
-
-            if (e.getTo().getY() < yMin) {
-                e.setCancelled(true);
-                p.sendMessage(Utils.chat("&cYou may not go below y " + yMin + ", please contact staff if you need to bypass it."));
-                return;
-            }
-
+        if (u.afk) {
+            u.last_time_log = u.last_movement;
+            u.afk = false;
+            Network.getInstance().chat.broadcastMessage("&7" + u.player.getName() + " is no longer afk.", "uknet:globalchat");
         }
 
         //If regions are enabled, check for movement between regions.
@@ -112,8 +102,8 @@ public class MoveListener implements Listener {
                                     int zTransform = Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
 
                                     //Set join event to teleport there.
-                                    Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('" + p.getUniqueId() + "','network','teleport "
-                                            + location + " " + (l.getX() + xTransform) + " " + (l.getZ() + zTransform) + " " + l.getYaw() + " " + l.getPitch() + "');");
+                                    EventManager.createJoinEvent(u.player.getUniqueId().toString(), "network", "teleport " +
+                                            location + " " + (l.getX() + xTransform) + " " + (l.getZ() + zTransform) + " " + l.getYaw() + " " + l.getPitch() + " " + Network.SERVER_NAME);
 
                                 } else {
 
@@ -121,8 +111,8 @@ public class MoveListener implements Listener {
                                     server = Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';");
 
                                     //Set join event to teleport there.
-                                    Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('" + p.getUniqueId() + "','network','teleport "
-                                            + earthWorld + " " + l.getX() + " " + l.getZ() + " " + l.getYaw() + " " + l.getPitch() + "');");
+                                    EventManager.createJoinEvent(u.player.getUniqueId().toString(), "network", "teleport " +
+                                            earthWorld + " " + l.getX() + " " + l.getZ() + " " + l.getYaw() + " " + l.getPitch() + " " + Network.SERVER_NAME);
 
                                 }
 
@@ -133,13 +123,13 @@ public class MoveListener implements Listener {
                             } else {
 
                                 //You can't enter this region.
-                                p.sendMessage(Utils.chat("&cThe terrain for this region has not been generated, you must be at least Jr.Builder to load new terrain."));
+                                p.sendMessage(Utils.error("The terrain for this region has not been generated, you must be at least Jr.Builder to load new terrain."));
                             }
 
                         } else {
 
                             //Cancel movement as the location is on another server.
-                            p.sendMessage(Utils.chat("&cThe terrain for this location is on another server, you may not enter."));
+                            p.sendMessage(Utils.error("The terrain for this location is on another server, you may not enter."));
                         }
                         e.setCancelled(true);
                     } else {
@@ -150,24 +140,24 @@ public class MoveListener implements Listener {
                             //If the player is the region owner update last enter and tell set the message.
                             if (region.isOwner(p.getUniqueId().toString())) {
 
-                                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.chat("&aYou have entered " + region.getTag(p.getUniqueId().toString()) + " and left " + u.region.getTag(p.getUniqueId().toString()) + ", you are the owner of this region.")));
+                                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.success("You have entered &3" + region.getTag(p.getUniqueId().toString()) + " &aand left &3" + u.region.getTag(p.getUniqueId().toString()) + "&a, you are the owner of this region.")));
                                 region.setLastEnter(p.getUniqueId().toString());
 
                                 //Check if the player is a region members.
                             } else if (region.isMember(p.getUniqueId().toString())) {
 
-                                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.chat("&aYou have entered " + region.getTag(p.getUniqueId().toString()) + " and left " + u.region.getTag(p.getUniqueId().toString()) + ", you are a member of this region.")));
+                                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.success("You have entered &3" + region.getTag(p.getUniqueId().toString()) + " &aand left &3" + u.region.getTag(p.getUniqueId().toString()) + "&a, you are a member of this region.")));
                                 region.setLastEnter(p.getUniqueId().toString());
 
                                 //Check if the region is open and the player is at least jr.builder.
                             } else if (region.isOpen() && p.hasPermission("group.jrbuilder")) {
 
-                                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.chat("&aYou have entered " + region.getTag(p.getUniqueId().toString()) + " and left " + u.region.getTag(p.getUniqueId().toString()) + ", you can build in this region.")));
+                                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.success("You have entered &3" + region.getTag(p.getUniqueId().toString()) + " &aand left &3" + u.region.getTag(p.getUniqueId().toString()) + "&a, you can build in this region.")));
 
                             } else {
 
                                 //Send default enter message.
-                                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.chat("&aYou have entered " + region.getTag(p.getUniqueId().toString()) + " and left " + u.region.getTag(p.getUniqueId().toString()) + ".")));
+                                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.success("You have entered &3" + region.getTag(p.getUniqueId().toString()) + " &aand left &3" + u.region.getTag(p.getUniqueId().toString()) + "&a.")));
 
                             }
 
@@ -180,15 +170,12 @@ public class MoveListener implements Listener {
                         } else {
 
                             //You can't enter this region.
-                            p.sendMessage(Utils.chat("&cThe terrain for this region has not been generated, you must be at least Jr.Builder to load new terrain."));
+                            p.sendMessage(Utils.error("The terrain for this region has not been generated, you must be at least Jr.Builder to load new terrain."));
                             e.setCancelled(true);
                         }
                     }
                 }
             }
         }
-
-        //Network.getInstance().getLogger().info("Move: " + e.getTo().getX() + "," + e.getTo().getZ());
-
     }
 }

@@ -40,20 +40,27 @@ public class PlotMenu extends Gui {
         for (int i = 0; i < plots.size(); i++) {
 
             int finalI = i;
-            setItem(slot, Utils.createItem(Material.LIME_CONCRETE, 1,
-                            Utils.chat("&b&lPlot " + plots.get(i)),
-                            Utils.chat("&fClick to open the menu of this plot.")),
-                    u -> {
 
-                        //Delete this gui.
-                        this.delete();
-                        u.mainGui = null;
+            //Change the colour of the material for plot owners/members.
+            //Lime for owners, yellow for members.
+            if (plotSQL.hasRow("SELECT uuid FROM plot_members WHERE uuid='" + user.player.getUniqueId() + "' AND id=" + plots.get(i) + " AND is_owner=1;"))
 
-                        //Switch to plot info.
-                        u.mainGui = new PlotInfo(plots.get(finalI), u.player.getUniqueId().toString());
-                        u.mainGui.open(u);
+                setItem(slot, Utils.createItem(
+                                (plotSQL.hasRow("SELECT uuid FROM plot_members WHERE uuid='" + user.player.getUniqueId() + "' AND id=" + plots.get(i) + " AND is_owner=1;") ? Material.LIME_CONCRETE : Material.YELLOW_CONCRETE),
+                                1,
+                                Utils.title("Plot " + plots.get(i)),
+                                Utils.line("Click to open the menu of this plot.")),
+                        u -> {
 
-                    });
+                            //Delete this gui.
+                            this.delete();
+                            u.mainGui = null;
+
+                            //Switch to plot info.
+                            u.mainGui = new PlotInfo(plots.get(finalI), u.player.getUniqueId().toString());
+                            u.mainGui.open(u);
+
+                        });
 
             //Increase slot accordingly.
             if (slot % 9 == 7) {
@@ -70,8 +77,8 @@ public class PlotMenu extends Gui {
         if (plotSQL.hasRow("SELECT uuid FROM accept_data WHERE uuid='" + user.player.getUniqueId() + "';")) {
 
             setItem(40, Utils.createItem(Material.CLOCK, 1,
-                            Utils.chat("&b&lAccepted Plots"),
-                            Utils.chat("&fClick to view your accepted plots.")),
+                            Utils.title("Accepted Plots"),
+                            Utils.line("Click to view your accepted plots.")),
 
                     u -> {
 
@@ -88,8 +95,8 @@ public class PlotMenu extends Gui {
 
         //Return
         setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        Utils.chat("&b&lReturn"),
-                        Utils.chat("&fOpen the building menu.")),
+                        Utils.title("Return"),
+                        Utils.line("Open the building menu.")),
                 u -> {
 
                     //Delete this gui.

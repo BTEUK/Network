@@ -57,8 +57,8 @@ public class AcceptedPlotFeedback extends Gui {
         //If page is greater than 1 add a previous page button.
         if (page > 1) {
             setItem(18, Utils.createItem(Material.ARROW, 1,
-                            Utils.chat("&b&lPrevious Page"),
-                            Utils.chat("&fOpen the previous page of accepted plots.")),
+                            Utils.title("Previous Page"),
+                            Utils.line("Open the previous page of accepted plots.")),
                     u ->
 
                     {
@@ -78,8 +78,8 @@ public class AcceptedPlotFeedback extends Gui {
             if (slot > 34) {
 
                 setItem(26, Utils.createItem(Material.ARROW, 1,
-                                Utils.chat("&b&lNext Page"),
-                                Utils.chat("&fOpen the next page of online users.")),
+                                Utils.title("Next Page"),
+                                Utils.line("Open the next page of online users.")),
                         u ->
 
                         {
@@ -105,26 +105,26 @@ public class AcceptedPlotFeedback extends Gui {
 
                 //No feedback
                 setItem(slot, Utils.createItem(Material.BOOK, 1,
-                        Utils.chat("&b&lPlot " + plot),
-                        Utils.chat("&fAccepted by &7" + globalSQL.getString("SELECT name FROM player_data WHERE uuid='"
+                        Utils.title("Plot " + plot),
+                        Utils.line("Accepted by &7" + globalSQL.getString("SELECT name FROM player_data WHERE uuid='"
                                 + plotSQL.getString("SELECT reviewer FROM accept_data WHERE id=" + plot + ";") + "';")),
-                        Utils.chat("&fDifficulty: &7" + PlotValues.difficultyName(plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plot + ";"))),
-                        Utils.chat("&fSize: &7" + PlotValues.sizeName(plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + plot + ";"))),
-                        Utils.chat("&fAccuracy: &7" + plotSQL.getInt("SELECT accuracy FROM accept_data WHERE id=" + plot + ";") + "&f/&75"),
-                        Utils.chat("&fQuality: &7" + plotSQL.getInt("SELECT quality FROM accept_data WHERE id=" + plot + ";") + "&f/&75")));
+                        Utils.line("Difficulty: &7" + PlotValues.difficultyName(plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plot + ";"))),
+                        Utils.line("Size: &7" + PlotValues.sizeName(plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + plot + ";"))),
+                        Utils.line("Accuracy: &7" + plotSQL.getInt("SELECT accuracy FROM accept_data WHERE id=" + plot + ";") + "&f/&75"),
+                        Utils.line("Quality: &7" + plotSQL.getInt("SELECT quality FROM accept_data WHERE id=" + plot + ";") + "&f/&75")));
 
             } else {
 
                 //There is feedback
                 setItem(slot, Utils.createItem(Material.WRITTEN_BOOK, 1,
-                                Utils.chat("&b&lPlot " + plot),
-                                Utils.chat("&fAccepted by &7" + globalSQL.getString("SELECT name FROM player_data WHERE uuid='"
+                                Utils.title("Plot " + plot),
+                                Utils.line("Accepted by &7" + globalSQL.getString("SELECT name FROM player_data WHERE uuid='"
                                         + plotSQL.getString("SELECT reviewer FROM accept_data WHERE id=" + plot + ";") + "';")),
-                                Utils.chat("&fDifficulty: &7" + PlotValues.difficultyName(plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plot + ";"))),
-                                Utils.chat("&fSize: &7" + PlotValues.sizeName(plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + plot + ";"))),
-                                Utils.chat("&fAccuracy: &7" + plotSQL.getInt("SELECT accuracy FROM accept_data WHERE id=" + plot + ";") + "&f/&75"),
-                                Utils.chat("&fQuality: &7" + plotSQL.getInt("SELECT quality FROM accept_data WHERE id=" + plot + ";") + "&f/&75"),
-                                Utils.chat("&fClick to view feedback for this plot.")),
+                                Utils.line("Difficulty: &7" + PlotValues.difficultyName(plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plot + ";"))),
+                                Utils.line("Size: &7" + PlotValues.sizeName(plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + plot + ";"))),
+                                Utils.line("Accuracy: &7" + plotSQL.getInt("SELECT accuracy FROM accept_data WHERE id=" + plot + ";") + "&f/&75"),
+                                Utils.line("Quality: &7" + plotSQL.getInt("SELECT quality FROM accept_data WHERE id=" + plot + ";") + "&f/&75"),
+                                Utils.line("Click to view feedback for this plot.")),
                         u ->
 
                         {
@@ -135,7 +135,7 @@ public class AcceptedPlotFeedback extends Gui {
                             //Create book.
                             ItemStack writtenBook = new ItemStack(Material.WRITTEN_BOOK);
                             BookMeta bookMeta = (BookMeta) writtenBook.getItemMeta();
-                            bookMeta.setTitle(Utils.chat("&b&lPlot " + plot));
+                            bookMeta.setTitle(Utils.title("Plot " + plot));
 
                             //Get book author, aka the reviewer.
                             String author = globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
@@ -169,8 +169,8 @@ public class AcceptedPlotFeedback extends Gui {
 
         //Return to plot menu.
         setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        Utils.chat("&b&lReturn"),
-                        Utils.chat("&fOpen the plot menu.")),
+                        Utils.title("Return"),
+                        Utils.line("Open the plot menu.")),
                 u ->
 
                 {

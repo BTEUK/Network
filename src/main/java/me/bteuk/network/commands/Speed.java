@@ -15,7 +15,7 @@ public class Speed implements CommandExecutor {
         //Check if the sender is a player.
         if (!(sender instanceof Player p)) {
 
-            sender.sendMessage(Utils.chat("&cThis command can only be run by a player."));
+            sender.sendMessage(Utils.error("This command can only be run by a player."));
             return true;
 
         }
@@ -38,15 +38,15 @@ public class Speed implements CommandExecutor {
 
         speed = getRealMoveSpeed(speed, isFly);
 
-        p.setFlySpeed(speed);
-
         if (isFly) {
 
-            p.sendMessage(Utils.chat("&aSet flying speed to &7" + args[0] + "&a."));
+            p.setFlySpeed(speed);
+            p.sendMessage(Utils.success("Set flying speed to &3" + args[0]));
 
         } else {
 
-            p.sendMessage(Utils.chat("&aSet walking speed to &7" + args[0] + "&a."));
+            p.setWalkSpeed(speed);
+            p.sendMessage(Utils.success("Set walking speed to &3" + args[0]));
 
         }
 
@@ -80,6 +80,6 @@ public class Speed implements CommandExecutor {
 
     //Error message.
     private void error(Player p) {
-        p.sendMessage(Utils.chat("&c/speed [0-10]"));
+        p.sendMessage(Utils.error("/speed [0-10]"));
     }
 }

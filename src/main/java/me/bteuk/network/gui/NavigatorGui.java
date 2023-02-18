@@ -18,8 +18,8 @@ public class NavigatorGui extends Gui {
         super(27, Component.text("Navigator", NamedTextColor.AQUA, TextDecoration.BOLD));
 
         setItem(12, Utils.createItem(Material.DIAMOND_PICKAXE, 1,
-                        Utils.chat("&b&lBuild"),
-                        Utils.chat("&fClick to open the build menu.")),
+                        Utils.title("Build"),
+                        Utils.line("Click to open the build menu.")),
                 u -> {
 
                     //Switch to the build menu.
@@ -29,8 +29,8 @@ public class NavigatorGui extends Gui {
                 });
 
         setItem(14, Utils.createItem(Material.SPRUCE_BOAT, 1,
-                        Utils.chat("&b&lExplore"),
-                        Utils.chat("&fClick to open the explore menu.")),
+                        Utils.title("Explore"),
+                        Utils.line("Click to open the explore menu.")),
                 u -> {
 
                     //Click Action
@@ -40,9 +40,9 @@ public class NavigatorGui extends Gui {
                 });
 
         setItem(8, Utils.createItem(Material.NETHER_STAR, 1,
-                        Utils.chat("&b&lToggle Navigator"),
-                        Utils.chat("&fClick to toggle the navigator in your inventory."),
-                        Utils.chat("&fYou can always open this menu with &7/navigator")),
+                        Utils.title("Toggle Navigator"),
+                        Utils.line("Click to toggle the navigator in your inventory."),
+                        Utils.line("You can always open this menu with &7/navigator")),
                 u -> {
 
                     if (u.navigator) {
@@ -54,7 +54,7 @@ public class NavigatorGui extends Gui {
                         //Disable navigator in database.
                         Network.getInstance().globalSQL.update("UPDATE player_data SET navigator=0 WHERE uuid='" + u.player.getUniqueId() + "';");
 
-                        u.player.sendMessage(Utils.chat("&aDisabled navigator in inventory."));
+                        u.player.sendMessage(Utils.success("Disabled navigator in inventory."));
 
                     } else {
 
@@ -64,20 +64,20 @@ public class NavigatorGui extends Gui {
                         //Enable navigator in database.
                         Network.getInstance().globalSQL.update("UPDATE player_data SET navigator=1 WHERE uuid='" + u.player.getUniqueId() + "';");
 
-                        u.player.sendMessage(Utils.chat("&aEnabled navigator in inventory."));
+                        u.player.sendMessage(Utils.success("Enabled navigator in inventory."));
                     }
 
                 });
 
         setItem(7, Utils.createPotion(Material.SPLASH_POTION, PotionEffectType.NIGHT_VISION, 1,
-                        Utils.chat("&b&lToggle Nightvision"),
-                        Utils.chat("&fClick to toggle nightvision."),
-                        Utils.chat("&fYou can also use the command &7/nightvision &for &7/nv&f.")),
+                        Utils.title("Toggle Nightvision"),
+                        Utils.line("Click to toggle nightvision."),
+                        Utils.line("You can also use the command &7/nightvision &for &7/nv&f.")),
                 u -> Nightvision.toggleNightvision(u.player));
 
         setItem(0, Utils.createItem(Material.REDSTONE_LAMP, 1,
-                        Utils.chat("&b&lLights Out"),
-                        Utils.chat("&fPlay a game of Lights Out.")),
+                        Utils.title("Lights Out"),
+                        Utils.line("Play a game of Lights Out.")),
                 u -> {
 
                     if (u.lightsOut == null) {
@@ -90,6 +90,17 @@ public class NavigatorGui extends Gui {
                         u.lightsOut.open(u);
 
                     }
+                });
+
+        //Set rules.
+        setItem(26, Utils.createItem(Material.ENCHANTED_BOOK, 1,
+                        Utils.title("Rules"),
+                        Utils.line("Click to view the rules.")),
+                u -> {
+
+                    u.player.closeInventory();
+                    u.player.openBook(Network.getInstance().getLobby().getRules());
+
                 });
 
 

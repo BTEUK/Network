@@ -5,11 +5,13 @@ import me.bteuk.network.commands.Nightvision;
 import me.bteuk.network.events.EventManager;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.utils.NetworkUser;
+import me.bteuk.network.utils.Roles;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.ServerType;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
@@ -29,7 +31,7 @@ public class JoinServer implements Listener {
 
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void joinServerEvent(PlayerJoinEvent e) {
 
         //Cancel default join message to null.
@@ -51,8 +53,8 @@ public class JoinServer implements Listener {
         } else {
 
             //Add user to table and run network connect.
-            globalSQL.update("INSERT INTO online_users(uuid,join_time,last_ping,server) VALUES('" + e.getPlayer().getUniqueId() +
-                    "'," + Time.currentTime() + "," + Time.currentTime() + ",'" + Network.SERVER_NAME + "');");
+            globalSQL.update("INSERT INTO online_users(uuid,join_time,last_ping,server,primary_role) VALUES('" + e.getPlayer().getUniqueId() +
+                    "'," + Time.currentTime() + "," + Time.currentTime() + ",'" + Network.SERVER_NAME + "','" + Roles.getPrimaryRole(e.getPlayer()) + "');");
             connect.joinEvent(e.getPlayer());
         }
 
@@ -81,21 +83,27 @@ public class JoinServer implements Listener {
         */
 
         //Check if the player has any join events, if try run them.
-        if (globalSQL.hasRow("SELECT uuid FROM join_events WHERE uuid='" + u.player.getUniqueId() + "' AND type='network';")) {
+        //Delay by 1 second for all plugins to run their join events.
+        Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> {
+            if (globalSQL.hasRow("SELECT uuid FROM join_events WHERE uuid='" + u.player.getUniqueId() + "' AND type='network';")) {
 
-            //Get the event from the database.
-            String event = globalSQL.getString("SELECT event FROM join_events WHERE uuid='" + u.player.getUniqueId() + "' AND type='network'");
+                //Get the event from the database.
+                String event = globalSQL.getString("SELECT event FROM join_events WHERE uuid='" + u.player.getUniqueId() + "' AND type='network'");
 
-            //Split the event by word.
-            String[] aEvent = event.split(" ");
+                //Get message.
+                String message = globalSQL.getString("SELECT message FROM join_events WHERE uuid='" + u.player.getUniqueId() + "' AND type='network'");
 
-            //Send the event to the event handler.
-            EventManager.event(u.player.getUniqueId().toString(), aEvent);
+                //Split the event by word.
+                String[] aEvent = event.split(" ");
 
-            //Clear the events.
-            globalSQL.update("DELETE FROM join_events WHERE uuid='" + u.player.getUniqueId() + "' AND type='network';");
+                //Clear the events.
+                globalSQL.update("DELETE FROM join_events WHERE uuid='" + u.player.getUniqueId() + "' AND type='network';");
 
-        }
+                //Send the event to the event handler.
+                EventManager.event(u.player.getUniqueId().toString(), aEvent, message);
+
+            }
+        }, 20L);
 
         //Give the player nightvision if enabled or remove it if disabled.
         if (globalSQL.hasRow("SELECT nightvision_enabled FROM player_data WHERE nightvision_enabled=1 AND uuid='" + u.player.getUniqueId() + "';")) {

@@ -23,19 +23,19 @@ commands:
     usage: /<command>
     description: Opens the Staff Menu.
   region:
-    aliases: [region]
     usage: /<command>
     description: Allows players to manipulate regions without using the gui.
   teleport:
-    aliasses: [tp]
+    aliases: [tp]
     usage: /<command>
     description: Teleport to any online player.
   back:
     usage: /<command>
     description: Teleports the player to the previous teleported location.
-  modpack:
+  teleporttoggle:
+    aliases: [tptoggle, toggleteleport, toggletp]
     usage: /<command>
-    description: Sends links to the BTE modpack download, can be configured in the plugin config.
+    description: Enables/Disables the ability for other players to teleport to you.
   discord:
     usage: /<command>
     description: Sends a link to our discord server.
@@ -52,9 +52,36 @@ commands:
   warp:
     usage: /<command>
     description: Warp to locations in the exploration menu.
+  warps:
+    usage: /<command>
+    description: List all warps on the server, 16 per page.
   navigation:
     usage: /<command>
     description: Adds commands to do with navigation.
   database:
     usage: /<command>
     description: Adds all database conversions.
+  afk:
+    usage: /<command>
+    description: Toggles afk status.
+  ban:
+    usage: /<command>
+    description: Bans a player for a specific duration and reason.
+  mute:
+    usage: /<command>
+    description: Mutes a player for a specific duration and reason.
+  portals:
+    usage: /<command>
+    description: Command to reload portals.
+  sethome:
+    usage: /<command>
+    description: Set a home to your current location.
+  home:
+    usage: /<command>
+    description: Teleport to your home.
+  delhome:
+    usage: /<command>
+    description: Delete a home.
+  rules:
+    usage: /<command>
+    description: Get rules book.

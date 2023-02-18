@@ -1,11 +1,12 @@
 package me.bteuk.network.gui.plotsystem;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 import me.bteuk.network.Network;
+import me.bteuk.network.events.EventManager;
 import me.bteuk.network.gui.BuildGui;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.sql.PlotSQL;
+import me.bteuk.network.utils.NetworkUser;
+import me.bteuk.network.utils.Roles;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
@@ -27,16 +28,28 @@ public class PlotServerLocations extends Gui {
 
     private final PlotSQL plotSQL;
 
-    public PlotServerLocations() {
+    public PlotServerLocations(NetworkUser u) {
 
         super(45, Component.text("Plot Locations", NamedTextColor.AQUA, TextDecoration.BOLD));
 
         plotSQL = Network.getInstance().plotSQL;
 
         //Set default values of gui.
-        plotDifficulty = 0;
-        mDifficulty = Material.GRAY_CONCRETE;
-        sDifficulty = "Random";
+
+        //Default difficulty will depend on the role of the player.
+        //If the player is a guest, default will be easy, if apprentice default will be normal and if jrbuilder default will be hard.
+        //All other roles will have default set to random.
+        if (Roles.builderRole(u.player).equals("guest")) {
+            plotDifficulty = 1;
+        } else if (Roles.builderRole(u.player).equals("apprentice")) {
+            plotDifficulty = 2;
+        } else if (Roles.builderRole(u.player).equals("jrbuilder")) {
+            plotDifficulty = 3;
+        } else {
+            plotDifficulty = 0;
+        }
+        setDifficulty();
+
         plotSize = 0;
         mSize = Material.GRAY_CONCRETE;
         sSize = "Random";
@@ -46,8 +59,7 @@ public class PlotServerLocations extends Gui {
 
     }
 
-    private void createGui() {
-
+    private void setDifficulty() {
         if (plotDifficulty == 1) {
             mDifficulty = Material.LIME_CONCRETE;
             sDifficulty = "Easy";
@@ -61,7 +73,9 @@ public class PlotServerLocations extends Gui {
             mDifficulty = Material.GRAY_CONCRETE;
             sDifficulty = "Random";
         }
+    }
 
+    private void setSize() {
         if (plotSize == 1) {
             mSize = Material.LIME_CONCRETE;
             sSize = "Small";
@@ -75,50 +89,26 @@ public class PlotServerLocations extends Gui {
             mSize = Material.GRAY_CONCRETE;
             sSize = "Random";
         }
+    }
+
+    private void createGui() {
+
+        setDifficulty();
+
+        setSize();
 
         //Select plot difficulty.
         setItem(3, Utils.createItem(mDifficulty, 1,
-                        Utils.chat("&b&l" + sDifficulty),
-                        Utils.chat("&fClick to toggle the difficulty."),
-                        Utils.chat("&fYou will only be teleported to"),
-                        Utils.chat("&fplots of the selected difficulty.")),
+                        Utils.title(sDifficulty),
+                        Utils.line("Click to toggle the difficulty."),
+                        Utils.line("You will only be teleported to"),
+                        Utils.line("plots of the selected difficulty.")),
                 u ->
 
                 {
 
                     //Update the difficulty.
-                    if (plotDifficulty == 1) {
-
-                        //Set plot difficulty to next level.
-                        //If they are at least apprentice increase to normal, else return to random.
-                        if (u.player.hasPermission("group.apprentice")) {
-                            plotDifficulty = 2;
-                        } else {
-                            plotDifficulty = 0;
-                        }
-
-                    } else if (plotDifficulty == 2) {
-
-                        //Set plot difficulty to next level.
-                        //If they are at least jr.builder increase to hard, else return to random.
-                        if (u.player.hasPermission("group.jrbuilder")) {
-                            plotDifficulty = 3;
-                        } else {
-                            plotDifficulty = 0;
-                        }
-
-                    } else if (plotDifficulty == 3) {
-
-                        //Return the plot difficulty to random.
-                        plotDifficulty = 0;
-
-                    } else {
-
-                        //Difficulty was set to random previously.
-                        //Increase the plot difficulty to easy.
-                        plotDifficulty = 1;
-
-                    }
+                    plotDifficulty = (plotDifficulty == 3) ? 0 : plotDifficulty + 1;
 
                     //Update the gui.
                     this.refresh();
@@ -128,47 +118,16 @@ public class PlotServerLocations extends Gui {
 
         //Select plot size.
         setItem(5, Utils.createItem(mSize, 1,
-                        Utils.chat("&b&l" + sSize),
-                        Utils.chat("&fClick to toggle the size."),
-                        Utils.chat("&fYou will only be teleported to"),
-                        Utils.chat("&fplots of the selected size.")),
+                        Utils.title(sSize),
+                        Utils.line("Click to toggle the size."),
+                        Utils.line("You will only be teleported to"),
+                        Utils.line("plots of the selected size.")),
                 u ->
 
                 {
 
                     //Update the Size.
-                    if (plotSize == 1) {
-
-                        //Set plot Size to next level.
-                        //If they are at least apprentice increase to normal, else return to random.
-                        if (u.player.hasPermission("group.apprentice")) {
-                            plotSize = 2;
-                        } else {
-                            plotSize = 0;
-                        }
-
-                    } else if (plotSize == 2) {
-
-                        //Set plot Size to next level.
-                        //If they are at least jr.builder increase to hard, else return to random.
-                        if (u.player.hasPermission("group.jrbuilder")) {
-                            plotSize = 3;
-                        } else {
-                            plotSize = 0;
-                        }
-
-                    } else if (plotSize == 3) {
-
-                        //Return the plot Size to random.
-                        plotSize = 0;
-
-                    } else {
-
-                        //Size was set to random previously.
-                        //Increase the plot Size to easy.
-                        plotSize = 1;
-
-                    }
+                    plotSize = (plotSize == 3) ? 0 : plotSize + 1;
 
                     //Update the gui.
                     this.refresh();
@@ -187,13 +146,13 @@ public class PlotServerLocations extends Gui {
 
             //Create location button.
             setItem(slot, Utils.createItem(Material.DIAMOND_PICKAXE, 1,
-                            Utils.chat("&b&l" + plotSQL.getString("SELECT alias FROM location_data WHERE name='" + location + "';")),
-                            Utils.chat("&fClick to teleport to a plot in this location"),
-                            Utils.chat("&fsubject to the settings shown above."),
-                            Utils.chat("&fAvailable plots of each difficulty:"),
-                            Utils.chat("&fEasy: &7" + plotSQL.getInt("SELECT count(id) FROM plot_data WHERE location='" + location + "' AND status='unclaimed' AND difficulty=1;")),
-                            Utils.chat("&fMedium: &7" + plotSQL.getInt("SELECT count(id) FROM plot_data WHERE location='" + location + "' AND status='unclaimed' AND difficulty=2;")),
-                            Utils.chat("&fHard: &7" + plotSQL.getInt("SELECT count(id) FROM plot_data WHERE location='" + location + "' AND status='unclaimed' AND difficulty=3;"))),
+                            Utils.title(plotSQL.getString("SELECT alias FROM location_data WHERE name='" + location + "';")),
+                            Utils.line("Click to teleport to a plot in this location"),
+                            Utils.line("subject to the settings shown above."),
+                            Utils.line("Available plots of each difficulty:"),
+                            Utils.line("Easy: &7" + plotSQL.getInt("SELECT count(id) FROM plot_data WHERE location='" + location + "' AND status='unclaimed' AND difficulty=1;")),
+                            Utils.line("Medium: &7" + plotSQL.getInt("SELECT count(id) FROM plot_data WHERE location='" + location + "' AND status='unclaimed' AND difficulty=2;")),
+                            Utils.line("Hard: &7" + plotSQL.getInt("SELECT count(id) FROM plot_data WHERE location='" + location + "' AND status='unclaimed' AND difficulty=3;"))),
                     u ->
 
                     {
@@ -204,44 +163,63 @@ public class PlotServerLocations extends Gui {
 
                         if (plotDifficulty == 0 && plotSize == 0) {
 
-                            if (u.player.hasPermission("group.jrbuilder")) {
+                            if (Roles.builderRole(u.player).equals("jrbuilder")) {
 
-                                //Select a random plot of any difficulty.
-                                id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location='" + location + "' AND status='unclaimed' ORDER BY RAND() LIMIT 1;");
+                                //Select a random plot of the hard difficulty.
+                                //Since this is the next plot difficulty to get Builder.
+                                id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location = '" + location +
+                                        "' AND status='unclaimed' AND difficulty=3 ORDER BY RAND() LIMIT 1;");
 
-                            } else if (u.player.hasPermission("group.apprentice")) {
+                            } else if (Roles.builderRole(u.player).equals("apprentice")) {
 
-                                //Select a random plot of difficulty easy and normal.
-                                id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location='" + location + "' AND status='unclaimed' AND (difficulty=1 OR difficulty=2) ORDER BY RAND() LIMIT 1;");
+                                //Select a random plot of the normal difficulty.
+                                //Since this is the next plot difficulty to get Jr.Builder.
+                                id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location = '" + location +
+                                        "' AND status='unclaimed' AND difficulty=2 ORDER BY RAND() LIMIT 1;");
+
+                            } else if (Roles.builderRole(u.player).equals("default")) {
+
+                                //Select a random plot of the easy difficulty.
+                                //Since this is the next plot difficulty to get Apprentice.
+                                id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location = '" + location +
+                                        "' AND status='unclaimed' AND difficulty=1 ORDER BY RAND() LIMIT 1;");
 
                             } else {
 
-                                //Select a random plot of difficulty easy.
-                                id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location='" + location + "' AND status='unclaimed' AND difficulty=1 ORDER BY RAND() LIMIT 1;");
+                                //Select a random plot of any difficulty.
+                                id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location = '" + location +
+                                        "' AND status='unclaimed' ORDER BY RAND() LIMIT 1;");
 
                             }
 
                         } else if (plotDifficulty == 0) {
                             //Pick plot with random difficulty but fixed size.
 
-                            if (u.player.hasPermission("group.jrbuilder")) {
+                            if (Roles.builderRole(u.player).equals("jrbuilder")) {
 
-                                //Select a random plot of any difficulty.
-                                id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location='" + location +
-                                        "' AND status='unclaimed' AND size=" + plotSize + " ORDER BY RAND() LIMIT 1;");
+                                //Select a random plot of the hard difficulty.
+                                //Since this is the next plot difficulty to get Builder.
+                                id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location = '" + location +
+                                        "' AND status='unclaimed' AND difficulty=3 AND size=" + plotSize + " ORDER BY RAND() LIMIT 1;");
 
-                            } else if (u.player.hasPermission("group.apprentice")) {
+                            } else if (Roles.builderRole(u.player).equals("apprentice")) {
 
-                                //Select a random plot of difficulty easy and normal.
-                                id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location='" + location +
-                                        "' AND status='unclaimed' AND (difficulty=1 OR difficulty=2) AND size=" + plotSize + " ORDER BY RAND() LIMIT 1;");
+                                //Select a random plot of the normal difficulty.
+                                //Since this is the next plot difficulty to get Jr.Builder.
+                                id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location = '" + location +
+                                        "' AND status='unclaimed' AND difficulty=2 AND size=" + plotSize + " ORDER BY RAND() LIMIT 1;");
+
+                            } else if (Roles.builderRole(u.player).equals("default")) {
+
+                                //Select a random plot of the easy difficulty.
+                                //Since this is the next plot difficulty to get Apprentice.
+                                id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location = '" + location +
+                                        "' AND status='unclaimed' AND difficulty=1 AND size=" + plotSize + " ORDER BY RAND() LIMIT 1;");
 
                             } else {
-
-                                //Select a random plot of difficulty easy.
-                                id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location='" + location +
-                                        "' AND status='unclaimed' AND difficulty=1 AND size=" + plotSize + "  ORDER BY RAND() LIMIT 1;");
-
+                                //Select a random plot of any difficulty.
+                                id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location = '" + location +
+                                        "' AND status='unclaimed' AND size=" + plotSize + " ORDER BY RAND() LIMIT 1;");
                             }
 
 
@@ -263,8 +241,8 @@ public class PlotServerLocations extends Gui {
                         //If no plots fit the specified parameters the id will be 0.
                         if (id == 0) {
 
-                            u.player.sendMessage(Utils.chat("&cNo plots are available with the specified settings,"));
-                            u.player.sendMessage(Utils.chat("&ctry another location or change the settings."));
+                            u.player.sendMessage(Utils.error("No plots are available with the specified settings,"));
+                            u.player.sendMessage(Utils.error("try another location or change the settings."));
 
                         } else {
 
@@ -278,16 +256,13 @@ public class PlotServerLocations extends Gui {
                             if (server.equals(Network.SERVER_NAME)) {
 
                                 u.player.closeInventory();
-                                Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('"
-                                        + u.player.getUniqueId() + "','plotsystem','"
-                                        + Network.SERVER_NAME
-                                        + "','teleport plot " + id + "');");
+
+                                EventManager.createTeleportEvent(false, u.player.getUniqueId().toString(), "plotsystem", "teleport plot " + id, u.player.getLocation());
 
                             } else {
 
                                 //Set the server join event.
-                                Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('"
-                                        + u.player.getUniqueId() + "','plotsystem','teleport plot " + id + "');");
+                                EventManager.createTeleportEvent(true, u.player.getUniqueId().toString(), "plotsystem", "teleport plot " + id, u.player.getLocation());
 
                                 //Teleport them to another server.
                                 this.delete();
@@ -299,7 +274,7 @@ public class PlotServerLocations extends Gui {
                     });
 
             //Increase slot accordingly.
-            if (slot%9 == 7) {
+            if (slot % 9 == 7) {
                 //Increase row, basically add 3.
                 slot += 3;
             } else if (slot == 34) {
@@ -314,8 +289,8 @@ public class PlotServerLocations extends Gui {
 
         //Return
         setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        Utils.chat("&b&lReturn"),
-                        Utils.chat("&fOpen the build menu.")),
+                        Utils.title("Return"),
+                        Utils.line("Open the build menu.")),
                 u ->
 
                 {

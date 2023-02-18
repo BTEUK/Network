@@ -1,6 +1,7 @@
 package me.bteuk.network.staff;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.events.EventManager;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.gui.regions.RegionRequests;
 import me.bteuk.network.utils.NetworkUser;
@@ -29,46 +30,40 @@ public class StaffGui extends Gui {
 
     private void createGui() {
 
-        /*TODO:
-
-        Staff menu for regions.
-        Staff menu for region join requests.
-
-        //TODO: Staff menu for navigation menu requests.
-        uknet.navigation.review
-        */
-
         //Check if any location requests exist.
         //To make sure the string makes grammatical sense we check if the number is 1, in this case we change 'are' to 'is'.
-        int requestCount = Network.getInstance().globalSQL.getInt("SELECT location FROM location_requests");
-        String requestString = "There are currently &7" + requestCount + " &flocation requests.";
-        if (requestCount == 1) {
-            requestString = requestString.replace("are", "is");
-            requestString = requestString.replace("requests", "request");
+        int lRequestCount = Network.getInstance().globalSQL.getInt("SELECT COUNT(location) FROM location_requests");
+        String lRequestString = "There are currently &7" + lRequestCount + " &flocation requests.";
+        if (lRequestCount == 1) {
+            lRequestString = lRequestString.replace("are", "is");
+            lRequestString = lRequestString.replace("requests", "request");
         }
 
         //Create item.
         setItem(14, Utils.createItem(Material.ENDER_CHEST, 1,
                         Utils.title("Location Requests"),
                         Utils.line("Opens a menu to view all location requests for navigation."),
-                        Utils.line(requestString)),
+                        Utils.line(lRequestString)),
                 u -> {
 
                     //Check if the user has the relevant permissions.
-                    if (u.player.hasPermission("uknet.navigation.review")) {
+                    if (Network.getInstance().globalSQL.getInt("SELECT COUNT(location) FROM location_requests") > 0) {
+                        if (u.player.hasPermission("uknet.navigation.review")) {
 
-                        //Open the LocationRequest gui.
-                        this.delete();
-                        u.staffGui = null;
+                            //Open the LocationRequest gui.
+                            this.delete();
+                            u.staffGui = null;
 
-                        u.staffGui = new LocationRequests();
-                        u.staffGui.open(u);
+                            u.staffGui = new LocationRequests();
+                            u.staffGui.open(u);
 
+                        } else {
+                            u.player.sendMessage(Utils.chat("&cYou must be a reviewer to review location requests."));
+                        }
+                    } else {
+                        u.player.sendMessage(Utils.chat("&cThere are currently no location requests."));
                     }
                 });
-
-
-        //Staff menu for moderation.
 
         /*
         Click to open menu to edit region details.
@@ -85,8 +80,8 @@ public class StaffGui extends Gui {
         if (user.inRegion) {
 
             setItem(10, Utils.createItem(Material.ANVIL, 1,
-                            Utils.chat("&b&lManage Region " + user.region.regionName()),
-                            Utils.chat("&fOpens a menu to manage details of the region you are currently in.")),
+                            Utils.title("Manage Region " + user.region.regionName()),
+                            Utils.line("Opens a menu to manage details of the region you are currently in.")),
                     u ->
 
                     {
@@ -95,8 +90,10 @@ public class StaffGui extends Gui {
                         if (u.player.hasPermission("uknet.regions.manage")) {
 
                             if (u.inRegion) {
-                                //TODO: COMPLETE THIS
                                 //Open manage region menu
+                                this.delete();
+                                u.staffGui = new ManageRegion(u, u.region);
+                                u.staffGui.open(u);
 
                             }
 
@@ -109,20 +106,27 @@ public class StaffGui extends Gui {
                     });
         } else {
 
-            setItem(10, Utils.createItem(Material.ANVIL, 1,
-                    Utils.chat("&b&lNo Region"),
-                    Utils.chat("&fYou are currently not in a region.")));
+            setItem(10, Utils.createItem(Material.STRUCTURE_VOID, 1,
+                    Utils.title("No Region"),
+                    Utils.line("You are currently not standing in a valid region."),
+                    Utils.line("This is likely due to being in a lobby.")));
 
         }
 
         //Click to open menu to deal with region join requests.
         //Can only click on this if requests exist and player is a reviewer.
-        //TODO: Fix formatting for 1 request, see location requests for template.
+        //Check if any location requests exist.
+        //To make sure the string makes grammatical sense we check if the number is 1, in this case we change 'are' to 'is'.
+        int rRequestCount = Network.getInstance().globalSQL.getInt("SELECT COUNT(region) FROM region_requests WHERE staff_accept=0");
+        String rRequestString = "There are currently &7" + rRequestCount + " &fregion join requests by Jr.Builders.";
+        if (rRequestCount == 1) {
+            rRequestString = rRequestString.replace("are", "is");
+            rRequestString = rRequestString.replace("requests", "request");
+        }
         setItem(11, Utils.createItem(Material.CHEST_MINECART, 1,
-                        Utils.chat("&b&lReview Region Requests"),
-                        Utils.chat("&fOpens a menu to review active region join requests by Jr.Builders."),
-                        Utils.chat("&fThere are currently &7" +
-                                Network.getInstance().regionSQL.getInt("SELECT COUNT(*) FROM region_requests WHERE staff_accept=0;") + " &fregion requests.")),
+                        Utils.title("Review Region Requests"),
+                        Utils.line("Opens a menu to review active region join requests by Jr.Builders."),
+                        Utils.line(rRequestString)),
                 u -> {
 
                     if (Network.getInstance().regionSQL.hasRow("SELECT region FROM region_requests WHERE staff_accept=0;")) {
@@ -146,13 +150,19 @@ public class StaffGui extends Gui {
 
         //Click to review plot.
         //Show review plot button in gui.
-        //TODO: Fix formatting for 1 request, see location requests for template.
+        int plot_count = Network.getInstance().plotSQL.getInt("SELECT count(id) FROM plot_data WHERE status='submitted';");
+        String message = "";
+
+        if (plot_count == 1) {
+            message = "&fThere is currently &71 &fsubmitted plot.";
+        } else {
+            message = "&fThere are currently &7" + plot_count + " &fsubmitted plots.";
+        }
+
         setItem(13, Utils.createItem(Material.WRITABLE_BOOK, 1,
-                        Utils.chat("&b&lReview Plot"),
-                        Utils.chat("&fClick to review a submitted plot."),
-                        Utils.chat("&fThere are currently &7" +
-                                Network.getInstance().plotSQL.getInt("SELECT COUNT(id) FROM plot_data WHERE status='submitted';") +
-                                " &fsubmitted plots.")),
+                        Utils.title("Review Plot"),
+                        Utils.line("Click to review a submitted plot."),
+                        Utils.chat(message)),
                 u -> {
 
                     //Check if there is a plot available to review,
@@ -218,20 +228,10 @@ public class StaffGui extends Gui {
                     }
                 });
 
-        //Click to open menu of navigation menu requests.
-        if (true/*request exists*/) {
-            setItem(15, Utils.createItem(Material.ENDER_EYE, 1,
-                            Utils.chat("&b&lReview Navigation Menu Requests"),
-                            Utils.chat("&fOpens a menu to review navigation menu requests.")),
-                    u -> {
-
-                    });
-        }
-
         //Click to open moderation menu.
         setItem(16, Utils.createItem(Material.REDSTONE_BLOCK, 1,
-                        Utils.chat("&b&lModeration Menu"),
-                        Utils.chat("&fOpens the moderation menu to deal with wrongdoers.")),
+                        Utils.title("Moderation Menu"),
+                        Utils.line("Opens the moderation menu to deal with wrongdoers.")),
                 u ->
 
                 {
