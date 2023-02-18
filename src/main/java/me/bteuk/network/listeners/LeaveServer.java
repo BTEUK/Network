@@ -4,6 +4,8 @@ import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.utils.NetworkUser;
+import me.bteuk.network.utils.Statistics;
+import me.bteuk.network.utils.Time;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -27,6 +29,10 @@ public class LeaveServer implements Listener {
 
     }
 
+    public void unregister() {
+        PlayerQuitEvent.getHandlerList().unregister(this);
+    }
+
     @EventHandler
     public void leaveServerEvent(PlayerQuitEvent e) {
 
@@ -34,6 +40,16 @@ public class LeaveServer implements Listener {
         e.setQuitMessage(null);
 
         NetworkUser u = instance.getUser(e.getPlayer());
+
+        //Reset last logged time.
+        if (u.afk) {
+            u.last_time_log = u.last_movement = Time.currentTime();
+            u.afk = false;
+        }
+
+        //Update statistics
+        long time = Time.currentTime();
+        Statistics.save(u, Time.getDate(time), time);
 
         //Remove user from list.
         instance.removeUser(u);

@@ -1,6 +1,8 @@
 package me.bteuk.network.gui.regions;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.commands.Back;
+import me.bteuk.network.events.EventManager;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.utils.SwitchServer;
@@ -38,14 +40,23 @@ public class RegionInfo extends Gui {
     private void createGui() {
 
         //Region info.
-        setItem(4, Utils.createItem(Material.BOOK, 1,
-                Utils.chat("&b&lRegion " + region.getTag(uuid)),
-                Utils.chat("&fRegion Owner &7" + region.ownerName()),
-                Utils.chat("&fRegion Members &7" + region.memberCount())));
+        //If region has tag set then show both name and tag.
+        if (region.regionName().equals(region.getTag(uuid))) {
+            setItem(4, Utils.createItem(Material.BOOK, 1,
+                    Utils.title("Region " + region.regionName()),
+                    Utils.line("Region Owner &7" + region.ownerName()),
+                    Utils.line("Region Members &7" + region.memberCount())));
+        } else {
+            setItem(4, Utils.createItem(Material.BOOK, 1,
+                    Utils.title("Region " + region.regionName()),
+                    Utils.line("Region Tag &7" + region.getTag(uuid)),
+                    Utils.line("Region Owner &7" + region.ownerName()),
+                    Utils.line("Region Members &7" + region.memberCount())));
+        }
 
         //Leave Region.
         setItem(8, Utils.createItem(Material.RED_CONCRETE, 1,
-                        Utils.chat("&b&lLeave Region")),
+                        Utils.title("Leave Region")),
                 u -> {
 
                     //Send leave event to server events.
@@ -53,8 +64,8 @@ public class RegionInfo extends Gui {
                             + globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';") + "','region leave " + region.regionName() + "');");
 
                     //Return to region menu and close inventory.
+                    u.player.closeInventory();
                     this.delete();
-                    u.mainGui = null;
 
                     u.mainGui = new RegionMenu(u);
 
@@ -62,10 +73,10 @@ public class RegionInfo extends Gui {
 
         //Set region tag.
         setItem(21, Utils.createItem(Material.WRITABLE_BOOK, 1,
-                        Utils.chat("&b&lSet Region Tag"),
-                        Utils.chat("&fClick to give this region a custom name."),
-                        Utils.chat("&fYou will be prompted to type a name in chat."),
-                        Utils.chat("&fIt can have a maximum of 64 characters.")),
+                        Utils.title("Set Region Tag"),
+                        Utils.line("Click to give this region a custom name."),
+                        Utils.line("You will be prompted to type a name in chat."),
+                        Utils.line("It can have a maximum of 64 characters.")),
 
                 u -> {
 
@@ -78,18 +89,18 @@ public class RegionInfo extends Gui {
                     //Create chat listener and send message telling the player.
                     //Listener will automatically close after 1 minute or if a message is sent.
                     regionTagListener = new RegionTagListener(u.player, region);
-                    u.player.sendMessage(Utils.chat("&aWrite your region tag in chat, the first message counts."));
+                    u.player.sendMessage(Utils.success("Write your region tag in chat, the first message counts."));
                     u.player.closeInventory();
 
                 });
 
         //Teleport to region.
         setItem(22, Utils.createItem(Material.ENDER_PEARL, 1,
-                        Utils.chat("&b&lTeleport to Region"),
-                        Utils.chat("&fTeleports you to the region at the"),
-                        Utils.chat("&fcurrent set location."),
-                        Utils.chat("&fYou can edit the location by clicking on the"),
-                        Utils.chat("&f'Set Location' button while standing in the region.")),
+                        Utils.title("Teleport to Region"),
+                        Utils.line("Teleports you to the region at the"),
+                        Utils.line("current set location."),
+                        Utils.line("You can edit the location by clicking on the"),
+                        Utils.line("'Set Location' button while standing in the region.")),
                 u -> {
 
                     //If the player is on the earth server get the coordinate.
@@ -98,15 +109,17 @@ public class RegionInfo extends Gui {
                         //Close inventory.
                         u.player.closeInventory();
 
+                        //Set current location for /back
+                        Back.setPreviousCoordinate(u.player.getUniqueId().toString(), u.player.getLocation());
+
                         Location l = globalSQL.getCoordinate(region.getCoordinateID(uuid));
                         u.player.teleport(l);
-                        u.player.sendMessage(Utils.chat("&aTeleported to region &3" + region.getTag(uuid)));
+                        u.player.sendMessage(Utils.success("Teleported to region &3" + region.getTag(uuid)));
 
                     } else {
 
                         //Create teleport region event.
-                        Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('" + u.player.getUniqueId() + "','network'," + "'region teleport "
-                                + region + "');");
+                        EventManager.createTeleportEvent(true, u.player.getUniqueId().toString(), "network", "teleport region " + region.regionName(), u.player.getLocation());
 
                         //Switch server.
                         SwitchServer.switchServer(u.player, globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH'"));
@@ -116,11 +129,11 @@ public class RegionInfo extends Gui {
 
         //Set teleport location.
         setItem(23, Utils.createItem(Material.ENDER_EYE, 1,
-                        Utils.chat("&b&lSet Location"),
-                        Utils.chat("&fSets the teleport location of this region"),
-                        Utils.chat("&fto you current location."),
-                        Utils.chat("&fYou must be standing in the region"),
-                        Utils.chat("&ffor this to work.")),
+                        Utils.title("Set Location"),
+                        Utils.line("Sets the teleport location of this region"),
+                        Utils.line("to you current location."),
+                        Utils.line("You must be standing in the region"),
+                        Utils.line("for this to work.")),
                 u -> {
 
                     //Check if the player is in the correct region.
@@ -133,13 +146,13 @@ public class RegionInfo extends Gui {
 
                             //Create coordinate id for location of player and set that as the new coordinate id.
                             region.setCoordinateID(uuid, coordinateID);
-                            u.player.sendMessage(Utils.chat("&aSet teleport location for region &3" + region.getTag(uuid) + " &aat your current location."));
+                            u.player.sendMessage(Utils.success("Set teleport location for region &3" + region.getTag(uuid) + " &aat your current location."));
 
                         } else {
-                            u.player.sendMessage(Utils.chat("&cYou are not standing in the correct region."));
+                            u.player.sendMessage(Utils.error("You are not standing in the correct region."));
                         }
                     } else {
-                        u.player.sendMessage(Utils.chat("&cYou are not standing in a region."));
+                        u.player.sendMessage(Utils.error("You are not standing in a region."));
                     }
                 });
 
@@ -149,21 +162,21 @@ public class RegionInfo extends Gui {
             //If region is private, make public button, if public make private button.
             if (region.isPublic()) {
                 setItem(0, Utils.createItem(Material.IRON_TRAPDOOR, 1,
-                                Utils.chat("&b&lMake Private"),
-                                Utils.chat("&fNew members will need your approval to join the region.")),
+                                Utils.title("Make Private"),
+                                Utils.line("New members will need your approval to join the region.")),
                         u -> {
 
                             //Set the region as private and refresh gui.
                             region.setDefault();
 
-                            u.player.sendMessage(Utils.chat("&aRegion &3" + region.getTag(uuid) + " &ais now private."));
+                            u.player.sendMessage(Utils.success("Region &3" + region.getTag(uuid) + " &ais now private."));
                             this.refresh();
 
                         });
             } else {
                 setItem(0, Utils.createItem(Material.OAK_TRAPDOOR, 1,
-                                Utils.chat("&b&lMake Public"),
-                                Utils.chat("&fNew members can join the region without approval.")),
+                                Utils.title("Make Public"),
+                                Utils.line("New members can join the region without approval.")),
                         u -> {
 
                             //Set the region as public and refresh gui.
@@ -178,7 +191,7 @@ public class RegionInfo extends Gui {
                                         + region + "');");
                             }
 
-                            u.player.sendMessage(Utils.chat("&aRegion &3" + region.getTag(uuid) + " &ais now public."));
+                            u.player.sendMessage(Utils.success("Region &3" + region.getTag(uuid) + " &ais now public."));
                             this.refresh();
 
                         });
@@ -186,14 +199,13 @@ public class RegionInfo extends Gui {
 
             //Invite member.
             setItem(9, Utils.createItem(Material.OAK_BOAT, 1,
-                            Utils.chat("&b&lInvite Members"),
-                            Utils.chat("&fInvite a new member to your region."),
-                            Utils.chat("&fYou can only invite online users.")),
+                            Utils.title("Invite Members"),
+                            Utils.line("Invite a new member to your region."),
+                            Utils.line("You can only invite online users.")),
                     u -> {
 
                         //Open the invite member menu.
                         this.delete();
-                        u.mainGui = null;
 
                         u.mainGui = new InviteRegionMembers(region);
                         u.mainGui.open(u);
@@ -202,15 +214,29 @@ public class RegionInfo extends Gui {
 
             //Manage members.
             setItem(18, Utils.createItem(Material.PLAYER_HEAD, 1,
-                            Utils.chat("&b&lRegion Members"),
-                            Utils.chat("&fManage the members in your region.")),
+                            Utils.title("Region Members"),
+                            Utils.line("Manage the members in your region.")),
                     u -> {
 
                         //Open the invite member menu.
                         this.delete();
-                        u.mainGui = null;
 
                         u.mainGui = new RegionMembers(region);
+                        u.mainGui.open(u);
+
+                    });
+
+            //Return
+            setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
+                            Utils.title("Return"),
+                            Utils.line("Open the region menu.")),
+                    u -> {
+
+                        //Delete this gui.
+                        this.delete();
+
+                        //Switch to plot info.
+                        u.mainGui = new RegionMenu(u);
                         u.mainGui.open(u);
 
                     });

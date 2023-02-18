@@ -61,8 +61,6 @@ public abstract class Gui implements GuiInterface {
 
     public void open(NetworkUser u) {
 
-        Network.getInstance().getLogger().info("Number of Gui's: " + inventoriesByUUID.size());
-
         u.player.openInventory(inv);
         openInventories.put(u.player.getUniqueId(), getUuid());
 
@@ -79,8 +77,6 @@ public abstract class Gui implements GuiInterface {
         }
         inventoriesByUUID.remove(getUuid());
     }
-
-    //TODO: Refresh gui method in this class, which is then overwritten all unique guis.
 
     public UUID getUuid() {
         return uuid;

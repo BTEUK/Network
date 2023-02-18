@@ -27,7 +27,7 @@ public record Region(String regionName) {
 
     //Set the tag of the region for a specific player.
     public void setTag(String uuid, String tag) {
-        Network.getInstance().regionSQL.update("UPDATE region_members SET tag='" + tag + "' WHERE region='" + regionName + "' AND uuid='" + uuid + "';");
+        Network.getInstance().regionSQL.update("UPDATE region_members SET tag='" + tag.replace("'", "\\'")+ "' WHERE region='" + regionName + "' AND uuid='" + uuid + "';");
     }
 
     //Return whether the region has a tag for the specified uuid.
@@ -329,7 +329,7 @@ public record Region(String regionName) {
                     u.player.getUniqueId() + "','" + getOwner() + "',0," + coordinate + ");");
 
             //Send message to player.
-            u.player.sendMessage(Utils.chat("&aRequested to join region &3" + regionName + ", &aawaiting staff review."));
+            u.player.sendMessage(Utils.success("Requested to join region &3" + regionName + ", &aawaiting staff review."));
 
             Network.getInstance().chat.broadcastMessage("&aA region join request has been submitted by &7" + u.player.getName() + "&a for region &7" + regionName + "&a.", "uknet:reviewer");
 
@@ -341,7 +341,7 @@ public record Region(String regionName) {
                     u.player.getUniqueId() + "','" + getOwner() + "',0," + coordinate + ");");
 
             //Send message to player.
-            u.player.sendMessage(Utils.chat("&aRequested to join region &3" + regionName + ", &aawaiting owner review."));
+            u.player.sendMessage(Utils.success("Requested to join region &3" + regionName + ", &aawaiting owner review."));
 
             //If owner is in the online users list send a message.
             if (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid=" + getOwner() + ";")) {
@@ -370,7 +370,7 @@ public record Region(String regionName) {
             //Join region in WorldGuard.
             WorldGuard.addMember(regionName, u.player.getUniqueId().toString(), u.player.getWorld());
 
-            u.player.sendMessage(Utils.chat("&aYou have joined the region &3" + regionName + " &aas a member."));
+            u.player.sendMessage(Utils.success("You have joined the region &3" + regionName + " &aas a member."));
 
         } else {
 
@@ -408,7 +408,7 @@ public record Region(String regionName) {
             //Join region in WorldGuard.
             WorldGuard.addMember(regionName, u.player.getUniqueId().toString(), u.player.getWorld());
 
-            u.player.sendMessage(Utils.chat("&aYou have joined the region &3" + regionName + " &aas the owner."));
+            u.player.sendMessage(Utils.success("You have joined the region &3" + regionName + " &aas the owner."));
 
         }
     }

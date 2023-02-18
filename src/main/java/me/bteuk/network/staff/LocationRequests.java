@@ -50,8 +50,8 @@ public class LocationRequests extends Gui {
 
         //Return
         setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        Utils.chat("&b&lReturn"),
-                        Utils.chat("&fOpen the staff menu.")),
+                        Utils.title("Return"),
+                        Utils.line("Open the staff menu.")),
                 u ->
 
                 {

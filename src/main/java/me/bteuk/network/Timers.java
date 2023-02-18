@@ -3,13 +3,15 @@ package me.bteuk.network;
 import me.bteuk.network.events.EventManager;
 import me.bteuk.network.listeners.Connect;
 import me.bteuk.network.sql.GlobalSQL;
-import me.bteuk.network.utils.NetworkUser;
-import me.bteuk.network.utils.Time;
-import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.*;
 import me.bteuk.network.utils.regions.Inactivity;
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Timers {
 
@@ -18,6 +20,9 @@ public class Timers {
 
     //Users
     private final ArrayList<NetworkUser> users;
+
+    //Timers
+    private final ArrayList<Integer> timers;
 
     //Server name
     private final String SERVER_NAME;
@@ -46,29 +51,49 @@ public class Timers {
     private ArrayList<Inactivity> inactive_owners;
     private String uuid;
 
+    //Afk time
+    private final long afk;
+
+    //Discord roles
+    private final HashMap<String, Long> roles;
+
     public Timers(Network instance, GlobalSQL globalSQL, Connect connect) {
 
         this.instance = instance;
+        FileConfiguration config = instance.getConfig();
         this.users = instance.getUsers();
 
         this.globalSQL = globalSQL;
 
         this.connect = connect;
 
+        this.timers = new ArrayList<>();
+
         SERVER_NAME = Network.SERVER_NAME;
 
         events = new ArrayList<>();
 
         //days * 24 hours * 60 minutes * 60 seconds * 1000 milliseconds
-        inactivity = instance.getConfig().getInt("region_inactivity") * 24L * 60L * 60L * 1000L;
+        inactivity = config.getInt("region_inactivity") * 24L * 60L * 60L * 1000L;
         inactive_owners = new ArrayList<>();
+
+        //Minutes * 60 seconds * 1000 milliseconds
+        afk = config.getInt("afk") * 60L * 1000L;
+
+        //Get roles from config.
+        roles = new HashMap<>();
+        roles.put("architect", config.getLong("role_id.architect"));
+        roles.put("builder", config.getLong("role_id.builder"));
+        roles.put("jrbuilder", config.getLong("role_id.jrbuilder"));
+        roles.put("apprentice", config.getLong("role_id.apprentice"));
+        roles.put("applicant", config.getLong("role_id.applicant"));
 
     }
 
     public void startTimers() {
 
         //1 tick timer.
-        instance.getServer().getScheduler().scheduleSyncRepeatingTask(instance, () -> {
+        timers.add(instance.getServer().getScheduler().scheduleSyncRepeatingTask(instance, () -> {
 
             //Check for new server_events.
             if (globalSQL.hasRow("SELECT uuid FROM server_events WHERE server='" + SERVER_NAME + "' AND type='network';")) {
@@ -91,7 +116,7 @@ public class Timers {
                         String[] aEvent = event[1].split(" ");
 
                         //Send the event to the event handler.
-                        EventManager.event(event[0], aEvent);
+                        EventManager.event(event[0], aEvent, event[2]);
 
                     }
 
@@ -101,10 +126,10 @@ public class Timers {
                 }
             }
 
-        }, 0L, 1L);
+        }, 0L, 1L));
 
         //1 second timer.
-        instance.getServer().getScheduler().scheduleSyncRepeatingTask(instance, () -> {
+        timers.add(instance.getServer().getScheduler().scheduleSyncRepeatingTask(instance, () -> {
 
             //Get current time.
             long time = Time.currentTime();
@@ -141,6 +166,20 @@ public class Timers {
                     //Delete messages.
                     instance.globalSQL.update("DELETE FROM messages WHERE recipient='" + user.player.getUniqueId() + "'");
                 }
+
+                //Check if the player is afk.
+                if (user.last_movement < (time - afk) && !user.afk) {
+
+                    //Set player as AFK
+                    user.afk = true;
+
+                    //Save statistics.
+                    Statistics.save(user, Time.getDate(time), time);
+
+                    //Send message to chat and discord.
+                    Network.getInstance().chat.broadcastMessage("&7" + user.player.getName() + " is now afk.", "uknet:globalchat");
+
+                }
             }
 
             //Check for users switching to this server.
@@ -171,10 +210,10 @@ public class Timers {
 
             }
 
-        }, 0L, 20L);
+        }, 0L, 20L));
 
         //1 minute timer.
-        instance.getServer().getScheduler().scheduleSyncRepeatingTask(instance, () -> {
+        timers.add(instance.getServer().getScheduler().scheduleSyncRepeatingTask(instance, () -> {
 
             //Check for inactive owners.
             //If the region has members then make another member the new owner,
@@ -206,6 +245,47 @@ public class Timers {
                 }
             }
 
-        }, 0L, 1200L);
+            //For all online players sync the roles.
+            for (NetworkUser u : instance.getUsers()) {
+
+                if (u.isLinked) {
+                    //Get the highest role for syncing and sync it, except for guest.
+                    String role = Roles.builderRole(u.player);
+                    discordSync(u.discord_id, role);
+                }
+
+                //Update role in online_players table.
+                globalSQL.update("UPDATE online_users SET primary_role='" + Roles.getPrimaryRole(u.player) + "' WHERE uuid='" + u.player.getUniqueId() + "';");
+            }
+
+            //Update online time of all players.
+            Statistics.saveAll();
+
+        }, 0L, 1200L));
+    }
+
+    public void close() {
+
+        //Cancel all timers.
+        for (int timer : timers) {
+            Bukkit.getScheduler().cancelTask(timer);
+        }
+
+    }
+
+    public HashMap<String, Long> getRoles() {
+        return roles;
+    }
+
+    public void discordSync(long discord_id, String role) {
+        //Remove all roles except current role.
+        for (Map.Entry<String, Long> entry : Network.getInstance().timers.getRoles().entrySet()) {
+
+            if (role.equals(entry.getKey())) {
+                instance.chat.broadcastMessage("addrole " + discord_id + " " + entry.getValue(), "uknet:discord");
+            } else {
+                instance.chat.broadcastMessage("removerole " + discord_id + " " + entry.getValue(), "uknet:discord");
+            }
+        }
     }
 }

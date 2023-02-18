@@ -34,8 +34,8 @@ public class DeleteConfirm extends Gui {
 
         //Delete plot
         setItem(13, Utils.createItem(Material.TNT, 1,
-                        Utils.chat("&b&lDelete Plot " + plotID),
-                        Utils.chat("&fDelete the plot and its contents.")),
+                        Utils.title("Delete Plot " + plotID),
+                        Utils.line("Delete the plot and its contents.")),
                 u -> {
 
                     //Delete this inventory.
@@ -55,8 +55,8 @@ public class DeleteConfirm extends Gui {
 
         //Return to plot info menu.
         setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        Utils.chat("&b&lReturn"),
-                        Utils.chat("&fReturn to the menu of plot " + plotID + ".")),
+                        Utils.title("Return"),
+                        Utils.line("Return to the menu of plot " + plotID + ".")),
                 u ->
 
                 {

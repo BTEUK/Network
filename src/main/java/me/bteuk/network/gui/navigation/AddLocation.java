@@ -53,10 +53,10 @@ public class AddLocation extends Gui {
         //Set/edit name.
         if (name != null) {
             setItem(11, Utils.createItem(Material.SPRUCE_SIGN, 1,
-                            Utils.chat("&b&lUpdate Location Name"),
-                            Utils.chat("&fEdit the location name."),
-                            Utils.chat("&fThe current name is &7" + name + "&f."),
-                            Utils.chat("&fYou can type the name in chat.")),
+                            Utils.title("Update Location Name"),
+                            Utils.line("Edit the location name."),
+                            Utils.line("The current name is &7" + name + "&f."),
+                            Utils.line("You can type the name in chat.")),
 
                     u -> {
 
@@ -65,7 +65,7 @@ public class AddLocation extends Gui {
                         }
 
                         locationNameListener = new LocationNameListener(u.player, this);
-                        u.player.sendMessage(Utils.chat("&aWrite the location name in chat, the first message counts. You can include spaces in the name."));
+                        u.player.sendMessage(Utils.success("Write the location name in chat, the first message counts. You can include spaces in the name."));
                         u.player.closeInventory();
 
                     });
@@ -82,7 +82,7 @@ public class AddLocation extends Gui {
                         }
 
                         locationNameListener = new LocationNameListener(u.player, this);
-                        u.player.sendMessage(Utils.chat("&aWrite the location name in chat, the first message counts. You can include spaces in the name."));
+                        u.player.sendMessage(Utils.success("Write the location name in chat, the first message counts. You can include spaces in the name."));
                         u.player.closeInventory();
 
                     });
@@ -219,8 +219,8 @@ public class AddLocation extends Gui {
 
         //Return
         setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        Utils.chat("&b&lReturn"),
-                        Utils.chat("&fOpen the explore menu.")),
+                        Utils.title("Return"),
+                        Utils.line("Open the explore menu.")),
                 u ->
 
                 {

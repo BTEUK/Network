@@ -93,24 +93,25 @@ public class Help implements CommandExecutor {
         //Building is partially role-specific.
         p.sendMessage(Utils.chat("You currently have the builder role " + PlaceholderAPI.setPlaceholders(p, "%luckperms_current_group_on_track_builder%")));
 
-        switch (Roles.builderRole(p)) {
+        switch (PlaceholderAPI.setPlaceholders(p, "%luckperms_current_group_on_track_builder%")) {
 
             case "architect" -> p.sendMessage(Utils.chat("The highest obtainable builder role, you can claim regions without needing staff approval, " +
                     "claim plots of all difficulties in the plot system and allows you to create new plots."));
 
-            case "builder" -> p.sendMessage(Utils.chat("A &7Builder &fcan claim regions without needing staff approval as well as claims plots of all difficulties in the plot system. " +
-                    "To be promoted to &7Architect &fyou need x building points in the 30 days."));
+            case "builder" -> p.sendMessage(Utils.chat("A &7Builder &fcan claim regions without needing staff approval as well as claims plots of all difficulties in the plot system. " /*+
+                    "To be promoted to &7Architect &fyou need x building points in the last 30 days."*/));
 
             case "jrbuilder" -> p.sendMessage(Utils.chat("&7Jr.Builder &fis the first role that has the ability to claim regions freely, however in busy areas reviewers will need to review the request. " +
-                    "You also are able to claim plots of all difficulties in the plot system. Complete 1 hard plot to be promoted to &7Builder&f."));
+                    "Complete 1 hard plot to be promoted to &7Builder&f."));
 
-            case "apprentice" -> p.sendMessage(Utils.chat("&7Apprentice &fis the first role achieved by building, while not giving access to region claims yet it is a step in the right direction. " +
-                    "You are now able to claim plots of medium difficulty, complete 1 medium plot to be promoted to &7Jr.Builder&f."));
+            case "apprentice" -> p.sendMessage(Utils.chat("&7Apprentice &fis the first role achieved by building, however you must rankup once more to have access to region claiming. " +
+                    "Complete 1 medium plot to be promoted to &7Jr.Builder&f."));
 
-            case "applicant" -> p.sendMessage(Utils.chat("Achieved by completed the required steps in the tutorial, you not have access to the plot system. " +
-                    "Complete 1 easy plot to be promoted to &7Apprentice&f."));
+            /*case "applicant" -> p.sendMessage(Utils.chat("Achieved by completed the required steps in the tutorial, you now have access to the plot system. " +
+                    "Complete 1 easy plot to be promoted to &7Apprentice&f."));*/
 
-            case "guest" -> p.sendMessage(Utils.chat("The role you start with when you first join the server. To start your path towards becoming a builder just hop into the tutorial."));
+            case "default" -> p.sendMessage(Utils.chat("The role you start with when you first join the server. Complete 1 easy plot to be promoted to &7Apprentice&f."));
+            //case "guest" -> p.sendMessage(Utils.chat("The role you start with when you first join the server. To start your path towards becoming a builder just hop into the tutorial."));
 
         }
 

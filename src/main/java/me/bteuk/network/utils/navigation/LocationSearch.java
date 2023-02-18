@@ -32,7 +32,7 @@ public class LocationSearch implements Listener {
         task = Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
             //Send message to player telling them it's been timer out.
             if (u.player != null) {
-                u.player.sendMessage(Utils.chat("&c'Find Location' cancelled."));
+                u.player.sendMessage(Utils.error("'Find Location' cancelled."));
             }
             unregister();
         }, 1200L);
@@ -49,7 +49,7 @@ public class LocationSearch implements Listener {
 
             //Check if message is under 64 character.
             if (e.getMessage().length() > 64) {
-                e.getPlayer().sendMessage(Utils.chat("&cThe phrase can't be longer than 64 characters."));
+                e.getPlayer().sendMessage(Utils.error("The phrase can't be longer than 64 characters."));
             } else {
 
                 //Search for locations that include this phrase.
@@ -78,7 +78,7 @@ public class LocationSearch implements Listener {
                 //If there are no locations notify the user.
                 if (searchLocations.size() == 0) {
 
-                    u.player.sendMessage(Utils.chat("&cNo locations have been found."));
+                    u.player.sendMessage(Utils.error("No locations have been found."));
 
                 } else {
                     //Open the location menu with these locations.

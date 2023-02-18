@@ -5,6 +5,7 @@ import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 //This class deals with players joining and leaving the network.
@@ -55,16 +56,21 @@ public class Connect {
 
             if (plots != 0) {
                 if (plots == 1) {
-                    p.sendMessage(Utils.chat("&aThere is 1 plot available for review."));
+                    p.sendMessage(Utils.success("There is &31 &aplot available for review."));
                 } else {
-                    p.sendMessage(Utils.chat("&aThere are " + plots + " plots available for review."));
+                    p.sendMessage(Utils.success("There are &3" + plots + " &aplots available for review."));
                 }
             }
 
         }
 
+        //Log playercount in database
+        globalSQL.update("INSERT INTO player_count(log_time,players) VALUES(" + Time.currentTime() + "," +
+                globalSQL.getInt("SELECT count(uuid) FROM online_users;") + ");");
+
         //Send global connect message.
-        instance.chat.broadcastMessage(joinMessage.replace("%player%", p.getName()), "uknet:globalchat");
+        //Add a slight delay so message can be seen by player joining.
+        Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> instance.chat.broadcastMessage(joinMessage.replace("%player%", p.getName()), "uknet:connect"),1L);
 
     }
 
@@ -86,10 +92,14 @@ public class Connect {
 
         //Get the player name and send global disconnect message.
         String name = globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
-        instance.chat.broadcastMessage(leaveMessage.replace("%player%", name), "uknet:globalchat");
+        instance.chat.broadcastMessage(leaveMessage.replace("%player%", name), "uknet:disconnect");
 
         //Remove player from online_users.
         globalSQL.update("DELETE FROM online_users WHERE uuid='" + uuid + "';");
+
+        //Log playercount in database
+        globalSQL.update("INSERT INTO player_count(log_time,players) VALUES(" + Time.currentTime() + "," +
+                globalSQL.getInt("SELECT count(uuid) FROM online_users;") + ");");
 
     }
 

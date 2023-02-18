@@ -17,13 +17,13 @@ public class Plot implements CommandExecutor {
 
         if (!(sender instanceof Player p)) {
 
-            sender.sendMessage(Utils.chat("&cYou must be a player to run this command."));
+            sender.sendMessage(Utils.error("You must be a player to run this command."));
             return true;
 
         }
 
         if (args.length < 2) {
-            p.sendMessage(Utils.chat("&c/plot join <plotID>"));
+            p.sendMessage(Utils.error("/plot join <plotID>"));
             return true;
         }
 
@@ -35,13 +35,13 @@ public class Plot implements CommandExecutor {
             plotID = Integer.parseInt(args[1]);
 
         } catch (NumberFormatException e) {
-            p.sendMessage(Utils.chat("&c/plot join <plotID>"));
+            p.sendMessage(Utils.error("/plot join <plotID>"));
             return true;
         }
 
         //Check if the first arg is 'join'
         if (!args[0].equals("join")) {
-            p.sendMessage(Utils.chat("&c/plot join <plotID>"));
+            p.sendMessage(Utils.error("/plot join <plotID>"));
             return true;
         }
 
@@ -63,7 +63,7 @@ public class Plot implements CommandExecutor {
             return true;
 
         } else {
-            p.sendMessage(Utils.chat("&cYou have not been invited to join this plot."));
+            p.sendMessage(Utils.error("You have not been invited to join this plot."));
             return true;
         }
     }

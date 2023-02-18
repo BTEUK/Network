@@ -1,10 +1,14 @@
 package me.bteuk.network.gui;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.commands.Back;
+import me.bteuk.network.events.EventManager;
 import me.bteuk.network.gui.plotsystem.PlotMenu;
 import me.bteuk.network.gui.plotsystem.PlotServerLocations;
+import me.bteuk.network.gui.plotsystem.PlotsystemLocations;
 import me.bteuk.network.gui.regions.RegionMenu;
 import me.bteuk.network.utils.NetworkUser;
+import me.bteuk.network.utils.Roles;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.enums.ServerType;
 import me.bteuk.network.utils.Utils;
@@ -33,32 +37,40 @@ public class BuildGui extends Gui {
 
         //Teleport to random unclaimed plot.
         setItem(20, Utils.createItem(Material.ENDER_PEARL, 1,
-                        Utils.chat("&b&lRandom Plot"),
-                        Utils.chat("&fClick teleport to a random claimable plot.")),
+                        Utils.title("Random Plot"),
+                        Utils.line("Click teleport to a random claimable plot.")),
                 u -> {
 
                     int id;
 
-                    if (u.player.hasPermission("group.jrbuilder")) {
+                    if (Roles.builderRole(u.player).equals("jrbuilder")) {
 
-                        //Select a random plot of any difficulty.
-                        id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE status='unclaimed' ORDER BY RAND() LIMIT 1;");
+                        //Select a random plot of the hard difficulty.
+                        //Since this is the next plot difficulty to get Builder.
+                        id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE status='unclaimed' AND difficulty=3 ORDER BY RAND() LIMIT 1;");
 
-                    } else if (u.player.hasPermission("group.apprentice")) {
+                    } else if (Roles.builderRole(u.player).equals("apprentice")) {
 
-                        //Select a random plot of difficulty easy and normal.
-                        id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE status='unclaimed' AND (difficulty=1 OR difficulty=2) ORDER BY RAND() LIMIT 1;");
+                        //Select a random plot of the normal difficulty.
+                        //Since this is the next plot difficulty to get Jr.Builder.
+                        id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE status='unclaimed' AND difficulty=2 ORDER BY RAND() LIMIT 1;");
+
+                    } else if (Roles.builderRole(u.player).equals("default")) {
+
+                        //Select a random plot of the easy difficulty.
+                        //Since this is the next plot difficulty to get Apprentice.
+                        id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE status='unclaimed' AND difficulty=1 ORDER BY RAND() LIMIT 1;");
 
                     } else {
 
-                        //Select a random plot of difficulty easy.
-                        id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE status='unclaimed' AND difficulty=1 ORDER BY RAND() LIMIT 1;");
+                        //Select a random plot of any difficulty.
+                        id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE status='unclaimed' ORDER BY RAND() LIMIT 1;");
 
                     }
 
                     if (id == 0) {
 
-                        u.player.sendMessage(Utils.chat("&cThere are no plots available, please wait for new plots to be added."));
+                        u.player.sendMessage(Utils.error("There are no plots available, please wait for new plots to be added."));
                         u.player.closeInventory();
 
                     } else {
@@ -73,16 +85,16 @@ public class BuildGui extends Gui {
                         if (server.equals(Network.SERVER_NAME)) {
 
                             u.player.closeInventory();
-                            Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('"
-                                    + u.player.getUniqueId()
-                                    + "','plotsystem','" + Network.SERVER_NAME
-                                    + "','teleport plot " + id + "');");
+
+                            //Set current location for /back
+                            Back.setPreviousCoordinate(u.player.getUniqueId().toString(), u.player.getLocation());
+
+                            EventManager.createTeleportEvent(false, u.player.getUniqueId().toString(), "plotsystem", "teleport plot " + id, u.player.getLocation());
 
                         } else {
 
                             //Set the server join event.
-                            Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('"
-                                    + u.player.getUniqueId() + "','plotsystem','teleport plot " + id + "');");
+                            EventManager.createTeleportEvent(true, u.player.getUniqueId().toString(), "plotsystem", "teleport plot " + id, u.player.getLocation());
 
                             //Teleport them to another server.
                             u.player.closeInventory();
@@ -94,8 +106,8 @@ public class BuildGui extends Gui {
 
         //Claim plot
         setItem(2, Utils.createItem(Material.EMERALD, 1,
-                        Utils.chat("&b&lClaim Plot"),
-                        Utils.chat("&fClick to claim the plot your are currently standing in.")),
+                        Utils.title("Claim Plot"),
+                        Utils.line("Click to claim the plot you are currently standing in.")),
                 u -> {
 
                     //If server type is plot, then send a plot claim event to the database.
@@ -111,7 +123,7 @@ public class BuildGui extends Gui {
                     } else {
 
                         u.player.closeInventory();
-                        u.player.sendMessage(Utils.chat("&cYou must be standing in a plot to claim it."));
+                        u.player.sendMessage(Utils.error("You must be standing in a plot to claim it."));
 
                     }
                 });
@@ -119,8 +131,8 @@ public class BuildGui extends Gui {
 
         //Choose location.
         setItem(19, Utils.createItem(Material.DIAMOND_PICKAXE, 1,
-                        Utils.chat("&b&lPlot Locations"),
-                        Utils.chat("&fClick to choose a location to build a plot.")),
+                        Utils.title("Plot Locations"),
+                        Utils.line("Click to choose a location to build a plot.")),
                 u ->
 
                 {
@@ -130,7 +142,7 @@ public class BuildGui extends Gui {
                     u.mainGui = null;
 
                     //Switch to the plot location gui.
-                    u.mainGui = new PlotServerLocations();
+                    u.mainGui = new PlotServerLocations(u);
                     u.mainGui.open(u);
 
                 });
@@ -138,79 +150,57 @@ public class BuildGui extends Gui {
         //Join region (Jr.Builder+ only)
         //If region is claimable.
         //Check if the player is in a region.
-        //TODO: If the player is not able to claim a region change the icon.
         if (user.inRegion) {
 
-            //Check if region is claimable.
-            if (user.region.isClaimable()) {
+            //If the user is Jr.Builder+ go through the region joining process.
+            if (user.player.hasPermission("group.jrbuilder")) {
 
-                //If the region has an owner.
-                if (user.region.hasOwner()) {
+                //Check if region is claimable.
+                if (user.region.isClaimable()) {
 
-                    //Check if the region is public.
-                    if (user.region.isPublic()) {
+                    //If the region has an owner.
+                    if (user.region.hasOwner()) {
 
-                        setItem(5, Utils.createItem(Material.DARK_OAK_DOOR, 1,
-                                        Utils.chat("&b&lJoin Region"),
-                                        Utils.chat("&fClick to join the region you are standing in."),
-                                        Utils.chat("&fThe region is owned by " + user.region.ownerName() + "."),
-                                        Utils.chat("&fThe region is public, so they don't need to accept your request.")),
-                                u -> {
+                        //Check if the region is public.
+                        if (user.region.isPublic()) {
 
-                                    //If the user is Jr.Builder+ go through the region joining process.
-                                    if (u.player.hasPermission("group.jrbuilder")) {
+                            setItem(5, Utils.createItem(Material.DARK_OAK_DOOR, 1,
+                                            Utils.title("Join Region"),
+                                            Utils.line("Click to join the region you are standing in."),
+                                            Utils.line("The region is owned by " + user.region.ownerName() + "."),
+                                            Utils.line("The region is public, so they don't need to accept your request.")),
+                                    u -> {
 
                                         u.region.joinRegion(u);
                                         u.player.closeInventory();
 
-                                    } else {
+                                    });
 
-                                        //If they are not a Jr.Builder, cancel.
-                                        u.player.closeInventory();
-                                        u.player.sendMessage(Utils.chat("&cYou must be at least a Jr.Builder to join a region."));
+                        } else {
 
-                                    }
-                                });
-
-                    } else {
-
-                        //Join requires owner to approve request.
-                        setItem(5, Utils.createItem(Material.DARK_OAK_DOOR, 1,
-                                        Utils.chat("&b&lJoin Region"),
-                                        Utils.chat("&fClick to request to join the region you are standing in."),
-                                        Utils.chat("&fThe region is owned by " + user.region.ownerName() + "."),
-                                        Utils.chat("&fThey must accept the request for you to join.")),
-                                u -> {
-
-                                    //If the user is Jr.Builder+ go through the region joining process.
-                                    if (u.player.hasPermission("group.jrbuilder")) {
+                            //Join requires owner to approve request.
+                            setItem(5, Utils.createItem(Material.DARK_OAK_DOOR, 1,
+                                            Utils.title("Join Region"),
+                                            Utils.line("Click to request to join the region you are standing in."),
+                                            Utils.line("The region is owned by " + user.region.ownerName() + "."),
+                                            Utils.line("They must accept the request for you to join.")),
+                                    u -> {
 
                                         u.region.requestRegion(u, false);
                                         u.player.closeInventory();
 
-                                    } else {
+                                    });
+                        }
 
-                                        //If they are not a Jr.Builder, cancel.
-                                        u.player.closeInventory();
-                                        u.player.sendMessage(Utils.chat("&cYou must be at least a Jr.Builder to join a region."));
+                    } else
 
-                                    }
-                                });
-                    }
-
-                } else
-
-                    //Join region.
-                    setItem(5, Utils.createItem(Material.DARK_OAK_DOOR, 1,
-                                    Utils.chat("&b&lJoin Region"),
-                                    Utils.chat("&fClick to join the region you are standing in."),
-                                    Utils.chat("&fThe region currently has no active owner."),
-                                    Utils.chat("&fJoining the region will make you region owner.")),
-                            u -> {
-
-                                //If the user is Jr.Builder+ go through the region joining process.
-                                if (u.player.hasPermission("group.jrbuilder")) {
-
+                        //Join region.
+                        setItem(5, Utils.createItem(Material.DARK_OAK_DOOR, 1,
+                                        Utils.title("Join Region"),
+                                        Utils.line("Click to join the region you are standing in."),
+                                        Utils.line("The region currently has no active owner."),
+                                        Utils.line("Joining the region will make you the region owner.")),
+                                u -> {
 
                                     //If the player is a Jr.Builder
                                     //Check if any nearby regions are claimed by someone else.
@@ -229,7 +219,7 @@ public class BuildGui extends Gui {
                                             int z = Integer.parseInt(u.region.regionName().split(",")[1]);
 
                                             //Get the radius.
-                                            int radius = Network.getInstance().getConfig().getInt("staff_request.always");
+                                            int radius = Network.getInstance().getConfig().getInt("staff_request.radius");
 
                                             //For zero radius, skip.
                                             if (radius == 0) {
@@ -247,8 +237,8 @@ public class BuildGui extends Gui {
                                                 RegionManager regionManager = Network.getInstance().getRegionManager();
 
                                                 //Iterate through all regions in the radius.
-                                                for (int i = x; i <= x + radius*2; i++) {
-                                                    for (int j = z; j <= z + radius*2; j++) {
+                                                for (int i = x; i <= x + radius * 2; i++) {
+                                                    for (int j = z; j <= z + radius * 2; j++) {
 
                                                         String regionName = i + "," + j;
 
@@ -278,48 +268,50 @@ public class BuildGui extends Gui {
                                         u.player.closeInventory();
 
                                     }
-
-                                } else {
-
-                                    //If they are not a Jr.Builder, cancel.
-                                    u.player.closeInventory();
-                                    u.player.sendMessage(Utils.chat("&cYou must be at least a Jr.Builder to join a region."));
-
-                                }
-                            });
-
-            } else {
-
-                //If the region is open.
-                if (user.region.isOpen()) {
-                    setItem(5, Utils.createItem(Material.END_GATEWAY, 1,
-                            Utils.chat("&b&lOpen Region"),
-                            Utils.chat("&fThis region is open to all Jr.Builder+."),
-                            Utils.chat("&fYou can build here without claiming.")));
+                                });
 
                 } else {
 
-                    //This region is not claimable.
-                    setItem(5, Utils.createItem(Material.IRON_DOOR, 1,
-                            Utils.chat("&b&lLocked Region"),
-                            Utils.chat("&fThis region can not be claimed."),
-                            Utils.chat("&fIt is either locked or used in the plot system.")));
+                    //If the region is open.
+                    if (user.region.isOpen()) {
+                        setItem(5, Utils.createItem(Material.END_GATEWAY, 1,
+                                Utils.title("Open Region"),
+                                Utils.line("This region is open to all Jr.Builder+."),
+                                Utils.line("You can build here without claiming.")));
+
+                    } else {
+
+                        //This region is not claimable.
+                        setItem(5, Utils.createItem(Material.IRON_DOOR, 1,
+                                Utils.title("Locked Region"),
+                                Utils.line("This region can not be claimed."),
+                                Utils.line("&fIt is either locked or used in the plot system.")));
+
+                    }
 
                 }
+            } else {
+
+                //Can't claim since you don't have jr.builder.
+                setItem(5, Utils.createItem(Material.STRUCTURE_VOID, 1,
+                        Utils.title("Unable to Join Region"),
+                        Utils.line("To be able to join a region you"),
+                        Utils.line("must gain at least Jr.Builder or above."),
+                        Utils.line("For more information type &7/help building")));
 
             }
         } else {
             //Show that the user is not in a region.
             setItem(5, Utils.createItem(Material.STRUCTURE_VOID, 1,
-                    Utils.chat("&b&lNo Region"),
-                    Utils.chat("&fYou are currently not standing in a valid region."),
-                    Utils.chat("&fThis is likely due to being in a lobby.")));
+                    Utils.title("No Region"),
+                    Utils.line("You are currently not standing in a valid region."),
+                    Utils.line("This is likely due to being in a lobby.")));
         }
 
         //Plot menu.
         setItem(21, Utils.createItem(Material.CHEST, 1,
-                        Utils.chat("&b&lPlot Menu"),
-                        Utils.chat("&fView all your active plots.")),
+                        Utils.title("Plot Menu"),
+                        Utils.line("View all your active plots.")),
                 u ->
 
                 {
@@ -336,8 +328,8 @@ public class BuildGui extends Gui {
 
         //Region menu.
         setItem(23, Utils.createItem(Material.CHEST, 1,
-                        Utils.chat("&b&lRegion Menu"),
-                        Utils.chat("&fView all regions you can build in.")),
+                        Utils.title("Region Menu"),
+                        Utils.line("View all regions you can build in.")),
                 u ->
 
                 {
@@ -352,10 +344,25 @@ public class BuildGui extends Gui {
 
                 });
 
+        //Menu to teleport to plotsystem locations without going through a plot selection process.
+        setItem(8, Utils.createItem(Material.MINECART, 1,
+                        Utils.title("Plotsystem Locations"),
+                        Utils.line("Teleport to a location"),
+                        Utils.line("used by the Plotsystem.")),
+                u -> {
+
+                    this.delete();
+                    u.mainGui = null;
+
+                    u.mainGui = new PlotsystemLocations(u);
+                    u.mainGui.open(u);
+
+                });
+
         //Spawn
         setItem(17, Utils.createItem(Material.RED_BED, 1,
-                        Utils.chat("&b&lSpawn"),
-                        Utils.chat("&fTeleport to spawn.")),
+                        Utils.title("Spawn"),
+                        Utils.line("Teleport to spawn.")),
                 u ->
 
                 {
@@ -363,6 +370,10 @@ public class BuildGui extends Gui {
                     //Connect to the lobby server.
                     u.player.closeInventory();
                     if (!Network.SERVER_NAME.equalsIgnoreCase(Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='LOBBY';"))) {
+
+                        //Set current location for /back
+                        Back.setPreviousCoordinate(u.player.getUniqueId().toString(), u.player.getLocation());
+
                         SwitchServer.switchServer(u.player, Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='LOBBY';"));
                     } else {
                         u.player.sendMessage(Utils.error("You are already in Spawn."));
@@ -372,8 +383,8 @@ public class BuildGui extends Gui {
 
         //Return
         setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        Utils.chat("&b&lReturn"),
-                        Utils.chat("&fOpen the navigator main menu.")),
+                        Utils.title("Return"),
+                        Utils.line("Open the navigator main menu.")),
                 u ->
 
                 {

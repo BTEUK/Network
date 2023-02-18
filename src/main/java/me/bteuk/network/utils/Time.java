@@ -21,6 +21,14 @@ public class Time {
         return formatter.format(date);
     }
 
+    //Converts milliseconds to datetime.
+    public static String getDateTime(long time) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        formatter.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+        Date date = new Date(time);
+        return formatter.format(date);
+    }
+
     //Converts milliseconds to minutes.
     public static long minutes(long time) {
         return ((time / 1000) / 60);

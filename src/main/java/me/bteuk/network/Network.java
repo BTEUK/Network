@@ -1,15 +1,24 @@
 package me.bteuk.network;
 
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
 import me.bteuk.network.commands.*;
+import me.bteuk.network.commands.staff.Ban;
+import me.bteuk.network.commands.staff.Database;
+import me.bteuk.network.commands.staff.Mute;
+import me.bteuk.network.commands.staff.Staff;
 import me.bteuk.network.commands.tabcompleter.LocationSelector;
 import me.bteuk.network.commands.tabcompleter.PlayerSelector;
+import me.bteuk.network.events.CommandPreProcess;
 import me.bteuk.network.gui.NavigatorGui;
 import me.bteuk.network.listeners.*;
 import me.bteuk.network.listeners.global_teleport.MoveListener;
 import me.bteuk.network.listeners.global_teleport.TeleportListener;
+import me.bteuk.network.lobby.Lobby;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.sql.RegionSQL;
+import me.bteuk.network.utils.Statistics;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.ServerType;
@@ -42,6 +51,9 @@ public final class Network extends JavaPlugin {
     private static Network instance;
     private static FileConfiguration config;
 
+    //If the server can shutdown.
+    public boolean allow_shutdown;
+
     //RegionManager
     private RegionManager regionManager;
 
@@ -63,10 +75,19 @@ public final class Network extends JavaPlugin {
     public int socketPort;
 
     //Timers
-    private Timers timers;
+    public Timers timers;
 
     //Network connect
     private Connect connect;
+
+    //Lobby
+    private Lobby lobby;
+
+    //Leave Server listener.
+    public LeaveServer leaveServer;
+
+    public static int MIN_Y;
+    public static int MAX_Y;
 
     @Override
     public void onEnable() {
@@ -74,6 +95,8 @@ public final class Network extends JavaPlugin {
         //Config Setup
         Network.instance = this;
         Network.config = this.getConfig();
+
+        allow_shutdown = true;
 
         saveDefaultConfig();
 
@@ -168,7 +191,7 @@ public final class Network extends JavaPlugin {
 
         //Register events.
         new JoinServer(this, globalSQL, connect);
-        new LeaveServer(this, globalSQL, connect);
+        leaveServer = new LeaveServer(this, globalSQL, connect);
 
         new GuiListener(this);
         new PlayerInteract(this);
@@ -188,21 +211,48 @@ public final class Network extends JavaPlugin {
         //Create bungeecord channel
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 
+        //Setup the lobby, most features are only enabled in the lobby server.
+        lobby = new Lobby(this);
+        //Create the rules book.
+        lobby.loadRules();
+        //Command to view the rules.
+        getCommand("rules").setExecutor(new Rules());
+        if (SERVER_TYPE == ServerType.LOBBY) {
+            lobby.reloadPortals();
+
+            //Create portals reload command.
+            getCommand("portals").setExecutor(new Portals(lobby));
+
+            //Set the rules lectern.
+            lobby.setLectern();
+        }
+
+
         //Setup tpll if enabled in config.
         if (config.getBoolean("tpll.enabled")) {
+            //Set max and min y.
+            MIN_Y = config.getInt("tpll.min_y");
+            MAX_Y = config.getInt("tpll.max_y");
+
             getCommand("tpll").setExecutor(new Tpll(config.getBoolean("requires_permission")));
         }
 
         //Enable commands.
         getCommand("plot").setExecutor(new Plot());
         getCommand("navigator").setExecutor(new Navigator());
+
         getCommand("staff").setExecutor(new Staff());
+        getCommand("ban").setExecutor(new Ban());
+        getCommand("mute").setExecutor(new Mute());
 
         getCommand("teleport").setExecutor(new Tp());
         getCommand("teleport").setTabCompleter(new PlayerSelector());
+        getCommand("teleporttoggle").setExecutor(new TpToggle());
 
         getCommand("back").setExecutor(new Back());
 
+        //Modpack will no longer be used.
+        //getCommand("modpack").setExecutor(new Modpack());
         getCommand("discord").setExecutor(new Discord());
 
         getCommand("ll").setExecutor(new ll());
@@ -214,43 +264,74 @@ public final class Network extends JavaPlugin {
 
         getCommand("warp").setExecutor(new Warp());
         getCommand("warp").setTabCompleter(new LocationSelector());
+        getCommand("warps").setExecutor(new Warps());
 
         getCommand("navigation").setExecutor(new Navigation());
 
         getCommand("database").setExecutor(new Database());
+
+        getCommand("afk").setExecutor(new AFK());
+
+        getCommand("sethome").setExecutor(new Sethome(globalSQL));
+        getCommand("home").setExecutor(new Home(globalSQL));
+        getCommand("delhome").setExecutor(new Delhome(globalSQL));
+
+        //Register commandpreprocess to make sure /network:region runs and not that of another plugin.
+        new CommandPreProcess(this);
+        getCommand("region").setExecutor(new RegionCommand());
+
+        //Enable server in server table.
+        globalSQL.update("UPDATE server_data SET online=1 WHERE name='" + SERVER_NAME + "';");
 
     }
 
     @Override
     public void onDisable() {
 
-        //Disable bungeecord channel.
-        this.getServer().getMessenger().unregisterOutgoingPluginChannel(this);
-
-        if (networkUsers != null) {
-            //Remove all players from network.
-            for (NetworkUser u : networkUsers) {
-
-                //Uuid
-                String uuid = u.player.getUniqueId().toString();
-
-                //Remove any outstanding invites that this player has sent.
-                plotSQL.update("DELETE FROM plot_invites WHERE owner='" + uuid + "';");
-
-                //Remove any outstanding invites that this player has received.
-                plotSQL.update("DELETE FROM plot_invites WHERE uuid='" + uuid + "';");
-
-                //Set last_online time in playerdata.
-                globalSQL.update("UPDATE player_data SET last_online=" + Time.currentTime() + " WHERE UUID='" + uuid + "';");
-
-                //Remove player from online_users.
-                globalSQL.update("DELETE FROM online_users WHERE uuid='" + uuid + "';");
-
-            }
+        //Shut down chat.
+        if (chat != null) {
+            chat.onDisable();
         }
 
+        //Close timers.
+        if (timers != null) {
+            timers.close();
+        }
 
-        if (chat != null) {chat.onDisable();}
+        for (NetworkUser u : getUsers()) {
+
+            String uuid = u.player.getUniqueId().toString();
+
+            //Remove any outstanding invites that this player has sent.
+            instance.plotSQL.update("DELETE FROM plot_invites WHERE owner='" + uuid + "';");
+
+            //Remove any outstanding invites that this player has received.
+            instance.plotSQL.update("DELETE FROM plot_invites WHERE uuid='" + uuid + "';");
+
+            //Set last_online time in playerdata.
+            instance.globalSQL.update("UPDATE player_data SET last_online=" + Time.currentTime() + " WHERE UUID='" + uuid + "';");
+
+            //Remove player from online_users.
+            instance.globalSQL.update("DELETE FROM online_users WHERE uuid='" + uuid + "';");
+
+            //Log playercount in database
+            instance.globalSQL.update("INSERT INTO player_count(log_time,players) VALUES(" + Time.currentTime() + "," +
+                    instance.globalSQL.getInt("SELECT count(uuid) FROM online_users;") + ");");
+
+            //Reset last logged time.
+            if (u.afk) {
+                u.last_time_log = u.last_movement = Time.currentTime();
+                u.afk = false;
+            }
+
+            //Update statistics
+            long time = Time.currentTime();
+            Statistics.save(u, Time.getDate(time), time);
+
+        }
+
+        //Disable bungeecord channel.
+        instance.getServer().getMessenger().unregisterOutgoingPluginChannel(instance);
 
     }
 
@@ -349,5 +430,10 @@ public final class Network extends JavaPlugin {
 
         networkUsers.remove(u);
 
+    }
+
+    //Get lobby.
+    public Lobby getLobby() {
+        return lobby;
     }
 }
