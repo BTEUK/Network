@@ -43,19 +43,24 @@ public class BuildGui extends Gui {
 
                     int id;
 
-                    if (Roles.builderRole(u.player).equals("jrbuilder")) {
+                    if (u.player.hasPermission("uknet.plots.suggested.all")) {
+
+                        //Select a random plot of any difficulty.
+                        id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE status='unclaimed' ORDER BY RAND() LIMIT 1;");
+
+                    } else if (u.player.hasPermission("uknet.plots.suggested.hard")) {
 
                         //Select a random plot of the hard difficulty.
                         //Since this is the next plot difficulty to get Builder.
                         id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE status='unclaimed' AND difficulty=3 ORDER BY RAND() LIMIT 1;");
 
-                    } else if (Roles.builderRole(u.player).equals("apprentice")) {
+                    } else if (u.player.hasPermission("uknet.plots.suggested.normal")) {
 
                         //Select a random plot of the normal difficulty.
                         //Since this is the next plot difficulty to get Jr.Builder.
                         id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE status='unclaimed' AND difficulty=2 ORDER BY RAND() LIMIT 1;");
 
-                    } else if (Roles.builderRole(u.player).equals("default")) {
+                    } else if (u.player.hasPermission("uknet.plots.suggested.easy")) {
 
                         //Select a random plot of the easy difficulty.
                         //Since this is the next plot difficulty to get Apprentice.
@@ -152,8 +157,8 @@ public class BuildGui extends Gui {
         //Check if the player is in a region.
         if (user.inRegion) {
 
-            //If the user is Jr.Builder+ go through the region joining process.
-            if (user.player.hasPermission("group.jrbuilder")) {
+            //If the user has permission go through the region joining process.
+            if (user.player.hasPermission("uknet.regions.join")) {
 
                 //Check if region is claimable.
                 if (user.region.isClaimable()) {

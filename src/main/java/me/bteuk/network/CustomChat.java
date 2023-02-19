@@ -75,6 +75,16 @@ public class CustomChat implements Listener, PluginMessageListener {
             e.setCancelled(true);
             //Get user, if staff chat enabled send message to staff chat.
             NetworkUser u = instance.getUser(e.getPlayer());
+
+            //Reset last movement of player, if they're afk unset that.
+            u.last_movement = Time.currentTime();
+
+            if (u.afk) {
+                u.last_time_log = u.last_movement;
+                u.afk = false;
+                Network.getInstance().chat.broadcastMessage("&7" + u.player.getName() + " is no longer afk.", "uknet:globalchat");
+            }
+
             if (u.staffChat) {
                 broadcastPlayerMessage(e.getPlayer(), e.getMessage(), "uknet:staff");
             } else {

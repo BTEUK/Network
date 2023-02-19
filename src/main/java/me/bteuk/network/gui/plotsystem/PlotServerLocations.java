@@ -39,11 +39,13 @@ public class PlotServerLocations extends Gui {
         //Default difficulty will depend on the role of the player.
         //If the player is a guest, default will be easy, if apprentice default will be normal and if jrbuilder default will be hard.
         //All other roles will have default set to random.
-        if (Roles.builderRole(u.player).equals("guest")) {
+        if (u.player.hasPermission("uknet.plots.suggested.all")) {
+            plotDifficulty = 0;
+        } else if (u.player.hasPermission("uknet.plots.suggested.easy")) {
             plotDifficulty = 1;
-        } else if (Roles.builderRole(u.player).equals("apprentice")) {
+        } else if (u.player.hasPermission("uknet.plots.suggested.normal")) {
             plotDifficulty = 2;
-        } else if (Roles.builderRole(u.player).equals("jrbuilder")) {
+        } else if (u.player.hasPermission("uknet.plots.suggested.hard")) {
             plotDifficulty = 3;
         } else {
             plotDifficulty = 0;

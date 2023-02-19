@@ -45,7 +45,8 @@ public class Tp implements CommandExecutor {
 
                 //Check if the player has teleport enabled/disabled.
                 //If disabled cancel teleport.
-                if (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM player_data WHERE uuid='" + uuid + "' AND teleport_enabled=1;")) {
+                //TODO add method to bypass teleport blocking for mods.
+                if (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM player_data WHERE uuid='" + uuid + "' AND teleport_enabled=1;") || p.hasPermission("uknet.navigation.teleport.bypass")) {
 
                     //If the player is on your server teleport.
                     //Else switch server and add teleport join event.

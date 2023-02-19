@@ -123,7 +123,7 @@ public class Tpll implements CommandExecutor {
         //Check if permission is required.
         if (requires_permission) {
 
-            if (!p.hasPermission("uknet.tpll")) {
+            if (!p.hasPermission("uknet.navigation.tpll")) {
 
                 p.sendMessage(Utils.error("You do not have permission to use this command."));
                 return true;

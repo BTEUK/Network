@@ -192,7 +192,7 @@ public class AddLocation extends Gui {
                         //If category is england.
                         if (category == Categories.ENGLAND) {
                             //If player is reviewer, skip review.
-                            if (u.player.hasPermission("group.reviewer")) {
+                            if (u.player.hasPermission("uknet.navigation.add")) {
 
                                 addLocation(u, globalSQL, name, category, county.region, coordinate_id);
 
@@ -203,7 +203,7 @@ public class AddLocation extends Gui {
                             }
                         } else {
                             //If player is reviewer, skip review.
-                            if (u.player.hasPermission("group.reviewer")) {
+                            if (u.player.hasPermission("uknet.navigation.add")) {
 
                                 addLocation(u, globalSQL, name, category, null, coordinate_id);
 
