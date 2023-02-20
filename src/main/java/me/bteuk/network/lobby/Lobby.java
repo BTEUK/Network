@@ -37,6 +37,8 @@ public class Lobby {
 
     private ItemStack rulesBook;
 
+    public Location spawn;
+
     public Lobby(Network instance) {
 
         this.instance = instance;
@@ -238,5 +240,23 @@ public class Lobby {
 
     private void runMap() {
 
+    }
+
+    public void setSpawn() {
+
+        FileConfiguration config = instance.getConfig();
+
+        try {
+            spawn = new Location(Bukkit.getWorld(config.getString("spawn.world")), config.getDouble("spawn.x"), config.getDouble("spawn.y"),
+                    config.getDouble("spawn.z"), (float) config.getDouble("spawn.yaw"), (float) config.getDouble("spawn.pitch"));
+        } catch (Exception e) {
+            instance.getLogger().warning("Spawn location could not be set!");
+            //Set default spawn.
+            spawn = new Location(Bukkit.getWorlds().get(0), 0.0, 65.0, 0.0, 0, 0);
+        }
+    }
+
+    public void enableVoidTeleport() {
+        new VoidTeleport(instance, this);
     }
 }

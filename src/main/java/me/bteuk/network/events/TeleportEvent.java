@@ -3,6 +3,7 @@ package me.bteuk.network.events;
 import me.bteuk.network.Network;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.enums.ServerType;
 import me.bteuk.network.utils.regions.Region;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -102,6 +103,21 @@ public class TeleportEvent {
             }
             case "server" -> //Switch to server.
                     SwitchServer.switchServer(p, event[2]);
+
+            case "spawn" -> {
+
+                //If server is Lobby, teleport to spawn.
+                if (Network.SERVER_TYPE == ServerType.LOBBY) {
+                    p.teleport(Network.getInstance().getLobby().spawn);
+                    p.sendMessage(Utils.success("Teleported to spawn."));
+                } else {
+
+                    //Set teleport event to go to spawn.
+                    EventManager.createTeleportEvent(true, p.getUniqueId().toString(), "network", "teleport spawn", p.getLocation());
+                    SwitchServer.switchServer(p, Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='LOBBY';"));
+
+                }
+            }
 
             default -> {
 

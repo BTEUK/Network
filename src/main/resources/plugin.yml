@@ -85,3 +85,13 @@ commands:
   rules:
     usage: /<command>
     description: Get rules book.
+  clear:
+    usage: /<command>
+    description: Clears your inventory.
+  debugstick:
+    usage: /<command>
+    description: Get the debug stick.
+  spawn:
+    aliases: [lobby]
+    usage: /<command>
+    description: Teleport to spawnpoint in lobby.

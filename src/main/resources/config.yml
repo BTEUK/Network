@@ -17,6 +17,15 @@ enabled: false
 server_name: server_name
 server_type: EARTH
 
+#Lobby info, only necessary if server type is LOBBY.
+spawn:
+  world: Lobby
+  x: 1000.5
+  y: 69.0
+  z: -129.5
+  yaw: -90
+  pitch: 0
+
 #Chat Socket
 socket:
   IP:

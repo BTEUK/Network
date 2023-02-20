@@ -221,6 +221,11 @@ public final class Network extends JavaPlugin {
         //Command to view the rules.
         getCommand("rules").setExecutor(new Rules());
         if (SERVER_TYPE == ServerType.LOBBY) {
+
+            //Set spawn location and enable auto-spawn teleport when falling in the void.
+            lobby.setSpawn();
+            lobby.enableVoidTeleport();
+
             lobby.reloadPortals();
 
             //Create portals reload command.
@@ -278,6 +283,11 @@ public final class Network extends JavaPlugin {
         getCommand("sethome").setExecutor(new Sethome(globalSQL));
         getCommand("home").setExecutor(new Home(globalSQL));
         getCommand("delhome").setExecutor(new Delhome(globalSQL));
+
+        getCommand("clear").setExecutor(new Clear());
+        getCommand("debugstick").setExecutor(new DebugStick());
+
+        getCommand("spawn").setExecutor(new Spawn());
 
         //Register commandpreprocess to make sure /network:region runs and not that of another plugin.
         new CommandPreProcess(this);

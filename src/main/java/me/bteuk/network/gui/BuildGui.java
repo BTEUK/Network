@@ -350,7 +350,7 @@ public class BuildGui extends Gui {
                 });
 
         //Menu to teleport to plotsystem locations without going through a plot selection process.
-        setItem(8, Utils.createItem(Material.MINECART, 1,
+        setItem(24, Utils.createItem(Material.MINECART, 1,
                         Utils.title("Plotsystem Locations"),
                         Utils.line("Teleport to a location"),
                         Utils.line("used by the Plotsystem.")),
@@ -364,6 +364,20 @@ public class BuildGui extends Gui {
 
                 });
 
+        //Building utils menu.
+        setItem(8, Utils.createItem(Material.NETHERITE_AXE, 1,
+                        Utils.title("Building Utils"),
+                        Utils.line("Open the building utils menu.")),
+                u -> {
+
+                    this.delete();
+                    u.mainGui = null;
+
+                    u.mainGui = new UtilsGui();
+                    u.mainGui.open(u);
+
+                });
+
         //Spawn
         setItem(17, Utils.createItem(Material.RED_BED, 1,
                         Utils.title("Spawn"),
@@ -372,16 +386,21 @@ public class BuildGui extends Gui {
 
                 {
 
-                    //Connect to the lobby server.
                     u.player.closeInventory();
-                    if (!Network.SERVER_NAME.equalsIgnoreCase(Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='LOBBY';"))) {
 
-                        //Set current location for /back
+                    //If server is Lobby, teleport to spawn.
+                    if (Network.SERVER_TYPE == ServerType.LOBBY) {
+
                         Back.setPreviousCoordinate(u.player.getUniqueId().toString(), u.player.getLocation());
+                        u.player.teleport(Network.getInstance().getLobby().spawn);
+                        u.player.sendMessage(Utils.success("Teleported to spawn."));
 
-                        SwitchServer.switchServer(u.player, Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='LOBBY';"));
                     } else {
-                        u.player.sendMessage(Utils.error("You are already in Spawn."));
+
+                        //Set teleport event to go to spawn.
+                        EventManager.createTeleportEvent(true, u.player.getUniqueId().toString(), "network", "teleport spawn", u.player.getLocation());
+                        SwitchServer.switchServer(u.player, Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='LOBBY';"));
+
                     }
 
                 });

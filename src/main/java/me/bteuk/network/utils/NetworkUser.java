@@ -4,6 +4,7 @@ import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.utils.regions.Region;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class NetworkUser {
 
@@ -70,7 +71,19 @@ public class NetworkUser {
             discord_id = Network.getInstance().globalSQL.getLong("SELECT discord_id FROM discord WHERE uuid='" + player.getUniqueId() + "';");
         }
 
+        //Set navigator enabled/disabled.
         navigator = Network.getInstance().globalSQL.hasRow("SELECT navigator FROM player_data WHERE uuid='" + player.getUniqueId() + "' AND navigator=1;");
+        //If navigator is disabled, remove the navigator if in the inventory.
+        if (!navigator) {
+
+            ItemStack slot8 = player.getInventory().getItem(8);
+
+            if (slot8 != null) {
+                if (slot8.equals(Network.getInstance().navigator)) {
+                    player.getInventory().setItem(8, null);
+                }
+            }
+        }
 
         //Set staff chat value, if user is no longer staff, auto-disable.
         if (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM player_data WHERE uuid='" + player.getUniqueId() + "' AND staff_chat=1;")) {

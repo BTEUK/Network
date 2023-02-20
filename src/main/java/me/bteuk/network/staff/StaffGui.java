@@ -117,7 +117,7 @@ public class StaffGui extends Gui {
         //Can only click on this if requests exist and player is a reviewer.
         //Check if any location requests exist.
         //To make sure the string makes grammatical sense we check if the number is 1, in this case we change 'are' to 'is'.
-        int rRequestCount = Network.getInstance().globalSQL.getInt("SELECT COUNT(region) FROM region_requests WHERE staff_accept=0");
+        int rRequestCount = Network.getInstance().regionSQL.getInt("SELECT COUNT(region) FROM region_requests WHERE staff_accept=0");
         String rRequestString = "There are currently &7" + rRequestCount + " &fregion join requests by Jr.Builders.";
         if (rRequestCount == 1) {
             rRequestString = rRequestString.replace("are", "is");

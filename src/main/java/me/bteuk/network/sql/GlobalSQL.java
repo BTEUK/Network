@@ -83,7 +83,7 @@ public class GlobalSQL {
 
             if (results.next()) {
 
-                return results.getInt(1);
+                return results.getDouble(1);
 
             } else {
 
