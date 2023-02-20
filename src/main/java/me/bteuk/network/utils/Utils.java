@@ -1,7 +1,15 @@
 package me.bteuk.network.utils;
 
 import me.bteuk.network.Network;
+import me.clip.placeholderapi.libs.kyori.adventure.text.ComponentBuilder;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.serializer.ComponentSerializer;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.*;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
@@ -31,6 +39,31 @@ public class Utils {
             matcher = pattern.matcher(message);
         }
         return ChatColor.translateAlternateColorCodes('&', message);
+    }
+
+    public static String tabName(String prefix, String name) {
+        Pattern pattern = Pattern.compile("#[a-fA-F0-9]{6}");
+        Matcher matcher = pattern.matcher(prefix);
+
+        //Replace &r in string.
+        prefix = prefix.replace("&r", "");
+
+        TextComponent text;
+        if (matcher.find()) {
+
+            String color = prefix.substring(matcher.start(), matcher.end());
+            prefix = prefix.replace(color, "");
+
+            text = Component.text(prefix, TextColor.fromHexString(color))
+                    .append(Component.text(" " + name, NamedTextColor.WHITE));
+
+        } else {
+
+            text = Component.text(prefix, NamedTextColor.WHITE)
+                    .append(Component.text(" " + name, NamedTextColor.WHITE));
+        }
+
+        return GsonComponentSerializer.gson().serialize(text);
     }
 
     public static String title(String message) {
@@ -120,7 +153,7 @@ public class Utils {
 
     public static int getHighestYAt(World w, int x, int z) {
 
-        for (int i = (Network.MAX_Y-1); i >= Network.MIN_Y; i--) {
+        for (int i = (Network.MAX_Y - 1); i >= Network.MIN_Y; i--) {
             if (w.getBlockAt(x, i, z).getType() != Material.AIR) {
                 return i + 1;
             }

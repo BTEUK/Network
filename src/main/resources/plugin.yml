@@ -2,7 +2,7 @@ name: Network
 version: '${project.version}'
 main: me.bteuk.network.Network
 api-version: 1.18
-depend: [ PlaceholderAPI, WorldGuard]
+depend: [ PlaceholderAPI, WorldGuard, ProtocolLib]
 
 commands:
   plot:

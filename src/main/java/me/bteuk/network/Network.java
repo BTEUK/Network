@@ -86,6 +86,9 @@ public final class Network extends JavaPlugin {
     //Leave Server listener.
     public LeaveServer leaveServer;
 
+    //Tab
+    private TabManager tab;
+
     public static int MIN_Y;
     public static int MAX_Y;
 
@@ -280,6 +283,10 @@ public final class Network extends JavaPlugin {
         new CommandPreProcess(this);
         getCommand("region").setExecutor(new RegionCommand());
 
+        //Enable tab.
+        tab = new TabManager(this);
+        tab.startTab();
+
         //Enable server in server table.
         globalSQL.update("UPDATE server_data SET online=1 WHERE name='" + SERVER_NAME + "';");
 
@@ -291,6 +298,11 @@ public final class Network extends JavaPlugin {
         //Shut down chat.
         if (chat != null) {
             chat.onDisable();
+        }
+
+        //Shut down tab.
+        if (tab != null) {
+            tab.closeTab();
         }
 
         //Close timers.
