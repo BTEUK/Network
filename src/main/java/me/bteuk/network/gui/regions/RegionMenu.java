@@ -106,40 +106,83 @@ public class RegionMenu extends Gui {
                 region = Network.getInstance().getRegionManager().getRegion(owner.get(i));
 
                 //If the region is inactive change the colour of the icon so the user knows it's inactive.
+                if (region.isInactive()) {
+                    setItem(slot, Utils.createItem(Material.ORANGE_CONCRETE, 1,
+                                    Utils.title("Region " + region.getTag(user.player.getUniqueId().toString())),
+                                    Utils.line("You are the owner of this region."),
+                                    Utils.line("Click to open the menu of this region."),
+                                    Utils.line("This region is currently inactive."),
+                                    Utils.line("Enter this region to make it active again.")),
+                            u -> {
 
-                setItem(slot, Utils.createItem(Material.LIME_CONCRETE, 1,
-                                Utils.title("Region " + region.getTag(user.player.getUniqueId().toString())),
-                                Utils.line("You are the owner of this region."),
-                                Utils.line("Click to open the menu of this region.")),
-                        u -> {
+                                //Delete this gui.
+                                this.delete();
 
-                            //Delete this gui.
-                            this.delete();
+                                //Switch to region info.
+                                u.mainGui = new RegionInfo(Network.getInstance().getRegionManager().getRegion(owner.get(finalI)), u.player.getUniqueId().toString());
+                                u.mainGui.open(u);
 
-                            //Switch to region info.
-                            u.mainGui = new RegionInfo(Network.getInstance().getRegionManager().getRegion(owner.get(finalI)), u.player.getUniqueId().toString());
-                            u.mainGui.open(u);
+                            });
 
-                        });
+                } else {
+
+                    setItem(slot, Utils.createItem(Material.LIME_CONCRETE, 1,
+                                    Utils.title("Region " + region.getTag(user.player.getUniqueId().toString())),
+                                    Utils.line("You are the owner of this region."),
+                                    Utils.line("Click to open the menu of this region.")),
+                            u -> {
+
+                                //Delete this gui.
+                                this.delete();
+
+                                //Switch to region info.
+                                u.mainGui = new RegionInfo(Network.getInstance().getRegionManager().getRegion(owner.get(finalI)), u.player.getUniqueId().toString());
+                                u.mainGui.open(u);
+
+                            });
+                }
 
             } else {
 
                 region = Network.getInstance().getRegionManager().getRegion(member.get((finalI - owner.size())));
 
-                setItem(slot, Utils.createItem(Material.YELLOW_CONCRETE, 1,
-                                Utils.title("Region " + region.getTag(user.player.getUniqueId().toString())),
-                                Utils.line("You are a member of this region."),
-                                Utils.line("Click to open the menu of this plot.")),
-                        u -> {
+                //If the region is inactive change the colour of the icon so the user knows it's inactive.
+                if (region.isInactive()) {
 
-                            //Delete this gui.
-                            this.delete();
+                    setItem(slot, Utils.createItem(Material.LIME_CONCRETE, 1,
+                                    Utils.title("Region " + region.getTag(user.player.getUniqueId().toString())),
+                                    Utils.line("You are the owner of this region."),
+                                    Utils.line("Click to open the menu of this region."),
+                                    Utils.line("This region is currently inactive."),
+                                    Utils.line("Enter this region to make it active again."),
+                                    Utils.line("You will then become the region owner.")),
+                            u -> {
 
-                            //Switch to plot info.
-                            u.mainGui = new RegionInfo(Network.getInstance().getRegionManager().getRegion(member.get((finalI - owner.size()))), u.player.getUniqueId().toString());
-                            u.mainGui.open(u);
+                                //Delete this gui.
+                                this.delete();
 
-                        });
+                                //Switch to region info.
+                                u.mainGui = new RegionInfo(Network.getInstance().getRegionManager().getRegion(owner.get(finalI)), u.player.getUniqueId().toString());
+                                u.mainGui.open(u);
+
+                            });
+                } else {
+
+                    setItem(slot, Utils.createItem(Material.YELLOW_CONCRETE, 1,
+                                    Utils.title("Region " + region.getTag(user.player.getUniqueId().toString())),
+                                    Utils.line("You are a member of this region."),
+                                    Utils.line("Click to open the menu of this plot.")),
+                            u -> {
+
+                                //Delete this gui.
+                                this.delete();
+
+                                //Switch to plot info.
+                                u.mainGui = new RegionInfo(Network.getInstance().getRegionManager().getRegion(member.get((finalI - owner.size()))), u.player.getUniqueId().toString());
+                                u.mainGui.open(u);
+
+                            });
+                }
 
             }
 
