@@ -210,10 +210,10 @@ public class BuildGui extends Gui {
                                     //If the player is a Jr.Builder
                                     //Check if any nearby regions are claimed by someone else.
                                     //If true then the region needs to be checked by a staff member.
-                                    if (u.player.hasPermission("group.builder")) {
+                                    if (u.player.hasPermission("group.jrbuilder")) {
 
-                                        //If staff approval is always required do that.
-                                        if (Network.getInstance().getConfig().getBoolean("staff_request.always")) {
+                                        //If staff approval is always required do that or if the region was previously claimed.
+                                        if (Network.getInstance().getConfig().getBoolean("staff_request.always") || u.region.wasClaimed()) {
 
                                             u.region.requestRegion(u, true);
 

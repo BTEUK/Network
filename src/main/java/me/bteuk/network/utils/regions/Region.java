@@ -81,6 +81,11 @@ public record Region(String regionName) {
         return (Network.getInstance().regionSQL.hasRow("SELECT region FROM regions WHERE region='" + regionName + "' AND (status='default' OR status='public' OR status='inactive');"));
     }
 
+    //Return whether the region has been claimed in the past.
+    public boolean wasClaimed() {
+        return (Network.getInstance().regionSQL.hasRow("SELECT region FROM region_logs WHERE region='" + regionName + "' AND is_owner=1;"));
+    }
+
     //Set the region as inactive.
     public void setInactive() {
         Network.getInstance().regionSQL.update("UPDATE regions SET status='inactive' WHERE region='" + regionName + "';");
