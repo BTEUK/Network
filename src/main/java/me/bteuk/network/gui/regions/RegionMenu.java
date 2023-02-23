@@ -105,6 +105,8 @@ public class RegionMenu extends Gui {
 
                 region = Network.getInstance().getRegionManager().getRegion(owner.get(i));
 
+                //If the region is inactive change the colour of the icon so the user knows it's inactive.
+
                 setItem(slot, Utils.createItem(Material.LIME_CONCRETE, 1,
                                 Utils.title("Region " + region.getTag(user.player.getUniqueId().toString())),
                                 Utils.line("You are the owner of this region."),

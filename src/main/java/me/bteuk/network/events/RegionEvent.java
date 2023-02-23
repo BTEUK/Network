@@ -13,15 +13,18 @@ public class RegionEvent {
 
     public static void event(String uuid, String[] event) {
 
+        Region region;
+
         switch (event[1]) {
             case "set":
+
+                //Get region.
+                region = Network.getInstance().getRegionManager().getRegion(event[3]);
+
+                //If the region is not in the database add it.
+                region.addToPlotsystem();
+
                 if (event[2].equals("plotsystem")) {
-
-                    //Get region.
-                    Region region = Network.getInstance().getRegionManager().getRegion(event[3]);
-
-                    //If the region is not in the database add it.
-                    region.addToPlotsystem();
 
                     //If region is not already set to plotsystem.
                     if (!region.isPlot()) {
@@ -31,6 +34,16 @@ public class RegionEvent {
                         region.setPlot();
 
                     }
+                } else if (event[2].equals("default")) {
+
+                    //If region is not already set to default.
+                    if (!region.isDefault()) {
+
+                        //Set region to default.
+                        region.setDefault();
+
+                    }
+
                 }
 
                 break;
@@ -39,7 +52,7 @@ public class RegionEvent {
                 if (event[2].equals("accept")) {
 
                     //If length is 4 then no user is specified, this implies that it should accept all requests for the region, rather than a specific request.
-                    Region region = Network.getInstance().getRegionManager().getRegion(event[3]);
+                    region = Network.getInstance().getRegionManager().getRegion(event[3]);
                     if (event.length == 4) {
 
                         region.acceptRequests();
@@ -56,7 +69,7 @@ public class RegionEvent {
                     }
                 } else if (event[2].equals("deny")) {
 
-                    Region region = Network.getInstance().getRegionManager().getRegion(event[3]);
+                    region = Network.getInstance().getRegionManager().getRegion(event[3]);
 
                     region.denyRequest(event[4]);
 
@@ -69,7 +82,7 @@ public class RegionEvent {
             case "leave": {
 
                 //Get region.
-                Region region = Network.getInstance().getRegionManager().getRegion(event[2]);
+                region = Network.getInstance().getRegionManager().getRegion(event[2]);
 
                 //Leave region.
                 region.leaveRegion(uuid);
@@ -100,7 +113,7 @@ public class RegionEvent {
                 Player p = Bukkit.getPlayer(UUID.fromString(uuid));
 
                 //Get the region.
-                Region region = Network.getInstance().getRegionManager().getRegion(event[2]);
+                region = Network.getInstance().getRegionManager().getRegion(event[2]);
 
                 //Add player to the region.
                 //Create a copy of the coordinate id that the owner has.

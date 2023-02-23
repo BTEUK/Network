@@ -133,6 +133,11 @@ public record Region(String regionName) {
         return (Network.getInstance().regionSQL.hasRow("SELECT region FROM region_members WHERE region='" + regionName + "' AND is_owner=0;"));
     }
 
+    //Return whether the region has an active member.
+    public boolean hasActiveMember(long time) {
+        return (Network.getInstance().regionSQL.hasRow("SELECT region FROM region_members WHERE region='" + regionName + "' AND is_owner=0 AND last_enter>=" + time + ";"));
+    }
+
     //Return the number of members, if any.
     public int memberCount() {
         return (Network.getInstance().regionSQL.getInt("SELECT COUNT(uuid) FROM region_members WHERE region='" + regionName + "' AND is_owner=0;"));

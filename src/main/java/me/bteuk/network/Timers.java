@@ -223,7 +223,8 @@ public class Timers {
 
             for (Inactivity inactive : inactive_owners) {
 
-                if (inactive.region.hasMember()) {
+                //Check if there is another member in this region, they must be active.
+                if (inactive.region.hasActiveMember(Time.currentTime() - inactivity)) {
 
                     //Get most recent member.
                     uuid = inactive.region.getRecentMember();

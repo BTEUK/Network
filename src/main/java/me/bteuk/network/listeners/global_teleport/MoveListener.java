@@ -143,11 +143,33 @@ public class MoveListener implements Listener {
                                 p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.success("You have entered &3" + region.getTag(p.getUniqueId().toString()) + " &aand left &3" + u.region.getTag(p.getUniqueId().toString()) + "&a, you are the owner of this region.")));
                                 region.setLastEnter(p.getUniqueId().toString());
 
+                                //If the region is inactive, set it to active.
+                                if (region.isInactive()) {
+                                    region.setDefault();
+                                    p.sendMessage(Utils.success("This region is no longer \"Inactive\", it has been set back to default settings."));
+                                }
+
                                 //Check if the player is a region members.
                             } else if (region.isMember(p.getUniqueId().toString())) {
 
                                 p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.success("You have entered &3" + region.getTag(p.getUniqueId().toString()) + " &aand left &3" + u.region.getTag(p.getUniqueId().toString()) + "&a, you are a member of this region.")));
                                 region.setLastEnter(p.getUniqueId().toString());
+
+                                //If the region is inactive, make this member to owner.
+                                if (region.isInactive()) {
+                                    //Make the previous owner a member.
+                                    region.makeMember();
+
+                                    //Give the new player ownership.
+                                    region.makeOwner(p.getUniqueId().toString());
+
+                                    //Update any requests to take into account the new region owner.
+                                    region.updateRequests();
+
+                                    p.sendMessage(Utils.success("This region is no longer \"Inactive\", it has been set back to default settings."));
+                                    p.sendMessage(Utils.success("You have been made the new region owner."));
+
+                                }
 
                                 //Check if the region is open and the player is at least jr.builder.
                             } else if (region.isOpen() && p.hasPermission("group.jrbuilder")) {
