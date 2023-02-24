@@ -101,6 +101,11 @@ public class RegionMembers extends Gui {
         //Iterate through all online players.
         for (String uuid : region_members) {
 
+            //If uuid is yours, skip.
+            if (uuid.equals(region.getOwner())) {
+                continue;
+            }
+
             //If the slot is greater than the number that fit in a page, create a new page.
             if (slot > 34) {
 
@@ -198,11 +203,11 @@ public class RegionMembers extends Gui {
 
                     //Delete this gui.
                     this.delete();
-                    u.staffGui = null;
+                    u.mainGui = null;
 
                     //Switch back to plot info.
-                    u.staffGui = new ManageRegion(u, region);
-                    u.staffGui.open(u);
+                    u.mainGui = new RegionInfo(region, u.player.getUniqueId().toString());
+                    u.mainGui.open(u);
 
                 });
     }

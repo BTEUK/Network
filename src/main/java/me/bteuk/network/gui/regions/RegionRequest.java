@@ -12,6 +12,7 @@ import me.bteuk.network.utils.regions.Request;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
@@ -40,7 +41,7 @@ public class RegionRequest extends Gui {
                 Utils.title("Region " + request.region),
                 Utils.line("Requested by &7" +
                         Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
-                                request.uuid + "';") + ".")));
+                                request.uuid + "';"))));
 
         setItem(11, Utils.createItem(Material.LIME_CONCRETE, 1,
                         Utils.title("Accept Request"),
@@ -58,8 +59,11 @@ public class RegionRequest extends Gui {
                     this.delete();
                     u.staffGui = null;
 
-                    u.staffGui = new RegionRequests(staff);
-                    u.staffGui.open(u);
+                    //Delay opening to make sure request was dealt with.
+                    Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
+                        u.staffGui = new RegionRequests(staff);
+                        u.staffGui.open(u);
+                    },20L);
 
 
                 });
@@ -72,16 +76,19 @@ public class RegionRequest extends Gui {
                 {
 
                     //Create event to deny request.
-                    Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + u.player.getUniqueId() + "','network'," +
-                            Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';") + "'region request deny "
+                    Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + u.player.getUniqueId() + "','network','" +
+                            Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';") + "','region request deny "
                             + request.region + " " + request.uuid + "');");
 
                     //Return to request menu.
                     this.delete();
                     u.staffGui = null;
 
-                    u.staffGui = new RegionRequests(staff);
-                    u.staffGui.open(u);
+                    //Delay opening to make sure request was dealt with.
+                    Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
+                        u.staffGui = new RegionRequests(staff);
+                        u.staffGui.open(u);
+                    },20L);
 
                 });
 

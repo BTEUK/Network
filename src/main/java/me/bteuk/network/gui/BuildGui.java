@@ -6,6 +6,7 @@ import me.bteuk.network.events.EventManager;
 import me.bteuk.network.gui.plotsystem.PlotMenu;
 import me.bteuk.network.gui.plotsystem.PlotServerLocations;
 import me.bteuk.network.gui.plotsystem.PlotsystemLocations;
+import me.bteuk.network.gui.regions.RegionInfo;
 import me.bteuk.network.gui.regions.RegionMenu;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Roles;
@@ -157,8 +158,43 @@ public class BuildGui extends Gui {
         //Check if the player is in a region.
         if (user.inRegion) {
 
-            //If the user has permission go through the region joining process.
-            if (user.player.hasPermission("uknet.regions.join")) {
+            //Check if you're an owner or member of this region.
+            //If true then open the region info menu instead.
+            if (user.region.isOwner(user.player.getUniqueId().toString())) {
+
+                setItem(5, Utils.createItem(Material.LIME_CONCRETE, 1,
+                                Utils.title("Region " + user.region.getTag(user.player.getUniqueId().toString())),
+                                Utils.line("You are the owner of this region."),
+                                Utils.line("Click to open the menu of this region.")),
+                        u -> {
+
+                            //Delete this gui.
+                            this.delete();
+
+                            //Switch to region info.
+                            u.mainGui = new RegionInfo(user.region, u.player.getUniqueId().toString());
+                            u.mainGui.open(u);
+
+                        });
+
+            } else if (user.region.isMember(user.player.getUniqueId().toString())) {
+
+                setItem(5, Utils.createItem(Material.YELLOW_CONCRETE, 1,
+                                Utils.title("Region " + user.region.getTag(user.player.getUniqueId().toString())),
+                                Utils.line("You are a member of this region."),
+                                Utils.line("Click to open the menu of this plot.")),
+                        u -> {
+
+                            //Delete this gui.
+                            this.delete();
+
+                            //Switch to plot info.
+                            u.mainGui = new RegionInfo(user.region, u.player.getUniqueId().toString());
+                            u.mainGui.open(u);
+
+                        });
+
+            } else if (user.player.hasPermission("uknet.regions.join")) {
 
                 //Check if region is claimable.
                 if (user.region.isClaimable()) {
@@ -207,15 +243,16 @@ public class BuildGui extends Gui {
                                         Utils.line("Joining the region will make you the region owner.")),
                                 u -> {
 
-                                    //If the player is a Jr.Builder
+                                    //If the player does not have the bypass permission.
                                     //Check if any nearby regions are claimed by someone else.
                                     //If true then the region needs to be checked by a staff member.
-                                    if (u.player.hasPermission("group.jrbuilder")) {
+                                    if (!u.player.hasPermission("uknet.regions.staff_request.bypass")) {
 
                                         //If staff approval is always required do that or if the region was previously claimed.
                                         if (Network.getInstance().getConfig().getBoolean("staff_request.always") || u.region.wasClaimed()) {
 
                                             u.region.requestRegion(u, true);
+                                            u.player.closeInventory();
 
                                         } else {
 
@@ -257,13 +294,18 @@ public class BuildGui extends Gui {
 
                                                                     //Staff approval is required.
                                                                     u.region.requestRegion(u, true);
-                                                                    break;
+                                                                    u.player.closeInventory();
+                                                                    return;
 
                                                                 }
                                                             }
                                                         }
                                                     }
                                                 }
+
+                                                //No regions were found, so join the region anyway.
+                                                u.region.joinRegion(u);
+                                                u.player.closeInventory();
                                             }
                                         }
 

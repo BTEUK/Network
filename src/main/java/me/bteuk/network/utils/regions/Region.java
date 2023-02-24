@@ -354,7 +354,7 @@ public record Region(String regionName) {
             u.player.sendMessage(Utils.success("Requested to join region &3" + regionName + ", &aawaiting owner review."));
 
             //If owner is in the online users list send a message.
-            if (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid=" + getOwner() + ";")) {
+            if (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid='" + getOwner() + "';")) {
                 Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + getOwner() + "','&7" + u.player.getName() + " &a has requested to join region &7" + getTag(getOwner()) + "');");
             }
         }

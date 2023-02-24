@@ -101,7 +101,7 @@ public class RegionRequests extends Gui {
                             Utils.title("Region " + requests.get(i).region),
                             Utils.line("Requested by &7" +
                                     Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
-                                            requests.get(i).uuid + "';") + "."),
+                                            requests.get(i).uuid + "';")),
                             Utils.line("Click to open the menu for this request.")),
                     u -> {
 
