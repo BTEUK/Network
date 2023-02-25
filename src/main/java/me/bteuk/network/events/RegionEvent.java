@@ -64,7 +64,7 @@ public class RegionEvent {
                         region.acceptRequest(event[4]);
 
                         //Send feedback to user who accepted the request.
-                        Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aAccepted region request for &3" + Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + event[4] + "';") + " &ain the region &3 " + event[3] + ".'");
+                        Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aAccepted region request for &3" + Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + event[4] + "';") + " &ain the region &3 " + event[3] + ".');");
 
                     }
                 } else if (event[2].equals("deny")) {
@@ -74,7 +74,7 @@ public class RegionEvent {
                     region.denyRequest(event[4]);
 
                     //Send feedback to user who accepted the request.
-                    Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aDenied region request for &3" + Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + event[4] + "';") + " &ain the region &3 " + event[3] + ".'");
+                    Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aDenied region request for &3" + Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + event[4] + "';") + " &ain the region &3 " + event[3] + ".');");
 
                 }
 
@@ -132,7 +132,7 @@ public class RegionEvent {
                 } else {
 
                     //Send a cross-server message.
-                    Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','" + message + "';");
+                    Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','" + message + "');");
 
                 }
                 break;

@@ -267,6 +267,11 @@ public record Region(String regionName) {
         return Network.getInstance().regionSQL.hasRow("SELECT region FROM region_requests WHERE region='" + regionName + "';");
     }
 
+    //Check if the player has already requested to join this region.
+    public boolean hasRequest(NetworkUser u) {
+        return Network.getInstance().regionSQL.hasRow("SELECT region FROM region_requests WHERE region='" + regionName + "' AND uuid='" + u.player.getUniqueId() + "';");
+    }
+
     //Check if the specified player has been invited to this region.
     public boolean hasInvite(String uuid) {
         return Network.getInstance().regionSQL.hasRow("SELECT region FROM region_invites WHERE region='" + regionName + "' AND uuid='" + uuid + "';");
@@ -321,13 +326,21 @@ public record Region(String regionName) {
         Network.getInstance().regionSQL.update("DELETE FROM region_requests WHERE region='" + regionName + "' AND uuid='" + uuid + "';");
 
         //Send message to user.
-        Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aYour request to join region &3" + regionName + " &ahas been denied.'");
+        Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aYour request to join region &3" + regionName + " &ahas been denied.');");
 
     }
 
     //Join region with owner or staff request.
     //If staff request is true then it requires a staff request else it's an owner request.
     public void requestRegion(NetworkUser u, boolean staffRequest) {
+
+        //Check if you don't already have a request for this region.
+        if (hasRequest(u)) {
+
+            u.player.sendMessage(Utils.error("You have already requested to join this region."));
+            u.player.sendMessage(Utils.error("Check the request status in the region menu."));
+            return;
+        }
 
         //Get coordinate of player.
         int coordinate = Network.getInstance().globalSQL.addCoordinate(u.player.getLocation());
@@ -341,7 +354,7 @@ public record Region(String regionName) {
             //Send message to player.
             u.player.sendMessage(Utils.success("Requested to join region &3" + regionName + ", &aawaiting staff review."));
 
-            Network.getInstance().chat.broadcastMessage("&aA region join request has been submitted by &7" + u.player.getName() + "&a for region &7" + regionName + "&a.", "uknet:reviewer");
+            Network.getInstance().chat.broadcastMessage("&aA region join request has been submitted by &3" + u.player.getName() + "&a for region &3" + regionName + "&a.", "uknet:reviewer");
 
         } else {
             //Owner request
@@ -355,7 +368,7 @@ public record Region(String regionName) {
 
             //If owner is in the online users list send a message.
             if (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid='" + getOwner() + "';")) {
-                Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + getOwner() + "','&7" + u.player.getName() + " &a has requested to join region &7" + getTag(getOwner()) + "');");
+                Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + getOwner() + "','&3" + u.player.getName() + " &a has requested to join region &3" + getTag(getOwner()) + "');");
             }
         }
     }

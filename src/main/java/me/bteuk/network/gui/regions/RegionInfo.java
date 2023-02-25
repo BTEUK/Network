@@ -136,6 +136,8 @@ public class RegionInfo extends Gui {
                         Utils.line("for this to work.")),
                 u -> {
 
+                    u.player.closeInventory();
+
                     //Check if the player is in the correct region.
                     if (u.inRegion) {
                         if (u.region.equals(region)) {

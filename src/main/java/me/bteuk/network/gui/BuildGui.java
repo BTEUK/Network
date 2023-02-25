@@ -162,7 +162,7 @@ public class BuildGui extends Gui {
             //If true then open the region info menu instead.
             if (user.region.isOwner(user.player.getUniqueId().toString())) {
 
-                setItem(5, Utils.createItem(Material.LIME_CONCRETE, 1,
+                setItem(5, Utils.createItem(Material.LIME_GLAZED_TERRACOTTA, 1,
                                 Utils.title("Region " + user.region.getTag(user.player.getUniqueId().toString())),
                                 Utils.line("You are the owner of this region."),
                                 Utils.line("Click to open the menu of this region.")),
@@ -179,7 +179,7 @@ public class BuildGui extends Gui {
 
             } else if (user.region.isMember(user.player.getUniqueId().toString())) {
 
-                setItem(5, Utils.createItem(Material.YELLOW_CONCRETE, 1,
+                setItem(5, Utils.createItem(Material.YELLOW_GLAZED_TERRACOTTA, 1,
                                 Utils.title("Region " + user.region.getTag(user.player.getUniqueId().toString())),
                                 Utils.line("You are a member of this region."),
                                 Utils.line("Click to open the menu of this plot.")),
