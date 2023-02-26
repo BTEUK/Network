@@ -160,6 +160,7 @@ public class BuildGui extends Gui {
 
             //Check if you're an owner or member of this region.
             //If true then open the region info menu instead.
+            //If you're already waiting for you request to be reviewed then show that.
             if (user.region.isOwner(user.player.getUniqueId().toString())) {
 
                 setItem(5, Utils.createItem(Material.LIME_GLAZED_TERRACOTTA, 1,
@@ -194,7 +195,24 @@ public class BuildGui extends Gui {
 
                         });
 
-            } else if (user.player.hasPermission("uknet.regions.join")) {
+            } else if (user.region.hasRequest(user)) {
+
+                setItem(5, Utils.createItem(Material.ORANGE_GLAZED_TERRACOTTA, 1,
+                                Utils.title("Region " + user.region.getTag(user.player.getUniqueId().toString())),
+                                Utils.line("You have requested to join this region."),
+                                Utils.line("The request is still pending."),
+                                Utils.line("Click to cancel the request.")),
+                        u -> {
+
+                            //Close the gui.
+                            u.player.closeInventory();
+
+                            //Cancel the request.
+                            u.region.cancelRequest(u);
+
+                        });
+
+            }else if (user.player.hasPermission("uknet.regions.join")) {
 
                 //Check if region is claimable.
                 if (user.region.isClaimable()) {

@@ -12,7 +12,7 @@ public class EventManager {
         switch (event[0]) {
             case "invite" -> InviteEvent.event(uuid, event);
             case "teleport" -> TeleportEvent.event(uuid, event, message);
-            case "region" -> RegionEvent.event(uuid, event);
+            case "region" -> RegionEvent.event(uuid, event, message);
         }
     }
 

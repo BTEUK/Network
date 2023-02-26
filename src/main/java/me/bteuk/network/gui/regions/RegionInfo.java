@@ -60,8 +60,8 @@ public class RegionInfo extends Gui {
                 u -> {
 
                     //Send leave event to server events.
-                    Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + u.player.getUniqueId() + "','network','"
-                            + globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';") + "','region leave " + region.regionName() + "');");
+                    EventManager.createEvent(u.player.getUniqueId().toString(), "network", globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';"),
+                            "region leave " + region.regionName(), "&aYou have left region &3" + region.getTag(u.player.getUniqueId().toString()));
 
                     //Return to region menu and close inventory.
                     u.player.closeInventory();
@@ -227,22 +227,22 @@ public class RegionInfo extends Gui {
                         u.mainGui.open(u);
 
                     });
-
-            //Return
-            setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                            Utils.title("Return"),
-                            Utils.line("Open the region menu.")),
-                    u -> {
-
-                        //Delete this gui.
-                        this.delete();
-
-                        //Switch to plot info.
-                        u.mainGui = new RegionMenu(u);
-                        u.mainGui.open(u);
-
-                    });
         }
+
+        //Return
+        setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
+                        Utils.title("Return"),
+                        Utils.line("Open the region menu.")),
+                u -> {
+
+                    //Delete this gui.
+                    this.delete();
+
+                    //Switch to plot info.
+                    u.mainGui = new RegionMenu(u);
+                    u.mainGui.open(u);
+
+                });
 
     }
 

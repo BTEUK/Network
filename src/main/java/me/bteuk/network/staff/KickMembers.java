@@ -102,7 +102,7 @@ public class KickMembers extends Gui {
 
                     {
                         //Remove them from the region.
-                        region.leaveRegion(uuid);
+                        region.leaveRegion(uuid, "&cYou have been kicked from region &4" + region.getTag(uuid));
 
                         //Send message to user.
                         u.player.sendMessage(Utils.success("Kicked &3" +

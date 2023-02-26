@@ -51,19 +51,31 @@ public class RegionRequest extends Gui {
                 {
 
                     //Create event to accept request.
-                    Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + u.player.getUniqueId() + "','network'," +
-                            Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';") + "'region request accept "
-                            + request.region + " " + request.uuid + "');");
+                    EventManager.createEvent(u.player.getUniqueId().toString(), "network", Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';"),
+                            "region request accept " + request.region + " " + request.uuid);
 
                     //Return to request menu.
                     this.delete();
-                    u.staffGui = null;
 
-                    //Delay opening to make sure request was dealt with.
-                    Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
-                        u.staffGui = new RegionRequests(staff);
-                        u.staffGui.open(u);
-                    },20L);
+                    if (staff) {
+
+                        u.staffGui = null;
+
+                        //Delay opening to make sure request was dealt with.
+                        Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
+                            u.staffGui = new RegionRequests(true);
+                            u.staffGui.open(u);
+                        }, 20L);
+                    } else {
+
+                        u.mainGui = null;
+
+                        //Delay opening to make sure request was dealt with.
+                        Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
+                            u.mainGui = new RegionRequests(false);
+                            u.mainGui.open(u);
+                        }, 20L);
+                    }
 
 
                 });
@@ -76,19 +88,31 @@ public class RegionRequest extends Gui {
                 {
 
                     //Create event to deny request.
-                    Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + u.player.getUniqueId() + "','network','" +
-                            Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';") + "','region request deny "
-                            + request.region + " " + request.uuid + "');");
+                    EventManager.createEvent(u.player.getUniqueId().toString(), "network", Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';"),
+                            "region request deny " + request.region + " " + request.uuid);
 
                     //Return to request menu.
                     this.delete();
-                    u.staffGui = null;
 
-                    //Delay opening to make sure request was dealt with.
-                    Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
-                        u.staffGui = new RegionRequests(staff);
-                        u.staffGui.open(u);
-                    },20L);
+                    if (staff) {
+
+                        u.staffGui = null;
+
+                        //Delay opening to make sure request was dealt with.
+                        Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
+                            u.staffGui = new RegionRequests(true);
+                            u.staffGui.open(u);
+                        }, 20L);
+                    } else {
+
+                        u.mainGui = null;
+
+                        //Delay opening to make sure request was dealt with.
+                        Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
+                            u.mainGui = new RegionRequests(false);
+                            u.mainGui.open(u);
+                        }, 20L);
+                    }
 
                 });
 
@@ -125,7 +149,7 @@ public class RegionRequest extends Gui {
                                 l.getYaw() + " " + l.getPitch(), u.player.getLocation());
 
                         //Switch server.
-                        SwitchServer.switchServer(u.player, globalSQL.getString("SELECT name FROM server_data WHERE type='PLOT'"));
+                        SwitchServer.switchServer(u.player, globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH'"));
 
                     }
 
@@ -140,10 +164,26 @@ public class RegionRequest extends Gui {
 
                     //Return to request menu.
                     this.delete();
-                    u.staffGui = null;
 
-                    u.staffGui = new RegionRequests(staff);
-                    u.staffGui.open(u);
+                    if (staff) {
+
+                        u.staffGui = null;
+
+                        //Delay opening to make sure request was dealt with.
+                        Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
+                            u.staffGui = new RegionRequests(true);
+                            u.staffGui.open(u);
+                        }, 20L);
+                    } else {
+
+                        u.mainGui = null;
+
+                        //Delay opening to make sure request was dealt with.
+                        Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
+                            u.mainGui = new RegionRequests(false);
+                            u.mainGui.open(u);
+                        }, 20L);
+                    }
 
                 });
     }

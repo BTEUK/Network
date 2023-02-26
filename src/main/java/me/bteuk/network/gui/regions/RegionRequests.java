@@ -53,19 +53,16 @@ public class RegionRequests extends Gui {
 
         //If page is greater than 1 add a previous page button.
         if (page > 1) {
-            setItem(18, Utils.createItem(Material.ARROW, 1,
-                            Utils.title("Previous Page"),
-                            Utils.line("Open the previous page of region requests.")),
-                    u ->
+            setItem(18, Utils.createItem(Material.ARROW, 1, Utils.title("Previous Page"), Utils.line("Open the previous page of region requests.")), u ->
 
-                    {
+            {
 
-                        //Update the gui.
-                        page--;
-                        this.refresh();
-                        u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
+                //Update the gui.
+                page--;
+                this.refresh();
+                u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
 
-                    });
+            });
         }
 
         //Make a button for each plot.
@@ -80,52 +77,43 @@ public class RegionRequests extends Gui {
             //If the slot is greater than the number that fit in a page, create a new page.
             if (slot > 34) {
 
-                setItem(26, Utils.createItem(Material.ARROW, 1,
-                                Utils.title("Next Page"),
-                                Utils.line("Open the next page of regions requests.")),
-                        u ->
+                setItem(26, Utils.createItem(Material.ARROW, 1, Utils.title("Next Page"), Utils.line("Open the next page of regions requests.")), u ->
 
-                        {
+                {
 
-                            //Update the gui.
-                            page++;
-                            this.refresh();
-                            u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
+                    //Update the gui.
+                    page++;
+                    this.refresh();
+                    u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
 
-                        });
+                });
 
             }
 
             int finalI = i;
-            setItem(slot, Utils.createItem(Material.LIME_CONCRETE, 1,
-                            Utils.title("Region " + requests.get(i).region),
-                            Utils.line("Requested by &7" +
-                                    Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
-                                            requests.get(i).uuid + "';")),
-                            Utils.line("Click to open the menu for this request.")),
-                    u -> {
+            setItem(slot, Utils.createItem(Material.LIME_CONCRETE, 1, Utils.title("Region " + requests.get(i).region), Utils.line("Requested by &7" + Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + requests.get(i).uuid + "';")), Utils.line("Click to open the menu for this request.")), u -> {
 
-                        //Delete this gui.
-                        this.delete();
-                        if (staff) {
+                //Delete this gui.
+                this.delete();
+                if (staff) {
 
-                            u.staffGui = null;
+                    u.staffGui = null;
 
-                            //Switch to region request.
-                            u.staffGui = new RegionRequest(requests.get(finalI), true);
-                            u.staffGui.open(u);
+                    //Switch to region request.
+                    u.staffGui = new RegionRequest(requests.get(finalI), true);
+                    u.staffGui.open(u);
 
-                        } else {
+                } else {
 
-                            u.mainGui = null;
+                    u.mainGui = null;
 
-                            //Switch to region request.
-                            u.mainGui = new RegionRequest(requests.get(finalI), false);
-                            u.mainGui.open(u);
+                    //Switch to region request.
+                    u.mainGui = new RegionRequest(requests.get(finalI), false);
+                    u.mainGui.open(u);
 
-                        }
+                }
 
-                    });
+            });
 
             //Increase slot accordingly.
             if (slot % 9 == 7) {
@@ -140,40 +128,34 @@ public class RegionRequests extends Gui {
         //Return
         if (staff) {
 
-            setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                            Utils.title("Return"),
-                            Utils.line("Open the staff menu.")),
-                    u ->
+            setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1, Utils.title("Return"), Utils.line("Open the staff menu.")), u ->
 
-                    {
+            {
 
-                        //Delete this gui.
-                        this.delete();
-                        u.staffGui = null;
+                //Delete this gui.
+                this.delete();
+                u.staffGui = null;
 
-                        //Switch to staff menu.
-                        u.staffGui = new StaffGui(u);
-                        u.staffGui.open(u);
+                //Switch to staff menu.
+                u.staffGui = new StaffGui(u);
+                u.staffGui.open(u);
 
-                    });
+            });
         } else {
 
-            setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                            Utils.title("Return"),
-                            Utils.line("Open the region menu.")),
-                    u ->
+            setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1, Utils.title("Return"), Utils.line("Open the region menu.")), u ->
 
-                    {
+            {
 
-                        //Delete this gui.
-                        this.delete();
-                        u.mainGui = null;
+                //Delete this gui.
+                this.delete();
+                u.mainGui = null;
 
-                        //Switch to staff menu.
-                        u.mainGui = new RegionMenu(u);
-                        u.mainGui.open(u);
+                //Switch to staff menu.
+                u.mainGui = new RegionMenu(u);
+                u.mainGui.open(u);
 
-                    });
+            });
         }
     }
 

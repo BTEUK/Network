@@ -9,6 +9,7 @@ import me.bteuk.network.utils.regions.Region;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
 import java.util.ArrayList;
@@ -170,14 +171,15 @@ public class RegionMembers extends Gui {
 
                         {
                             //Remove them from the region.
-                            region.leaveRegion(uuid);
+                            region.leaveRegion(uuid, "&cYou have been kicked from region &4" + region.getTag(uuid));
 
                             //Send message to user.
                             u.player.sendMessage(Utils.success("Kicked &3" +
                                     globalSQL.getString("SELECT name FROM player_data WHERE uuid ='" + region.getOwner() + "';") + " &afrom the region"));
 
                             //Refresh the gui.
-                            this.refresh();
+                            //Delay this action so the user can be kicked, even if on another server.
+                            Bukkit.getScheduler().runTaskLater(Network.getInstance(), this::refresh, 20L);
 
                         });
             }

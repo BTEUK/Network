@@ -1,10 +1,12 @@
 package me.bteuk.network.utils.regions;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.events.EventManager;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.WorldGuard;
+import me.bteuk.network.utils.enums.ServerType;
 import org.bukkit.Bukkit;
 
 import java.util.ArrayList;
@@ -13,7 +15,7 @@ public record Region(String regionName) {
 
     //Get the status of the region.
     public String getStatus() {
-        return Network.getInstance().regionSQL.getString("SELECT status FROM region WHERE region='" + regionName + "';");
+        return Network.getInstance().regionSQL.getString("SELECT status FROM regions WHERE region='" + regionName + "';");
     }
 
     //Get the tag of the region for a specific player, or name if no tag is set.
@@ -209,7 +211,7 @@ public record Region(String regionName) {
     public void setLocked() {
 
         //Remove all members and the owner.
-        removeMembers();
+        removeMembers("&cThe region &4%tag% &chas been locked, you can no longer build here.");
 
         //Set locked.
         Network.getInstance().regionSQL.update("UPDATE regions SET status='locked' WHERE region='" + regionName + "';");
@@ -328,6 +330,16 @@ public record Region(String regionName) {
         //Send message to user.
         Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aYour request to join region &3" + regionName + " &ahas been denied.');");
 
+    }
+
+    //Cancel a request for a specific user.
+    public void cancelRequest(NetworkUser u) {
+
+        //Delete request.
+        Network.getInstance().regionSQL.update("DELETE FROM region_requests WHERE region='" + regionName + "' AND uuid='" + u.player.getUniqueId() + "'; ");
+
+        //Send message to user.
+        u.player.sendMessage(Utils.success("&cCancelled region join request."));
     }
 
     //Join region with owner or staff request.
@@ -454,7 +466,7 @@ public record Region(String regionName) {
             WorldGuard.addMember(regionName, uuid, Bukkit.getWorld(Network.getInstance().getConfig().getString("earth_world")));
 
             //Send message to user.
-            Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aYou have joined the region &3" + regionName + " &aas a member.'");
+            Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aYou have joined the region &3" + regionName + " &aas a member.');");
 
         } else {
 
@@ -495,22 +507,32 @@ public record Region(String regionName) {
     }
 
     //Leave region.
-    public void leaveRegion(String uuid) {
+    public void leaveRegion(String uuid, String message) {
 
-        //Send message to user.
-        //Is sent before actual removal so we can read the region tag.
-        Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aYou have left region &3" + getTag(uuid) + "')");
+        //Check if this is the correct server.
+        //If this is not the earth server then create a server-event.
+        if (Network.SERVER_TYPE == ServerType.EARTH) {
 
-        //Leave region in database.
-        Network.getInstance().regionSQL.update("DELETE FROM region_members WHERE region='" + regionName + "' AND uuid='" + uuid + "';");
+            //Send message to user.
+            //Is sent before actual removal so we can read the region tag.
+            Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','" + message + "')");
 
-        //Close log of player in region.
-        Network.getInstance().regionSQL.update("UPDATE region_logs SET end_time=" + Time.currentTime()
-                + " WHERE region='" + regionName + "' AND uuid='" + uuid + "';");
+            //Leave region in database.
+            Network.getInstance().regionSQL.update("DELETE FROM region_members WHERE region='" + regionName + "' AND uuid='" + uuid + "';");
 
-        //Leave region in WorldGuard.
-        WorldGuard.removeMember(regionName, uuid, Bukkit.getWorld(Network.getInstance().getConfig().getString("earth_world")));
+            //Close log of player in region.
+            Network.getInstance().regionSQL.update("UPDATE region_logs SET end_time=" + Time.currentTime()
+                    + " WHERE region='" + regionName + "' AND uuid='" + uuid + "';");
 
+            //Leave region in WorldGuard.
+            WorldGuard.removeMember(regionName, uuid, Bukkit.getWorld(Network.getInstance().getConfig().getString("earth_world")));
+
+        } else {
+
+            EventManager.createEvent(uuid, "network", Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';"),
+                    "region leave " + regionName, message);
+
+        }
     }
 
     //Make the owner a member of the region.
@@ -569,7 +591,8 @@ public record Region(String regionName) {
     }
 
     //Remove all members and owner of the region.
-    public void removeMembers() {
+    //The placeholder %tag% is used in the message to show the region tag.
+    public void removeMembers(String message) {
 
         if (hasOwner() || hasMember()) {
 
@@ -578,7 +601,7 @@ public record Region(String regionName) {
 
             for (String uuid : uuids) {
 
-                leaveRegion(uuid);
+                leaveRegion(uuid, message.replace("%tag%", getTag(uuid)));
 
             }
         }
