@@ -8,6 +8,7 @@ import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.PlayerInfoData;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.comphenix.protocol.wrappers.WrappedGameProfile;
+import me.bteuk.network.utils.TabPlayer;
 import me.bteuk.network.utils.Utils;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.TextComponent;
@@ -33,6 +34,10 @@ public class TabManager {
     private List<PlayerInfoData> pd;
     private List<PlayerInfoData> pdOld;
 
+    private boolean changed;
+    private List<TabPlayer> players;
+    private List<TabPlayer> playersOld;
+
     //Create packet.
     PacketContainer packetIn;
     PacketContainer packetOut;
@@ -41,8 +46,12 @@ public class TabManager {
 
         this.instance = instance;
         pm = ProtocolLibrary.getProtocolManager();
-        pd = new ArrayList<>();
+
         pdOld = new ArrayList<>();
+        pd = new ArrayList<>();
+
+        players = new ArrayList<>();
+        playersOld = new ArrayList<>();
 
         packetIn = pm.createPacket(PacketType.Play.Server.PLAYER_INFO);
         packetOut = pm.createPacket(PacketType.Play.Server.PLAYER_INFO);
@@ -55,7 +64,7 @@ public class TabManager {
 
     }
 
-    public void startTab() {
+    private void startTab() {
 
         //createPacketListener();
 
@@ -63,49 +72,70 @@ public class TabManager {
 
         taskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(instance, () -> {
 
-            pdOld.addAll(pd);
-            pd.clear();
+            changed = false;
 
             //Create list from online players.
             for (String uuid : instance.globalSQL.getStringList("SELECT uuid FROM online_users;")) {
 
+                //Check if the list already contains this player.
                 String name = instance.globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
-                WrappedGameProfile profile = new WrappedGameProfile(UUID.fromString(uuid),
-                        name);
 
                 //Get OfflinePlayer for role placeholder.
                 OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
                 String placeholder = PlaceholderAPI.setPlaceholders(offlinePlayer, "%luckperms_prefix%");
-
                 WrappedChatComponent displayName = WrappedChatComponent.fromJson(Utils.tabName(placeholder, name));
 
-                pd.add(new PlayerInfoData(profile, 0, EnumWrappers.NativeGameMode.CREATIVE, displayName));
+                TabPlayer tabPlayer = new TabPlayer(displayName, offlinePlayer);
+                players.add(tabPlayer);
 
-            }
+                //Check if the old list does not contain this player.
+                if (!playersOld.contains(tabPlayer)) {
 
-            //If the list has different players, remove the current list first.
-            if (pd.size() != pdOld.size()) {
-                packetOut.getPlayerInfoDataLists().write(0, pdOld);
-                pm.broadcastServerPacket(packetOut);
-            } else {
-                for (PlayerInfoData pi : pd) {
-                    if (!pdOld.contains(pi)) {
-                        packetOut.getPlayerInfoDataLists().write(0, pdOld);
-                        pm.broadcastServerPacket(packetOut);
-                        break;
-                    }
+                    changed = true;
+
                 }
             }
 
-            pdOld.clear();
-
-            //Send new tablist packet.
-            if (!pd.isEmpty()) {
-                packetIn.getPlayerInfoDataLists().write(0, pd);
-                pm.broadcastServerPacket(packetIn);
+            //Check the length of players is different from playersOld, then something also changed.
+            if (players.size() != playersOld.size()) {
+                changed = true;
             }
 
-        },0L, 40L);
+            //If the list changed, then recreate tab.
+            if (changed) {
+
+                Network.getInstance().getLogger().info("Updating Tab");
+
+                for (TabPlayer tp : players) {
+
+                    WrappedGameProfile profile = new WrappedGameProfile(tp.player.getUniqueId(),
+                            tp.player.getName());
+
+                    pd.add(new PlayerInfoData(profile, 0, EnumWrappers.NativeGameMode.CREATIVE, tp.displayName));
+
+                }
+
+                //Remove current list.
+                packetOut.getPlayerInfoDataLists().write(0, pdOld);
+                pm.broadcastServerPacket(packetOut);
+
+                //Add new list.
+                packetIn.getPlayerInfoDataLists().write(0, pd);
+                pm.broadcastServerPacket(packetIn);
+
+                //Reset the tab players.
+                pdOld.clear();
+                pdOld.addAll(pd);
+                pd.clear();
+
+            }
+
+            //Clear the players list for the next iteration.
+            playersOld.clear();
+            playersOld.addAll(players);
+            players.clear();
+
+        }, 0L, 40L);
 
     }
 
