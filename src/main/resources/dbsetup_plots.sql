@@ -86,3 +86,12 @@ CREATE TABLE IF NOT EXISTS regions
     location    VARCHAR(64) NOT NULL,
     PRIMARY KEY(region)
 );
+
+CREATE TABLE IF NOT EXISTS zones
+(
+    id          INT         AUTO_INCREMENT,
+    location    VARCHAR(64) NOT NULL,
+    expiration  BIGINT      NOT NULL,
+    is_public      TINYINT(1)  NULL DEFAULT 0,
+    PRIMARY KEY(id)
+);
