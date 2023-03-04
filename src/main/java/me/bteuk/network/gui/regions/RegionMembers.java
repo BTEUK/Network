@@ -137,7 +137,7 @@ public class RegionMembers extends Gui {
 
                 setItem(slot, Utils.createPlayerSkull(uuid, 1,
                                 Utils.title("Make " + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " the region owner."),
-                                Utils.line("You will be demoted to region members.")),
+                                Utils.line("You will be demoted to region member.")),
                         u ->
 
                         {
@@ -175,7 +175,7 @@ public class RegionMembers extends Gui {
 
                             //Send message to user.
                             u.player.sendMessage(Utils.success("Kicked &3" +
-                                    globalSQL.getString("SELECT name FROM player_data WHERE uuid ='" + region.getOwner() + "';") + " &afrom the region"));
+                                    globalSQL.getString("SELECT name FROM player_data WHERE uuid ='" + uuid + "';") + " &afrom the region"));
 
                             //Refresh the gui.
                             //Delay this action so the user can be kicked, even if on another server.

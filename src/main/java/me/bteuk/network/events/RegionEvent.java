@@ -125,17 +125,6 @@ public class RegionEvent {
 
                 String message = "&aYou have joined region &3" + region.getTag(uuid) + " &aas a member.";
 
-                if (p != null) {
-
-                    p.sendMessage(Utils.chat(message));
-
-                } else {
-
-                    //Send a cross-server message.
-                    Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','" + message + "');");
-
-                }
-
                 //Send message to plot owner.
                 Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + region.getOwner() + "','&3" +
                         Network.getInstance().globalSQL.getStringList("SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " &ahas joined region &3" + region.getTag(region.getOwner()) + "');");

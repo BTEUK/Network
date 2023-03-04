@@ -364,7 +364,7 @@ public record Region(String regionName) {
                     u.player.getUniqueId() + "','" + getOwner() + "',0," + coordinate + ");");
 
             //Send message to player.
-            u.player.sendMessage(Utils.success("Requested to join region &3" + regionName + ", &aawaiting staff review."));
+            u.player.sendMessage(Utils.success("Requested to join region &3" + regionName + "&a, awaiting staff review."));
 
             Network.getInstance().chat.broadcastMessage("&aA region join request has been submitted by &3" + u.player.getName() + "&a for region &3" + regionName + "&a.", "uknet:reviewer");
 
@@ -376,7 +376,7 @@ public record Region(String regionName) {
                     u.player.getUniqueId() + "','" + getOwner() + "',0," + coordinate + ");");
 
             //Send message to player.
-            u.player.sendMessage(Utils.success("Requested to join region &3" + regionName + ", &aawaiting owner review."));
+            u.player.sendMessage(Utils.success("Requested to join region &3" + regionName + "&a, awaiting owner review."));
 
             //If owner is in the online users list send a message.
             if (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid='" + getOwner() + "';")) {
