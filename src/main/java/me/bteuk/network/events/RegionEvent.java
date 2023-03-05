@@ -123,8 +123,6 @@ public class RegionEvent {
                 int coordinateID = Network.getInstance().globalSQL.addCoordinate(l);
                 region.joinRegion(uuid, coordinateID);
 
-                String message = "&aYou have joined region &3" + region.getTag(uuid) + " &aas a member.";
-
                 //Send message to plot owner.
                 Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + region.getOwner() + "','&3" +
                         Network.getInstance().globalSQL.getStringList("SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " &ahas joined region &3" + region.getTag(region.getOwner()) + "');");

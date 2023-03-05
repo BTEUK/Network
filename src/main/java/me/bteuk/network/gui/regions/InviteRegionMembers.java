@@ -154,7 +154,7 @@ public class InviteRegionMembers extends Gui {
         //Return to plot info menu.
         setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
                         Utils.title("Return"),
-                        Utils.line("Return to the menu of region &7" + region.regionName() + "&f.")),
+                        Utils.line("Return to the menu of region &7" + region.getTag(region.getOwner()) + "&f.")),
                 u ->
 
                 {

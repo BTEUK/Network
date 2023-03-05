@@ -212,13 +212,13 @@ public class BuildGui extends Gui {
 
                         });
 
-            }else if (user.player.hasPermission("uknet.regions.join")) {
+            } else if (user.player.hasPermission("uknet.regions.join")) {
 
                 //Check if region is claimable.
                 if (user.region.isClaimable()) {
 
                     //If the region has an owner.
-                    if (user.region.hasOwner()) {
+                    if (user.region.hasActiveOwner()) {
 
                         //Check if the region is public.
                         if (user.region.isPublic()) {
@@ -372,6 +372,25 @@ public class BuildGui extends Gui {
                     Utils.line("You are currently not standing in a valid region."),
                     Utils.line("This is likely due to being in a lobby.")));
         }
+
+        /*
+        Region Join Button
+
+        Claimable:
+        -   No active owner
+            - uknet.regions.staff_request.bypass: Join region without request.
+            - staff_request.always: Staff request
+            - Check radius if any nearby region is claimed.
+        -   Has active owner
+            - Default (Owner request)
+            - Public (No request needed)
+
+
+
+
+
+         */
+
 
         //Plot menu.
         setItem(21, Utils.createItem(Material.CHEST, 1,

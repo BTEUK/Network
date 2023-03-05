@@ -3,7 +3,7 @@ package me.bteuk.network.gui.regions;
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.sql.GlobalSQL;
-import me.bteuk.network.staff.ManageRegion;
+import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.regions.Region;
 import net.kyori.adventure.text.Component;
@@ -137,6 +137,7 @@ public class RegionMembers extends Gui {
 
                 setItem(slot, Utils.createPlayerSkull(uuid, 1,
                                 Utils.title("Make " + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " the region owner."),
+                                Utils.line("Most recently in this region at " + Time.getDateTime(region.lastActive(uuid))),
                                 Utils.line("You will be demoted to region member.")),
                         u ->
 
@@ -155,6 +156,9 @@ public class RegionMembers extends Gui {
                             u.player.sendMessage(Utils.success("Transferred ownership of the region to &3" +
                                     globalSQL.getString("SELECT name FROM player_data WHERE uuid ='" + region.getOwner() + "';")));
 
+                            //Send message to new owner.
+                            Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aYou are now the owner of region &3" + region.getTag(uuid) + "');");
+
                             //Return to region info.
                             this.delete();
                             u.mainGui = null;
@@ -166,7 +170,8 @@ public class RegionMembers extends Gui {
             } else {
 
                 setItem(slot, Utils.createPlayerSkull(uuid, 1,
-                                Utils.title("Kick " + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " from the region.")),
+                                Utils.title("Kick " + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " from the region."),
+                                Utils.line("Most recently in this region at " + Time.getDateTime(region.lastActive(uuid)))),
                         u ->
 
                         {
@@ -198,7 +203,7 @@ public class RegionMembers extends Gui {
         //Return to plot info menu.
         setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
                         Utils.title("Return"),
-                        Utils.line("Return to manage region &7" + region.regionName() + ".")),
+                        Utils.line("Return to the menu of region &7" + region.getTag(region.getOwner()) + "&f.")),
                 u ->
 
                 {

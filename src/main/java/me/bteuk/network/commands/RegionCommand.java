@@ -41,10 +41,22 @@ public class RegionCommand implements CommandExecutor {
             //Check if they have an invite for this region.
             if (region.hasInvite(p.getUniqueId().toString())) {
 
-                //Add server event to join plot.
-                Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + p.getUniqueId() + "'," + "'network'" + ",'" +
-                        Network.getInstance().getConfig().getString("earth_world") +
-                        "','region join " + region.regionName() + "');");
+                //Check if the player has permission, else notify the player accordingly.
+                if (p.hasPermission("uknet.regions.join")) {
+
+                    //Add server event to join plot.
+                    Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + p.getUniqueId() + "'," + "'network'" + ",'" +
+                            Network.getInstance().getConfig().getString("earth_world") +
+                            "','region join " + region.regionName() + "');");
+
+                } else {
+
+                    //Send error.
+                    p.sendMessage(Utils.error("You do not have permission to join regions."));
+                    p.sendMessage(Utils.error("To join regions you need at least Jr.Builder."));
+                    p.sendMessage(Utils.error("For more information type &4/help building"));
+
+                }
 
                 //Remove invite.
                 region.removeInvite(p.getUniqueId().toString());

@@ -135,6 +135,11 @@ public record Region(String regionName) {
         return (Network.getInstance().regionSQL.hasRow("SELECT region FROM region_members WHERE region='" + regionName + "' AND is_owner=1;"));
     }
 
+    //Return whether the region has an owner.
+    public boolean hasActiveOwner() {
+        return (Network.getInstance().regionSQL.hasRow("SELECT region FROM region_members WHERE region='" + regionName + "' AND is_owner=1 AND last_enter>=" + (Time.currentTime()-Network.getInstance().timers.inactivity) + ";"));
+    }
+
     //Return whether the region has a member.
     public boolean hasMember() {
         return (Network.getInstance().regionSQL.hasRow("SELECT region FROM region_members WHERE region='" + regionName + "' AND is_owner=0;"));
@@ -427,6 +432,9 @@ public record Region(String regionName) {
                 Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + owner + "','&aYou have been demoted to a member in region &3"
                         + getTag(owner) + " &adue to inactivity.');");
 
+                //Set region to default, since it would've been set to inactive previously.
+                setDefault();
+
             }
 
             //Add new coordinate at the location of the player.
@@ -571,6 +579,10 @@ public record Region(String regionName) {
             //Update region member to set as owner.
             Network.getInstance().regionSQL.update("UPDATE region_members SET is_owner=1 WHERE region='" + regionName + "' AND uuid='" + uuid + "';");
 
+            //If the region is currently set as inactive and the new owner isn't, set it to default.
+            if (isInactive() && hasActiveOwner()) {
+                setDefault();
+            }
         }
     }
 
@@ -605,5 +617,10 @@ public record Region(String regionName) {
 
             }
         }
+    }
+
+    //Get time that a region member was last in this region.
+    public long lastActive(String uuid) {
+        return (Network.getInstance().regionSQL.getLong("SELECT last_enter FROM region_members WHERE region='" + regionName + "' AND uuid='" + uuid + "';"));
     }
 }

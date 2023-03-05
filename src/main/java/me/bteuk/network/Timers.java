@@ -47,7 +47,7 @@ public class Timers {
     private ItemStack slot9;
 
     //Region Inactivity
-    private final long inactivity;
+    public final long inactivity;
     private ArrayList<Inactivity> inactive_owners;
     private String uuid;
 
