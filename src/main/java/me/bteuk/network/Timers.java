@@ -5,6 +5,7 @@ import me.bteuk.network.listeners.Connect;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.utils.*;
 import me.bteuk.network.utils.regions.Inactivity;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
@@ -137,8 +138,9 @@ public class Timers {
             //Ping all players on this server to check their online status.
             for (NetworkUser user : users) {
 
-                //Update the last_ping.
-                globalSQL.update("UPDATE online_users SET last_ping=" + time + " WHERE uuid='" + user.player.getUniqueId() + "' AND server='" + SERVER_NAME + "';");
+                //Update the last_ping and displayname.
+                globalSQL.update("UPDATE online_users SET last_ping=" + time + ",display_name=" +
+                        PlaceholderAPI.setPlaceholders(user.player, "%luckperms_prefix%") + " " + user.player.getName() + " WHERE uuid='" + user.player.getUniqueId() + "' AND server='" + SERVER_NAME + "';");
 
                 //If navigator is enabled check if they have it in slot 9.
                 if (user.navigator) {

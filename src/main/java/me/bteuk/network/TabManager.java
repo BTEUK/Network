@@ -77,13 +77,10 @@ public class TabManager {
             //Create list from online players.
             for (String uuid : instance.globalSQL.getStringList("SELECT uuid FROM online_users;")) {
 
-                //Check if the list already contains this player.
-                String name = instance.globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
 
                 //Get OfflinePlayer for role placeholder.
                 OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
-                String placeholder = PlaceholderAPI.setPlaceholders(offlinePlayer, "%luckperms_prefix%");
-                WrappedChatComponent displayName = WrappedChatComponent.fromJson(Utils.tabName(placeholder, name));
+                WrappedChatComponent displayName = WrappedChatComponent.fromJson(Utils.tabName(instance.globalSQL.getString("SELECT display_name FROM online_users WHERE uuid='" + uuid + "';")));
 
                 TabPlayer tabPlayer = new TabPlayer(displayName, offlinePlayer);
                 players.add(tabPlayer);

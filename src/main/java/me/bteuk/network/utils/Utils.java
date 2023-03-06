@@ -41,6 +41,10 @@ public class Utils {
         return ChatColor.translateAlternateColorCodes('&', message);
     }
 
+    public static String tabName(String displayName) {
+        return tabName(displayName.split(" ")[0], displayName.split(" ")[1]);
+    }
+
     public static String tabName(String prefix, String name) {
         Pattern pattern = Pattern.compile("#[a-fA-F0-9]{6}");
         Matcher matcher = pattern.matcher(prefix);

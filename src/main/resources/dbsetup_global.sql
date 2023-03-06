@@ -60,6 +60,7 @@ CREATE TABLE IF NOT EXISTS online_users
     last_ping   BIGINT          NOT NULL,
     server      VARCHAR(64)     NOT NULL,
     primary_role    VARCHAR(64) NOT NULL,
+    display_name    VARCHAR(64) NOT NULL,
     PRIMARY KEY(uuid)
 );
 
