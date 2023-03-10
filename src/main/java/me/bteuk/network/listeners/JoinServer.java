@@ -9,6 +9,7 @@ import me.bteuk.network.utils.Roles;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.ServerType;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -53,8 +54,9 @@ public class JoinServer implements Listener {
         } else {
 
             //Add user to table and run network connect.
-            globalSQL.update("INSERT INTO online_users(uuid,join_time,last_ping,server,primary_role) VALUES('" + e.getPlayer().getUniqueId() +
-                    "'," + Time.currentTime() + "," + Time.currentTime() + ",'" + Network.SERVER_NAME + "','" + Roles.getPrimaryRole(e.getPlayer()) + "');");
+            globalSQL.update("INSERT INTO online_users(uuid,join_time,last_ping,server,primary_role,display_name) VALUES('" + e.getPlayer().getUniqueId() +
+                    "'," + Time.currentTime() + "," + Time.currentTime() + ",'" + Network.SERVER_NAME + "','" + Roles.getPrimaryRole(e.getPlayer()) + "','" +
+                    PlaceholderAPI.setPlaceholders(e.getPlayer(), "%luckperms_prefix%") + " " + e.getPlayer().getName() + "');");
             connect.joinEvent(e.getPlayer());
         }
 

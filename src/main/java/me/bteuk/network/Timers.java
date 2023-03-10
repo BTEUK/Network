@@ -139,8 +139,8 @@ public class Timers {
             for (NetworkUser user : users) {
 
                 //Update the last_ping and displayname.
-                globalSQL.update("UPDATE online_users SET last_ping=" + time + ",display_name=" +
-                        PlaceholderAPI.setPlaceholders(user.player, "%luckperms_prefix%") + " " + user.player.getName() + " WHERE uuid='" + user.player.getUniqueId() + "' AND server='" + SERVER_NAME + "';");
+                globalSQL.update("UPDATE online_users SET last_ping=" + time + ",display_name='" +
+                        PlaceholderAPI.setPlaceholders(user.player, "%luckperms_prefix%") + " " + user.player.getName() + "' WHERE uuid='" + user.player.getUniqueId() + "' AND server='" + SERVER_NAME + "';");
 
                 //If navigator is enabled check if they have it in slot 9.
                 if (user.navigator) {
