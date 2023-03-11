@@ -112,13 +112,17 @@ public class TabManager {
 
                 }
 
-                //Remove current list.
-                packetOut.getPlayerInfoDataLists().write(0, pdOld);
-                pm.broadcastServerPacket(packetOut);
+                //Remove current list if it contains something.
+                if (!pdOld.isEmpty()) {
+                    packetOut.getPlayerInfoDataLists().write(0, pdOld);
+                    pm.broadcastServerPacket(packetOut);
+                }
 
                 //Add new list.
-                packetIn.getPlayerInfoDataLists().write(0, pd);
-                pm.broadcastServerPacket(packetIn);
+                if (!pd.isEmpty()) {
+                    packetIn.getPlayerInfoDataLists().write(0, pd);
+                    pm.broadcastServerPacket(packetIn);
+                }
 
                 //Reset the tab players.
                 pdOld.clear();
@@ -133,6 +137,58 @@ public class TabManager {
             players.clear();
 
         }, 0L, 40L);
+
+    }
+
+    //Updates tab without requiring a change, this will be used when a user switches server, this won't updat the online player list.
+    public void updateTab() {
+
+        //Create list from online players.
+        for (String uuid : instance.globalSQL.getStringList("SELECT uuid FROM online_users;")) {
+
+
+            //Get OfflinePlayer for role placeholder.
+            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
+            WrappedChatComponent displayName = WrappedChatComponent.fromJson(Utils.tabName(instance.globalSQL.getString("SELECT display_name FROM online_users WHERE uuid='" + uuid + "';")));
+
+            TabPlayer tabPlayer = new TabPlayer(displayName, offlinePlayer);
+            players.add(tabPlayer);
+
+        }
+
+        Network.getInstance().getLogger().info("Updating Tab");
+
+        for (TabPlayer tp : players) {
+
+            WrappedGameProfile profile = new WrappedGameProfile(tp.player.getUniqueId(),
+                    tp.player.getName());
+
+            pd.add(new PlayerInfoData(profile, 0, EnumWrappers.NativeGameMode.CREATIVE, tp.displayName));
+
+        }
+
+        //Remove current list if it contains something.
+        if (!pdOld.isEmpty()) {
+            packetOut.getPlayerInfoDataLists().write(0, pdOld);
+            pm.broadcastServerPacket(packetOut);
+        }
+
+        //Add new list.
+        if (!pd.isEmpty()) {
+            packetIn.getPlayerInfoDataLists().write(0, pd);
+            pm.broadcastServerPacket(packetIn);
+        }
+
+        //Reset the tab players.
+        pdOld.clear();
+        pdOld.addAll(pd);
+        pd.clear();
+
+
+        //Clear the players list for the next iteration.
+        playersOld.clear();
+        playersOld.addAll(players);
+        players.clear();
 
     }
 

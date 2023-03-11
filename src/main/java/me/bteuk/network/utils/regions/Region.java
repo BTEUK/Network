@@ -385,7 +385,7 @@ public record Region(String regionName) {
 
             //If owner is in the online users list send a message.
             if (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid='" + getOwner() + "';")) {
-                Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + getOwner() + "','&3" + u.player.getName() + " &a has requested to join region &3" + getTag(getOwner()) + "');");
+                Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + getOwner() + "','&3" + u.player.getName() + " &ahas requested to join region &3" + getTag(getOwner()) + "');");
             }
         }
     }

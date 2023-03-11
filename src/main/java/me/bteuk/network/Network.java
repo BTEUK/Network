@@ -87,7 +87,7 @@ public final class Network extends JavaPlugin {
     public LeaveServer leaveServer;
 
     //Tab
-    private TabManager tab;
+    public TabManager tab;
 
     public static int MIN_Y;
     public static int MAX_Y;

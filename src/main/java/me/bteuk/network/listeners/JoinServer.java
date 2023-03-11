@@ -64,6 +64,9 @@ public class JoinServer implements Listener {
         NetworkUser u = new NetworkUser(e.getPlayer());
         instance.addUser(u);
 
+        //Update tab.
+        instance.tab.updateTab();
+
         /*
         //Check version per server type.
         //Ignore lobby, only relevant for Earth and Plot.

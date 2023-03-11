@@ -1,5 +1,7 @@
 package me.bteuk.network.commands;
 
+import me.bteuk.network.Network;
+import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -34,6 +36,9 @@ public class DebugStick implements CommandExecutor {
         //Get the player inventory and check whether they already have the selection tool.
         PlayerInventory i = p.getInventory();
 
+        //Get user.
+        NetworkUser u = Network.getInstance().getUser(p);
+
         //Check if the player already has the selection tool in their inventory.
         if (i.containsAtLeast(new ItemStack(Material.DEBUG_STICK), 1)) {
 
@@ -42,6 +47,12 @@ public class DebugStick implements CommandExecutor {
             i.setItemInMainHand(new ItemStack(Material.DEBUG_STICK));
 
             p.sendMessage(Utils.success("Switched to debug stick from inventory."));
+
+        } else if (u.navigator && i.getHeldItemSlot() == 8) {
+
+            i.setItem(7, new ItemStack(Material.DEBUG_STICK));
+
+            u.player.sendMessage(Utils.success("Set debug stick to slot 8."));
 
         } else {
 

@@ -54,6 +54,13 @@ public class UtilsGui extends Gui {
 
                         u.player.sendMessage(Utils.success("Switched to debug stick from inventory."));
 
+                        //If user has navigator enabled and they have that slot selected, set it to slot 7.
+                    } else if (u.navigator && i.getHeldItemSlot() == 8) {
+
+                        i.setItem(7, new ItemStack(Material.DEBUG_STICK));
+
+                        u.player.sendMessage(Utils.success("Set debug stick to slot 8."));
+
                     } else {
 
                         //If they don't have the selection tool already set it in their main hand.
