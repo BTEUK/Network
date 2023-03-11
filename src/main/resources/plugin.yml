@@ -20,6 +20,7 @@ commands:
     usage: /<command>
     description: Opens the main gui, will always return to the previous menu if possible.
   staff:
+    aliases: [st]
     usage: /<command>
     description: Opens the Staff Menu.
   region:
