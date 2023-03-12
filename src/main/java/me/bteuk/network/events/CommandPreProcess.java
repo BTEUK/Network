@@ -62,9 +62,10 @@ public class CommandPreProcess implements Listener {
         //Disable server in server table.
         instance.globalSQL.update("UPDATE server_data SET online=0 WHERE name='" + Network.SERVER_NAME + "';");
 
-        //Stop the LeaveServer listener so it doesn't trigger since it causes an error.
+        //Block the LeaveServer listener so it doesn't trigger since it causes an error.
+        //It needs to be active to prevent the leave message to show in chat.
         if (instance.leaveServer != null) {
-            instance.leaveServer.unregister();
+            instance.leaveServer.block();
         }
 
         //Check if another server is online,

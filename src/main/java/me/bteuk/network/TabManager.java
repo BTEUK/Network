@@ -14,7 +14,9 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -141,7 +143,7 @@ public class TabManager {
     }
 
     //Updates tab without requiring a change, this will be used when a user switches server, this won't updat the online player list.
-    public void updateTab() {
+    public void updateTab(Player p) {
 
         //Create list from online players.
         for (String uuid : instance.globalSQL.getStringList("SELECT uuid FROM online_users;")) {
@@ -156,7 +158,7 @@ public class TabManager {
 
         }
 
-        Network.getInstance().getLogger().info("Updating Tab");
+        Network.getInstance().getLogger().info("Updating Tab for " + p.getName());
 
         for (TabPlayer tp : players) {
 
@@ -167,16 +169,13 @@ public class TabManager {
 
         }
 
-        //Remove current list if it contains something.
-        if (!pdOld.isEmpty()) {
-            packetOut.getPlayerInfoDataLists().write(0, pdOld);
-            pm.broadcastServerPacket(packetOut);
-        }
-
-        //Add new list.
-        if (!pd.isEmpty()) {
-            packetIn.getPlayerInfoDataLists().write(0, pd);
-            pm.broadcastServerPacket(packetIn);
+        try {
+            if (!pd.isEmpty()) {
+                packetIn.getPlayerInfoDataLists().write(0, pd);
+                pm.sendServerPacket(p, packetIn);
+            }
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
         }
 
         //Reset the tab players.

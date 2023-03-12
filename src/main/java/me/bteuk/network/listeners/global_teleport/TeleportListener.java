@@ -23,6 +23,8 @@ public class TeleportListener implements Listener {
 
     private final RegionManager regionManager;
 
+    private boolean blocked;
+
     public TeleportListener(Network instance) {
 
         Bukkit.getServer().getPluginManager().registerEvents(this, instance);
@@ -33,6 +35,8 @@ public class TeleportListener implements Listener {
         earthWorld = config.getString("earth_world");
 
         regionManager = instance.getRegionManager();
+
+        blocked = false;
 
     }
 

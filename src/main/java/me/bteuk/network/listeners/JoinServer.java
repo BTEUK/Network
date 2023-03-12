@@ -65,7 +65,7 @@ public class JoinServer implements Listener {
         instance.addUser(u);
 
         //Update tab.
-        instance.tab.updateTab();
+        Bukkit.getScheduler().runTask(instance, () -> instance.tab.updateTab(u.player));
 
         /*
         //Check version per server type.

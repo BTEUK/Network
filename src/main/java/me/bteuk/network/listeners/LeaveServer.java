@@ -20,6 +20,8 @@ public class LeaveServer implements Listener {
 
     GlobalSQL globalSQL;
 
+    private boolean blocked;
+
     public LeaveServer(Network instance, GlobalSQL globalSQL, Connect connect) {
 
         this.instance = instance;
@@ -27,10 +29,12 @@ public class LeaveServer implements Listener {
         this.globalSQL = globalSQL;
         Bukkit.getServer().getPluginManager().registerEvents(this, instance);
 
+        blocked = false;
+
     }
 
-    public void unregister() {
-        PlayerQuitEvent.getHandlerList().unregister(this);
+    public void block() {
+        blocked = true;
     }
 
     @EventHandler
@@ -38,6 +42,10 @@ public class LeaveServer implements Listener {
 
         //Set default leave message to null.
         e.setQuitMessage(null);
+
+        if (blocked) {
+            return;
+        }
 
         NetworkUser u = instance.getUser(e.getPlayer());
 
