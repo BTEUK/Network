@@ -139,6 +139,10 @@ public class CommandPreProcess implements Listener {
 
         }
 
+        //Block movement and teleport listeners.
+        instance.moveListener.block();
+        instance.teleportListener.block();
+
         //Remove users from list.
         users.clear();
 

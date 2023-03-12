@@ -26,6 +26,8 @@ public class MoveListener implements Listener {
 
     private final RegionManager regionManager;
 
+    private boolean blocked;
+
     public MoveListener(Network instance) {
 
         Bukkit.getServer().getPluginManager().registerEvents(this, instance);
@@ -38,10 +40,21 @@ public class MoveListener implements Listener {
 
         regionManager = instance.getRegionManager();
 
+        blocked = false;
+
+    }
+
+    public void block() {
+        blocked = true;
     }
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent e) {
+
+        if (blocked) {
+            e.setCancelled(true);
+            return;
+        }
 
         Player p = e.getPlayer();
         NetworkUser u = Network.getInstance().getUser(p);

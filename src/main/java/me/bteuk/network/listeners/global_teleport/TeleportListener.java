@@ -36,8 +36,17 @@ public class TeleportListener implements Listener {
 
     }
 
+    public void block() {
+        blocked = true;
+    }
+
     @EventHandler
     public void onPlayerTeleport(PlayerTeleportEvent e) {
+
+        if (blocked) {
+            e.setCancelled(true);
+            return;
+        }
 
         Player p = e.getPlayer();
         NetworkUser u = Network.getInstance().getUser(p);

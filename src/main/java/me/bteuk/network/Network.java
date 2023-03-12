@@ -86,6 +86,10 @@ public final class Network extends JavaPlugin {
     //Leave Server listener.
     public LeaveServer leaveServer;
 
+    //Movement listeners.
+    public MoveListener moveListener;
+    public TeleportListener teleportListener;
+
     //Tab
     public TabManager tab;
 
@@ -204,8 +208,8 @@ public final class Network extends JavaPlugin {
             regionManager = new RegionManager(regionSQL);
         }
 
-        new MoveListener(this);
-        new TeleportListener(this);
+        moveListener = new MoveListener(this);
+        teleportListener = new TeleportListener(this);
 
         //Setup Timers
         timers = new Timers(this, globalSQL, connect);

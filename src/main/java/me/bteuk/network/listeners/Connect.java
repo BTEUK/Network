@@ -19,6 +19,8 @@ public class Connect {
     private final String joinMessage;
     private final String leaveMessage;
 
+    private boolean blocked;
+
     public Connect(Network instance, GlobalSQL globalSQL, PlotSQL plotSQL) {
 
         this.instance = instance;
@@ -29,6 +31,8 @@ public class Connect {
         //Get join and leave message from config.
         joinMessage = instance.getConfig().getString("chat.join");
         leaveMessage = instance.getConfig().getString("chat.leave");
+
+        blocked = false;
 
     }
 
