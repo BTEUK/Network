@@ -7,12 +7,14 @@ import me.bteuk.network.utils.*;
 import me.bteuk.network.utils.regions.Inactivity;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class Timers {
 
@@ -196,7 +198,7 @@ public class Timers {
 
                     //Run network disconnect and remove their entry.
                     globalSQL.update("DELETE FROM server_switch WHERE uuid='" + uuid + "';");
-                    connect.leaveEvent(uuid);
+                    connect.leaveEvent(Bukkit.getOfflinePlayer(UUID.fromString(uuid)));
 
                 }
             }
@@ -208,7 +210,7 @@ public class Timers {
             for (String uuid : uuids) {
 
                 //Run network disconnect and remove their entry.
-                connect.leaveEvent(uuid);
+                connect.leaveEvent(Bukkit.getOfflinePlayer(uuid));
 
             }
 

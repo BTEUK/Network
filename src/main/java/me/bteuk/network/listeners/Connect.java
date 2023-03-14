@@ -1,11 +1,14 @@
 package me.bteuk.network.listeners;
 
+import com.destroystokyo.paper.profile.PlayerProfile;
 import me.bteuk.network.Network;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
+import me.bteuk.network.utils.TextureUtils;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 //This class deals with players joining and leaving the network.
@@ -65,7 +68,6 @@ public class Connect {
                     p.sendMessage(Utils.success("There are &3" + plots + " &aplots available for review."));
                 }
             }
-
         }
 
         //Log playercount in database
@@ -74,7 +76,7 @@ public class Connect {
 
         //Send global connect message.
         //Add a slight delay so message can be seen by player joining.
-        Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> instance.chat.broadcastMessage(joinMessage.replace("%player%", p.getName()), "uknet:connect"),1L);
+        Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> instance.chat.broadcastMessage(TextureUtils.getAvatarUrl(p.getPlayerProfile()) + " " + joinMessage.replace("%player%", p.getName()), "uknet:connect"), 1L);
 
     }
 
@@ -83,7 +85,9 @@ public class Connect {
     unsuccessful pings by any network-connected server.
     A ping will occur on a one-second interval.
      */
-    public void leaveEvent(String uuid) {
+    public void leaveEvent(OfflinePlayer p) {
+
+        String uuid = p.getUniqueId().toString();
 
         //Remove any outstanding invites that this player has sent.
         plotSQL.update("DELETE FROM plot_invites WHERE owner='" + uuid + "';");
@@ -96,7 +100,11 @@ public class Connect {
 
         //Get the player name and send global disconnect message.
         String name = globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
-        instance.chat.broadcastMessage(leaveMessage.replace("%player%", name), "uknet:disconnect");
+
+        p.getPlayerProfile().update().thenAcceptAsync(updatedProfile ->
+                        instance.chat.broadcastMessage(TextureUtils.getAvatarUrl(updatedProfile) + " " + leaveMessage.replace("%player%", name), "uknet:disconnect")
+                , runnable -> Bukkit.getScheduler().runTask(instance, runnable));
+
 
         //Remove player from online_users.
         globalSQL.update("DELETE FROM online_users WHERE uuid='" + uuid + "';");

@@ -84,7 +84,7 @@ public class LeaveServer implements Listener {
                 + "' AND from_server='" + instance.SERVER_NAME + "';")) {
 
             //Run leave network sequence.
-            connect.leaveEvent(e.getPlayer().getUniqueId().toString());
+            connect.leaveEvent(e.getPlayer());
 
         }
 
