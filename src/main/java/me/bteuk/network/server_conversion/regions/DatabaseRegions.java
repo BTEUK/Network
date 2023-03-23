@@ -91,7 +91,7 @@ public class DatabaseRegions {
         }
     }
 
-    public void convertMembers() {
+    public void convertOwners() {
 
         //Get the region manager.
         RegionManager regionManager = Network.getInstance().getRegionManager();
@@ -101,20 +101,20 @@ public class DatabaseRegions {
 
         //Get all the existing region members.
         try (Connection conn = conn();
-             PreparedStatement statement = conn.prepareStatement("SELECT * FROM region_members;");
+             PreparedStatement statement = conn.prepareStatement("SELECT * FROM region_owners;");
              ResultSet results = statement.executeQuery()) {
 
             while (results.next()) {
 
                 //If the region is not open, add the user to the region.
-                if (!regionManager.getRegion(results.getString("id")).isOpen()) {
+                if (!regionManager.getRegion(results.getString("region")).isOpen()) {
 
                     //If this region already has a member, copy their coordinate id to prevent duplicate entries in the database.
                     if (Network.getInstance().regionSQL.hasRow("SELECT region FROM region_members WHERE region='" + results.getString("id") + "';")) {
 
                         int coordinateID = Network.getInstance().regionSQL.getInt("SELECT coordinateID FROM region_members WHERE region='" + results.getString("id") + "';");
                         //Add member.
-                        addMember(results.getString("id"), results.getString("uuid"),
+                        addMember(results.getString("region"), results.getString("uuid"),
                                 results.getBoolean("is_owner"), results.getLong("last_enter"), coordinateID);
 
                     } else {
@@ -122,8 +122,8 @@ public class DatabaseRegions {
                         //Create a new coordinateID at the centre of the region.
 
                         //Get coordinates of region centre.
-                        xcentre = Integer.parseInt(results.getString("id").split(",")[0]) * 512 + 255;
-                        zcentre = Integer.parseInt(results.getString("id").split(",")[1]) * 512 + 255;
+                        xcentre = Integer.parseInt(results.getString("region").split(",")[0]) * 512 + 255;
+                        zcentre = Integer.parseInt(results.getString("region").split(",")[1]) * 512 + 255;
 
                         //Convert region centre to irl coordinates.
                         coords = bteGeneratorSettings.projection().toGeo(xcentre, zcentre);
@@ -141,17 +141,92 @@ public class DatabaseRegions {
 
                         int finalXcentre = xcentre;
                         int finalZcentre = zcentre;
+
+                        //Get info to store since the resultset will be closed before the altFuture completes.
+                        String region = results.getString("region");
+                        String uuid = results.getString("uuid");
+                        long last_enter = results.getLong("last_enter");
+
                         altFuture.thenAccept(s -> Bukkit.getScheduler().runTask(Network.getInstance(), () -> {
 
                             int coordinateID = Network.getInstance().globalSQL.addCoordinate(new Location(world, finalXcentre, s, finalZcentre));
 
                             //Add member.
-                            try {
-                                addMember(results.getString("id"), results.getString("uuid"),
-                                        results.getBoolean("is_owner"), results.getLong("last_enter"), coordinateID);
-                            } catch (SQLException e) {
-                                e.printStackTrace();
-                            }
+                            addMember(region, uuid, true, last_enter, coordinateID);
+                        }));
+                    }
+                }
+
+            }
+
+
+        } catch (SQLException | OutOfProjectionBoundsException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void convertMembers() {
+
+        //Get the region manager.
+        RegionManager regionManager = Network.getInstance().getRegionManager();
+
+        int xcentre, zcentre;
+        double[] coords;
+
+        //Get all the existing region members.
+        try (Connection conn = conn();
+             PreparedStatement statement = conn.prepareStatement("SELECT * FROM region_members;");
+             ResultSet results = statement.executeQuery()) {
+
+            while (results.next()) {
+
+                //If the region is not open, add the user to the region.
+                if (!regionManager.getRegion(results.getString("region")).isOpen()) {
+
+                    //If this region already has a member, copy their coordinate id to prevent duplicate entries in the database.
+                    if (Network.getInstance().regionSQL.hasRow("SELECT region FROM region_members WHERE region='" + results.getString("id") + "';")) {
+
+                        int coordinateID = Network.getInstance().regionSQL.getInt("SELECT coordinateID FROM region_members WHERE region='" + results.getString("id") + "';");
+                        //Add member.
+                        addMember(results.getString("region"), results.getString("uuid"),
+                                results.getBoolean("is_owner"), results.getLong("last_enter"), coordinateID);
+
+                    } else {
+
+                        //Create a new coordinateID at the centre of the region.
+
+                        //Get coordinates of region centre.
+                        xcentre = Integer.parseInt(results.getString("region").split(",")[0]) * 512 + 255;
+                        zcentre = Integer.parseInt(results.getString("region").split(",")[1]) * 512 + 255;
+
+                        //Convert region centre to irl coordinates.
+                        coords = bteGeneratorSettings.projection().toGeo(xcentre, zcentre);
+
+                        //Get altitude.
+                        CompletableFuture<Double> altFuture;
+                        try {
+                            altFuture = bteGeneratorSettings.datasets()
+                                    .<IScalarDataset>getCustom(EarthGeneratorPipelines.KEY_DATASET_HEIGHTS)
+                                    .getAsync(coords[0], coords[1])
+                                    .thenApply(a -> a + 1.0d);
+                        } catch (OutOfProjectionBoundsException e) {
+                            altFuture = CompletableFuture.completedFuture(0d);
+                        }
+
+                        int finalXcentre = xcentre;
+                        int finalZcentre = zcentre;
+
+                        //Get info to store since the resultset will be closed before the altFuture completes.
+                        String region = results.getString("region");
+                        String uuid = results.getString("uuid");
+                        long last_enter = results.getLong("last_enter");
+
+                        altFuture.thenAccept(s -> Bukkit.getScheduler().runTask(Network.getInstance(), () -> {
+
+                            int coordinateID = Network.getInstance().globalSQL.addCoordinate(new Location(world, finalXcentre, s, finalZcentre));
+
+                            //Add member.
+                            addMember(region, uuid, false, last_enter, coordinateID);
                         }));
                     }
                 }
@@ -188,7 +263,7 @@ public class DatabaseRegions {
                 }
 
                 //Add log to new database.
-                Network.getInstance().regionSQL.update("INSERT INTO region_logs(region,uuid,is_owner,start_time,end_time) VAULES('" +
+                Network.getInstance().regionSQL.update("INSERT INTO region_logs(region,uuid,is_owner,start_time,end_time) VALUES('" +
                         results.getString("region") + "','" + results.getString("uuid") + "'," + is_owner + "," +
                         results.getLong("start_time") + "," + results.getLong("end_time") + ");");
 

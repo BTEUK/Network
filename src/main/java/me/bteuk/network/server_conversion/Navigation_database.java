@@ -12,6 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class Navigation_database {
 
@@ -72,7 +73,9 @@ public class Navigation_database {
             //Get new category.
             if (l.category.equalsIgnoreCase("London")) {
                 category = Categories.ENGLAND;
-            } else {
+            } else if (l.category.toUpperCase().equals("NORTHERN-IRELAND")) {
+                category = Categories.NORTHERN_IRELAND;
+            }  else {
                 //Get the category from the existing category, converted to uppercase.
                 category = Categories.valueOf(l.category.toUpperCase());
             }
@@ -87,7 +90,11 @@ public class Navigation_database {
                         county = Counties.GREATER_LONDON;
                     }
                 } else {
-                    county = Counties.valueOf(l.subcategory.toUpperCase());
+                    if (l.subcategory.equalsIgnoreCase("LINCOLN")) {
+                        county = Counties.LINCOLNSHIRE;
+                    } else {
+                        county = Counties.valueOf(l.subcategory.toUpperCase());
+                    }
                 }
             }
 
@@ -96,11 +103,11 @@ public class Navigation_database {
 
             //Add location to new database.
             if (category == Categories.ENGLAND) {
-                globalSQL.update("INSERT INTO location_requests(location,category,subcategory,coordinate) " +
-                        "VALUES('" + l.name + "','" + category + "','" + county.region + "," + coordinate_id + ";");
+                globalSQL.update("INSERT INTO location_data(location,category,subcategory,coordinate) " +
+                        "VALUES('" + l.name + "','" + category + "','" + county.region + "'," + coordinate_id + ");");
             } else {
                 globalSQL.update("INSERT INTO location_data(location,category,coordinate) " +
-                        "VALUES('" + l.name + "','" + category + "','" + coordinate_id + ";");
+                        "VALUES('" + l.name + "','" + category + "'," + coordinate_id + ");");
 
             }
         }

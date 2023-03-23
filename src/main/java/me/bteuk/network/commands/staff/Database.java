@@ -1,10 +1,12 @@
 package me.bteuk.network.commands.staff;
 
+import me.bteuk.network.Network;
 import me.bteuk.network.server_conversion.Navigation_database;
 import me.bteuk.network.server_conversion.UKnet_database;
 import me.bteuk.network.server_conversion.regions.DatabaseRegions;
 import me.bteuk.network.server_conversion.regions.WGRegions;
 import me.bteuk.network.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -26,7 +28,7 @@ public class Database implements CommandExecutor {
 
         //Check args.
         if (args.length < 2) {
-            console.sendMessage(Utils.error("/database convert navigation|playerdata|regions"));
+            console.sendMessage(Utils.error("/database convert navigation|playerdata|regions|regionmembers"));
             return true;
         }
 
@@ -48,27 +50,36 @@ public class Database implements CommandExecutor {
                 UKnet_database pd = new UKnet_database();
                 pd.player_data();
 
-            } else if (args[2].equalsIgnoreCase("regions")) {
+            } else if (args[1].equalsIgnoreCase("regions")) {
 
                 //Convert regions and region members. If successfull it will show up in console.
                 //If an error occurs then there will be an error log.
-                DatabaseRegions dr = new DatabaseRegions();
-                dr.getRegions();
-                dr.convertMembers();
-                dr.convertLogs();
+                //Run this async.
+                Bukkit.getScheduler().runTaskAsynchronously(Network.getInstance(), () -> {
 
-                //Convert region to worldguard.
+                    Network.getInstance().getLogger().info("Started region conversion async, this could take a while.");
+
+                    DatabaseRegions dr = new DatabaseRegions();
+                    dr.getRegions();
+                    dr.convertOwners();
+                    dr.convertMembers();
+                    dr.convertLogs();
+
+                    Network.getInstance().getLogger().info("Region conversion complete!");
+                });
+
+            } else if (args[1].equalsIgnoreCase("regionmembers")) {
+
                 WGRegions.convertWGRegions();
 
-
             } else {
-                console.sendMessage(Utils.error("/database convert navigation|playerdata"));
+                console.sendMessage(Utils.error("/database convert navigation|playerdata|regions|regionmembers"));
             }
 
 
 
         } else {
-            console.sendMessage(Utils.error("/database convert navigation|playerdata"));
+            console.sendMessage(Utils.error("/database convert navigation|playerdata|regions|regionmembers"));
         }
 
         return true;
