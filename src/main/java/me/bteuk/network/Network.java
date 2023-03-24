@@ -298,7 +298,7 @@ public final class Network extends JavaPlugin {
         getCommand("region").setExecutor(new RegionCommand());
 
         //Enable tab.
-        tab = new TabManager(this);
+        //tab = new TabManager(this);
 
         //Enable server in server table.
         globalSQL.update("UPDATE server_data SET online=1 WHERE name='" + SERVER_NAME + "';");

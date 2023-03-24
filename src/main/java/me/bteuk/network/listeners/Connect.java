@@ -20,6 +20,7 @@ public class Connect {
     private final PlotSQL plotSQL;
 
     private final String joinMessage;
+    private final String firstJoinMessage;
     private final String leaveMessage;
 
     private boolean blocked;
@@ -33,6 +34,7 @@ public class Connect {
 
         //Get join and leave message from config.
         joinMessage = instance.getConfig().getString("chat.join");
+        firstJoinMessage = instance.getConfig().getString("chat.firstjoin");
         leaveMessage = instance.getConfig().getString("chat.leave");
 
         blocked = false;
@@ -51,10 +53,18 @@ public class Connect {
             globalSQL.update("INSERT INTO player_data(uuid,name,last_online,last_submit) VALUES('" +
                     p.getUniqueId() + "','" + p.getName() + "'," + Time.currentTime() + "," + 0 + ");");
 
+            //Send global welcome message.
+            //Add a slight delay so message can be seen by player joining.
+            Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> instance.chat.broadcastMessage(TextureUtils.getAvatarUrl(p.getPlayerProfile()) + " " + firstJoinMessage.replace("%player%", p.getName()), "uknet:connect"), 1L);
+
         } else {
 
             //Update the online time and name.
             globalSQL.update("UPDATE player_data SET name='" + p.getName() + "',last_online=" + Time.currentTime() + " WHERE uuid='" + p.getUniqueId() + "';");
+
+            //Send global connect message.
+            //Add a slight delay so message can be seen by player joining.
+            Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> instance.chat.broadcastMessage(TextureUtils.getAvatarUrl(p.getPlayerProfile()) + " " + joinMessage.replace("%player%", p.getName()), "uknet:connect"), 1L);
 
         }
 
@@ -73,10 +83,6 @@ public class Connect {
         //Log playercount in database
         globalSQL.update("INSERT INTO player_count(log_time,players) VALUES(" + Time.currentTime() + "," +
                 globalSQL.getInt("SELECT count(uuid) FROM online_users;") + ");");
-
-        //Send global connect message.
-        //Add a slight delay so message can be seen by player joining.
-        Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> instance.chat.broadcastMessage(TextureUtils.getAvatarUrl(p.getPlayerProfile()) + " " + joinMessage.replace("%player%", p.getName()), "uknet:connect"), 1L);
 
     }
 

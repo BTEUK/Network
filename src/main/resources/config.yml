@@ -35,6 +35,7 @@ socket:
 #%player% is a placeholder for the player name.
 chat:
   join: '&e%player% has joined UKnet'
+  firstjoin: '&eWelcome to UKnet %player%'
   leave: '&e%player% has left UKnet'
 
 #Tpll config.
