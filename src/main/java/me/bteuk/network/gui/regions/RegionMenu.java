@@ -98,6 +98,9 @@ public class RegionMenu extends Gui {
 
                         });
 
+                //Stop iterating.
+                break;
+
             }
 
             //If i is less than owner.size it means that we are still iterating through the owners, else we are iterating through the members.

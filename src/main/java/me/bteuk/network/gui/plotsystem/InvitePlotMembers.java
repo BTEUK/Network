@@ -84,6 +84,9 @@ public class InvitePlotMembers extends Gui {
 
                         });
 
+                //Stop iterating.
+                break;
+
             }
 
             //Check whether the player is not already the owner or member of the plot, if true skip them.

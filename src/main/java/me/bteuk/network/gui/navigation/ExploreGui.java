@@ -105,7 +105,7 @@ public class ExploreGui extends Gui {
                         Utils.title("Scotland"),
                         Utils.line("Click to pick from"),
                         Utils.line("locations in Scotland.")),
-                u -> openLocation("Scotland", Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='SCOTLAND';"))
+                u -> openLocation("Scotland", Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='SCOTLAND';"), u)
         );
 
         //Wales
@@ -113,7 +113,7 @@ public class ExploreGui extends Gui {
                         Utils.title("Wales"),
                         Utils.line("Click to pick from"),
                         Utils.line("locations in Wales.")),
-                u -> openLocation("Wales", Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='WALES';"))
+                u -> openLocation("Wales", Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='WALES';"), u)
         );
 
         //Northern Ireland
@@ -121,7 +121,7 @@ public class ExploreGui extends Gui {
                         Utils.title("Northern Ireland"),
                         Utils.line("Click to pick from"),
                         Utils.line("locations in Norther Ireland.")),
-                u -> openLocation("Northern Ireland", Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='NORTHERN_IRELAND';"))
+                u -> openLocation("Northern Ireland", Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='NORTHERN_IRELAND';"), u)
         );
 
         //Other
@@ -129,7 +129,7 @@ public class ExploreGui extends Gui {
                         Utils.title("Other"),
                         Utils.line("Click to pick from locations"),
                         Utils.line("not in the 4 countries of the UK.")),
-                u -> openLocation("Other", Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='OTHER';"))
+                u -> openLocation("Other", Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='OTHER';"), u)
         );
 
         //Suggested Locations
@@ -138,7 +138,7 @@ public class ExploreGui extends Gui {
                         Utils.title("Suggested Locations"),
                         Utils.line("Click to view locations"),
                         Utils.line("that are recommended to view.")),
-                u -> openLocation("Suggested Locations", Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE suggested=1;"))
+                u -> openLocation("Suggested Locations", Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE suggested=1;"), u)
         );
 
         //Nearby Locations (radius set in config under navigation_radius)
@@ -147,10 +147,11 @@ public class ExploreGui extends Gui {
                         Utils.line("Click to view locations"),
                         Utils.line("in a " + Network.getInstance().getConfig().getInt("navigation_radius") + "km radius.")),
                 u -> openLocation("Nearby Locations", Network.getInstance().globalSQL.getStringList("SELECT location_data.location FROM location_data " +
-                        "INNER JOIN coordinates ON location_data.coordinate=coordinates.id " +
-                        "WHERE (((coordinates.x-" + u.player.getLocation().getX() + ")*(coordinates.x-" + u.player.getLocation().getX() + ")) + " +
-                        "((coordinates.z-" + u.player.getLocation().getZ() + ")*(coordinates.z-" + u.player.getLocation().getZ() + "))) < " +
-                        (Network.getInstance().getConfig().getInt("navigation_radius") * Network.getInstance().getConfig().getInt("navigation_radius")) + ";")
+                                "INNER JOIN coordinates ON location_data.coordinate=coordinates.id " +
+                                "WHERE (((coordinates.x-" + u.player.getLocation().getX() + ")*(coordinates.x-" + u.player.getLocation().getX() + ")) + " +
+                                "((coordinates.z-" + u.player.getLocation().getZ() + ")*(coordinates.z-" + u.player.getLocation().getZ() + "))) < " +
+                                ((Network.getInstance().getConfig().getInt("navigation_radius") * 1000) * (Network.getInstance().getConfig().getInt("navigation_radius") * 1000)) + ";"),
+                        true, u
                 ));
 
         //Find Locations
@@ -189,7 +190,13 @@ public class ExploreGui extends Gui {
 
     }
 
-    private void openLocation(String name, ArrayList<String> locations) {
+    private void openLocation(String name, ArrayList<String> locations, NetworkUser u) {
+
+        openLocation(name, locations, false, u);
+
+    }
+
+    private void openLocation(String name, ArrayList<String> locations, boolean nearby, NetworkUser u) {
 
         if (locations.isEmpty()) {
             u.player.sendMessage(Utils.error("No locations added to the menu in &4" + name + "&c."));
@@ -198,7 +205,7 @@ public class ExploreGui extends Gui {
 
         //Switch to location menu with all scotland locations.
         this.delete();
-        u.mainGui = new LocationMenu(name, new HashSet<>(locations), false);
+        u.mainGui = new LocationMenu(name, new HashSet<>(locations), false, nearby, u);
         u.mainGui.open(u);
 
     }

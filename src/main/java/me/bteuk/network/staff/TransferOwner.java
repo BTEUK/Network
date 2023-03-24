@@ -82,6 +82,9 @@ public class TransferOwner extends Gui {
 
                         });
 
+                //Stop iterating.
+                break;
+
             }
 
             //If skip is greater than 0, skip this iteration.

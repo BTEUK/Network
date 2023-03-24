@@ -85,7 +85,7 @@ public class LocationSearch implements Listener {
                     Bukkit.getScheduler().runTask(Network.getInstance(), () -> {
 
                         u.mainGui.delete();
-                        u.mainGui = new LocationMenu("Search: " + e.getMessage(), searchLocations, false);
+                        u.mainGui = new LocationMenu("Search: " + e.getMessage(), searchLocations, false, false, u);
                         u.mainGui.open(u);
 
                     });

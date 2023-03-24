@@ -168,7 +168,7 @@ public class EnglandMenu extends Gui {
 
         //Switch to location menu with all scotland locations.
         this.delete();
-        u.mainGui = new LocationMenu(name, new HashSet<>(locations), true);
+        u.mainGui = new LocationMenu(name, new HashSet<>(locations), true, false, u);
         u.mainGui.open(u);
 
     }

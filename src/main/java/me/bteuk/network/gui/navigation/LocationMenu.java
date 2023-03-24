@@ -4,6 +4,7 @@ import me.bteuk.network.Network;
 import me.bteuk.network.commands.Back;
 import me.bteuk.network.events.EventManager;
 import me.bteuk.network.gui.Gui;
+import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
@@ -16,18 +17,25 @@ import java.util.HashSet;
 
 public class LocationMenu extends Gui {
 
-    private final HashSet<String> locations;
+    private HashSet<String> locations;
 
     private int page;
     private boolean england;
 
-    public LocationMenu(String title, HashSet<String> locations, boolean england) {
+    //This tells us we have the "Nearby Locations" menu open, and when refreshed should update to the current location of the player.
+    private boolean nearby;
+    private NetworkUser u;
+
+    public LocationMenu(String title, HashSet<String> locations, boolean england, boolean nearby, NetworkUser u) {
 
         super(45, Component.text(title, NamedTextColor.AQUA, TextDecoration.BOLD));
 
         this.locations = locations;
 
         this.england = england;
+
+        this.nearby = nearby;
+        this.u = u;
 
         //On initialization the page is always 1.
         page = 1;
@@ -62,11 +70,11 @@ public class LocationMenu extends Gui {
         }
 
         //Iterate through all locations
-        for (String location: locations) {
+        for (String location : locations) {
 
             //Skip iterations if skip > 0.
             if (skip > 0) {
-                skip --;
+                skip--;
                 continue;
             }
 
@@ -86,6 +94,9 @@ public class LocationMenu extends Gui {
                             u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
 
                         });
+
+                //Stop iterating.
+                break;
             }
 
             //Create location teleport button.
@@ -173,6 +184,14 @@ public class LocationMenu extends Gui {
     public void refresh() {
 
         this.clearGui();
+
+        //If menu is nearby locations, update the locations.
+        locations = new HashSet<>(Network.getInstance().globalSQL.getStringList("SELECT location_data.location FROM location_data " +
+                "INNER JOIN coordinates ON location_data.coordinate=coordinates.id " +
+                "WHERE (((coordinates.x-" + u.player.getLocation().getX() + ")*(coordinates.x-" + u.player.getLocation().getX() + ")) + " +
+                "((coordinates.z-" + u.player.getLocation().getZ() + ")*(coordinates.z-" + u.player.getLocation().getZ() + "))) < " +
+                ((Network.getInstance().getConfig().getInt("navigation_radius") * 1000) * (Network.getInstance().getConfig().getInt("navigation_radius") * 1000))));
+
         createGui();
 
     }

@@ -1,7 +1,10 @@
 package me.bteuk.network.commands;
 
+import me.bteuk.network.Network;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.enums.ServerType;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -12,7 +15,7 @@ import java.util.Arrays;
 
 public class Sethome implements CommandExecutor {
 
-    private GlobalSQL globalSQL;
+    private final GlobalSQL globalSQL;
 
     public Sethome(GlobalSQL globalSQL) {
         this.globalSQL = globalSQL;
@@ -39,7 +42,7 @@ public class Sethome implements CommandExecutor {
             }
 
             //Set home to current location.
-            int coordinate_id = globalSQL.addCoordinate(p.getLocation());
+            int coordinate_id = getCoordinateID(p.getLocation());
 
             globalSQL.update("INSERT INTO home(coordinate_id,uuid) VALUES(" + coordinate_id + ",'" + p.getUniqueId() + "');");
 
@@ -68,7 +71,7 @@ public class Sethome implements CommandExecutor {
             }
 
             //Set home to current location.
-            int coordinate_id = globalSQL.addCoordinate(p.getLocation());
+            int coordinate_id = getCoordinateID(p.getLocation());
 
             globalSQL.update("INSERT INTO home(coordinate_id,uuid,name) VALUES(" + coordinate_id + ",'" + p.getUniqueId() + "','" + name + "');");
 
@@ -78,5 +81,21 @@ public class Sethome implements CommandExecutor {
 
         return true;
 
+    }
+
+    private int getCoordinateID(Location l) {
+
+        //If the location is on a plot server, get the location transformation and convert the coordinate to take that into account.
+        if (Network.SERVER_TYPE == ServerType.PLOT) {
+            //If world is in database.
+            if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + l.getWorld().getName() + "';")) {
+                //Apply negative coordinate transform to location.
+                l.setX(l.getX() - Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + l.getWorld().getName() + "';"));
+                l.setZ(l.getZ() - Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + l.getWorld().getName() + "';"));
+            }
+        }
+
+        //Create location coordinate.
+        return Network.getInstance().globalSQL.addCoordinate(l);
     }
 }

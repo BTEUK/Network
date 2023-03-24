@@ -88,6 +88,9 @@ public class RegionRequests extends Gui {
 
                 });
 
+                //Stop iterating.
+                break;
+
             }
 
             int finalI = i;
