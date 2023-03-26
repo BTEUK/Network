@@ -8,18 +8,13 @@ import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.PlayerInfoData;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.comphenix.protocol.wrappers.WrappedGameProfile;
-import me.bteuk.network.utils.TabPlayer;
 import me.bteuk.network.utils.Utils;
-import me.clip.placeholderapi.PlaceholderAPI;
-import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class TabManager {
 
@@ -28,17 +23,10 @@ public class TabManager {
     private ProtocolManager pm;
     private PacketListener pl;
 
-    private int taskID;
+    //private List<TextComponent> headers = new ArrayList<>();
+    //private List<TextComponent> footers = new ArrayList<>();
 
-    private List<TextComponent> headers = new ArrayList<>();
-    private List<TextComponent> footers = new ArrayList<>();
-
-    private List<PlayerInfoData> pd;
-    private List<PlayerInfoData> pdOld;
-
-    private boolean changed;
-    private List<TabPlayer> players;
-    private List<TabPlayer> playersOld;
+    private HashMap<String, PlayerInfoData> fakePlayers;
 
     //Create packet.
     PacketContainer packetIn;
@@ -49,11 +37,7 @@ public class TabManager {
         this.instance = instance;
         pm = ProtocolLibrary.getProtocolManager();
 
-        pdOld = new ArrayList<>();
-        pd = new ArrayList<>();
-
-        players = new ArrayList<>();
-        playersOld = new ArrayList<>();
+        fakePlayers = new HashMap<>();
 
         packetIn = pm.createPacket(PacketType.Play.Server.PLAYER_INFO);
         packetOut = pm.createPacket(PacketType.Play.Server.PLAYER_INFO);
@@ -68,179 +52,135 @@ public class TabManager {
 
     private void startTab() {
 
-        //createPacketListener();
-
-        //pm.addPacketListener(pl);
-
-        taskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(instance, () -> {
-
-            changed = false;
-
-            //Create list from online players.
-            for (String uuid : instance.globalSQL.getStringList("SELECT uuid FROM online_users;")) {
-
-
-                //Get OfflinePlayer for role placeholder.
-                OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
-                WrappedChatComponent displayName = WrappedChatComponent.fromJson(Utils.tabName(instance.globalSQL.getString("SELECT display_name FROM online_users WHERE uuid='" + uuid + "';")));
-
-                TabPlayer tabPlayer = new TabPlayer(displayName, offlinePlayer);
-                players.add(tabPlayer);
-
-                //Check if the old list does not contain this player.
-                if (!playersOld.contains(tabPlayer)) {
-
-                    changed = true;
-
-                }
-            }
-
-            //Check the length of players is different from playersOld, then something also changed.
-            if (players.size() != playersOld.size()) {
-                changed = true;
-            }
-
-            //If the list changed, then recreate tab.
-            if (changed) {
-
-                Network.getInstance().getLogger().info("Updating Tab");
-
-                for (TabPlayer tp : players) {
-
-                    WrappedGameProfile profile = new WrappedGameProfile(tp.player.getUniqueId(),
-                            tp.player.getName());
-
-                    pd.add(new PlayerInfoData(profile, 0, EnumWrappers.NativeGameMode.CREATIVE, tp.displayName));
-
-                }
-
-                //Remove current list if it contains something.
-                if (!pdOld.isEmpty()) {
-                    packetOut.getPlayerInfoDataLists().write(0, pdOld);
-                    pm.broadcastServerPacket(packetOut);
-                }
-
-                //Add new list.
-                if (!pd.isEmpty()) {
-                    packetIn.getPlayerInfoDataLists().write(0, pd);
-                    pm.broadcastServerPacket(packetIn);
-                }
-
-                //Reset the tab players.
-                pdOld.clear();
-                pdOld.addAll(pd);
-                pd.clear();
-
-            }
-
-            //Clear the players list for the next iteration.
-            playersOld.clear();
-            playersOld.addAll(players);
-            players.clear();
-
-        }, 0L, 40L);
+        createPacketListener();
+        pm.addPacketListener(pl);
 
     }
 
-    //Updates tab without requiring a change, this will be used when a user switches server, this won't updat the online player list.
-    public void updateTab(Player p) {
+    public void addFakePlayer(String uuid) {
 
-        //Create list from online players.
-        for (String uuid : instance.globalSQL.getStringList("SELECT uuid FROM online_users;")) {
+        //Check if the player is not connected to this server, and is not already contained in the list.
+        if (!instance.hasPlayer(uuid) && !fakePlayers.containsKey(uuid)) {
 
+            //Add player to fake player array, if not yet added.
+            OfflinePlayer player = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
 
-            //Get OfflinePlayer for role placeholder.
-            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
-            WrappedChatComponent displayName = WrappedChatComponent.fromJson(Utils.tabName(instance.globalSQL.getString("SELECT display_name FROM online_users WHERE uuid='" + uuid + "';")));
+            WrappedGameProfile profile = new WrappedGameProfile(player.getUniqueId(), player.getName());
 
-            TabPlayer tabPlayer = new TabPlayer(displayName, offlinePlayer);
-            players.add(tabPlayer);
+            PlayerInfoData playerInfoData = new PlayerInfoData(profile, 0, EnumWrappers.NativeGameMode.CREATIVE, null);
 
-        }
+            instance.getLogger().info("Added " + player.getName() + " to fake players list.");
+            fakePlayers.put(uuid, playerInfoData);
 
-        Network.getInstance().getLogger().info("Updating Tab for " + p.getName());
-
-        for (TabPlayer tp : players) {
-
-            WrappedGameProfile profile = new WrappedGameProfile(tp.player.getUniqueId(),
-                    tp.player.getName());
-
-            pd.add(new PlayerInfoData(profile, 0, EnumWrappers.NativeGameMode.CREATIVE, tp.displayName));
+            //Also add them to tab.
+            packetIn.getPlayerInfoDataLists().write(0, Collections.singletonList(playerInfoData));
+            pm.broadcastServerPacket(packetIn);
 
         }
+    }
 
-        try {
-            if (!pd.isEmpty()) {
-                packetIn.getPlayerInfoDataLists().write(0, pd);
-                pm.sendServerPacket(p, packetIn);
+    public void removeFakePlayer(String uuid) {
+
+        //Remove the uuid from the map if exists.
+        PlayerInfoData playerInfoData = fakePlayers.remove(uuid);
+
+        //If the uuid exists remove them from tab.
+        if (playerInfoData != null) {
+
+            instance.getLogger().info("Removed " + playerInfoData.getProfile().getName() + " from fake players list.");
+
+            packetOut.getPlayerInfoDataLists().write(0, Collections.singletonList(playerInfoData));
+            pm.broadcastServerPacket(packetOut);
+
+        }
+    }
+
+    //Handles the different types of tab updates sent from other servers.
+    public void updateAll(String message) {
+
+        instance.getLogger().info(message);
+
+        String[] info = message.split(" ");
+
+        switch (info[0]) {
+
+            case "add" -> {
+
+                //Add the fake player to tab, if the player is on this server they won't be added.
+                addFakePlayer(info[1]);
+
             }
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
+
+            case "remove" -> {
+
+                //Remove the fake player from tab, if the player isn't in the fake player list it won't do anything.
+                removeFakePlayer(info[1]);
+
+            }
+
+            //TODO UPDATE
+
         }
 
-        //Reset the tab players.
-        pdOld.clear();
-        pdOld.addAll(pd);
-        pd.clear();
 
+    }
 
-        //Clear the players list for the next iteration.
-        playersOld.clear();
-        playersOld.addAll(players);
-        players.clear();
+    public void updateDisplayName() {
+
+    }
+
+    //Add all players from other servers.
+    public void loadTab(Player p) {
+
+        //Add all players from the fake player list.
+        for (PlayerInfoData playerInfoData : fakePlayers.values()) {
+
+            packetIn.getPlayerInfoDataLists().write(0, Collections.singletonList(playerInfoData));
+            try {
+                pm.sendServerPacket(p, packetIn);
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
+
+        instance.getLogger().info("Loaded tab for " + p.getName());
+
 
     }
 
     public void closeTab() {
-        //pm.removePacketListener(pl);
-        Bukkit.getScheduler().cancelTask(taskID);
+        pm.removePacketListener(pl);
         instance.getLogger().info("Disabled Tab");
     }
 
-    /*
     private void createPacketListener() {
         pl = new PacketAdapter(instance, ListenerPriority.NORMAL, PacketType.Play.Server.PLAYER_INFO) {
 
             @Override
             public void onPacketSending(PacketEvent event) {
 
-                //Intercept and cancel Add and Remove player packets.
+                //If packet is for adding a player, intercept it and add the custom display name.
+                if (event.getPacket().getPlayerInfoAction().getValues().get(0).equals(EnumWrappers.PlayerInfoAction.ADD_PLAYER)) {
 
+                    PacketContainer packet = event.getPacket();
 
-                //Cancel the packet and send custom data instead.
-                PacketContainer packet = event.getPacket();
+                    List<PlayerInfoData> infoList = event.getPacket().getPlayerInfoDataLists().getValues().get(0);
 
-                if (packet.getPlayerInfoAction().read(0).equals(EnumWrappers.PlayerInfoAction.ADD_PLAYER)) {
+                    PlayerInfoData info = infoList.get(0);
 
-                    instance.getLogger().info("Intercepting Packet.");
+                    String displayName = instance.globalSQL.getString("SELECT display_name FROM online_users WHERE uuid='" + info.getProfile().getUUID() + "';");
 
-                    //Create custom packet.
-                    List<PlayerInfoData> pd = new ArrayList<>();
+                    infoList.clear();
+                    infoList.add(new PlayerInfoData(info.getProfile(), 0, EnumWrappers.NativeGameMode.CREATIVE, WrappedChatComponent.fromJson(Utils.tabName(displayName))));
 
-                    //Create list from online players.
-                    for (String uuid : instance.globalSQL.getStringList("SELECT uuid FROM online_users;")) {
+                    packet.getPlayerInfoDataLists().write(0, infoList);
 
-                        String name = instance.globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
-                        WrappedGameProfile profile = new WrappedGameProfile(UUID.fromString(uuid),
-                                name);
+                    instance.getLogger().info("Intercepting ADD_PLAYER packet, setting display name for " + displayName);
 
-                        //Get OfflinePlayer for role placeholder.
-                        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
-                        String placeholder = PlaceholderAPI.setPlaceholders(offlinePlayer, "%luckperms_prefix%");
-
-                        WrappedChatComponent displayName = WrappedChatComponent.fromJson(Utils.tabName(placeholder, name));
-
-                        pd.add(new PlayerInfoData(profile, 0, EnumWrappers.NativeGameMode.CREATIVE, displayName));
-
-                    }
-
-                    //Update the packet.
-                    packet.getPlayerInfoDataLists().write(0, pd);
                     event.setPacket(packet);
 
                 }
             }
         };
     }
-     */
 }

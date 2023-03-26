@@ -42,6 +42,7 @@ public class CustomChat implements Listener, PluginMessageListener {
         instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:connect", this);
         instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:disconnect", this);
         instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord", this);
+        instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:tab", this);
 
         instance.getLogger().info("Successfully enabled Global Chat!");
 
@@ -55,6 +56,7 @@ public class CustomChat implements Listener, PluginMessageListener {
         instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:connect");
         instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:disconnect");
         instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord");
+        instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:tab");
 
     }
 
@@ -172,6 +174,16 @@ public class CustomChat implements Listener, PluginMessageListener {
                         }
                     }
                 }
+
+                break;
+
+            case "uknet:tab":
+
+                //Run a tab update, the structure is the following.
+                //'update/add/remove <uuid>'
+                //This allows us to only update what is necessary.
+                Network.getInstance().tab.updateAll(sMessage);
+
 
         }
     }

@@ -282,12 +282,7 @@ public class BuildGui extends Gui {
                                             int radius = Network.getInstance().getConfig().getInt("staff_request.radius");
 
                                             //For zero radius, skip.
-                                            if (radius == 0) {
-
-                                                u.region.joinRegion(u);
-                                                u.player.closeInventory();
-
-                                            } else {
+                                            if (radius != 0) {
 
                                                 //Subtract the config radius value.
                                                 x -= radius;
@@ -321,10 +316,11 @@ public class BuildGui extends Gui {
                                                     }
                                                 }
 
-                                                //No regions were found, so join the region anyway.
-                                                u.region.joinRegion(u);
-                                                u.player.closeInventory();
+
                                             }
+
+                                            u.region.joinRegion(u);
+                                            u.player.closeInventory();
                                         }
 
                                     } else {

@@ -1,7 +1,5 @@
 package me.bteuk.network;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 import me.bteuk.network.commands.*;
 import me.bteuk.network.commands.staff.Ban;
 import me.bteuk.network.commands.staff.Database;
@@ -298,7 +296,12 @@ public final class Network extends JavaPlugin {
         getCommand("region").setExecutor(new RegionCommand());
 
         //Enable tab.
-        //tab = new TabManager(this);
+        tab = new TabManager(this);
+
+        //Add all players from other servers to the fake players list, so they will show in tab when players connect.
+        for (String uuid : globalSQL.getStringList("SELECT uuid FROM online_users;")) {
+            tab.addFakePlayer(uuid);
+        }
 
         //Enable server in server table.
         globalSQL.update("UPDATE server_data SET online=1 WHERE name='" + SERVER_NAME + "';");
@@ -338,6 +341,10 @@ public final class Network extends JavaPlugin {
 
             //Remove player from online_users.
             instance.globalSQL.update("DELETE FROM online_users WHERE uuid='" + uuid + "';");
+
+            //Update tab for all players.
+            //This is done with the tab chat channel.
+            instance.chat.broadcastMessage("remove " + uuid, "uknet:tab");
 
             //Log playercount in database
             instance.globalSQL.update("INSERT INTO player_count(log_time,players) VALUES(" + Time.currentTime() + "," +
@@ -455,6 +462,16 @@ public final class Network extends JavaPlugin {
 
         networkUsers.remove(u);
 
+    }
+
+    //Check if user is on the server.
+    public boolean hasPlayer(String uuid) {
+        for (NetworkUser u : getUsers()) {
+            if (u.player.getUniqueId().toString().equals(uuid)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     //Get lobby.

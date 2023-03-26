@@ -84,17 +84,6 @@ public class Sethome implements CommandExecutor {
     }
 
     private int getCoordinateID(Location l) {
-
-        //If the location is on a plot server, get the location transformation and convert the coordinate to take that into account.
-        if (Network.SERVER_TYPE == ServerType.PLOT) {
-            //If world is in database.
-            if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + l.getWorld().getName() + "';")) {
-                //Apply negative coordinate transform to location.
-                l.setX(l.getX() - Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + l.getWorld().getName() + "';"));
-                l.setZ(l.getZ() - Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + l.getWorld().getName() + "';"));
-            }
-        }
-
         //Create location coordinate.
         return Network.getInstance().globalSQL.addCoordinate(l);
     }

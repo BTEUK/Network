@@ -60,12 +60,18 @@ public class JoinServer implements Listener {
             connect.joinEvent(e.getPlayer());
         }
 
+        //Add the player to the fake players list for other servers.
+        instance.chat.broadcastMessage("add " + e.getPlayer().getUniqueId(), "uknet:tab");
+
+        //Remove the player from the fake players list, if they are currently in it.
+        instance.tab.removeFakePlayer(e.getPlayer().getUniqueId().toString());
+
+        //Load tab for the player, this will add the fake players.
+        instance.tab.loadTab(e.getPlayer());
+
         //Add user to the list.
         NetworkUser u = new NetworkUser(e.getPlayer());
         instance.addUser(u);
-
-        //Update tab.
-        Bukkit.getScheduler().runTask(instance, () -> instance.tab.updateTab(u.player));
 
         //Check if the player has any join events, if try run them.
         //Delay by 1 second for all plugins to run their join events.

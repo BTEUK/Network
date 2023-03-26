@@ -115,6 +115,10 @@ public class Connect {
         //Remove player from online_users.
         globalSQL.update("DELETE FROM online_users WHERE uuid='" + uuid + "';");
 
+        //Update tab for all players.
+        //This is done with the tab chat channel.
+        instance.chat.broadcastMessage("remove " + p.getUniqueId(), "uknet:tab");
+
         //Log playercount in database
         globalSQL.update("INSERT INTO player_count(log_time,players) VALUES(" + Time.currentTime() + "," +
                 globalSQL.getInt("SELECT count(uuid) FROM online_users;") + ");");

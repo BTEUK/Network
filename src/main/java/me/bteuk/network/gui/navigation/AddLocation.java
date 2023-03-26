@@ -177,15 +177,6 @@ public class AddLocation extends Gui {
 
                         Location l = u.player.getLocation();
 
-                        //If the location is on a plot server, get the location transformation and convert the coordinate to take that into account.
-                        if (Network.SERVER_TYPE == ServerType.PLOT) {
-                            //If world is in database.
-                            if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + u.player.getWorld().getName() + "';")) {
-                                //Apply negative coordinate transform to location.
-                                l.setX(l.getX() - Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + l.getWorld().getName() + "';"));
-                                l.setZ(l.getZ() - Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + l.getWorld().getName() + "';"));
-                            }
-                        }
                         //Create location coordinate.
                         int coordinate_id = Network.getInstance().globalSQL.addCoordinate(l);
 

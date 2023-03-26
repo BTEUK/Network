@@ -126,6 +126,7 @@ public class CommandPreProcess implements Listener {
                 instance.globalSQL.update("UPDATE player_data SET last_online=" + Time.currentTime() + " WHERE UUID='" + uuid + "';");
 
                 //Remove player from online_users.
+                //Since this closes the server tab does not need to be updated for these players.
                 instance.globalSQL.update("DELETE FROM online_users WHERE uuid='" + uuid + "';");
 
                 //Log playercount in database

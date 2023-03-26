@@ -235,7 +235,7 @@ public class TeleportListener implements Listener {
                     //Get region.
                     Region region = regionManager.getRegion(l);
 
-                    //Check if are teleporting to a new region, if currently in one.
+                    //Check if you are teleporting to a new region, if currently in one.
                     if (u.inRegion) {
 
                         //If the regions are not equal

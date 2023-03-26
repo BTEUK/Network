@@ -499,8 +499,8 @@ public record Region(String regionName) {
             }
 
             //Join region as owner.
-            Network.getInstance().regionSQL.update("INSERT INTO region_members(region,uuid,is_owner,last_enter) VALUES('" + regionName + "','" +
-                    uuid + "',1," + Time.currentTime() + ");");
+            Network.getInstance().regionSQL.update("INSERT INTO region_members(region,uuid,is_owner,last_enter,coordinate_id) VALUES('" + regionName + "','" +
+                    uuid + "',1," + Time.currentTime() + "," + coordinateID + ");");
 
             //Start log of player in region.
             Network.getInstance().regionSQL.update("INSERT INTO region_logs(region,uuid,is_owner,start_time) VALUES('" + regionName + "','" +

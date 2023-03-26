@@ -73,13 +73,6 @@ public class TeleportEvent {
 
                 Location l = Network.getInstance().globalSQL.getCoordinate(coordinate_id);
 
-                //If world is in plot system add coordinate transform.
-                String world = Network.getInstance().globalSQL.getString("SELECT world FROM coordinates WHERE id=" + coordinate_id + ";");
-                if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + world + "';")) {
-                    l.setX(l.getX() + Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + world + "';"));
-                    l.setZ(l.getZ() + Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + world + "';"));
-                }
-
                 p.teleport(l);
                 p.sendMessage(Utils.success("Teleported to &3" + location));
 

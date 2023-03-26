@@ -140,9 +140,27 @@ public class Timers {
             //Ping all players on this server to check their online status.
             for (NetworkUser user : users) {
 
-                //Update the last_ping and displayname.
-                globalSQL.update("UPDATE online_users SET last_ping=" + time + ",display_name='" +
-                        PlaceholderAPI.setPlaceholders(user.player, "%luckperms_prefix%") + " " + user.player.getName() + "' WHERE uuid='" + user.player.getUniqueId() + "' AND server='" + SERVER_NAME + "';");
+                //Update the last_ping and display name.
+                //Check if display name has actually changed.
+                if ((PlaceholderAPI.setPlaceholders(user.player, "%luckperms_prefix%") + " " + user.player.getName()).equals(
+                        globalSQL.getString("SELECT display_name FROM online_users WHERE uuid='" + user.player.getUniqueId() + "' AND server='" + SERVER_NAME + "';")
+                )) {
+
+                    //Update last ping
+                    globalSQL.update("UPDATE online_users SET last_ping=" + time + " WHERE uuid='" + user.player.getUniqueId() + "' AND server='" + SERVER_NAME + "';");
+
+                } else {
+
+                    //Update display name and last ping
+                    globalSQL.update("UPDATE online_users SET last_ping=" + time + ",display_name='" +
+                            PlaceholderAPI.setPlaceholders(user.player, "%luckperms_prefix%") + " " + user.player.getName() +
+                            "' WHERE uuid='" + user.player.getUniqueId() + "' AND server='" + SERVER_NAME + "';");
+
+                    //Update tab for all players to update display name.
+                    //This is done with the tab chat channel.
+                    instance.chat.broadcastMessage("update " + user.player.getUniqueId(), "uknet:tab");
+
+                }
 
                 //If navigator is enabled check if they have it in slot 9.
                 if (user.navigator) {

@@ -165,7 +165,7 @@ public class RegionMenu extends Gui {
                                 this.delete();
 
                                 //Switch to region info.
-                                u.mainGui = new RegionInfo(Network.getInstance().getRegionManager().getRegion(owner.get(finalI)), u.player.getUniqueId().toString());
+                                u.mainGui = new RegionInfo(Network.getInstance().getRegionManager().getRegion(member.get(finalI - owner.size())), u.player.getUniqueId().toString());
                                 u.mainGui.open(u);
 
                             });
