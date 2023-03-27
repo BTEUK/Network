@@ -60,6 +60,14 @@ public class JoinServer implements Listener {
             connect.joinEvent(e.getPlayer());
         }
 
+        //If this is the first player on the server, add all players from other servers to tab.
+        if (instance.getServer().getOnlinePlayers().size() == 1) {
+            //Add all players from other servers to the fake players list, so they will show in tab when players connect.
+            for (String uuid : globalSQL.getStringList("SELECT uuid FROM online_users;")) {
+                instance.tab.addFakePlayer(uuid);
+            }
+        }
+
         //Add the player to the fake players list for other servers.
         instance.chat.broadcastMessage("add " + e.getPlayer().getUniqueId(), "uknet:tab");
 
@@ -67,7 +75,7 @@ public class JoinServer implements Listener {
         instance.tab.removeFakePlayer(e.getPlayer().getUniqueId().toString());
 
         //Load tab for the player, this will add the fake players.
-        instance.tab.loadTab(e.getPlayer());
+        Bukkit.getScheduler().runTask(instance, () -> instance.tab.loadTab(e.getPlayer()));
 
         //Add user to the list.
         NetworkUser u = new NetworkUser(e.getPlayer());

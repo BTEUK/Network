@@ -88,5 +88,13 @@ public class LeaveServer implements Listener {
 
         }
 
+        //If this is the last player on the server, remove all players from other servers from tab.
+        if (instance.getServer().getOnlinePlayers().size() == 1) {
+            //Add all players from other servers to the fake players list, so they will show in tab when players connect.
+            for (String uuid : globalSQL.getStringList("SELECT uuid FROM online_users;")) {
+                instance.tab.removeFakePlayer(uuid);
+            }
+        }
+
     }
 }

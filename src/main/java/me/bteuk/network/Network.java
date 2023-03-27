@@ -298,11 +298,6 @@ public final class Network extends JavaPlugin {
         //Enable tab.
         tab = new TabManager(this);
 
-        //Add all players from other servers to the fake players list, so they will show in tab when players connect.
-        for (String uuid : globalSQL.getStringList("SELECT uuid FROM online_users;")) {
-            tab.addFakePlayer(uuid);
-        }
-
         //Enable server in server table.
         globalSQL.update("UPDATE server_data SET online=1 WHERE name='" + SERVER_NAME + "';");
 

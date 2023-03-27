@@ -28,22 +28,12 @@ public class TabManager {
 
     private HashMap<String, PlayerInfoData> fakePlayers;
 
-    //Create packet.
-    PacketContainer packetIn;
-    PacketContainer packetOut;
-
     public TabManager(Network instance) {
 
         this.instance = instance;
         pm = ProtocolLibrary.getProtocolManager();
 
         fakePlayers = new HashMap<>();
-
-        packetIn = pm.createPacket(PacketType.Play.Server.PLAYER_INFO);
-        packetOut = pm.createPacket(PacketType.Play.Server.PLAYER_INFO);
-
-        packetIn.getPlayerInfoAction().write(0, EnumWrappers.PlayerInfoAction.ADD_PLAYER);
-        packetOut.getPlayerInfoAction().write(0, EnumWrappers.PlayerInfoAction.REMOVE_PLAYER);
 
         startTab();
         instance.getLogger().info("Enabled Tab");
@@ -62,21 +52,24 @@ public class TabManager {
         //Check if the player is not connected to this server, and is not already contained in the list.
         if (!instance.hasPlayer(uuid) && !fakePlayers.containsKey(uuid)) {
 
-            //Add player to fake player array, if not yet added.
-            OfflinePlayer player = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
+            //Get name from database
+            String name = instance.globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
 
-            WrappedGameProfile profile = new WrappedGameProfile(player.getUniqueId(), player.getName());
+            WrappedGameProfile profile = new WrappedGameProfile(UUID.fromString(uuid), name);
 
             PlayerInfoData playerInfoData = new PlayerInfoData(profile, 0, EnumWrappers.NativeGameMode.CREATIVE, null);
 
-            instance.getLogger().info("Added " + player.getName() + " to fake players list.");
+            instance.getLogger().info("Added " + name + " to fake players list.");
             fakePlayers.put(uuid, playerInfoData);
 
             //Also add them to tab.
+            PacketContainer packetIn = pm.createPacket(PacketType.Play.Server.PLAYER_INFO);
+            packetIn.getPlayerInfoAction().write(0, EnumWrappers.PlayerInfoAction.ADD_PLAYER);
             packetIn.getPlayerInfoDataLists().write(0, Collections.singletonList(playerInfoData));
             pm.broadcastServerPacket(packetIn);
 
         }
+
     }
 
     public void removeFakePlayer(String uuid) {
@@ -89,10 +82,13 @@ public class TabManager {
 
             instance.getLogger().info("Removed " + playerInfoData.getProfile().getName() + " from fake players list.");
 
+            PacketContainer packetOut = pm.createPacket(PacketType.Play.Server.PLAYER_INFO);
+            packetOut.getPlayerInfoAction().write(0, EnumWrappers.PlayerInfoAction.REMOVE_PLAYER);
             packetOut.getPlayerInfoDataLists().write(0, Collections.singletonList(playerInfoData));
             pm.broadcastServerPacket(packetOut);
 
         }
+
     }
 
     //Handles the different types of tab updates sent from other servers.
@@ -122,7 +118,6 @@ public class TabManager {
 
         }
 
-
     }
 
     public void updateDisplayName() {
@@ -132,9 +127,12 @@ public class TabManager {
     //Add all players from other servers.
     public void loadTab(Player p) {
 
+
         //Add all players from the fake player list.
         for (PlayerInfoData playerInfoData : fakePlayers.values()) {
 
+            PacketContainer packetIn = pm.createPacket(PacketType.Play.Server.PLAYER_INFO);
+            packetIn.getPlayerInfoAction().write(0, EnumWrappers.PlayerInfoAction.ADD_PLAYER);
             packetIn.getPlayerInfoDataLists().write(0, Collections.singletonList(playerInfoData));
             try {
                 pm.sendServerPacket(p, packetIn);
@@ -144,7 +142,6 @@ public class TabManager {
         }
 
         instance.getLogger().info("Loaded tab for " + p.getName());
-
 
     }
 
