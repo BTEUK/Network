@@ -335,7 +335,7 @@ public class BuildGui extends Gui {
 
                     //If the region is open.
                     if (user.region.isOpen()) {
-                        setItem(5, Utils.createItem(Material.END_GATEWAY, 1,
+                        setItem(5, Utils.createItem(Material.SPYGLASS, 1,
                                 Utils.title("Open Region"),
                                 Utils.line("This region is open to all Jr.Builder+."),
                                 Utils.line("You can build here without claiming.")));

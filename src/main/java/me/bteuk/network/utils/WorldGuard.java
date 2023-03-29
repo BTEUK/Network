@@ -34,6 +34,28 @@ public class WorldGuard {
         }
     }
 
+    public static boolean addGroup(String region, String group, World world) {
+
+        //Get instance of WorldGuard.
+        com.sk89q.worldguard.WorldGuard wg = com.sk89q.worldguard.WorldGuard.getInstance();
+
+        //Get regions.
+        RegionContainer container = wg.getPlatform().getRegionContainer();
+        RegionManager buildRegions = container.get(BukkitAdapter.adapt(world));
+
+        //Add the group to the region.
+        buildRegions.getRegion(region).getMembers().addGroup(group);
+
+        //Save the changes
+        try {
+            buildRegions.saveChanges();
+            return true;
+        } catch (StorageException e1) {
+            e1.printStackTrace();
+            return false;
+        }
+    }
+
     public static boolean removeMember(String region, String uuid, World world) {
 
         //Get instance of WorldGuard.
@@ -59,6 +81,30 @@ public class WorldGuard {
             e1.printStackTrace();
             return false;
         }
+    }
+
+    public static boolean removeGroup(String region, String group, World world) {
+
+        //Get instance of WorldGuard.
+        com.sk89q.worldguard.WorldGuard wg = com.sk89q.worldguard.WorldGuard.getInstance();
+
+        //Get regions.
+        RegionContainer container = wg.getPlatform().getRegionContainer();
+        RegionManager buildRegions = container.get(BukkitAdapter.adapt(world));
+
+        //Remove the group from the region.
+        buildRegions.getRegion(region).getMembers().removeGroup(group);
+
+        //Save the changes
+        try {
+            buildRegions.saveChanges();
+            return true;
+        } catch (
+                StorageException e1) {
+            e1.printStackTrace();
+            return false;
+        }
+
     }
 
     public static boolean createRegion(String regionName, int xmin, int zmin, int xmax, int zmax, World world) {

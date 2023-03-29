@@ -207,6 +207,12 @@ public record Region(String regionName) {
         Network.getInstance().regionSQL.update("UPDATE regions SET status='default' WHERE region='" + regionName + "';");
     }
 
+    //Set the region to default.
+    public void setDefault(String removeRole) {
+        WorldGuard.removeGroup(regionName, "jrbuilder", Bukkit.getWorld(Network.getInstance().getConfig().getString("earth_world")));
+        Network.getInstance().regionSQL.update("UPDATE regions SET status='default' WHERE region='" + regionName + "';");
+    }
+
     //Set the region to public.
     public void setPublic() {
         Network.getInstance().regionSQL.update("UPDATE regions SET status='public' WHERE region='" + regionName + "';");
@@ -227,8 +233,10 @@ public record Region(String regionName) {
     public void setOpen() {
 
         //Remove all members and the owner.
+        removeMembers("&aThe region &3%tag% &ais now open, you no longer need to claimed it to build here.");
 
         //Set open.
+        WorldGuard.addGroup(regionName, "jrbuilder", Bukkit.getWorld(Network.getInstance().getConfig().getString("earth_world")));
         Network.getInstance().regionSQL.update("UPDATE regions SET status='open' WHERE region='" + regionName + "';");
 
     }

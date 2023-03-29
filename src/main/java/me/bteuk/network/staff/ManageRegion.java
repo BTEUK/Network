@@ -134,7 +134,13 @@ public class ManageRegion extends Gui {
 
                         u -> {
 
+                            //If region is currently open, remove jrbuilder group.
+                            if (region.isOpen()) {
+                                region.setDefault("jrbuilder");
+                            }
+
                             region.setLocked();
+
                             this.refresh();
 
                         });
@@ -168,7 +174,10 @@ public class ManageRegion extends Gui {
                                 Utils.line("needing to join the region."),
                                 Utils.line("Any existing members will be kicked.")),
 
-                        u -> region.setOpen());
+                        u -> {
+                            region.setOpen();
+                            this.refresh();
+                        });
 
             } else if (region.isOpen()) {
 
@@ -178,7 +187,10 @@ public class ManageRegion extends Gui {
                                 Utils.line("people will again be required"),
                                 Utils.line("to join the region to build.")),
 
-                        u -> region.setDefault());
+                        u -> {
+                            region.setDefault("jrbuilder");
+                            this.refresh();
+                        });
 
             }
         }

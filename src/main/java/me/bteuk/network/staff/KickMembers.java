@@ -39,11 +39,6 @@ public class KickMembers extends Gui {
         //Get all members of the region.
         ArrayList<String> region_members = region.getMembers();
 
-        //Add the region owner.
-        if (region.hasOwner()) {
-            region_members.add(0, region.getOwner());
-        }
-
         //Slot count.
         int slot = 10;
 
