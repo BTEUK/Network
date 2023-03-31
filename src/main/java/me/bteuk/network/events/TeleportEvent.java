@@ -80,7 +80,7 @@ public class TeleportEvent {
                 if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + worldName + "';")) {
 
                     //Add coordinate transformation.
-                    Location newLoc = new Location(
+                    l = new Location(
                             Bukkit.getWorld(worldName),
                             l.getX() + Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + worldName + "';"),
                             l.getY(),
@@ -88,8 +88,6 @@ public class TeleportEvent {
                             l.getYaw(),
                             l.getPitch()
                     );
-
-                    l = newLoc;
 
                 }
 

@@ -131,7 +131,7 @@ public class LocationMenu extends Gui {
                             if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + worldName + "';")) {
 
                                 //Add coordinate transformation.
-                                Location newLoc = new Location(
+                                l = new Location(
                                         Bukkit.getWorld(worldName),
                                         l.getX() + Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + worldName + "';"),
                                         l.getY(),
@@ -139,8 +139,6 @@ public class LocationMenu extends Gui {
                                         l.getYaw(),
                                         l.getPitch()
                                 );
-
-                                l = newLoc;
 
                             }
 
@@ -210,7 +208,7 @@ public class LocationMenu extends Gui {
             if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + worldName + "';")) {
 
                 //Add coordinate transformation.
-                Location newLoc = new Location(
+                l = new Location(
                         Bukkit.getWorld(worldName),
                         u.player.getLocation().getX() - Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + worldName + "';"),
                         u.player.getLocation().getY(),
@@ -218,8 +216,6 @@ public class LocationMenu extends Gui {
                         u.player.getLocation().getYaw(),
                         u.player.getLocation().getPitch()
                 );
-
-                l = newLoc;
 
             }
 

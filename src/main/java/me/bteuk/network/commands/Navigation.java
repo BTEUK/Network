@@ -142,10 +142,15 @@ public class Navigation implements CommandExecutor {
 
         //If the player has permission for any of the commands send them the error.
         //Else tell them they don't have permission.
-        if (p.hasPermission("uknet.navigation.request") || p.hasPermission("uknet.navigation.suggested") || p.hasPermission("uknet.navigation.remove")) {
+        if (p.hasPermission("uknet.navigation.request") || p.hasPermission("uknet.navigation.suggested") || p.hasPermission("uknet.navigation.remove") || p.hasPermission("uknet.navigation.update")) {
             if (p.hasPermission("uknet.navigation.request")) {
                 p.sendMessage(Utils.error("/navigation add"));
             }
+
+            if (p.hasPermission("uknet.navigation.update")) {
+                p.sendMessage(Utils.error("/navigation update <location>"));
+            }
+
 
             if (p.hasPermission("uknet.navigation.remove")) {
                 p.sendMessage(Utils.error("/navigation remove <location>"));

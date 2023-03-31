@@ -14,7 +14,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 
 public class ExploreGui extends Gui {
@@ -159,7 +158,7 @@ public class ExploreGui extends Gui {
                     if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + worldName + "';")) {
 
                         //Add coordinate transformation.
-                        Location newLoc = new Location(
+                        l = new Location(
                                 Bukkit.getWorld(worldName),
                                 u.player.getLocation().getX() - Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + worldName + "';"),
                                 u.player.getLocation().getY(),
@@ -167,8 +166,6 @@ public class ExploreGui extends Gui {
                                 u.player.getLocation().getYaw(),
                                 u.player.getLocation().getPitch()
                         );
-
-                        l = newLoc;
 
                     }
 

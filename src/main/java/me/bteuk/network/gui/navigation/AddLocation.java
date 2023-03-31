@@ -237,7 +237,7 @@ public class AddLocation extends Gui {
                             if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + worldName + "';")) {
 
                                 //Add coordinate transformation.
-                                Location newLoc = new Location(
+                                l = new Location(
                                         l.getWorld(),
                                         l.getX() - Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + worldName + "';"),
                                         l.getY(),
@@ -245,8 +245,6 @@ public class AddLocation extends Gui {
                                         l.getYaw(),
                                         l.getPitch()
                                 );
-
-                                l = newLoc;
 
                             }
                         }
@@ -307,7 +305,8 @@ public class AddLocation extends Gui {
                                 if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + worldName + "';")) {
 
                                     //Add coordinate transformation.
-                                    Location newLoc = new Location(
+
+                                    l = new Location(
                                             l.getWorld(),
                                             l.getX() - Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + worldName + "';"),
                                             l.getY(),
@@ -315,8 +314,6 @@ public class AddLocation extends Gui {
                                             l.getYaw(),
                                             l.getPitch()
                                     );
-
-                                    l = newLoc;
 
                                 }
                             }
@@ -373,22 +370,8 @@ public class AddLocation extends Gui {
 
                         } else {
 
-                            //If category is england.
-                            if (category == Categories.ENGLAND) {
-                                //If player is reviewer, skip review.
-                                updateLocation(u);
-                            } else {
-                                //If player is reviewer, skip review.
-                                if (u.player.hasPermission("uknet.navigation.add")) {
+                            updateLocation(u);
 
-                                    addLocation(u);
-
-                                } else {
-
-                                    requestLocation(u);
-
-                                }
-                            }
                         }
 
                     });
