@@ -1,6 +1,7 @@
 package me.bteuk.network.events;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.commands.Back;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.ServerType;
@@ -72,6 +73,25 @@ public class TeleportEvent {
                 }
 
                 Location l = Network.getInstance().globalSQL.getCoordinate(coordinate_id);
+
+                String worldName = Network.getInstance().globalSQL.getString("SELECT world FROM coordinates WHERE id=" + coordinate_id + ";");
+
+                //Check if world is in plotsystem.
+                if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + worldName + "';")) {
+
+                    //Add coordinate transformation.
+                    Location newLoc = new Location(
+                            Bukkit.getWorld(worldName),
+                            l.getX() + Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + worldName + "';"),
+                            l.getY(),
+                            l.getZ() + Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + worldName + "';"),
+                            l.getYaw(),
+                            l.getPitch()
+                    );
+
+                    l = newLoc;
+
+                }
 
                 p.teleport(l);
                 p.sendMessage(Utils.success("Teleported to &3" + location));

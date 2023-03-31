@@ -4,6 +4,8 @@ import me.bteuk.network.Network;
 import me.bteuk.network.events.EventManager;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -43,11 +45,33 @@ public class Warp implements CommandExecutor {
             if (server.equals(Network.SERVER_NAME)) {
                 //Server is equal.
 
+                //Get location from coordinate id.
+                Location l = Network.getInstance().globalSQL.getCoordinate(coordinate_id);
+
+                String worldName = Network.getInstance().globalSQL.getString("SELECT world FROM coordinates WHERE id=" + coordinate_id + ";");
+
+                //Check if world is in plotsystem.
+                if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + worldName + "';")) {
+
+                    //Add coordinate transformation.
+                    Location newLoc = new Location(
+                            Bukkit.getWorld(worldName),
+                            l.getX() + Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + worldName + "';"),
+                            l.getY(),
+                            l.getZ() + Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + worldName + "';"),
+                            l.getYaw(),
+                            l.getPitch()
+                    );
+
+                    l = newLoc;
+
+                }
+
                 //Set current location for /back
                 Back.setPreviousCoordinate(p.getUniqueId().toString(), p.getLocation());
 
                 //Teleport to location.
-                p.teleport(Network.getInstance().globalSQL.getCoordinate(coordinate_id));
+                p.teleport(l);
                 p.sendMessage(Utils.success("Teleported to &3" + location));
             } else {
 

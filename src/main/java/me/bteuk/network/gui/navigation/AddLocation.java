@@ -226,7 +226,33 @@ public class AddLocation extends Gui {
                             Utils.line("location to your current position.")),
                     u -> {
 
-                        Network.getInstance().globalSQL.updateCoordinate(coordinate_id, u.player.getLocation());
+                        Location l = u.player.getLocation();
+
+                        //If server is plotsystem add the necessary coordinate transformation.
+                        if (Network.SERVER_TYPE == ServerType.PLOT) {
+
+                            String worldName = u.player.getLocation().getWorld().getName();
+
+                            //If location exists.
+                            if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + worldName + "';")) {
+
+                                //Add coordinate transformation.
+                                Location newLoc = new Location(
+                                        l.getWorld(),
+                                        l.getX() - Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + worldName + "';"),
+                                        l.getY(),
+                                        l.getZ() - Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + worldName + "';"),
+                                        l.getYaw(),
+                                        l.getPitch()
+                                );
+
+                                l = newLoc;
+
+                            }
+                        }
+
+
+                        Network.getInstance().globalSQL.updateCoordinate(coordinate_id, l);
                         u.player.sendMessage(Utils.success("Updated location to your current position."));
 
                     });
@@ -271,6 +297,29 @@ public class AddLocation extends Gui {
                         } else {
 
                             Location l = u.player.getLocation();
+
+                            //If server is plotsystem add the necessary coordinate transformation.
+                            if (Network.SERVER_TYPE == ServerType.PLOT) {
+
+                                String worldName = u.player.getLocation().getWorld().getName();
+
+                                //If location exists.
+                                if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + worldName + "';")) {
+
+                                    //Add coordinate transformation.
+                                    Location newLoc = new Location(
+                                            l.getWorld(),
+                                            l.getX() - Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + worldName + "';"),
+                                            l.getY(),
+                                            l.getZ() - Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + worldName + "';"),
+                                            l.getYaw(),
+                                            l.getPitch()
+                                    );
+
+                                    l = newLoc;
+
+                                }
+                            }
 
                             //Create location coordinate.
                             coordinate_id = Network.getInstance().globalSQL.addCoordinate(l);

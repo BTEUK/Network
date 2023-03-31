@@ -95,7 +95,8 @@ public class CommandPreProcess implements Listener {
 
                 //Reset last logged time.
                 if (u.afk) {
-                    u.last_time_log = u.last_movement = Time.currentTime();
+                    u.last_time_log = Time.currentTime();
+                    u.last_movement = Time.currentTime();
                     u.afk = false;
                     Network.getInstance().chat.broadcastMessage("&7" + u.player.getName() + " is no longer afk.", "uknet:globalchat");
                 }
@@ -110,7 +111,8 @@ public class CommandPreProcess implements Listener {
 
                 //Reset last logged time.
                 if (u.afk) {
-                    u.last_time_log = u.last_movement = Time.currentTime();
+                    u.last_time_log = Time.currentTime();
+                    u.last_movement = Time.currentTime();
                     u.afk = false;
                 }
 

@@ -36,7 +36,7 @@ public class Warps implements CommandExecutor {
         }
 
         //Get all locations in alphabetical order.
-        ArrayList<String> locations = Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data ORDER BY location DESC;");
+        ArrayList<String> locations = Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data ORDER BY location ASC;");
 
         //If there are no locations notify the user.
         if (locations.isEmpty()) {
@@ -79,6 +79,7 @@ public class Warps implements CommandExecutor {
             if (((locations.indexOf(location) + 1) % 16) == 0 || (locations.indexOf(location) + 1 == locations.size())) {
 
                 message.append(Utils.chat("&7" + location));
+                break;
 
             } else {
 

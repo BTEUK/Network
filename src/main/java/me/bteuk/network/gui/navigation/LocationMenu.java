@@ -7,9 +7,11 @@ import me.bteuk.network.gui.Gui;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.enums.ServerType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
@@ -123,6 +125,25 @@ public class LocationMenu extends Gui {
                             //Get location from coordinate id.
                             Location l = Network.getInstance().globalSQL.getCoordinate(coordinate_id);
 
+                            String worldName = Network.getInstance().globalSQL.getString("SELECT world FROM coordinates WHERE id=" + coordinate_id + ";");
+
+                            //Check if world is in plotsystem.
+                            if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + worldName + "';")) {
+
+                                //Add coordinate transformation.
+                                Location newLoc = new Location(
+                                        Bukkit.getWorld(worldName),
+                                        l.getX() + Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + worldName + "';"),
+                                        l.getY(),
+                                        l.getZ() + Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + worldName + "';"),
+                                        l.getYaw(),
+                                        l.getPitch()
+                                );
+
+                                l = newLoc;
+
+                            }
+
                             //Set current location for /back
                             Back.setPreviousCoordinate(u.player.getUniqueId().toString(), u.player.getLocation());
 
@@ -181,12 +202,33 @@ public class LocationMenu extends Gui {
 
         //If menu is nearby locations, update the locations.
         if (nearby) {
+
+            Location l = u.player.getLocation();
+            String worldName = l.getWorld().getName();
+
+            //Check if world is in plotsystem.
+            if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + worldName + "';")) {
+
+                //Add coordinate transformation.
+                Location newLoc = new Location(
+                        Bukkit.getWorld(worldName),
+                        u.player.getLocation().getX() - Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + worldName + "';"),
+                        u.player.getLocation().getY(),
+                        u.player.getLocation().getZ() - Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + worldName + "';"),
+                        u.player.getLocation().getYaw(),
+                        u.player.getLocation().getPitch()
+                );
+
+                l = newLoc;
+
+            }
+
             locations = new LinkedHashSet<>(Network.getInstance().globalSQL.getStringList("SELECT location_data.location FROM location_data INNER JOIN coordinates ON location_data.coordinate=coordinates.id " +
-                    "WHERE ((((coordinates.x/1000)-" + (u.player.getLocation().getX()/1000) + ")*((coordinates.x/1000)-" + (u.player.getLocation().getX()/1000) + ")) + " +
-                    "(((coordinates.z/1000)-" + (u.player.getLocation().getZ()/1000) + ")*((coordinates.z/1000)-" + (u.player.getLocation().getZ()/1000) + "))) < " +
+                    "WHERE ((((coordinates.x/1000)-" + (l.getX()/1000) + ")*((coordinates.x/1000)-" + (l.getX()/1000) + ")) + " +
+                    "(((coordinates.z/1000)-" + (l.getZ()/1000) + ")*((coordinates.z/1000)-" + (l.getZ()/1000) + "))) < " +
                     (Network.getInstance().getConfig().getInt("navigation_radius") * Network.getInstance().getConfig().getInt("navigation_radius")) +
-                    " ORDER BY ((((coordinates.x/1000)-" + (u.player.getLocation().getX()/1000) + ")*((coordinates.x/1000)-" + (u.player.getLocation().getX()/1000) + ")) + " +
-                    "(((coordinates.z/1000)-" + (u.player.getLocation().getZ()/1000) + ")*((coordinates.z/1000)-" + (u.player.getLocation().getZ()/1000) + "))) ASC;"));
+                    " ORDER BY ((((coordinates.x/1000)-" + (l.getX()/1000) + ")*((coordinates.x/1000)-" + (l.getX()/1000) + ")) + " +
+                    "(((coordinates.z/1000)-" + (l.getZ()/1000) + ")*((coordinates.z/1000)-" + (l.getZ()/1000) + "))) ASC;"));
         }
 
         createGui();
