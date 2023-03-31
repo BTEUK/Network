@@ -11,6 +11,7 @@ import org.bukkit.Material;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 public class EnglandMenu extends Gui {
 
@@ -32,7 +33,7 @@ public class EnglandMenu extends Gui {
                         Utils.line("North Yorkshire, South Yorkshire"),
                         Utils.line("and West Yorkshire.")),
                 u -> openLocation(u, "Yorkshire",
-                        Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='YORKSHIRE';"))
+                        Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='YORKSHIRE' ORDER BY location ASC;"))
 
         );
 
@@ -45,7 +46,7 @@ public class EnglandMenu extends Gui {
                         Utils.line("Warwickshire, the West Midlands"),
                         Utils.line("and Worcestershire.")),
                 u -> openLocation(u, "West Midlands",
-                        Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='WEST_MIDLANDS';"))
+                        Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='WEST_MIDLANDS' ORDER BY location ASC;"))
 
         );
 
@@ -56,7 +57,7 @@ public class EnglandMenu extends Gui {
                         Utils.line("locations in the City of London"),
                         Utils.line("and Greater London.")),
                 u -> openLocation(u, "London",
-                        Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='LONDON';"))
+                        Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='LONDON' ORDER BY location ASC;"))
 
         );
 
@@ -69,7 +70,7 @@ public class EnglandMenu extends Gui {
                         Utils.line("Northamptonshire, Nottinghamshire"),
                         Utils.line("and Rutland.")),
                 u -> openLocation(u, "East Midlands",
-                        Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='EAST_MIDLANDS';"))
+                        Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='EAST_MIDLANDS' ORDER BY location ASC;"))
 
         );
 
@@ -81,7 +82,7 @@ public class EnglandMenu extends Gui {
                         Utils.line("Cambridgeshire, Essex,"),
                         Utils.line("Hertfordshire, Norfork and Suffolk.")),
                 u -> openLocation(u, "East of England",
-                        Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='EAST_OF_ENGLAND';"))
+                        Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='EAST_OF_ENGLAND' ORDER BY location ASC;"))
 
         );
 
@@ -93,7 +94,7 @@ public class EnglandMenu extends Gui {
                         Utils.line("Cumbria, Greater Manchester,"),
                         Utils.line("Merseyside and Lancashire.")),
                 u -> openLocation(u, "North West",
-                        Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='NORTH_WEST';"))
+                        Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='NORTH_WEST' ORDER BY location ASC;"))
 
         );
 
@@ -104,7 +105,7 @@ public class EnglandMenu extends Gui {
                         Utils.line("locations in Durham,"),
                         Utils.line("Northumberland and Tyne and Wear.")),
                 u -> openLocation(u, "North East",
-                        Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='NORTH_EAST';"))
+                        Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='NORTH_EAST' ORDER BY location ASC;"))
 
         );
 
@@ -116,7 +117,7 @@ public class EnglandMenu extends Gui {
                         Utils.line("Devon, Dorset, Gloucestershire,"),
                         Utils.line("Somerset and Wiltshire.")),
                 u -> openLocation(u, "South West",
-                        Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='SOUTH_WEST';"))
+                        Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='SOUTH_WEST' ORDER BY location ASC;"))
 
         );
 
@@ -130,7 +131,7 @@ public class EnglandMenu extends Gui {
                         Utils.line("Kent, Oxfordshire, Surrey"),
                         Utils.line("and West Sussex.")),
                 u -> openLocation(u, "South East",
-                        Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='SOUTH_EAST';"))
+                        Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='SOUTH_EAST' ORDER BY location ASC;"))
 
         );
 
@@ -168,7 +169,7 @@ public class EnglandMenu extends Gui {
 
         //Switch to location menu with all scotland locations.
         this.delete();
-        u.mainGui = new LocationMenu(name, new HashSet<>(locations), true, false, u);
+        u.mainGui = new LocationMenu(name, new LinkedHashSet<>(locations), true, false, u);
         u.mainGui.open(u);
 
     }

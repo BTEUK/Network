@@ -6,6 +6,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
+import me.bteuk.network.Network;
 import org.bukkit.World;
 
 import java.util.UUID;
@@ -45,6 +46,7 @@ public class WorldGuard {
 
         //Add the group to the region.
         buildRegions.getRegion(region).getMembers().addGroup(group);
+        Network.getInstance().getLogger().info("Added " + group + " to " + region);
 
         //Save the changes
         try {

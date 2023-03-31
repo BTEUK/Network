@@ -1,7 +1,6 @@
 package me.bteuk.network.staff;
 
 import me.bteuk.network.Network;
-import me.bteuk.network.events.EventManager;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.gui.regions.RegionRequests;
 import me.bteuk.network.utils.NetworkUser;

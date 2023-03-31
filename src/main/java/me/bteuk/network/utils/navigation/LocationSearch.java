@@ -14,7 +14,9 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 public class LocationSearch implements Listener {
 
@@ -72,7 +74,9 @@ public class LocationSearch implements Listener {
                     }
                 }
 
-                HashSet<String> searchLocations = new HashSet<>(locations);
+                locations.sort(Comparator.naturalOrder());
+
+                LinkedHashSet<String> searchLocations = new LinkedHashSet<>(locations);
 
 
                 //If there are no locations notify the user.

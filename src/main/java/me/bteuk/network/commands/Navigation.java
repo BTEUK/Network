@@ -4,6 +4,9 @@ import me.bteuk.network.Network;
 import me.bteuk.network.gui.navigation.AddLocation;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.enums.AddLocationType;
+import me.bteuk.network.utils.enums.Categories;
+import me.bteuk.network.utils.enums.Regions;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -36,8 +39,44 @@ public class Navigation implements CommandExecutor {
                 if (u.mainGui != null) {
                     u.mainGui.delete();
                 }
-                u.mainGui = new AddLocation();
+                u.mainGui = new AddLocation(AddLocationType.ADD);
                 u.mainGui.open(u);
+            } else {
+                p.sendMessage(Utils.error("You do not have permission to use this command."));
+            }
+        }
+
+        //Update
+        if (args[0].equalsIgnoreCase("update")) {
+            if (p.hasPermission("uknet.navigation.update")) {
+                if (args.length > 1) {
+                    //Combine all args excluding the first, with spaces, since the name can be multiple words.
+                    String location = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
+
+                    //Check if the location exists.
+                    if (Network.getInstance().globalSQL.hasRow("SELECT location FROM location_data WHERE location='" + location + "';")) {
+                        //Open update location menu.
+                        //They must be staff to access this.
+                        NetworkUser u = Network.getInstance().getUser(p);
+                        if (u.staffGui != null) {
+                            u.staffGui.delete();
+                        }
+                        //Get details from the location.
+                        Categories category = Categories.valueOf(Network.getInstance().globalSQL.getString("SELECT category FROM location_data WHERE location='" + location + "';"));
+                        Regions subcategory = null;
+                        if (category == Categories.ENGLAND) {
+                            //Get subcategory.
+                            subcategory = Regions.valueOf(Network.getInstance().globalSQL.getString("SELECT subcategory FROM location_data WHERE location='" + location + "';"));
+                        }
+                        int coordinate_id = Network.getInstance().globalSQL.getInt("SELECT coordinate FROM location_data WHERE location='" + location + "';");
+                        u.staffGui = new AddLocation(AddLocationType.UPDATE, location, coordinate_id, category, subcategory);
+                        u.staffGui.open(u);
+                    } else {
+                        p.sendMessage(Utils.error("The location &4" + location + " &cdoes not exist."));
+                    }
+                } else {
+                    p.sendMessage(Utils.error("/navigation update <location>"));
+                }
             } else {
                 p.sendMessage(Utils.error("You do not have permission to use this command."));
             }

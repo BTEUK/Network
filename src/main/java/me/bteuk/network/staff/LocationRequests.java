@@ -2,7 +2,11 @@ package me.bteuk.network.staff;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
+import me.bteuk.network.gui.navigation.AddLocation;
 import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.enums.AddLocationType;
+import me.bteuk.network.utils.enums.Categories;
+import me.bteuk.network.utils.enums.Regions;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -41,10 +45,24 @@ public class LocationRequests extends Gui {
                         this.delete();
                         u.staffGui = null;
 
-                        u.staffGui = new LocationRequest(location);
+                        int coordinate_id = Network.getInstance().globalSQL.getInt("SELECT coordinate_id FROM location_requests WHERE location='" + location + "';");
+                        Categories category = Categories.valueOf(Network.getInstance().globalSQL.getString("SELECT category FROM location_requests WHERE location='" + location + "';"));
+
+                        Regions subcategory = null;
+                        if (category == Categories.ENGLAND) {
+                            subcategory = Regions.valueOf(Network.getInstance().globalSQL.getString("SELECT subcategory FROM location_requests WHERE location='" + location + "';"));
+                        }
+
+                        u.staffGui = new AddLocation(AddLocationType.REVIEW, location, coordinate_id, category, subcategory);
                         u.staffGui.open(u);
 
                     });
+
+            slot++;
+
+            if (slot > 16) {
+                break;
+            }
 
         }
 

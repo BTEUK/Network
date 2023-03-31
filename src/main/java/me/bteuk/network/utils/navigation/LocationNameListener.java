@@ -4,6 +4,7 @@ import me.bteuk.network.Network;
 import me.bteuk.network.gui.navigation.AddLocation;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.enums.AddLocationType;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -35,9 +36,18 @@ public class LocationNameListener implements Listener {
                 //Also check if player is actually still online.
                 if (p.isOnline()) {
                     NetworkUser u = Network.getInstance().getUser(p);
-                    if (u.mainGui != null) {
-                        if (u.mainGui instanceof AddLocation) {
-                            u.mainGui.open(u);
+                    //Open staff gui if it's update or review.
+                    if (gui.getType() == AddLocationType.ADD) {
+                        if (u.mainGui != null) {
+                            if (u.mainGui instanceof AddLocation) {
+                                u.mainGui.open(u);
+                            }
+                        }
+                    } else {
+                        if (u.staffGui != null) {
+                            if (u.staffGui instanceof AddLocation) {
+                                u.staffGui.open(u);
+                            }
                         }
                     }
                 }
@@ -73,12 +83,23 @@ public class LocationNameListener implements Listener {
 
                 //If AddLocation gui still exists, reopen it.
                 NetworkUser u = Network.getInstance().getUser(p);
-                if (u.mainGui != null) {
-                    if (u.mainGui instanceof AddLocation) {
-                        Bukkit.getScheduler().runTask(Network.getInstance(), () -> {
-                            u.mainGui.refresh();
-                            u.mainGui.open(u);
-                        });
+                if (gui.getType() == AddLocationType.ADD) {
+                    if (u.mainGui != null) {
+                        if (u.mainGui instanceof AddLocation) {
+                            Bukkit.getScheduler().runTask(Network.getInstance(), () -> {
+                                u.mainGui.refresh();
+                                u.mainGui.open(u);
+                            });
+                        }
+                    }
+                } else {
+                    if (u.staffGui != null) {
+                        if (u.staffGui instanceof AddLocation) {
+                            Bukkit.getScheduler().runTask(Network.getInstance(), () -> {
+                                u.staffGui.refresh();
+                                u.staffGui.open(u);
+                            });
+                        }
                     }
                 }
             }

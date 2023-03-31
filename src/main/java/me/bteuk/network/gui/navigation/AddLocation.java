@@ -1,14 +1,16 @@
 package me.bteuk.network.gui.navigation;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.commands.Back;
+import me.bteuk.network.events.EventManager;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.sql.GlobalSQL;
+import me.bteuk.network.staff.LocationRequests;
+import me.bteuk.network.staff.StaffGui;
 import me.bteuk.network.utils.NetworkUser;
+import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
-import me.bteuk.network.utils.enums.Categories;
-import me.bteuk.network.utils.enums.Counties;
-import me.bteuk.network.utils.enums.Regions;
-import me.bteuk.network.utils.enums.ServerType;
+import me.bteuk.network.utils.enums.*;
 import me.bteuk.network.utils.navigation.LocationNameListener;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -18,23 +20,62 @@ import org.bukkit.Material;
 
 public class AddLocation extends Gui {
 
+    private String old_name;
     private String name;
     private Categories category;
     private Counties county;
+
+    private Regions subcategory;
+    private int coordinate_id;
 
     public SelectCounty selectCounty;
 
     private LocationNameListener locationNameListener;
 
-    public AddLocation() {
+    private final AddLocationType type;
 
-        super(27, Component.text("Add Location", NamedTextColor.AQUA, TextDecoration.BOLD));
+    private GlobalSQL globalSQL;
+
+    public AddLocation(AddLocationType type) {
+
+        super(27, Component.text(type.label + " Location", NamedTextColor.AQUA, TextDecoration.BOLD));
 
         //Set default category to England, since it is the most common.
         category = Categories.ENGLAND;
 
         //Set default county to London, since it is the most common.
         county = Counties.GREATER_LONDON;
+        subcategory = county.region;
+
+        this.type = type;
+
+        createGui();
+
+    }
+
+    //This is used when location details need to be updated.
+    public AddLocation(AddLocationType type, String name, int coordinate_id, Categories category, Regions subcategory) {
+
+        super(27, Component.text(type.label + " Location", NamedTextColor.AQUA, TextDecoration.BOLD));
+
+        //Set name.
+        this.old_name = name;
+        this.name = name;
+
+        //Set coordinate id.
+        this.coordinate_id = coordinate_id;
+
+        //Set category from input.
+        this.category = category;
+
+        //Set county from input, if null then set greater london as default.
+        if (category == Categories.ENGLAND) {
+            county = Counties.GREATER_LONDON;
+        }
+
+        this.subcategory = subcategory;
+
+        this.type = type;
 
         createGui();
 
@@ -46,9 +87,17 @@ public class AddLocation extends Gui {
 
     public void setCounty(Counties county) {
         this.county = county;
+        this.subcategory = county.region;
+    }
+
+    public AddLocationType getType() {
+        return type;
     }
 
     private void createGui() {
+
+        //Get globalSQL.
+        globalSQL = Network.getInstance().globalSQL;
 
         //Set/edit name.
         if (name != null) {
@@ -92,8 +141,7 @@ public class AddLocation extends Gui {
         setItem(15, Utils.createItem(Material.MAP, 1,
                         Utils.title("Select Category"),
                         Utils.line("Click to cycle through categories."),
-                        Utils.line("Current category is:"),
-                        Utils.chat("&7" + category.label),
+                        Utils.line("Current category is: &7" + category.label),
                         Utils.line("Available categories are:"),
                         Utils.line("England, Scotland, Wales, Northern Ireland and Other")),
 
@@ -126,14 +174,60 @@ public class AddLocation extends Gui {
             setItem(16, Utils.createItem(Material.COMPASS, 1,
                             Utils.title("Select County"),
                             Utils.line("Click to select a county."),
-                            Utils.line("Current county is:"),
-                            Utils.chat("&7" + county.label)),
+                            Utils.line("This will update the region."),
+                            Utils.line("The current region is &7" + county.region.label)),
 
                     u -> {
 
                         //Open select county menu.
                         selectCounty = new SelectCounty(this);
                         selectCounty.open(u);
+
+                    });
+        }
+
+        //Teleport location update.
+        //Teleport to location.
+        //These options are not needed for adding a location as that is based on the players current location.
+        if (type != AddLocationType.ADD) {
+
+            //Teleport to location.
+            setItem(21, Utils.createItem(Material.ENDER_PEARL, 1,
+                            Utils.title("Teleport to Location"),
+                            Utils.line("Click to teleport to the location.")),
+                    u -> {
+
+                        //Close inventory.
+                        u.player.closeInventory();
+
+                        //If location is on this server teleport the player, else switch server.
+                        //Teleport to location.
+                        String server = Network.getInstance().globalSQL.getString("SELECT server FROM coordinates WHERE id=" + coordinate_id + ";");
+                        if (Network.SERVER_NAME.equalsIgnoreCase(server)) {
+                            //Get location from coordinate id.
+                            Location l = Network.getInstance().globalSQL.getCoordinate(coordinate_id);
+
+                            //Set current location for /back
+                            Back.setPreviousCoordinate(u.player.getUniqueId().toString(), u.player.getLocation());
+
+                            u.player.teleport(l);
+                        } else {
+                            //Create teleport event and switch server.
+                            EventManager.createTeleportEvent(true, u.player.getUniqueId().toString(), "network", "teleport location_request " + name, u.player.getLocation());
+                            SwitchServer.switchServer(u.player, server);
+                        }
+
+                    });
+
+            //Update teleport location.
+            setItem(23, Utils.createItem(Material.ACACIA_BOAT, 1,
+                            Utils.title("Update teleport location"),
+                            Utils.line("Click to set the teleport"),
+                            Utils.line("location to your current position.")),
+                    u -> {
+
+                        Network.getInstance().globalSQL.updateCoordinate(coordinate_id, u.player.getLocation());
+                        u.player.sendMessage(Utils.success("Updated location to your current position."));
 
                     });
         }
@@ -145,96 +239,207 @@ public class AddLocation extends Gui {
         Add request to database
         Notify reviewers if online using reviewer chat channel
          */
-        setItem(13, Utils.createItem(Material.EMERALD, 1,
-                        Utils.title("Add Location"),
-                        Utils.line("Your location will be added to the exploration menu."),
-                        Utils.line("However, it must first be accepted by a reviewer.")),
+        if (type == AddLocationType.ADD) {
+            setItem(13, Utils.createItem(Material.EMERALD, 1,
+                            Utils.title("Add Location"),
+                            Utils.line("Your location will be added to the exploration menu."),
+                            Utils.line("However, it must first be accepted by a reviewer.")),
 
-                u -> {
+                    u -> {
 
-                    //Get globalSQL.
-                    GlobalSQL globalSQL = Network.getInstance().globalSQL;
+                        //Get globalSQL.
+                        GlobalSQL globalSQL = Network.getInstance().globalSQL;
 
-                    //Checks:
-                    //Name has been set
-                    if (name == null) {
+                        //Checks:
+                        //Name has been set
+                        if (name == null) {
 
-                        u.player.sendMessage(Utils.error("You have not set a name for the location."));
-                        u.player.closeInventory();
+                            u.player.sendMessage(Utils.error("You have not set a name for the location."));
+                            u.player.closeInventory();
 
-                        //Name isn't duplicate
-                    } else if (globalSQL.hasRow("SELECT location FROM location_data WHERE location='" + name + "';")) {
+                            //Name isn't duplicate
+                        } else if (globalSQL.hasRow("SELECT location FROM location_data WHERE location='" + name + "';")) {
 
-                        u.player.sendMessage(Utils.error("A location with this name already exists."));
-                        u.player.closeInventory();
+                            u.player.sendMessage(Utils.error("A location with this name already exists."));
+                            u.player.closeInventory();
 
-                    } else if (globalSQL.hasRow("SELECT location FROM location_requests WHERE location = '" + name + "';")) {
+                        } else if (globalSQL.hasRow("SELECT location FROM location_requests WHERE location = '" + name + "';")) {
 
-                        u.player.sendMessage(Utils.error("A location with this name has already been requested."));
-                        u.player.closeInventory();
+                            u.player.sendMessage(Utils.error("A location with this name has already been requested."));
+                            u.player.closeInventory();
 
-                    } else {
-
-                        Location l = u.player.getLocation();
-
-                        //Create location coordinate.
-                        int coordinate_id = Network.getInstance().globalSQL.addCoordinate(l);
-
-                        //If category is england.
-                        if (category == Categories.ENGLAND) {
-                            //If player is reviewer, skip review.
-                            if (u.player.hasPermission("uknet.navigation.add")) {
-
-                                addLocation(u, globalSQL, name, category, county.region, coordinate_id);
-
-                            } else {
-
-                                requestLocation(u, globalSQL, name, category, county.region, coordinate_id);
-
-                            }
                         } else {
-                            //If player is reviewer, skip review.
-                            if (u.player.hasPermission("uknet.navigation.add")) {
 
-                                addLocation(u, globalSQL, name, category, null, coordinate_id);
+                            Location l = u.player.getLocation();
 
+                            //Create location coordinate.
+                            coordinate_id = Network.getInstance().globalSQL.addCoordinate(l);
+
+                            //If category is england.
+                            if (category == Categories.ENGLAND) {
+                                //If player is reviewer, skip review.
+                                if (u.player.hasPermission("uknet.navigation.add")) {
+
+                                    addLocation(u);
+
+                                } else {
+
+                                    requestLocation(u);
+
+                                }
                             } else {
+                                //If player is reviewer, skip review.
+                                if (u.player.hasPermission("uknet.navigation.add")) {
 
-                                requestLocation(u, globalSQL, name, category, null, coordinate_id);
+                                    addLocation(u);
 
+                                } else {
+
+                                    requestLocation(u);
+
+                                }
                             }
                         }
-                    }
 
-                });
+                    });
+        } else if (type == AddLocationType.UPDATE) {
+            setItem(4, Utils.createItem(Material.EMERALD, 1,
+                            Utils.title("Update Location"),
+                            Utils.line("The location will be updated"),
+                            Utils.line("with the selected settings.")),
+
+                    u -> {
+
+                        //Checks:
+                        //Name isn't duplicate
+                        if (globalSQL.hasRow("SELECT location FROM location_data WHERE location='" + name + " AND coordinate<>" + coordinate_id + "';")) {
+
+                            u.player.sendMessage(Utils.error("Another location with this name already exists."));
+                            u.player.closeInventory();
+
+                        } else if (globalSQL.hasRow("SELECT location FROM location_requests WHERE location = '" + name + " AND coordinate<>" + coordinate_id + "';")) {
+
+                            u.player.sendMessage(Utils.error("A location with this name has already been requested."));
+                            u.player.closeInventory();
+
+                        } else {
+
+                            //If category is england.
+                            if (category == Categories.ENGLAND) {
+                                //If player is reviewer, skip review.
+                                updateLocation(u);
+                            } else {
+                                //If player is reviewer, skip review.
+                                if (u.player.hasPermission("uknet.navigation.add")) {
+
+                                    addLocation(u);
+
+                                } else {
+
+                                    requestLocation(u);
+
+                                }
+                            }
+                        }
+
+                    });
+        } else if (type == AddLocationType.REVIEW) {
+
+            //Accept request.
+            setItem(3, Utils.createItem(Material.LIME_CONCRETE, 1,
+                            Utils.title("Accept Location Request"),
+                            Utils.line("Location will be added to"),
+                            Utils.line("the exploration menu as well as"),
+                            Utils.line("the list of warps.")),
+                    u -> {
+
+                        //Accept request.
+                        acceptRequest(u);
+
+                        //Delete gui and return to previous menu.
+                        this.delete();
+
+                        u.staffGui = new LocationRequests();
+                        u.staffGui.open(u);
+
+                    });
+
+            //Deny request.
+            setItem(5, Utils.createItem(Material.RED_CONCRETE, 1,
+                            Utils.title("Deny Location Request"),
+                            Utils.line("Location request will be denied.")),
+                    u -> {
+
+                        //Delete request.
+                        globalSQL.update("DELETE FROM location_requests WHERE location='" + name + "';");
+
+                        //Notify player.
+                        u.player.sendMessage(Utils.error("Denied location request &4" + name + "&c."));
+
+                        //Delete gui and return to previous menu.
+                        this.delete();
+
+                        u.staffGui = new LocationRequests();
+                        u.staffGui.open(u);
+
+                    });
+        }
 
         //Return
-        setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        Utils.title("Return"),
-                        Utils.line("Open the explore menu.")),
-                u ->
+        if (type == AddLocationType.ADD) {
+            setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
+                            Utils.title("Return"),
+                            Utils.line("Open the explore menu.")),
+                    u ->
 
-                {
+                    {
 
-                    //Delete this gui.
-                    this.delete();
-                    u.mainGui = null;
+                        //Delete this gui.
+                        this.delete();
 
-                    //Switch to navigation menu.
-                    u.mainGui = new ExploreGui(u);
-                    u.mainGui.open(u);
+                        //Switch to navigation menu.
+                        u.mainGui = new ExploreGui(u);
+                        u.mainGui.open(u);
 
-                });
+                    });
+        } else if (type == AddLocationType.REVIEW) {
+            setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
+                            Utils.chat("&b&lReturn"),
+                            Utils.chat("&fReturn to location requests.")),
+                    u -> {
+
+                        //Delete gui and return to previous menu.
+                        this.delete();
+
+                        u.staffGui = new LocationRequests();
+                        u.staffGui.open(u);
+
+                    });
+        } else {
+            setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
+                            Utils.chat("&b&lReturn"),
+                            Utils.chat("&fReturn to staff menu.")),
+                    u -> {
+
+                        //Delete gui and return to previous menu.
+                        this.delete();
+
+                        u.staffGui = new StaffGui(u);
+                        u.staffGui.open(u);
+
+                    });
+        }
+
     }
 
-    public void addLocation(NetworkUser u, GlobalSQL globalSQL, String name, Categories category, Regions region, int coordinate_id) {
+    public void addLocation(NetworkUser u) {
 
-        if (region == null) {
+        if (category == Categories.ENGLAND) {
+            globalSQL.update("INSERT INTO location_data(location,category,subcategory,coordinate) " +
+                    "VALUES('" + name + "','" + category + "','" + subcategory + "'," + coordinate_id + ");");
+        } else {
             globalSQL.update("INSERT INTO location_data(location,category,coordinate) " +
                     "VALUES('" + name + "','" + category + "'," + coordinate_id + ");");
-        } else {
-            globalSQL.update("INSERT INTO location_data(location,category,subcategory,coordinate) " +
-                    "VALUES('" + name + "','" + category + "','" + region + "'," + coordinate_id + ");");
         }
 
         u.player.sendMessage(Utils.success("Location &3" + name + " &aadded to exploration menu."));
@@ -248,14 +453,51 @@ public class AddLocation extends Gui {
 
     }
 
-    public void requestLocation(NetworkUser u, GlobalSQL globalSQL, String name, Categories category, Regions region, int coordinate_id) {
+    public void updateLocation(NetworkUser u) {
 
-        if (region ==  null) {
+        if (category == Categories.ENGLAND) {
+            globalSQL.update("UPDATE location_data SET location='" + name + "',category='" + category + "',subcategory='" + subcategory + "' WHERE location='" + old_name + "';");
+        } else {
+            globalSQL.update("UPDATE location_data SET location='" + name + "',category='" + category + "' WHERE location='" + old_name + "';");
+        }
+
+        u.player.sendMessage(Utils.success("Updated location &3" + name));
+
+        //Delete gui.
+        this.delete();
+        u.staffGui = null;
+
+        u.player.closeInventory();
+
+    }
+
+    public void acceptRequest(NetworkUser u) {
+
+        //Delete request.
+        globalSQL.update("DELETE FROM location_requests WHERE location='" + old_name + "';");
+
+        //Add location.
+        if (category == Categories.ENGLAND) {
+            globalSQL.update("INSERT INTO location_data(location,category,subcategory,coordinate) " +
+                    "VALUES('" + name + "','" + category + "','" + subcategory + "'," + coordinate_id + ");");
+        } else {
+            globalSQL.update("INSERT INTO location_data(location,category,coordinate) " +
+                    "VALUES('" + name + "','" + category + "'," + coordinate_id + ");");
+        }
+
+        //Notify player.
+        u.player.sendMessage(Utils.success("Accepted location request &3" + name + " &a."));
+
+    }
+
+    public void requestLocation(NetworkUser u) {
+
+        if (category == Categories.ENGLAND) {
+            globalSQL.update("INSERT INTO location_requests(location,category,subcategory,coordinate) " +
+                    "VALUES('" + name + "','" + category + "','" + subcategory + "'," + coordinate_id + ");");
+        } else {
             globalSQL.update("INSERT INTO location_requests(location,category,coordinate) " +
                     "VALUES('" + name + "','" + category + "'," + coordinate_id + ");");
-        } else {
-            globalSQL.update("INSERT INTO location_requests(location,category,subcategory,coordinate) " +
-                    "VALUES('" + name + "','" + category + "','" + region + "'," + coordinate_id + ");");
         }
 
         //Notify reviewers.

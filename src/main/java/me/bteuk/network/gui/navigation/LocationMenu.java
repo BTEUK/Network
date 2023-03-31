@@ -14,10 +14,11 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 public class LocationMenu extends Gui {
 
-    private HashSet<String> locations;
+    private LinkedHashSet<String> locations;
 
     private int page;
     private boolean england;
@@ -26,7 +27,7 @@ public class LocationMenu extends Gui {
     private boolean nearby;
     private NetworkUser u;
 
-    public LocationMenu(String title, HashSet<String> locations, boolean england, boolean nearby, NetworkUser u) {
+    public LocationMenu(String title, LinkedHashSet<String> locations, boolean england, boolean nearby, NetworkUser u) {
 
         super(45, Component.text(title, NamedTextColor.AQUA, TextDecoration.BOLD));
 
@@ -179,13 +180,14 @@ public class LocationMenu extends Gui {
         this.clearGui();
 
         //If menu is nearby locations, update the locations.
-        locations = new HashSet<>(Network.getInstance().globalSQL.getStringList("SELECT location_data.location FROM location_data " +
-                "INNER JOIN coordinates ON location_data.coordinate=coordinates.id " +
-                "WHERE (((coordinates.x-" + u.player.getLocation().getX() + ")*(coordinates.x-" + u.player.getLocation().getX() + ")) + " +
-                "((coordinates.z-" + u.player.getLocation().getZ() + ")*(coordinates.z-" + u.player.getLocation().getZ() + "))) < " +
-                ((Network.getInstance().getConfig().getInt("navigation_radius") * 1000) * (Network.getInstance().getConfig().getInt("navigation_radius") * 1000)) +
-                " ORDER BY (((coordinates.x-" + u.player.getLocation().getX() + ")*(coordinates.x-" + u.player.getLocation().getX() + ")) + " +
-                "((coordinates.z-" + u.player.getLocation().getZ() + ")*(coordinates.z-" + u.player.getLocation().getZ() + "))) ASC;"));
+        if (nearby) {
+            locations = new LinkedHashSet<>(Network.getInstance().globalSQL.getStringList("SELECT location_data.location FROM location_data INNER JOIN coordinates ON location_data.coordinate=coordinates.id " +
+                    "WHERE ((((coordinates.x/1000)-" + (u.player.getLocation().getX()/1000) + ")*((coordinates.x/1000)-" + (u.player.getLocation().getX()/1000) + ")) + " +
+                    "(((coordinates.z/1000)-" + (u.player.getLocation().getZ()/1000) + ")*((coordinates.z/1000)-" + (u.player.getLocation().getZ()/1000) + "))) < " +
+                    (Network.getInstance().getConfig().getInt("navigation_radius") * Network.getInstance().getConfig().getInt("navigation_radius")) +
+                    " ORDER BY ((((coordinates.x/1000)-" + (u.player.getLocation().getX()/1000) + ")*((coordinates.x/1000)-" + (u.player.getLocation().getX()/1000) + ")) + " +
+                    "(((coordinates.z/1000)-" + (u.player.getLocation().getZ()/1000) + ")*((coordinates.z/1000)-" + (u.player.getLocation().getZ()/1000) + "))) ASC;"));
+        }
 
         createGui();
 
