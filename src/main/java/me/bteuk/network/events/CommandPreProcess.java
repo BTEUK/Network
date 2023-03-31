@@ -34,8 +34,9 @@ public class CommandPreProcess implements Listener {
         //If player is afk, unset it.
         //Reset last logged time.
         NetworkUser u = instance.getUser(e.getPlayer());
+        u.last_movement = Time.currentTime();
         if (u.afk) {
-            u.last_time_log = u.last_movement = Time.currentTime();
+            u.last_time_log = Time.currentTime();
             u.afk = false;
             Network.getInstance().chat.broadcastMessage("&7" + u.player.getName() + " is no longer afk.", "uknet:globalchat");
         }
@@ -93,13 +94,16 @@ public class CommandPreProcess implements Listener {
 
             if (server != null) {
 
+                u.last_movement = Time.currentTime();
+
                 //Reset last logged time.
                 if (u.afk) {
                     u.last_time_log = Time.currentTime();
-                    u.last_movement = Time.currentTime();
                     u.afk = false;
                     Network.getInstance().chat.broadcastMessage("&7" + u.player.getName() + " is no longer afk.", "uknet:globalchat");
                 }
+
+                u.last_movement = Time.currentTime();
 
                 //Switch the player to that server.
                 ByteArrayDataOutput out = ByteStreams.newDataOutput();
@@ -109,10 +113,11 @@ public class CommandPreProcess implements Listener {
 
             } else {
 
+                u.last_movement = Time.currentTime();
+
                 //Reset last logged time.
                 if (u.afk) {
                     u.last_time_log = Time.currentTime();
-                    u.last_movement = Time.currentTime();
                     u.afk = false;
                 }
 
