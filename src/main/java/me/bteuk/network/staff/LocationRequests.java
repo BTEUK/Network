@@ -37,7 +37,7 @@ public class LocationRequests extends Gui {
         for (String location : locations) {
 
             setItem(slot, Utils.createItem(Material.ORANGE_CONCRETE, 1,
-                            Utils.title("location"),
+                            Utils.title(location),
                             Utils.line("Click to review this location request.")),
                     u -> {
 
@@ -45,7 +45,7 @@ public class LocationRequests extends Gui {
                         this.delete();
                         u.staffGui = null;
 
-                        int coordinate_id = Network.getInstance().globalSQL.getInt("SELECT coordinate_id FROM location_requests WHERE location='" + location + "';");
+                        int coordinate_id = Network.getInstance().globalSQL.getInt("SELECT coordinate FROM location_requests WHERE location='" + location + "';");
                         Categories category = Categories.valueOf(Network.getInstance().globalSQL.getString("SELECT category FROM location_requests WHERE location='" + location + "';"));
 
                         Regions subcategory = null;

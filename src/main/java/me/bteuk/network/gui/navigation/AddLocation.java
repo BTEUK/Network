@@ -518,7 +518,7 @@ public class AddLocation extends Gui {
         }
 
         //Notify player.
-        u.player.sendMessage(Utils.success("Accepted location request &3" + name + " &a."));
+        u.player.sendMessage(Utils.success("Accepted location request &3" + name + "&a."));
 
     }
 

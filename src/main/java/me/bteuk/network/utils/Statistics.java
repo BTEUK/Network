@@ -65,7 +65,7 @@ public class Statistics {
         if (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM statistics WHERE uuid='" + uuid + "' AND on_date='" + date + "';")) {
             Network.getInstance().globalSQL.update("UPDATE statistics SET tpll=tpll+1 WHERE uuid='" + uuid + "' AND on_date='" + date + "';");
         } else {
-            Network.getInstance().globalSQL.update("INSERT INTO statistics(uuid,date,tpll) VALUES('" + uuid + "','" + date + "',1);");
+            Network.getInstance().globalSQL.update("INSERT INTO statistics(uuid,on_date,tpll) VALUES('" + uuid + "','" + date + "',1);");
         }
     }
 }
