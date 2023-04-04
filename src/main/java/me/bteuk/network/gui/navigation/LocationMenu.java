@@ -142,6 +142,8 @@ public class LocationMenu extends Gui {
         this.type = type;
         this.returnMenu = returnMenu;
 
+        this.locations = getLocations();
+
         //On initialization the page is always 1.
         page = 1;
 
@@ -300,7 +302,7 @@ public class LocationMenu extends Gui {
 
         //Check if page has content.
         //Else set it to the maximum possible.
-        if (locations.size()/21 < page) {
+        if (Math.ceil(locations.size()/21.0) < page) {
             page = locations.size()/21;
         }
 
