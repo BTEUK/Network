@@ -54,34 +54,13 @@ public class LocationSearch implements Listener {
                 e.getPlayer().sendMessage(Utils.error("The phrase can't be longer than 64 characters."));
             } else {
 
-                //Search for locations that include this phrase.
-                ArrayList<String> locations = Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE location LIKE '%" + e.getMessage() + "%';");
-
-                //Also search for any regions or counties.
-                for (Counties county : Counties.values()) {
-                    if (StringUtils.containsIgnoreCase(county.label, e.getMessage())) {
-
-                        locations.addAll(Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE subcategory='" + county.region + "';"));
-
-                    }
-                }
-
-                for (Categories category : Categories.values()) {
-                    if (StringUtils.containsIgnoreCase(category.label, e.getMessage())) {
-
-                        locations.addAll(Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='" + category + "';"));
-
-                    }
-                }
-
-                locations.sort(Comparator.naturalOrder());
-
-                LinkedHashSet<String> searchLocations = new LinkedHashSet<>(locations);
+                LocationMenu gui = new LocationMenu("Search: " + e.getMessage(), u, e.getMessage(), "Explore");
 
 
                 //If there are no locations notify the user.
-                if (searchLocations.size() == 0) {
+                if (gui.isEmpty()) {
 
+                    gui.delete();
                     u.player.sendMessage(Utils.error("No locations have been found."));
 
                 } else {
@@ -89,7 +68,7 @@ public class LocationSearch implements Listener {
                     Bukkit.getScheduler().runTask(Network.getInstance(), () -> {
 
                         u.mainGui.delete();
-                        u.mainGui = new LocationMenu("Search: " + e.getMessage(), searchLocations, false, false, u);
+                        u.mainGui = gui;
                         u.mainGui.open(u);
 
                     });

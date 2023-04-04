@@ -9,12 +9,7 @@ import me.bteuk.network.utils.navigation.LocationSearch;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
-
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
 
 public class ExploreGui extends Gui {
 
@@ -108,7 +103,7 @@ public class ExploreGui extends Gui {
                         Utils.title("Scotland"),
                         Utils.line("Click to pick from"),
                         Utils.line("locations in Scotland.")),
-                u -> openLocation("Scotland", Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='SCOTLAND' ORDER BY location ASC;"), u)
+                u -> openLocation("Scotland", u, "Scotland")
         );
 
         //Wales
@@ -116,7 +111,7 @@ public class ExploreGui extends Gui {
                         Utils.title("Wales"),
                         Utils.line("Click to pick from"),
                         Utils.line("locations in Wales.")),
-                u -> openLocation("Wales", Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='WALES' ORDER BY location ASC;"), u)
+                u -> openLocation("Wales", u, "Wales")
         );
 
         //Northern Ireland
@@ -124,7 +119,7 @@ public class ExploreGui extends Gui {
                         Utils.title("Northern Ireland"),
                         Utils.line("Click to pick from"),
                         Utils.line("locations in Norther Ireland.")),
-                u -> openLocation("Northern Ireland", Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='NORTHERN_IRELAND' ORDER BY location ASC;"), u)
+                u -> openLocation("Northern Ireland", u, "Northern Ireland")
         );
 
         //Other
@@ -132,7 +127,7 @@ public class ExploreGui extends Gui {
                         Utils.title("Other"),
                         Utils.line("Click to pick from locations"),
                         Utils.line("not in the 4 countries of the UK.")),
-                u -> openLocation("Other", Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='OTHER' ORDER BY location ASC;"), u)
+                u -> openLocation("Other", u, "Other")
         );
 
         //Suggested Locations
@@ -141,43 +136,14 @@ public class ExploreGui extends Gui {
                         Utils.title("Suggested Locations"),
                         Utils.line("Click to view locations"),
                         Utils.line("that are recommended to view.")),
-                u -> openLocation("Suggested Locations", Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE suggested=1 ORDER BY location ASC;"), u)
-        );
+                u -> openLocation("Suggested Locations", u, "Suggested"));
 
         //Nearby Locations (radius set in config under navigation_radius)
         setItem(22, Utils.createItem(Material.COMPASS, 1,
                         Utils.title("Nearby Locations"),
                         Utils.line("Click to view locations"),
                         Utils.line("in a " + Network.getInstance().getConfig().getInt("navigation_radius") + "km radius.")),
-                u -> {
-
-                    Location l = u.player.getLocation();
-                    String worldName = l.getWorld().getName();
-
-                    //Check if world is in plotsystem.
-                    if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + worldName + "';")) {
-
-                        //Add coordinate transformation.
-                        l = new Location(
-                                Bukkit.getWorld(worldName),
-                                u.player.getLocation().getX() - Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + worldName + "';"),
-                                u.player.getLocation().getY(),
-                                u.player.getLocation().getZ() - Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + worldName + "';"),
-                                u.player.getLocation().getYaw(),
-                                u.player.getLocation().getPitch()
-                        );
-
-                    }
-
-                    openLocation("Nearby Locations", Network.getInstance().globalSQL.getStringList("SELECT location_data.location FROM location_data INNER JOIN coordinates ON location_data.coordinate=coordinates.id " +
-                                    "WHERE ((((coordinates.x/1000)-" + (l.getX()/1000) + ")*((coordinates.x/1000)-" + (l.getX()/1000) + ")) + " +
-                                    "(((coordinates.z/1000)-" + (l.getZ()/1000) + ")*((coordinates.z/1000)-" + (l.getZ()/1000) + "))) < " +
-                                    (Network.getInstance().getConfig().getInt("navigation_radius") * Network.getInstance().getConfig().getInt("navigation_radius")) +
-                                    " ORDER BY ((((coordinates.x/1000)-" + (l.getX()/1000) + ")*((coordinates.x/1000)-" + (l.getX()/1000) + ")) + " +
-                                    "(((coordinates.z/1000)-" + (l.getZ()/1000) + ")*((coordinates.z/1000)-" + (l.getZ()/1000) + "))) ASC;"),
-                            true, u
-                    );
-                });
+                u -> openLocation("Nearby Locations", u, "Nearby"));
 
         //Find Locations
         setItem(23, Utils.createItem(Material.OAK_SIGN, 1,
@@ -215,23 +181,22 @@ public class ExploreGui extends Gui {
 
     }
 
-    private void openLocation(String name, ArrayList<String> locations, NetworkUser u) {
+    private void openLocation(String name, NetworkUser u, String type) {
 
-        openLocation(name, locations, false, u);
+        LocationMenu gui = new LocationMenu(name, u, type, "Explore");
 
-    }
+        if (gui.isEmpty()) {
 
-    private void openLocation(String name, ArrayList<String> locations, boolean nearby, NetworkUser u) {
-
-        if (locations.isEmpty()) {
+            gui.delete();
             u.player.sendMessage(Utils.error("No locations added to the menu in &4" + name + "&c."));
-            return;
+
+        } else {
+
+            //Switch to location menu.
+            this.delete();
+            u.mainGui = gui;
+            u.mainGui.open(u);
+
         }
-
-        //Switch to location menu.
-        this.delete();
-        u.mainGui = new LocationMenu(name, new LinkedHashSet<>(locations), false, nearby, u);
-        u.mainGui.open(u);
-
     }
 }

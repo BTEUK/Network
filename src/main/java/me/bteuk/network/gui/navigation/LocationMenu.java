@@ -7,15 +7,18 @@ import me.bteuk.network.gui.Gui;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
-import me.bteuk.network.utils.enums.ServerType;
+import me.bteuk.network.utils.enums.Categories;
+import me.bteuk.network.utils.enums.Counties;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 
 public class LocationMenu extends Gui {
@@ -23,22 +26,121 @@ public class LocationMenu extends Gui {
     private LinkedHashSet<String> locations;
 
     private int page;
-    private boolean england;
 
-    //This tells us we have the "Nearby Locations" menu open, and when refreshed should update to the current location of the player.
-    private boolean nearby;
-    private NetworkUser u;
+    private final String type;
+    private final String returnMenu;
+    private final NetworkUser u;
 
-    public LocationMenu(String title, LinkedHashSet<String> locations, boolean england, boolean nearby, NetworkUser u) {
+    //Method to determine the search parameters when getting the locations to display in the menu.
+    private LinkedHashSet<String> getLocations() {
+
+        switch (type) {
+
+            //UK Categories (Excluding England)
+            case "Scotland" -> {return new LinkedHashSet<>(Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='SCOTLAND' ORDER BY location ASC;"));}
+            case "Wales" -> {return new LinkedHashSet<>(Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='WALES' ORDER BY location ASC;"));}
+            case "Northern Ireland" -> {return new LinkedHashSet<>(Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='NORTHERN_IRELAND' ORDER BY location ASC;"));}
+            case "Other" -> {return new LinkedHashSet<>(Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='OTHER' ORDER BY location ASC;"));}
+            case "Suggested" -> {return new LinkedHashSet<>(Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE suggested=1 ORDER BY location ASC;"));}
+
+            //Regions of England
+            case "Yorkshire" -> {return new LinkedHashSet<>(Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='YORKSHIRE' ORDER BY location ASC;"));}
+            case "West Midlands" -> {return new LinkedHashSet<>(Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='WEST_MIDLANDS' ORDER BY location ASC;"));}
+            case "London" -> {return new LinkedHashSet<>(Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='LONDON' ORDER BY location ASC;"));}
+            case "East Midlands" -> {return new LinkedHashSet<>(Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='EAST_MIDLANDS' ORDER BY location ASC;"));}
+            case "East of England" -> {return new LinkedHashSet<>(Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='EAST_OF_ENGLAND' ORDER BY location ASC;"));}
+            case "North West" -> {return new LinkedHashSet<>(Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='NORTH_WEST' ORDER BY location ASC;"));}
+            case "North East" -> {return new LinkedHashSet<>(Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='NORTH_EAST' ORDER BY location ASC;"));}
+            case "South East" -> {return new LinkedHashSet<>(Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='SOUTH_EAST' ORDER BY location ASC;"));}
+            case "South West" -> {return new LinkedHashSet<>(Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='SOUTH_WEST' ORDER BY location ASC;"));}
+
+            //Nearby locations to the player.
+            case "Nearby" -> {return getNearbyLocations();}
+
+            //This is for the 'search' case where the location is based on the user input.
+            default -> {return searchLocations();}
+
+        }
+    }
+
+    private LinkedHashSet<String> getNearbyLocations() {
+
+        Location l = u.player.getLocation();
+        String worldName = l.getWorld().getName();
+
+        //Check if world is in plotsystem.
+        if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + worldName + "';")) {
+
+            //Add coordinate transformation.
+            l = new Location(
+                    Bukkit.getWorld(worldName),
+                    u.player.getLocation().getX() - Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + worldName + "';"),
+                    u.player.getLocation().getY(),
+                    u.player.getLocation().getZ() - Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + worldName + "';"),
+                    u.player.getLocation().getYaw(),
+                    u.player.getLocation().getPitch()
+            );
+
+        }
+
+        return new LinkedHashSet<>(Network.getInstance().globalSQL.getStringList("SELECT location_data.location FROM location_data INNER JOIN coordinates ON location_data.coordinate=coordinates.id " +
+                "WHERE ((((coordinates.x/1000)-" + (l.getX() / 1000) + ")*((coordinates.x/1000)-" + (l.getX() / 1000) + ")) + " +
+                "(((coordinates.z/1000)-" + (l.getZ() / 1000) + ")*((coordinates.z/1000)-" + (l.getZ() / 1000) + "))) < " +
+                (Network.getInstance().getConfig().getInt("navigation_radius") * Network.getInstance().getConfig().getInt("navigation_radius")) +
+                " ORDER BY ((((coordinates.x/1000)-" + (l.getX() / 1000) + ")*((coordinates.x/1000)-" + (l.getX() / 1000) + ")) + " +
+                "(((coordinates.z/1000)-" + (l.getZ() / 1000) + ")*((coordinates.z/1000)-" + (l.getZ() / 1000) + "))) ASC;"));
+
+    }
+
+    private LinkedHashSet<String> searchLocations() {
+
+        //Search for locations that include this phrase.
+        ArrayList<String> locations = Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE location LIKE '%" + type + "%';");
+
+        //Also search for any regions or counties.
+        for (Counties county : Counties.values()) {
+            if (StringUtils.containsIgnoreCase(county.label, type)) {
+
+                locations.addAll(Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE subcategory='" + county.region + "';"));
+
+            }
+        }
+
+        for (Categories category : Categories.values()) {
+            if (StringUtils.containsIgnoreCase(category.label, type)) {
+
+                locations.addAll(Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='" + category + "';"));
+
+            }
+        }
+
+        locations.sort(Comparator.naturalOrder());
+
+        return new LinkedHashSet<>(locations);
+
+    }
+
+    //Function to get the gui for the return button.
+    private Gui getReturnGui() {
+        if (returnMenu.equals("England")) {
+
+            return new EnglandMenu();
+
+        } else {
+
+            return new ExploreGui(u);
+
+        }
+    }
+
+    public LocationMenu(String title, NetworkUser u, String type, String returnMenu) {
 
         super(45, Component.text(title, NamedTextColor.AQUA, TextDecoration.BOLD));
 
-        this.locations = locations;
-
-        this.england = england;
-
-        this.nearby = nearby;
         this.u = u;
+
+        this.type = type;
+        this.returnMenu = returnMenu;
 
         //On initialization the page is always 1.
         page = 1;
@@ -183,12 +285,7 @@ public class LocationMenu extends Gui {
                     this.delete();
 
                     //Switch to navigation menu.
-                    //If england is true then return to the england menu.
-                    if (england) {
-                        u.mainGui = new EnglandMenu();
-                    } else {
-                        u.mainGui = new ExploreGui(u);
-                    }
+                    u.mainGui = getReturnGui();
                     u.mainGui.open(u);
 
                 });
@@ -198,36 +295,20 @@ public class LocationMenu extends Gui {
 
         this.clearGui();
 
-        //If menu is nearby locations, update the locations.
-        if (nearby) {
+        //Refresh the location list.
+        locations = getLocations();
 
-            Location l = u.player.getLocation();
-            String worldName = l.getWorld().getName();
-
-            //Check if world is in plotsystem.
-            if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + worldName + "';")) {
-
-                //Add coordinate transformation.
-                l = new Location(
-                        Bukkit.getWorld(worldName),
-                        u.player.getLocation().getX() - Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + worldName + "';"),
-                        u.player.getLocation().getY(),
-                        u.player.getLocation().getZ() - Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + worldName + "';"),
-                        u.player.getLocation().getYaw(),
-                        u.player.getLocation().getPitch()
-                );
-
-            }
-
-            locations = new LinkedHashSet<>(Network.getInstance().globalSQL.getStringList("SELECT location_data.location FROM location_data INNER JOIN coordinates ON location_data.coordinate=coordinates.id " +
-                    "WHERE ((((coordinates.x/1000)-" + (l.getX()/1000) + ")*((coordinates.x/1000)-" + (l.getX()/1000) + ")) + " +
-                    "(((coordinates.z/1000)-" + (l.getZ()/1000) + ")*((coordinates.z/1000)-" + (l.getZ()/1000) + "))) < " +
-                    (Network.getInstance().getConfig().getInt("navigation_radius") * Network.getInstance().getConfig().getInt("navigation_radius")) +
-                    " ORDER BY ((((coordinates.x/1000)-" + (l.getX()/1000) + ")*((coordinates.x/1000)-" + (l.getX()/1000) + ")) + " +
-                    "(((coordinates.z/1000)-" + (l.getZ()/1000) + ")*((coordinates.z/1000)-" + (l.getZ()/1000) + "))) ASC;"));
+        //Check if page has content.
+        //Else set it to the maximum possible.
+        if (locations.size()/21 < page) {
+            page = locations.size()/21;
         }
 
         createGui();
 
+    }
+
+    public boolean isEmpty() {
+        return locations.isEmpty();
     }
 }

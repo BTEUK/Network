@@ -1,6 +1,5 @@
 package me.bteuk.network.gui.navigation;
 
-import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
@@ -8,10 +7,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 
 public class EnglandMenu extends Gui {
 
@@ -32,10 +27,7 @@ public class EnglandMenu extends Gui {
                         Utils.line("locations in the East Riding of Yorkshire,"),
                         Utils.line("North Yorkshire, South Yorkshire"),
                         Utils.line("and West Yorkshire.")),
-                u -> openLocation(u, "Yorkshire",
-                        Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='YORKSHIRE' ORDER BY location ASC;"))
-
-        );
+                u -> openLocation("Yorkshire", u, "Yorkshire"));
 
         //West Midlands: Herefordshire, Shropshire, Staffordshire, Warwickshire, West Midlands and Worcestershire
         setItem(2, Utils.createItem(Material.PURPLE_CONCRETE_POWDER, 1,
@@ -45,10 +37,7 @@ public class EnglandMenu extends Gui {
                         Utils.line("Shropshire, Staffordshire,"),
                         Utils.line("Warwickshire, the West Midlands"),
                         Utils.line("and Worcestershire.")),
-                u -> openLocation(u, "West Midlands",
-                        Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='WEST_MIDLANDS' ORDER BY location ASC;"))
-
-        );
+                u -> openLocation("West Midlands", u, "West Midlands"));
 
         //London: City of London and Greater London
         setItem(4, Utils.createItem(Material.BLUE_CONCRETE_POWDER, 1,
@@ -56,10 +45,7 @@ public class EnglandMenu extends Gui {
                         Utils.line("Click to pick from"),
                         Utils.line("locations in the City of London"),
                         Utils.line("and Greater London.")),
-                u -> openLocation(u, "London",
-                        Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='LONDON' ORDER BY location ASC;"))
-
-        );
+                u -> openLocation("London", u, "London"));
 
         //East Midlands: Derbyshire, Leicestershire, Lincolnshire, Northamptonshire, Nottinghamshire and Rutland
         setItem(6, Utils.createItem(Material.CYAN_CONCRETE_POWDER, 1,
@@ -69,10 +55,7 @@ public class EnglandMenu extends Gui {
                         Utils.line("Leicestershire, Lincolnshire,"),
                         Utils.line("Northamptonshire, Nottinghamshire"),
                         Utils.line("and Rutland.")),
-                u -> openLocation(u, "East Midlands",
-                        Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='EAST_MIDLANDS' ORDER BY location ASC;"))
-
-        );
+                u -> openLocation("East Midlands", u, "East Midlands"));
 
         //East of England: Bedfordshire, Cambridgeshire, Essex, Hertfordshire, Norfolk and Suffolk
         setItem(7, Utils.createItem(Material.YELLOW_CONCRETE_POWDER, 1,
@@ -81,10 +64,7 @@ public class EnglandMenu extends Gui {
                         Utils.line("locations in Bedfordshire,"),
                         Utils.line("Cambridgeshire, Essex,"),
                         Utils.line("Hertfordshire, Norfork and Suffolk.")),
-                u -> openLocation(u, "East of England",
-                        Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='EAST_OF_ENGLAND' ORDER BY location ASC;"))
-
-        );
+                u -> openLocation("East of England", u, "East of England"));
 
         //North West: Cheshire, Cumbria, Greater Manchester, Merseyside and Lancashire
         setItem(11, Utils.createItem(Material.RED_CONCRETE_POWDER, 1,
@@ -93,10 +73,7 @@ public class EnglandMenu extends Gui {
                         Utils.line("locations in Cheshire,"),
                         Utils.line("Cumbria, Greater Manchester,"),
                         Utils.line("Merseyside and Lancashire.")),
-                u -> openLocation(u, "North West",
-                        Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='NORTH_WEST' ORDER BY location ASC;"))
-
-        );
+                u -> openLocation("North West", u, "North West"));
 
         //North East: Durham, Northumberland and Tyne and Wear
         setItem(12, Utils.createItem(Material.ORANGE_CONCRETE_POWDER, 1,
@@ -104,10 +81,7 @@ public class EnglandMenu extends Gui {
                         Utils.line("Click to pick from"),
                         Utils.line("locations in Durham,"),
                         Utils.line("Northumberland and Tyne and Wear.")),
-                u -> openLocation(u, "North East",
-                        Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='NORTH_EAST' ORDER BY location ASC;"))
-
-        );
+                u -> openLocation("North East", u, "North East"));
 
         //South West: Bristol, Cornwall, Devon, Dorset, Gloucestershire, Somerset and Wiltshire
         setItem(14, Utils.createItem(Material.LIGHT_BLUE_CONCRETE_POWDER, 1,
@@ -116,10 +90,7 @@ public class EnglandMenu extends Gui {
                         Utils.line("locations in Bristol, Cornwall,"),
                         Utils.line("Devon, Dorset, Gloucestershire,"),
                         Utils.line("Somerset and Wiltshire.")),
-                u -> openLocation(u, "South West",
-                        Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='SOUTH_WEST' ORDER BY location ASC;"))
-
-        );
+                u -> openLocation("South West", u, "South West"));
 
         //South East: Berkshire, Buckinghamshire, East Sussex, Hampshire, the Isle of Wight, Kent, Oxfordshire, Surrey and West Sussex
         setItem(15, Utils.createItem(Material.LIME_CONCRETE_POWDER, 1,
@@ -130,10 +101,7 @@ public class EnglandMenu extends Gui {
                         Utils.line("Hampshire, the Isle of Wight,"),
                         Utils.line("Kent, Oxfordshire, Surrey"),
                         Utils.line("and West Sussex.")),
-                u -> openLocation(u, "South East",
-                        Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data WHERE category='ENGLAND' AND subcategory='SOUTH_EAST' ORDER BY location ASC;"))
-
-        );
+                u -> openLocation("South East", u, "South East"));
 
         //Return
         setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
@@ -160,17 +128,22 @@ public class EnglandMenu extends Gui {
 
     }
 
-    private void openLocation(NetworkUser u, String name, ArrayList<String> locations) {
+    private void openLocation(String name, NetworkUser u, String type) {
 
-        if (locations.isEmpty()) {
+        LocationMenu gui = new LocationMenu(name, u, type, "England");
+
+        if (gui.isEmpty()) {
+
+            gui.delete();
             u.player.sendMessage(Utils.error("No locations added to the menu in &4" + name + "&c."));
-            return;
+
+        } else {
+
+            //Switch to location menu with all scotland locations.
+            this.delete();
+            u.mainGui = new LocationMenu(name, u, type, "England");
+            u.mainGui.open(u);
+
         }
-
-        //Switch to location menu with all scotland locations.
-        this.delete();
-        u.mainGui = new LocationMenu(name, new LinkedHashSet<>(locations), true, false, u);
-        u.mainGui.open(u);
-
     }
 }
