@@ -95,3 +95,11 @@ CREATE TABLE IF NOT EXISTS zones
     is_public      TINYINT(1)  NULL DEFAULT 0,
     PRIMARY KEY(id)
 );
+
+CREATE TABLE IF NOT EXISTS plot_submissions
+(
+    id          INT         NOT NULL,
+    submit_time BIGINT      NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (id) REFERENCES plot_data(id)
+);
