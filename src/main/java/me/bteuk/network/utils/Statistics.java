@@ -20,8 +20,6 @@ public class Statistics {
         //Add time difference to active session.
         u.active_time += time_diff;
 
-        Network.getInstance().getLogger().info("Adding playtime " + time_diff);
-
         //Add time to database, if date doesn't exist, create it.
         if (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM statistics WHERE uuid='" + u.player.getUniqueId() + "' AND on_date='" + date + "';")) {
             Network.getInstance().globalSQL.update("UPDATE statistics SET playtime=playtime+" + time_diff + " WHERE uuid='" + u.player.getUniqueId() + "' AND on_date='" + date + "';");

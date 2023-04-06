@@ -29,9 +29,11 @@ public class CommandPreProcess implements Listener {
         //Replace /region with /network:region
         if (e.getMessage().startsWith("/region")) {
             e.setMessage(e.getMessage().replace("/region", "/network:region"));
-        } else if (e.getMessage().startsWith("/afk")) {
+        } else if (e.getMessage().startsWith("/tpll")) {
+            e.setMessage(e.getMessage().replace("/tpll", "/network:tpll"));
+        }
 
-        } else {
+        if (!e.getMessage().startsWith("/afk")) {
 
             //If player is afk, unset it.
             //Reset last logged time.
@@ -55,7 +57,7 @@ public class CommandPreProcess implements Listener {
 
                 //Delay shutdown by 3 seconds to make sure players have switched server.
                 s.setCancelled(true);
-                Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "stop"),60L);
+                Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "stop"), 60L);
             }
         }
     }
