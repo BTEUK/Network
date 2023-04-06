@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS plot_submissions
 (
     id          INT         NOT NULL,
     submit_time BIGINT      NOT NULL,
-    last_query  BIGINT      NOT NULL,
+    last_query  BIGINT      NULL DEFAULT 0,
     PRIMARY KEY (id),
     FOREIGN KEY (id) REFERENCES plot_data(id)
 );
