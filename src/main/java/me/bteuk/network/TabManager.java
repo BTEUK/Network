@@ -9,8 +9,6 @@ import com.comphenix.protocol.wrappers.PlayerInfoData;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.comphenix.protocol.wrappers.WrappedGameProfile;
 import me.bteuk.network.utils.Utils;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.InvocationTargetException;
@@ -18,15 +16,15 @@ import java.util.*;
 
 public class TabManager {
 
-    private Network instance;
+    private final Network instance;
 
-    private ProtocolManager pm;
+    private final ProtocolManager pm;
     private PacketListener pl;
 
     //private List<TextComponent> headers = new ArrayList<>();
     //private List<TextComponent> footers = new ArrayList<>();
 
-    private HashMap<String, PlayerInfoData> fakePlayers;
+    private final HashMap<String, PlayerInfoData> fakePlayers;
 
     public TabManager(Network instance) {
 
@@ -59,7 +57,7 @@ public class TabManager {
 
             PlayerInfoData playerInfoData = new PlayerInfoData(profile, 0, EnumWrappers.NativeGameMode.CREATIVE, null);
 
-            instance.getLogger().info("Added " + name + " to fake players list.");
+            //instance.getLogger().info("Added " + name + " to fake players list.");
             fakePlayers.put(uuid, playerInfoData);
 
             //Also add them to tab.
@@ -80,7 +78,7 @@ public class TabManager {
         //If the uuid exists remove them from tab.
         if (playerInfoData != null) {
 
-            instance.getLogger().info("Removed " + playerInfoData.getProfile().getName() + " from fake players list.");
+            //instance.getLogger().info("Removed " + playerInfoData.getProfile().getName() + " from fake players list.");
 
             PacketContainer packetOut = pm.createPacket(PacketType.Play.Server.PLAYER_INFO);
             packetOut.getPlayerInfoAction().write(0, EnumWrappers.PlayerInfoAction.REMOVE_PLAYER);
@@ -100,19 +98,11 @@ public class TabManager {
 
         switch (info[0]) {
 
-            case "add" -> {
+            case "add" -> //Add the fake player to tab, if the player is on this server they won't be added.
+                    addFakePlayer(info[1]);
 
-                //Add the fake player to tab, if the player is on this server they won't be added.
-                addFakePlayer(info[1]);
-
-            }
-
-            case "remove" -> {
-
-                //Remove the fake player from tab, if the player isn't in the fake player list it won't do anything.
-                removeFakePlayer(info[1]);
-
-            }
+            case "remove" -> //Remove the fake player from tab, if the player isn't in the fake player list it won't do anything.
+                    removeFakePlayer(info[1]);
 
             //TODO UPDATE
 
@@ -172,7 +162,7 @@ public class TabManager {
 
                     packet.getPlayerInfoDataLists().write(0, infoList);
 
-                    instance.getLogger().info("Intercepting ADD_PLAYER packet, setting display name for " + displayName);
+                    //instance.getLogger().info("Intercepting ADD_PLAYER packet, setting display name for " + displayName);
 
                     event.setPacket(packet);
 
