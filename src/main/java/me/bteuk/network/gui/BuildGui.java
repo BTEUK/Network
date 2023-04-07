@@ -6,6 +6,7 @@ import me.bteuk.network.events.EventManager;
 import me.bteuk.network.gui.plotsystem.PlotMenu;
 import me.bteuk.network.gui.plotsystem.PlotServerLocations;
 import me.bteuk.network.gui.plotsystem.PlotsystemLocations;
+import me.bteuk.network.gui.plotsystem.ZoneMenu;
 import me.bteuk.network.gui.regions.RegionInfo;
 import me.bteuk.network.gui.regions.RegionMenu;
 import me.bteuk.network.utils.NetworkUser;
@@ -407,7 +408,7 @@ public class BuildGui extends Gui {
                 });
 
         //Region menu.
-        setItem(23, Utils.createItem(Material.CHEST, 1,
+        setItem(6, Utils.createItem(Material.ORANGE_SHULKER_BOX, 1,
                         Utils.title("Region Menu"),
                         Utils.line("View all regions you can build in.")),
                 u ->
@@ -420,6 +421,24 @@ public class BuildGui extends Gui {
 
                     //Switch to plot menu.
                     u.mainGui = new RegionMenu(u);
+                    u.mainGui.open(u);
+
+                });
+
+        //Zone menu.
+        setItem(6, Utils.createItem(Material.BARREL, 1,
+                        Utils.title("Zones Menu"),
+                        Utils.line("View all zones you can build in.")),
+                u ->
+
+                {
+
+                    //Delete this gui.
+                    this.delete();
+                    u.mainGui = null;
+
+                    //Switch to plot menu.
+                    u.mainGui = new ZoneMenu(u);
                     u.mainGui.open(u);
 
                 });

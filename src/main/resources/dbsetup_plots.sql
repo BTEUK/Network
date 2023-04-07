@@ -16,7 +16,36 @@ CREATE TABLE IF NOT EXISTS plot_members
     uuid        CHAR(36)    NOT NULL,
     is_owner    TINYINT(1)  NULL DEFAULT 0,
     last_enter  BIGINT      NOT NULL,
-    PRIMARY KEY(id, uuid)
+    PRIMARY KEY(id, uuid),
+    FOREIGN KEY (id) REFERENCES plot_data(id)
+);
+
+CREATE TABLE IF NOT EXISTS plot_corners
+(
+    id          INT         NOT NULL,
+    corner      INT         NOT NULL,
+    x           INT         NOT NULL,
+    z           INT         NOT NULL,
+    PRIMARY KEY(id,corner),
+    FOREIGN KEY (id) REFERENCES plot_data(id)
+);
+
+CREATE TABLE IF NOT EXISTS plot_invites
+(
+    id          INT         NOT NULL,
+    owner       CHAR(36)    NOT NULL,
+    uuid        CHAR(36)    NOT NULL,
+    PRIMARY KEY(id,uuid),
+    FOREIGN KEY (id) REFERENCES plot_data(id)
+);
+
+CREATE TABLE IF NOT EXISTS plot_submissions
+(
+    id          INT         NOT NULL,
+    submit_time BIGINT      NOT NULL,
+    last_query  BIGINT      NULL DEFAULT 0,
+    PRIMARY KEY (id),
+    FOREIGN KEY (id) REFERENCES plot_data(id)
 );
 
 CREATE TABLE IF NOT EXISTS accept_data
@@ -28,7 +57,8 @@ CREATE TABLE IF NOT EXISTS accept_data
     accuracy    INT         NOT NULL,
     quality     INT         NOT NULL,
     accept_time BIGINT      NOT NULL,
-    PRIMARY KEY(id)
+    PRIMARY KEY(id),
+    FOREIGN KEY (id) REFERENCES plot_data(id)
 );
 
 CREATE TABLE IF NOT EXISTS deny_data
@@ -39,7 +69,8 @@ CREATE TABLE IF NOT EXISTS deny_data
     book_id     INT         NOT NULL,
     attempt     INT         NOT NULL,
     deny_time   BIGINT      NOT NULL,
-    PRIMARY KEY(id, uuid, attempt)
+    PRIMARY KEY(id, uuid, attempt),
+    FOREIGN KEY (id) REFERENCES plot_data(id)
 );
 
 CREATE TABLE IF NOT EXISTS book_data
@@ -48,15 +79,6 @@ CREATE TABLE IF NOT EXISTS book_data
     page        INT         NOT NULL,
     contents    VARCHAR(798)    NOT NULL,
     PRIMARY KEY(id, page)
-);
-
-CREATE TABLE IF NOT EXISTS plot_corners
-(
-    id          INT         NOT NULL,
-    corner      INT         NOT NULL,
-    x           INT         NOT NULL,
-    z           INT         NOT NULL,
-    PRIMARY KEY(id,corner)
 );
 
 CREATE TABLE IF NOT EXISTS location_data
@@ -71,14 +93,6 @@ CREATE TABLE IF NOT EXISTS location_data
     PRIMARY KEY(name)
 );
 
-CREATE TABLE IF NOT EXISTS plot_invites
-(
-    id          INT         NOT NULL,
-    owner       CHAR(36)    NOT NULL,
-    uuid        CHAR(36)    NOT NULL,
-    PRIMARY KEY(id,uuid)
-);
-
 CREATE TABLE IF NOT EXISTS regions
 (
     region      VARCHAR(16) NOT NULL,
@@ -91,16 +105,17 @@ CREATE TABLE IF NOT EXISTS zones
 (
     id          INT         AUTO_INCREMENT,
     location    VARCHAR(64) NOT NULL,
+    status      ENUM('open','closed')   NOT NULL,
     expiration  BIGINT      NOT NULL,
     is_public      TINYINT(1)  NULL DEFAULT 0,
     PRIMARY KEY(id)
 );
 
-CREATE TABLE IF NOT EXISTS plot_submissions
+CREATE TABLE IF NOT EXISTS zone_members
 (
     id          INT         NOT NULL,
-    submit_time BIGINT      NOT NULL,
-    last_query  BIGINT      NULL DEFAULT 0,
-    PRIMARY KEY (id),
-    FOREIGN KEY (id) REFERENCES plot_data(id)
+    uuid        CHAR(36)    NOT NULL,
+    is_owner    TINYINT(1)  NULL DEFAULT 0
+    PRIMARY KEY(id, uuid),
+    FOREIGN KEY (id) REFERENCES zone_data(id)
 );
