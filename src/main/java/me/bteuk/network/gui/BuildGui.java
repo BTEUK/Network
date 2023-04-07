@@ -10,7 +10,6 @@ import me.bteuk.network.gui.plotsystem.ZoneMenu;
 import me.bteuk.network.gui.regions.RegionInfo;
 import me.bteuk.network.gui.regions.RegionMenu;
 import me.bteuk.network.utils.NetworkUser;
-import me.bteuk.network.utils.Roles;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.enums.ServerType;
 import me.bteuk.network.utils.Utils;
@@ -433,13 +432,22 @@ public class BuildGui extends Gui {
 
                 {
 
-                    //Delete this gui.
-                    this.delete();
-                    u.mainGui = null;
+                    //Must be a jr.builder to open this menu.
+                    if (u.player.hasPermission("uknet.zones.join")) {
 
-                    //Switch to plot menu.
-                    u.mainGui = new ZoneMenu(u);
-                    u.mainGui.open(u);
+                        //Delete this gui.
+                        this.delete();
+                        u.mainGui = null;
+
+                        //Switch to plot menu.
+                        u.mainGui = new ZoneMenu(u);
+                        u.mainGui.open(u);
+
+                    } else {
+
+                        u.player.sendMessage(Utils.error("You must be at least a Jr.Builder to join zones."));
+
+                    }
 
                 });
 

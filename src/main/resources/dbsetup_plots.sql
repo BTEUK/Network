@@ -119,3 +119,12 @@ CREATE TABLE IF NOT EXISTS zone_members
     PRIMARY KEY(id, uuid),
     FOREIGN KEY (id) REFERENCES zone_data(id)
 );
+
+CREATE TABLE IF NOT EXISTS zone_invites
+(
+    id          INT         NOT NULL,
+    owner       CHAR(36)    NOT NULL,
+    uuid        CHAR(36)    NOT NULL,
+    PRIMARY KEY(id,uuid),
+    FOREIGN KEY (id) REFERENCES zone_data(id)
+);
