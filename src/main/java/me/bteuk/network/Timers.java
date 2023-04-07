@@ -240,31 +240,33 @@ public class Timers {
             //Check for inactive owners.
             //If the region has members then make another member the new owner,
             //If the region has no members then set it inactive.
-            inactive_owners.clear();
-            inactive_owners = instance.regionSQL.getInactives("SELECT region,uuid FROM region_members WHERE is_owner=1 AND last_enter<" + (Time.currentTime() - inactivity) + ";");
+            if (Network.REGIONS_ENABLED) {
+                inactive_owners.clear();
+                inactive_owners = instance.regionSQL.getInactives("SELECT region,uuid FROM region_members WHERE is_owner=1 AND last_enter<" + (Time.currentTime() - inactivity) + ";");
 
-            for (Inactivity inactive : inactive_owners) {
+                for (Inactivity inactive : inactive_owners) {
 
-                //Check if there is another member in this region, they must be active.
-                if (inactive.region.hasActiveMember(Time.currentTime() - inactivity)) {
+                    //Check if there is another member in this region, they must be active.
+                    if (inactive.region.hasActiveMember(Time.currentTime() - inactivity)) {
 
-                    //Get most recent member.
-                    uuid = inactive.region.getRecentMember();
+                        //Get most recent member.
+                        uuid = inactive.region.getRecentMember();
 
-                    //Make the previous owner a member.
-                    inactive.region.makeMember();
+                        //Make the previous owner a member.
+                        inactive.region.makeMember();
 
-                    //Give the new player ownership.
-                    inactive.region.makeOwner(uuid);
+                        //Give the new player ownership.
+                        inactive.region.makeOwner(uuid);
 
-                    //Update any requests to take into account the new region owner.
-                    inactive.region.updateRequests();
+                        //Update any requests to take into account the new region owner.
+                        inactive.region.updateRequests();
 
-                } else {
+                    } else {
 
-                    //Set region as inactive.
-                    inactive.region.setInactive();
+                        //Set region as inactive.
+                        inactive.region.setInactive();
 
+                    }
                 }
             }
 

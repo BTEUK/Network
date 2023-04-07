@@ -94,6 +94,8 @@ public final class Network extends JavaPlugin {
     public static int MIN_Y;
     public static int MAX_Y;
 
+    public static boolean REGIONS_ENABLED;
+
     @Override
     public void onEnable() {
 
@@ -202,7 +204,8 @@ public final class Network extends JavaPlugin {
         new PlayerInteract(this);
 
         //Create regionManager if enabled.
-        if (config.getBoolean("regions_enabled")) {
+        REGIONS_ENABLED = config.getBoolean("regions_enabled");
+        if (REGIONS_ENABLED) {
             regionManager = new RegionManager(regionSQL);
         }
 
