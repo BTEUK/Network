@@ -1,7 +1,5 @@
 package me.bteuk.network.gui.plotsystem;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 import me.bteuk.network.Network;
 import me.bteuk.network.events.EventManager;
 import me.bteuk.network.gui.*;
@@ -226,7 +224,7 @@ public class PlotInfo extends Gui {
                         u.mainGui = null;
 
                         //Switch back to plot menu.
-                        u.mainGui = new PlotMembers(plotID);
+                        u.mainGui = new PlotsystemMembers(plotID, RegionType.PLOT);
                         u.mainGui.open(u);
 
                     });

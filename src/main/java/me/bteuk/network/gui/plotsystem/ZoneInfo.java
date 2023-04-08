@@ -6,18 +6,13 @@ import me.bteuk.network.gui.Gui;
 import me.bteuk.network.gui.InviteMembers;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
-import me.bteuk.network.utils.PlotValues;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.RegionType;
-import net.buildtheearth.terraminusminus.generator.EarthGeneratorSettings;
-import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
@@ -84,14 +79,14 @@ public class ZoneInfo extends Gui {
 
                 });
 
-        //If you the owner of this plot.
+        //If you the owner of this zone.
         if (plotSQL.hasRow("SELECT id FROM zone_members WHERE id=" + zoneID + " AND uuid='" + uuid + "' AND is_owner=1;")) {
 
             //Delete zone button.
             //Beware, this will revert any progress made in the zone!
             setItem(6, Utils.createItem(Material.RED_CONCRETE, 1,
-                            Utils.title("Delete Plot"),
-                            Utils.line("Delete the plot and all its contents.")),
+                            Utils.title("Delete Zone"),
+                            Utils.line("Delete the zone and all its contents.")),
                     u -> {
 
                         //Delete this gui.
@@ -107,8 +102,8 @@ public class ZoneInfo extends Gui {
             //Close and save zone.
             //This will save the progress and then close the zone.
             setItem(6, Utils.createItem(Material.RED_CONCRETE, 1,
-                            Utils.title("Delete Plot"),
-                            Utils.line("Delete the plot and all its contents.")),
+                            Utils.title("Save and close Zone"),
+                            Utils.line("Close the Zone and save its contents.")),
                     u -> {
 
                         //Delete this gui.
@@ -116,7 +111,7 @@ public class ZoneInfo extends Gui {
                         u.mainGui = null;
 
                         //Switch back to plot menu.
-                        //u.mainGui = new DeleteConfirm(plotID);
+                        //TODO Save and delete zone!
                         u.mainGui.open(u);
 
                     });
@@ -131,8 +126,8 @@ public class ZoneInfo extends Gui {
                         this.delete();
                         u.mainGui = null;
 
-                        //Switch back to plot menu.
-                        u.mainGui = new PlotMembers(plotID);
+                        //Open the members menu.
+                        u.mainGui = new PlotsystemMembers(zoneID, RegionType.ZONE);
                         u.mainGui.open(u);
 
                     });
@@ -177,8 +172,8 @@ public class ZoneInfo extends Gui {
                         //Add server event to leave plot.
                         globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + u.player.getUniqueId() + "','plotsystem','" +
                                 plotSQL.getString("SELECT server FROM location_data WHERE name='" +
-                                        plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + "';") +
-                                "','leave plot " + plotID + "');");
+                                        plotSQL.getString("SELECT location FROM plot_data WHERE id=" + zoneID + ";") + "';") +
+                                "','leave plot " + zoneID + "');");
 
                     });
 
