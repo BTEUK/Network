@@ -1,10 +1,12 @@
 package me.bteuk.network.gui.plotsystem;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.events.EventManager;
+import me.bteuk.network.gui.BuildGui;
 import me.bteuk.network.gui.Gui;
-import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.enums.RegionType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -12,13 +14,15 @@ import org.bukkit.Material;
 
 public class DeleteConfirm extends Gui {
 
-    private final int plotID;
+    private final int id;
+    private final RegionType regionType;
 
-    public DeleteConfirm(int plotID) {
+    public DeleteConfirm(int id, RegionType regionType) {
 
-        super(27, Component.text("Delete Plot " + plotID, NamedTextColor.AQUA, TextDecoration.BOLD));
+        super(27, Component.text("Delete " + regionType.label + " " + id, NamedTextColor.AQUA, TextDecoration.BOLD));
 
-        this.plotID = plotID;
+        this.id = id;
+        this.regionType = regionType;
 
         createGui();
 
@@ -29,34 +33,42 @@ public class DeleteConfirm extends Gui {
         //Get plot sql.
         PlotSQL plotSQL = Network.getInstance().plotSQL;
 
-        //Get global sql.
-        GlobalSQL globalSQL = Network.getInstance().globalSQL;
-
         //Delete plot
         setItem(13, Utils.createItem(Material.TNT, 1,
-                        Utils.title("Delete Plot " + plotID),
-                        Utils.line("Delete the plot and its contents.")),
+                        Utils.title("Delete " + regionType.label + " " + id),
+                        Utils.line("Delete the " + regionType.label + " and its contents.")),
                 u -> {
 
                     //Delete this inventory.
                     this.delete();
                     u.mainGui = null;
 
-                    //Create plot menu, so the next time you open the navigator you return to that.
-                    u.mainGui = new PlotMenu(u);
+                    //Create plot or zone menu, so the next time you open the navigator you return to that.
+                    //Then add server event to delete plot or zone.
+                    if (regionType == RegionType.PLOT) {
 
-                    //Add server event to delete plot.
-                    globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + u.player.getUniqueId() + "','plotsystem','" +
-                            plotSQL.getString("SELECT server FROM location_data WHERE name='" +
-                                    plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + "';") +
-                            "','delete plot " + plotID + "');");
+                        u.mainGui = new PlotMenu(u);
+
+                        //Add server event to delete plot or zone.
+                        EventManager.createEvent(u.player.getUniqueId().toString(), "plotsystem", plotSQL.getString("SELECT server FROM location_data WHERE name='" +
+                                plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";") + "';"), "delete plot " + id);
+
+                    } else if (regionType == RegionType.ZONE) {
+
+                        u.mainGui = new ZoneMenu(u);
+
+                        //Add server event to delete plot or zone.
+                        EventManager.createEvent(u.player.getUniqueId().toString(), "plotsystem", plotSQL.getString("SELECT server FROM location_data WHERE name='" +
+                                plotSQL.getString("SELECT location FROM zones WHERE id=" + id + ";") + "';"), "delete zone " + id);
+
+                    }
 
                 });
 
         //Return to plot info menu.
         setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
                         Utils.title("Return"),
-                        Utils.line("Return to the menu of plot " + plotID + ".")),
+                        Utils.line("Return to the menu of " + regionType.label + " " + id + ".")),
                 u ->
 
                 {
@@ -65,8 +77,21 @@ public class DeleteConfirm extends Gui {
                     this.delete();
                     u.mainGui = null;
 
-                    //Switch back to plot info.
-                    u.mainGui = new PlotInfo(plotID, u.player.getUniqueId().toString());
+                    //Switch back to plot or zone info.
+                    if (regionType == RegionType.PLOT) {
+
+                        u.mainGui = new PlotInfo(id, u.player.getUniqueId().toString());
+
+                    } else if (regionType == RegionType.ZONE) {
+
+                        u.mainGui = new ZoneInfo(id, u.player.getUniqueId().toString());
+
+                    } else {
+
+                        u.mainGui = new BuildGui(u);
+
+                    }
+
                     u.mainGui.open(u);
 
                 });

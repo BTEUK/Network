@@ -208,7 +208,7 @@ public class PlotInfo extends Gui {
                             u.mainGui = null;
 
                             //Switch back to plot menu.
-                            u.mainGui = new DeleteConfirm(plotID);
+                            u.mainGui = new DeleteConfirm(plotID, RegionType.PLOT);
                             u.mainGui.open(u);
 
                         });

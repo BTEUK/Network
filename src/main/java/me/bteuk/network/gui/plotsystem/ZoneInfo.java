@@ -99,7 +99,7 @@ public class ZoneInfo extends Gui {
                         u.mainGui = null;
 
                         //Switch back to plot menu.
-                        u.mainGui = new DeleteConfirm(plotID);
+                        u.mainGui = new DeleteConfirm(zoneID, RegionType.ZONE);
                         u.mainGui.open(u);
 
                     });
@@ -116,7 +116,7 @@ public class ZoneInfo extends Gui {
                         u.mainGui = null;
 
                         //Switch back to plot menu.
-                        u.mainGui = new DeleteConfirm(plotID);
+                        //u.mainGui = new DeleteConfirm(plotID);
                         u.mainGui.open(u);
 
                     });
