@@ -10,6 +10,7 @@ import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.PlotValues;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.enums.RegionType;
 import net.buildtheearth.terraminusminus.generator.EarthGeneratorSettings;
 import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
 import net.kyori.adventure.text.Component;
@@ -242,7 +243,7 @@ public class PlotInfo extends Gui {
                         u.mainGui = null;
 
                         //Switch back to plot menu.
-                        u.mainGui = new InvitePlotMembers(plotID);
+                        u.mainGui = new InviteMembers(plotID, RegionType.PLOT);
                         u.mainGui.open(u);
 
                     });

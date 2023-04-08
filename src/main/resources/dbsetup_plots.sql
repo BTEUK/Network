@@ -108,6 +108,7 @@ CREATE TABLE IF NOT EXISTS zones
     status      ENUM('open','closed')   NOT NULL,
     expiration  BIGINT      NOT NULL,
     is_public      TINYINT(1)  NULL DEFAULT 0,
+    location    VARCHAR(64) NOT NULL,
     PRIMARY KEY(id)
 );
 
@@ -115,7 +116,7 @@ CREATE TABLE IF NOT EXISTS zone_members
 (
     id          INT         NOT NULL,
     uuid        CHAR(36)    NOT NULL,
-    is_owner    TINYINT(1)  NULL DEFAULT 0
+    is_owner    TINYINT(1)  NULL DEFAULT 0,
     PRIMARY KEY(id, uuid),
     FOREIGN KEY (id) REFERENCES zone_data(id)
 );
@@ -126,5 +127,15 @@ CREATE TABLE IF NOT EXISTS zone_invites
     owner       CHAR(36)    NOT NULL,
     uuid        CHAR(36)    NOT NULL,
     PRIMARY KEY(id,uuid),
+    FOREIGN KEY (id) REFERENCES zone_data(id)
+);
+
+CREATE TABLE IF NOT EXISTS zone_corners
+(
+    id          INT         NOT NULL,
+    corner      INT         NOT NULL,
+    x           INT         NOT NULL,
+    z           INT         NOT NULL,
+    PRIMARY KEY(id,corner),
     FOREIGN KEY (id) REFERENCES zone_data(id)
 );

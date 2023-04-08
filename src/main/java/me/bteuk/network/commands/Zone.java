@@ -11,7 +11,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class Plot implements CommandExecutor {
+public class Zone implements CommandExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
@@ -24,25 +24,25 @@ public class Plot implements CommandExecutor {
         }
 
         if (args.length < 2) {
-            p.sendMessage(Utils.error("/plot join <plotID>"));
+            p.sendMessage(Utils.error("/zone join <zoneID>"));
             return true;
         }
 
-        int plotID;
+        int zoneID;
 
-        //Check if the plotID is an actual number.
+        //Check if the zoneID is an actual number.
         try {
 
-            plotID = Integer.parseInt(args[1]);
+            zoneID = Integer.parseInt(args[1]);
 
         } catch (NumberFormatException e) {
-            p.sendMessage(Utils.error("/plot join <plotID>"));
+            p.sendMessage(Utils.error("/zone join <plotID>"));
             return true;
         }
 
         //Check if the first arg is 'join'
         if (!args[0].equals("join")) {
-            p.sendMessage(Utils.error("/plot join <plotID>"));
+            p.sendMessage(Utils.error("/zone join <plotID>"));
             return true;
         }
 
@@ -50,23 +50,19 @@ public class Plot implements CommandExecutor {
         PlotSQL plotSQL = Network.getInstance().plotSQL;
 
         //Check if they have an invite for this plot.
-        if (plotSQL.hasRow("SELECT id FROM plot_invites WHERE id=" + plotID + " AND uuid='" + p.getUniqueId() + "';")) {
+        if (plotSQL.hasRow("SELECT id FROM zone_invites WHERE id=" + zoneID + " AND uuid='" + p.getUniqueId() + "';")) {
 
             //Add server event to join plot.
             EventManager.createEvent(p.getUniqueId().toString(), "plotsystem", plotSQL.getString("SELECT server FROM location_data WHERE name='" +
-                    plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + "';"), "join plot " + plotID);
-            globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + p.getUniqueId() + "'," + "'plotsystem'" + ",'" +
-                    plotSQL.getString("SELECT server FROM location_data WHERE name='" +
-                            plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + "';") +
-                    "','join plot " + plotID + "');");
+                    plotSQL.getString("SELECT location FROM zones WHERE id=" + zoneID + ";") + "';"), "join zone " + zoneID);
 
             //Remove invite.
-            plotSQL.update("DELETE FROM plot_invites WHERE id=" + plotID + " AND uuid='" + p.getUniqueId() + "';");
+            plotSQL.update("DELETE FROM plot_invites WHERE id=" + zoneID + " AND uuid='" + p.getUniqueId() + "';");
 
             return true;
 
         } else {
-            p.sendMessage(Utils.error("You have not been invited to join this plot."));
+            p.sendMessage(Utils.error("You have not been invited to join this Zone."));
             return true;
         }
     }

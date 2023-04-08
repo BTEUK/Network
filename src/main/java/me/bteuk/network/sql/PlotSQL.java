@@ -67,6 +67,28 @@ public class PlotSQL {
         }
     }
 
+    public long getLong(String sql) {
+
+        try (Connection conn = conn();
+             PreparedStatement statement = conn.prepareStatement(sql);
+             ResultSet results = statement.executeQuery()) {
+
+            if (results.next()) {
+
+                return results.getLong(1);
+
+            } else {
+
+                return 0;
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
     public ArrayList<Integer> getIntList(String sql) {
 
         ArrayList<Integer> list = new ArrayList<>();

@@ -1,6 +1,7 @@
 package me.bteuk.network.gui.plotsystem;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.events.EventManager;
 import me.bteuk.network.gui.BuildGui;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.sql.PlotSQL;
@@ -81,7 +82,12 @@ public class ZoneMenu extends Gui {
                                 Utils.line("Click to join this zone.")),
                         u -> {
 
-                            //TODO: Join the zone and then teleport there.
+                            //Add server event to join zone.
+                            EventManager.createEvent(u.player.getUniqueId().toString(), "plotsystem",
+                                    plotSQL.getString("SELECT server FROM location_data WHERE name='" +
+                                            plotSQL.getString("SELECT location FROM zones WHERE id=" + zones.get(finalI) + ";") + "';"),
+                                    "join zone " + zones.get(finalI));
+
 
                         });
 

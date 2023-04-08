@@ -37,6 +37,27 @@ public class InviteEvent {
                 p.spigot().sendMessage(message);
 
             }
+        } else if (event[1].equals("zone")) {
+
+            //Get player.
+            Player p = Bukkit.getPlayer(UUID.fromString(uuid));
+
+            //Send the player a message telling them the command to join the plot.
+            if (p != null) {
+
+                GlobalSQL globalSQL = Network.getInstance().globalSQL;
+                PlotSQL plotSQL = Network.getInstance().plotSQL;
+
+                int id = Integer.parseInt(event[2]);
+
+                p.sendMessage(Utils.success("You have been invited to zone &3" + event[2] + " &aby &3" +
+                        globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + plotSQL.getString("SELECT owner FROM zone_invites WHERE id=" + id + ";") + "';")));
+
+                TextComponent message = new TextComponent(Utils.success("To join the zone click &3here&a!"));
+                message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/zone join " + event[2]));
+                p.spigot().sendMessage(message);
+
+            }
         } else if (event[1].equals("region")) {
 
             //Get player.

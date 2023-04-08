@@ -4,9 +4,11 @@ import me.bteuk.network.Network;
 import me.bteuk.network.commands.Back;
 import me.bteuk.network.events.EventManager;
 import me.bteuk.network.gui.Gui;
+import me.bteuk.network.gui.InviteMembers;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.enums.RegionType;
 import me.bteuk.network.utils.regions.Region;
 import me.bteuk.network.utils.regions.RegionTagListener;
 import net.kyori.adventure.text.Component;
@@ -209,7 +211,7 @@ public class RegionInfo extends Gui {
                         //Open the invite member menu.
                         this.delete();
 
-                        u.mainGui = new InviteRegionMembers(region);
+                        u.mainGui = new InviteMembers(region, RegionType.REGION);
                         u.mainGui.open(u);
 
                     });
