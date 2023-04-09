@@ -110,8 +110,8 @@ public class ZoneInfo extends Gui {
                         this.delete();
                         u.mainGui = null;
 
-                        //Switch back to plot menu.
-                        //TODO Save and delete zone!
+                        //Open close confirm menu.
+                        u.mainGui = new CloseConfirm(zoneID);
                         u.mainGui.open(u);
 
                     });
@@ -149,10 +149,46 @@ public class ZoneInfo extends Gui {
 
                     });
 
-        } else {
-            //You are a member of this plot.
+            //Set public/private
+            if (plotSQL.hasRow("SELECT id FROM zones WHERE id=" + zoneID + " WHERE is_public=1;")) {
 
-            //Leave zone.
+                setItem(20, Utils.createItem(Material.OAK_BOAT, 1,
+                                Utils.title("Set Private"),
+                                Utils.line("Private zones require you to"),
+                                Utils.line("invite people if they want to build.")),
+                        u -> {
+
+                            //Set zone to private and refresh this gui.
+                            plotSQL.update("UPDATE zones SET is_public=0 WHERE id=" + zoneID + ";");
+
+                            this.refresh();
+                            u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
+
+                        });
+
+            } else {
+
+                setItem(20, Utils.createItem(Material.OAK_BOAT, 1,
+                                Utils.title("Set Public"),
+                                Utils.line("Public zones allow Jr.Builder+"),
+                                Utils.line("to join the zone without invitation.")),
+                        u -> {
+
+                            //Set zone to private and refresh this gui.
+                            plotSQL.update("UPDATE zones SET is_public=1 WHERE id=" + zoneID + ";");
+
+                            this.refresh();
+                            u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
+
+                        });
+            }
+
+
+            //TODO Extend duration
+
+        } else {
+
+            //You are a member of this zone.
             setItem(20, Utils.createItem(Material.RED_CONCRETE, 1,
                             Utils.title("Leave Zone"),
                             Utils.line("You will not be able to build in the zone once you leave.")),
@@ -162,9 +198,9 @@ public class ZoneInfo extends Gui {
                         this.delete();
                         u.mainGui = null;
 
-                        //Switch back to plot menu.
+                        //Switch back to zone menu,
                         Bukkit.getScheduler().scheduleSyncDelayedTask(Network.getInstance(), () -> {
-                            u.mainGui = new PlotMenu(u);
+                            u.mainGui = new ZoneMenu(u);
                             u.mainGui.open(u);
                         }, 20L);
 
@@ -172,8 +208,8 @@ public class ZoneInfo extends Gui {
                         //Add server event to leave plot.
                         globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + u.player.getUniqueId() + "','plotsystem','" +
                                 plotSQL.getString("SELECT server FROM location_data WHERE name='" +
-                                        plotSQL.getString("SELECT location FROM plot_data WHERE id=" + zoneID + ";") + "';") +
-                                "','leave plot " + zoneID + "');");
+                                        plotSQL.getString("SELECT location FROM zones WHERE id=" + zoneID + ";") + "';") +
+                                "','leave zone " + zoneID + "');");
 
                     });
 
