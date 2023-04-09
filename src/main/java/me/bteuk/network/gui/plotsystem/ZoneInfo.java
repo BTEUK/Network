@@ -84,7 +84,7 @@ public class ZoneInfo extends Gui {
 
             //Delete zone button.
             //Beware, this will revert any progress made in the zone!
-            setItem(6, Utils.createItem(Material.RED_CONCRETE, 1,
+            setItem(5, Utils.createItem(Material.RED_CONCRETE, 1,
                             Utils.title("Delete Zone"),
                             Utils.line("Delete the zone and all its contents.")),
                     u -> {
@@ -101,7 +101,7 @@ public class ZoneInfo extends Gui {
 
             //Close and save zone.
             //This will save the progress and then close the zone.
-            setItem(6, Utils.createItem(Material.RED_CONCRETE, 1,
+            setItem(3, Utils.createItem(Material.LIME_CONCRETE, 1,
                             Utils.title("Save and close Zone"),
                             Utils.line("Close the Zone and save its contents.")),
                     u -> {
@@ -117,7 +117,7 @@ public class ZoneInfo extends Gui {
                     });
 
             //If zone has members, edit plot members.
-            setItem(21, Utils.createItem(Material.PLAYER_HEAD, 1,
+            setItem(19, Utils.createItem(Material.PLAYER_HEAD, 1,
                             Utils.title("Zone Members"),
                             Utils.line("Manage the members of your zone.")),
                     u -> {
@@ -133,7 +133,7 @@ public class ZoneInfo extends Gui {
                     });
 
             //Invite new members to your zone.
-            setItem(20, Utils.createItem(Material.OAK_BOAT, 1,
+            setItem(18, Utils.createItem(Material.OAK_BOAT, 1,
                             Utils.title("Invite Members"),
                             Utils.line("Invite a new member to your zone."),
                             Utils.line("You can only invite online users.")),
@@ -152,7 +152,7 @@ public class ZoneInfo extends Gui {
             //Set public/private
             if (plotSQL.hasRow("SELECT id FROM zones WHERE id=" + zoneID + " WHERE is_public=1;")) {
 
-                setItem(20, Utils.createItem(Material.OAK_BOAT, 1,
+                setItem(21, Utils.createItem(Material.OAK_BOAT, 1,
                                 Utils.title("Set Private"),
                                 Utils.line("Private zones require you to"),
                                 Utils.line("invite people if they want to build.")),
@@ -168,7 +168,7 @@ public class ZoneInfo extends Gui {
 
             } else {
 
-                setItem(20, Utils.createItem(Material.OAK_BOAT, 1,
+                setItem(21, Utils.createItem(Material.OAK_BOAT, 1,
                                 Utils.title("Set Public"),
                                 Utils.line("Public zones allow Jr.Builder+"),
                                 Utils.line("to join the zone without invitation.")),
@@ -183,13 +183,98 @@ public class ZoneInfo extends Gui {
                         });
             }
 
+            //Extend zone duration (can't exceed maximum of 48 hours).
+            setItem(23, Utils.createItem(Material.CLOCK, 2,
+                            Utils.title("Extend Zone Duration by 2 Hours"),
+                            Utils.line("Increases the expiration time"),
+                            Utils.line("of the zone by 2 hours,"),
+                            Utils.line("can't exceed the maximum of 48 hours.")),
+                    u -> {
 
-            //TODO Extend duration
+                        //Get expiration time.
+                        long expiration = plotSQL.getLong("SELECT expiration FROM zones WHERE id=" + zoneID + ";") + (1000L * 60L * 60L * 2L);
+
+                        //Get maximum expiration time.
+                        long max_time = Time.currentTime() + 1000L * 60L * 60L * 48L;
+
+                        if (expiration > max_time) {
+
+                            plotSQL.update("UPDATE zones SET expiration=" + max_time + " WHERE id=" + zoneID);
+                            u.player.sendMessage(Utils.success("Set Zone expiration time to &3" + Time.getDateTime(max_time)));
+
+                        } else {
+
+                            plotSQL.update("UPDATE zones SET expiration=" + expiration + " WHERE id=" + zoneID);
+                            u.player.sendMessage(Utils.success("Set Zone expiration time to &3" + Time.getDateTime(expiration)));
+
+                        }
+
+                        u.player.closeInventory();
+
+                    });
+
+            setItem(24, Utils.createItem(Material.CLOCK, 6,
+                            Utils.title("Extend Zone Duration by 6 Hours"),
+                            Utils.line("Increases the expiration time"),
+                            Utils.line("of the zone by 6 hours,"),
+                            Utils.line("can't exceed the maximum of 48 hours.")),
+                    u -> {
+
+                        //Get expiration time.
+                        long expiration = plotSQL.getLong("SELECT expiration FROM zones WHERE id=" + zoneID + ";") + (1000L * 60L * 60L * 6L);
+
+                        //Get maximum expiration time.
+                        long max_time = Time.currentTime() + 1000L * 60L * 60L * 48L;
+
+                        if (expiration > max_time) {
+
+                            plotSQL.update("UPDATE zones SET expiration=" + max_time + " WHERE id=" + zoneID);
+                            u.player.sendMessage(Utils.success("Set Zone expiration time to &3" + Time.getDateTime(max_time)));
+
+                        } else {
+
+                            plotSQL.update("UPDATE zones SET expiration=" + expiration + " WHERE id=" + zoneID);
+                            u.player.sendMessage(Utils.success("Set Zone expiration time to &3" + Time.getDateTime(expiration)));
+
+                        }
+
+                        u.player.closeInventory();
+
+                    });
+
+            setItem(25, Utils.createItem(Material.OAK_BOAT, 24,
+                            Utils.title("Extend Zone Duration by 24 Hours"),
+                            Utils.line("Increases the expiration time"),
+                            Utils.line("of the zone by 24 hours,"),
+                            Utils.line("can't exceed the maximum of 48 hours.")),
+                    u -> {
+
+                        //Get expiration time.
+                        long expiration = plotSQL.getLong("SELECT expiration FROM zones WHERE id=" + zoneID + ";") + (1000L * 60L * 60L * 24L);
+
+                        //Get maximum expiration time.
+                        long max_time = Time.currentTime() + 1000L * 60L * 60L * 48L;
+
+                        if (expiration > max_time) {
+
+                            plotSQL.update("UPDATE zones SET expiration=" + max_time + " WHERE id=" + zoneID);
+                            u.player.sendMessage(Utils.success("Set Zone expiration time to &3" + Time.getDateTime(max_time)));
+
+                        } else {
+
+                            plotSQL.update("UPDATE zones SET expiration=" + expiration + " WHERE id=" + zoneID);
+                            u.player.sendMessage(Utils.success("Set Zone expiration time to &3" + Time.getDateTime(expiration)));
+
+                        }
+
+                        u.player.closeInventory();
+
+                    });
 
         } else {
 
             //You are a member of this zone.
-            setItem(20, Utils.createItem(Material.RED_CONCRETE, 1,
+            setItem(4, Utils.createItem(Material.RED_CONCRETE, 1,
                             Utils.title("Leave Zone"),
                             Utils.line("You will not be able to build in the zone once you leave.")),
                     u -> {
