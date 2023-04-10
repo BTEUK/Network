@@ -231,7 +231,7 @@ public class InviteMembers extends Gui {
 
     }
 
-    public boolean isMember(String uuid) {
+    public boolean isInvited(String uuid) {
 
         //Check whether the player is not already the owner or member of the region, plot or zone, if true skip them.
         if (regionType == RegionType.REGION) {
@@ -257,7 +257,7 @@ public class InviteMembers extends Gui {
         return false;
     }
 
-    public boolean isInvited(String uuid) {
+    public boolean isMember(String uuid) {
 
         if (regionType == RegionType.REGION) {
 

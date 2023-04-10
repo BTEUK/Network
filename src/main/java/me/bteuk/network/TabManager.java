@@ -92,8 +92,6 @@ public class TabManager {
     //Handles the different types of tab updates sent from other servers.
     public void updateAll(String message) {
 
-        instance.getLogger().info(message);
-
         String[] info = message.split(" ");
 
         switch (info[0]) {
