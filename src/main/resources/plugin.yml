@@ -96,3 +96,6 @@ commands:
     aliases: [lobby]
     usage: /<command>
     description: Teleport to spawnpoint in lobby.
+  zone:
+    usage: /<command>
+    description: Zone command.

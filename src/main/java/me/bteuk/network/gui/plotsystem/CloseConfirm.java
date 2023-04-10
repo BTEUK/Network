@@ -30,7 +30,7 @@ public class CloseConfirm extends Gui {
         PlotSQL plotSQL = Network.getInstance().plotSQL;
 
         //Save and Close zone.
-        setItem(13, Utils.createItem(Material.TNT, 1,
+        setItem(13, Utils.createItem(Material.LIME_CONCRETE, 1,
                         Utils.title("Save and Close Zone " + id),
                         Utils.line("Saves the zone and closes it.")),
                 u -> {
@@ -62,7 +62,7 @@ public class CloseConfirm extends Gui {
 
                     //Switch back to zone info.
                     u.mainGui = new ZoneInfo(id, u.player.getUniqueId().toString());
-                    u.mainGui.open(u);
+                    u.player.closeInventory();
 
                 });
     }

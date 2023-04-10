@@ -252,6 +252,8 @@ public final class Network extends JavaPlugin {
 
         //Enable commands.
         getCommand("plot").setExecutor(new Plot());
+        getCommand("zone").setExecutor(new Zone());
+
         getCommand("navigator").setExecutor(new Navigator());
 
         getCommand("staff").setExecutor(new Staff());
@@ -324,40 +326,42 @@ public final class Network extends JavaPlugin {
             timers.close();
         }
 
-        for (NetworkUser u : getUsers()) {
+        if (getUsers() != null) {
+            for (NetworkUser u : getUsers()) {
 
-            String uuid = u.player.getUniqueId().toString();
+                String uuid = u.player.getUniqueId().toString();
 
-            //Remove any outstanding invites that this player has sent.
-            instance.plotSQL.update("DELETE FROM plot_invites WHERE owner='" + uuid + "';");
+                //Remove any outstanding invites that this player has sent.
+                instance.plotSQL.update("DELETE FROM plot_invites WHERE owner='" + uuid + "';");
 
-            //Remove any outstanding invites that this player has received.
-            instance.plotSQL.update("DELETE FROM plot_invites WHERE uuid='" + uuid + "';");
+                //Remove any outstanding invites that this player has received.
+                instance.plotSQL.update("DELETE FROM plot_invites WHERE uuid='" + uuid + "';");
 
-            //Set last_online time in playerdata.
-            instance.globalSQL.update("UPDATE player_data SET last_online=" + Time.currentTime() + " WHERE UUID='" + uuid + "';");
+                //Set last_online time in playerdata.
+                instance.globalSQL.update("UPDATE player_data SET last_online=" + Time.currentTime() + " WHERE UUID='" + uuid + "';");
 
-            //Remove player from online_users.
-            instance.globalSQL.update("DELETE FROM online_users WHERE uuid='" + uuid + "';");
+                //Remove player from online_users.
+                instance.globalSQL.update("DELETE FROM online_users WHERE uuid='" + uuid + "';");
 
-            //Update tab for all players.
-            //This is done with the tab chat channel.
-            instance.chat.broadcastMessage("remove " + uuid, "uknet:tab");
+                //Update tab for all players.
+                //This is done with the tab chat channel.
+                instance.chat.broadcastMessage("remove " + uuid, "uknet:tab");
 
-            //Log playercount in database
-            instance.globalSQL.update("INSERT INTO player_count(log_time,players) VALUES(" + Time.currentTime() + "," +
-                    instance.globalSQL.getInt("SELECT count(uuid) FROM online_users;") + ");");
+                //Log playercount in database
+                instance.globalSQL.update("INSERT INTO player_count(log_time,players) VALUES(" + Time.currentTime() + "," +
+                        instance.globalSQL.getInt("SELECT count(uuid) FROM online_users;") + ");");
 
-            //Reset last logged time.
-            if (u.afk) {
-                u.last_time_log = u.last_movement = Time.currentTime();
-                u.afk = false;
+                //Reset last logged time.
+                if (u.afk) {
+                    u.last_time_log = u.last_movement = Time.currentTime();
+                    u.afk = false;
+                }
+
+                //Update statistics
+                long time = Time.currentTime();
+                Statistics.save(u, Time.getDate(time), time);
+
             }
-
-            //Update statistics
-            long time = Time.currentTime();
-            Statistics.save(u, Time.getDate(time), time);
-
         }
 
         //Disable bungeecord channel.

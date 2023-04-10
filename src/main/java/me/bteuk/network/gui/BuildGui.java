@@ -425,8 +425,8 @@ public class BuildGui extends Gui {
                 });
 
         //Zone menu.
-        setItem(6, Utils.createItem(Material.BARREL, 1,
-                        Utils.title("Zones Menu"),
+        setItem(23, Utils.createItem(Material.BARREL, 1,
+                        Utils.title("Zone Menu"),
                         Utils.line("View all zones you can build in.")),
                 u ->
 

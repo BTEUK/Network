@@ -45,7 +45,7 @@ public class ZoneInfo extends Gui {
                 Utils.line("Zone Owner: &7" + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
                         plotSQL.getString("SELECT uuid FROM zone_members WHERE id=" + zoneID + " AND is_owner=1;") + "';")),
                 Utils.line("Plot Members: &7" + plotSQL.getInt("SELECT COUNT(uuid) FROM zone_members WHERE id=" + zoneID + " AND is_owner=0;")),
-                Utils.line("Expiration: &7" + Time.getDateTime(plotSQL.getLong("SELECT expiration FROM zone_info WHERE id=" + zoneID + ";"))),
+                Utils.line("Expiration: &7" + Time.getDateTime(plotSQL.getLong("SELECT expiration FROM zones WHERE id=" + zoneID + ";"))),
                 Utils.line("Public: &7" + (plotSQL.hasRow("SELECT id FROM zones WHERE id=" + zoneID + " AND is_public=1") ? "True" : "False"))));
 
         setItem(24, Utils.createItem(Material.ENDER_PEARL, 1,
@@ -84,7 +84,7 @@ public class ZoneInfo extends Gui {
 
             //Delete zone button.
             //Beware, this will revert any progress made in the zone!
-            setItem(5, Utils.createItem(Material.RED_CONCRETE, 1,
+            setItem(6, Utils.createItem(Material.RED_CONCRETE, 1,
                             Utils.title("Delete Zone"),
                             Utils.line("Delete the zone and all its contents.")),
                     u -> {
@@ -101,7 +101,7 @@ public class ZoneInfo extends Gui {
 
             //Close and save zone.
             //This will save the progress and then close the zone.
-            setItem(3, Utils.createItem(Material.LIME_CONCRETE, 1,
+            setItem(2, Utils.createItem(Material.LIME_CONCRETE, 1,
                             Utils.title("Save and close Zone"),
                             Utils.line("Close the Zone and save its contents.")),
                     u -> {
@@ -150,9 +150,9 @@ public class ZoneInfo extends Gui {
                     });
 
             //Set public/private
-            if (plotSQL.hasRow("SELECT id FROM zones WHERE id=" + zoneID + " WHERE is_public=1;")) {
+            if (plotSQL.hasRow("SELECT id FROM zones WHERE id=" + zoneID + " AND is_public=1;")) {
 
-                setItem(21, Utils.createItem(Material.OAK_BOAT, 1,
+                setItem(20, Utils.createItem(Material.IRON_DOOR, 1,
                                 Utils.title("Set Private"),
                                 Utils.line("Private zones require you to"),
                                 Utils.line("invite people if they want to build.")),
@@ -168,7 +168,7 @@ public class ZoneInfo extends Gui {
 
             } else {
 
-                setItem(21, Utils.createItem(Material.OAK_BOAT, 1,
+                setItem(20, Utils.createItem(Material.OAK_DOOR, 1,
                                 Utils.title("Set Public"),
                                 Utils.line("Public zones allow Jr.Builder+"),
                                 Utils.line("to join the zone without invitation.")),
@@ -184,7 +184,7 @@ public class ZoneInfo extends Gui {
             }
 
             //Extend zone duration (can't exceed maximum of 48 hours).
-            setItem(23, Utils.createItem(Material.CLOCK, 2,
+            setItem(22, Utils.createItem(Material.CLOCK, 2,
                             Utils.title("Extend Zone Duration by 2 Hours"),
                             Utils.line("Increases the expiration time"),
                             Utils.line("of the zone by 2 hours,"),
@@ -213,7 +213,7 @@ public class ZoneInfo extends Gui {
 
                     });
 
-            setItem(24, Utils.createItem(Material.CLOCK, 6,
+            setItem(23, Utils.createItem(Material.CLOCK, 6,
                             Utils.title("Extend Zone Duration by 6 Hours"),
                             Utils.line("Increases the expiration time"),
                             Utils.line("of the zone by 6 hours,"),
@@ -242,7 +242,7 @@ public class ZoneInfo extends Gui {
 
                     });
 
-            setItem(25, Utils.createItem(Material.OAK_BOAT, 24,
+            setItem(24, Utils.createItem(Material.CLOCK, 24,
                             Utils.title("Extend Zone Duration by 24 Hours"),
                             Utils.line("Increases the expiration time"),
                             Utils.line("of the zone by 24 hours,"),
