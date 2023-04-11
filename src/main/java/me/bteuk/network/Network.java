@@ -332,10 +332,12 @@ public final class Network extends JavaPlugin {
                 String uuid = u.player.getUniqueId().toString();
 
                 //Remove any outstanding invites that this player has sent.
-                instance.plotSQL.update("DELETE FROM plot_invites WHERE owner='" + uuid + "';");
+                plotSQL.update("DELETE FROM plot_invites WHERE owner='" + uuid + "';");
+                plotSQL.update("DELETE FROM zone_invites WHERE owner='" + uuid + "';");
 
                 //Remove any outstanding invites that this player has received.
-                instance.plotSQL.update("DELETE FROM plot_invites WHERE uuid='" + uuid + "';");
+                plotSQL.update("DELETE FROM plot_invites WHERE uuid='" + uuid + "';");
+                plotSQL.update("DELETE FROM zone_invites WHERE uuid='" + uuid + "';");
 
                 //Set last_online time in playerdata.
                 instance.globalSQL.update("UPDATE player_data SET last_online=" + Time.currentTime() + " WHERE UUID='" + uuid + "';");

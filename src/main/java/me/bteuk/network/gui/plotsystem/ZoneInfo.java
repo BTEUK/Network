@@ -48,7 +48,7 @@ public class ZoneInfo extends Gui {
                 Utils.line("Expiration: &7" + Time.getDateTime(plotSQL.getLong("SELECT expiration FROM zones WHERE id=" + zoneID + ";"))),
                 Utils.line("Public: &7" + (plotSQL.hasRow("SELECT id FROM zones WHERE id=" + zoneID + " AND is_public=1") ? "True" : "False"))));
 
-        setItem(24, Utils.createItem(Material.ENDER_PEARL, 1,
+        setItem(8, Utils.createItem(Material.ENDER_PEARL, 1,
                         Utils.title("Teleport to Zone"),
                         Utils.line("Click to teleport to this zone.")),
 
@@ -117,7 +117,7 @@ public class ZoneInfo extends Gui {
                     });
 
             //If zone has members, edit plot members.
-            setItem(19, Utils.createItem(Material.PLAYER_HEAD, 1,
+            setItem(9, Utils.createItem(Material.PLAYER_HEAD, 1,
                             Utils.title("Zone Members"),
                             Utils.line("Manage the members of your zone.")),
                     u -> {
@@ -133,7 +133,7 @@ public class ZoneInfo extends Gui {
                     });
 
             //Invite new members to your zone.
-            setItem(18, Utils.createItem(Material.OAK_BOAT, 1,
+            setItem(0, Utils.createItem(Material.OAK_BOAT, 1,
                             Utils.title("Invite Members"),
                             Utils.line("Invite a new member to your zone."),
                             Utils.line("You can only invite online users.")),
@@ -152,7 +152,7 @@ public class ZoneInfo extends Gui {
             //Set public/private
             if (plotSQL.hasRow("SELECT id FROM zones WHERE id=" + zoneID + " AND is_public=1;")) {
 
-                setItem(20, Utils.createItem(Material.IRON_DOOR, 1,
+                setItem(18, Utils.createItem(Material.IRON_DOOR, 1,
                                 Utils.title("Set Private"),
                                 Utils.line("Private zones require you to"),
                                 Utils.line("invite people if they want to build.")),
@@ -168,7 +168,7 @@ public class ZoneInfo extends Gui {
 
             } else {
 
-                setItem(20, Utils.createItem(Material.OAK_DOOR, 1,
+                setItem(18, Utils.createItem(Material.OAK_DOOR, 1,
                                 Utils.title("Set Public"),
                                 Utils.line("Public zones allow Jr.Builder+"),
                                 Utils.line("to join the zone without invitation.")),
@@ -184,7 +184,7 @@ public class ZoneInfo extends Gui {
             }
 
             //Extend zone duration (can't exceed maximum of 48 hours).
-            setItem(22, Utils.createItem(Material.CLOCK, 2,
+            setItem(21, Utils.createItem(Material.CLOCK, 2,
                             Utils.title("Extend Zone Duration by 2 Hours"),
                             Utils.line("Increases the expiration time"),
                             Utils.line("of the zone by 2 hours,"),
@@ -213,7 +213,7 @@ public class ZoneInfo extends Gui {
 
                     });
 
-            setItem(23, Utils.createItem(Material.CLOCK, 6,
+            setItem(22, Utils.createItem(Material.CLOCK, 6,
                             Utils.title("Extend Zone Duration by 6 Hours"),
                             Utils.line("Increases the expiration time"),
                             Utils.line("of the zone by 6 hours,"),
@@ -242,7 +242,7 @@ public class ZoneInfo extends Gui {
 
                     });
 
-            setItem(24, Utils.createItem(Material.CLOCK, 24,
+            setItem(23, Utils.createItem(Material.CLOCK, 24,
                             Utils.title("Extend Zone Duration by 24 Hours"),
                             Utils.line("Increases the expiration time"),
                             Utils.line("of the zone by 24 hours,"),
@@ -297,7 +297,6 @@ public class ZoneInfo extends Gui {
                                 "','leave zone " + zoneID + "');");
 
                     });
-
         }
 
         //Return

@@ -40,7 +40,7 @@ public class CloseConfirm extends Gui {
                     u.mainGui = null;
 
                     u.mainGui = new ZoneMenu(u);
-                    u.mainGui.open(u);
+                    u.player.closeInventory();
 
                     //Add server event to delete plot or zone.
                     EventManager.createEvent(u.player.getUniqueId().toString(), "plotsystem", plotSQL.getString("SELECT server FROM location_data WHERE name='" +
@@ -62,7 +62,7 @@ public class CloseConfirm extends Gui {
 
                     //Switch back to zone info.
                     u.mainGui = new ZoneInfo(id, u.player.getUniqueId().toString());
-                    u.player.closeInventory();
+                    u.mainGui.open(u);
 
                 });
     }
