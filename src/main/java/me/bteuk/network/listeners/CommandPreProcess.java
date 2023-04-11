@@ -1,8 +1,9 @@
-package me.bteuk.network.events;
+package me.bteuk.network.listeners;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import me.bteuk.network.Network;
+import me.bteuk.network.utils.Constants;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Statistics;
 import me.bteuk.network.utils.Time;
@@ -28,9 +29,17 @@ public class CommandPreProcess implements Listener {
     public void onCommandPreProcess(PlayerCommandPreprocessEvent e) {
         //Replace /region with /network:region
         if (e.getMessage().startsWith("/region")) {
-            e.setMessage(e.getMessage().replace("/region", "/network:region"));
+            if (Constants.REGIONS_ENABLED) {
+                e.setMessage(e.getMessage().replace("/region", "/network:region"));
+            } else {
+                return;
+            }
         } else if (e.getMessage().startsWith("/tpll")) {
-            e.setMessage(e.getMessage().replace("/tpll", "/network:tpll"));
+            if (Constants.TPLL_ENABLED) {
+                e.setMessage(e.getMessage().replace("/tpll", "/network:tpll"));
+            } else {
+                return;
+            }
         }
 
         if (!e.getMessage().startsWith("/afk")) {

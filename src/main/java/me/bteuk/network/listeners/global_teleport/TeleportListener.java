@@ -16,6 +16,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
+import static me.bteuk.network.utils.Constants.SERVER_TYPE;
+
 public class TeleportListener implements Listener {
 
     private final boolean regionsEnabled;
@@ -217,7 +219,7 @@ public class TeleportListener implements Listener {
                     u.inRegion = false;
 
                 }
-            } else if (Network.SERVER_TYPE == ServerType.PLOT) {
+            } else if (SERVER_TYPE == ServerType.PLOT) {
 
                 //Check if the player is teleporting to a buildable world in the plot system.
                 if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + e.getTo().getWorld().getName() + "';")) {

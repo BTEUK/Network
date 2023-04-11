@@ -20,6 +20,9 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 
+import static me.bteuk.network.utils.Constants.SERVER_NAME;
+import static me.bteuk.network.utils.Constants.SERVER_TYPE;
+
 public class BuildGui extends Gui {
 
     private final NetworkUser user;
@@ -88,7 +91,7 @@ public class BuildGui extends Gui {
 
                         //If the plot is on the current server teleport them directly.
                         //Else teleport them to the correct server and them teleport them to the plot.
-                        if (server.equals(Network.SERVER_NAME)) {
+                        if (server.equals(SERVER_NAME)) {
 
                             u.player.closeInventory();
 
@@ -117,13 +120,13 @@ public class BuildGui extends Gui {
                 u -> {
 
                     //If server type is plot, then send a plot claim event to the database.
-                    if (Network.SERVER_TYPE == ServerType.PLOT) {
+                    if (SERVER_TYPE == ServerType.PLOT) {
 
                         //Set the claim event.
                         u.player.closeInventory();
                         Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('"
                                 + u.player.getUniqueId()
-                                + "','plotsystem','" + Network.SERVER_NAME
+                                + "','plotsystem','" + SERVER_NAME
                                 + "','claim plot');");
 
                     } else {
@@ -491,7 +494,7 @@ public class BuildGui extends Gui {
                     u.player.closeInventory();
 
                     //If server is Lobby, teleport to spawn.
-                    if (Network.SERVER_TYPE == ServerType.LOBBY) {
+                    if (SERVER_TYPE == ServerType.LOBBY) {
 
                         Back.setPreviousCoordinate(u.player.getUniqueId().toString(), u.player.getLocation());
                         u.player.teleport(Network.getInstance().getLobby().spawn);

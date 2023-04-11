@@ -7,7 +7,6 @@ import me.bteuk.network.utils.*;
 import me.bteuk.network.utils.regions.Inactivity;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 
@@ -15,6 +14,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
+import static me.bteuk.network.utils.Constants.REGIONS_ENABLED;
+import static me.bteuk.network.utils.Constants.SERVER_NAME;
 
 public class Timers {
 
@@ -26,9 +28,6 @@ public class Timers {
 
     //Timers
     private final ArrayList<Integer> timers;
-
-    //Server name
-    private final String SERVER_NAME;
 
     //SQL
     private final GlobalSQL globalSQL;
@@ -71,8 +70,6 @@ public class Timers {
         this.connect = connect;
 
         this.timers = new ArrayList<>();
-
-        SERVER_NAME = Network.SERVER_NAME;
 
         events = new ArrayList<>();
 
@@ -240,7 +237,7 @@ public class Timers {
             //Check for inactive owners.
             //If the region has members then make another member the new owner,
             //If the region has no members then set it inactive.
-            if (Network.REGIONS_ENABLED) {
+            if (REGIONS_ENABLED) {
                 inactive_owners.clear();
                 inactive_owners = instance.regionSQL.getInactives("SELECT region,uuid FROM region_members WHERE is_owner=1 AND last_enter<" + (Time.currentTime() - inactivity) + ";");
 

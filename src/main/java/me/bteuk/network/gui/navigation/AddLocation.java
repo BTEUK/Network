@@ -18,6 +18,8 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
+import static me.bteuk.network.utils.Constants.SERVER_TYPE;
+
 public class AddLocation extends Gui {
 
     private String old_name;
@@ -229,7 +231,7 @@ public class AddLocation extends Gui {
                         Location l = u.player.getLocation();
 
                         //If server is plotsystem add the necessary coordinate transformation.
-                        if (Network.SERVER_TYPE == ServerType.PLOT) {
+                        if (SERVER_TYPE == ServerType.PLOT) {
 
                             String worldName = u.player.getLocation().getWorld().getName();
 
@@ -297,7 +299,7 @@ public class AddLocation extends Gui {
                             Location l = u.player.getLocation();
 
                             //If server is plotsystem add the necessary coordinate transformation.
-                            if (Network.SERVER_TYPE == ServerType.PLOT) {
+                            if (SERVER_TYPE == ServerType.PLOT) {
 
                                 String worldName = u.player.getLocation().getWorld().getName();
 

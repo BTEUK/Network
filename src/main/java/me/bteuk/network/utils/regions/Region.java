@@ -11,6 +11,8 @@ import org.bukkit.Bukkit;
 
 import java.util.ArrayList;
 
+import static me.bteuk.network.utils.Constants.SERVER_TYPE;
+
 public record Region(String regionName) {
 
     //Get the status of the region.
@@ -527,7 +529,7 @@ public record Region(String regionName) {
 
         //Check if this is the correct server.
         //If this is not the earth server then create a server-event.
-        if (Network.SERVER_TYPE == ServerType.EARTH) {
+        if (SERVER_TYPE == ServerType.EARTH) {
 
             //Send message to user.
             //Is sent before actual removal so we can read the region tag.

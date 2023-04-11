@@ -15,6 +15,8 @@ import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.UUID;
 
+import static me.bteuk.network.utils.Constants.SERVER_TYPE;
+
 public class TeleportEvent {
 
     private static final DecimalFormat DECIMAL_FORMATTER = new DecimalFormat("##.#####");
@@ -118,7 +120,7 @@ public class TeleportEvent {
             case "spawn" -> {
 
                 //If server is Lobby, teleport to spawn.
-                if (Network.SERVER_TYPE == ServerType.LOBBY) {
+                if (SERVER_TYPE == ServerType.LOBBY) {
                     p.teleport(Network.getInstance().getLobby().spawn);
                     p.sendMessage(Utils.success("Teleported to spawn."));
                 } else {

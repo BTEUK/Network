@@ -11,6 +11,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import static me.bteuk.network.utils.Constants.SERVER_TYPE;
+
 public class Spawn implements CommandExecutor {
 
     @Override
@@ -33,7 +35,7 @@ public class Spawn implements CommandExecutor {
         }
 
         //If server is Lobby, teleport to spawn.
-        if (Network.SERVER_TYPE == ServerType.LOBBY) {
+        if (SERVER_TYPE == ServerType.LOBBY) {
 
             Back.setPreviousCoordinate(p.getUniqueId().toString(), p.getLocation());
             p.teleport(Network.getInstance().getLobby().spawn);

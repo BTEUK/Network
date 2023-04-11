@@ -17,6 +17,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import static me.bteuk.network.utils.Constants.LOGGER;
+
 public class CustomChat implements Listener, PluginMessageListener {
 
     private final Network instance;
@@ -44,7 +46,7 @@ public class CustomChat implements Listener, PluginMessageListener {
         instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord", this);
         instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:tab", this);
 
-        instance.getLogger().info("Successfully enabled Global Chat!");
+        LOGGER.info("Successfully enabled Global Chat!");
 
     }
 
@@ -104,7 +106,7 @@ public class CustomChat implements Listener, PluginMessageListener {
         try {
             sMessage = in.readUTF();
         } catch (IOException e) {
-            instance.getLogger().log(Level.SEVERE, "Could not broadcast received socket message!", e);
+            LOGGER.severe("Could not broadcast received socket message!");
             return;
         }
 
@@ -201,7 +203,7 @@ public class CustomChat implements Listener, PluginMessageListener {
 
                 objectOutput.close();
             } catch (IOException ex) {
-                instance.getLogger().log(Level.SEVERE, "Could not broadcast message to server socket!", ex);
+                LOGGER.severe("Could not broadcast message to server socket!");
             }
         });
     }
@@ -219,7 +221,7 @@ public class CustomChat implements Listener, PluginMessageListener {
 
                 objectOutput.close();
             } catch (IOException ex) {
-                instance.getLogger().log(Level.SEVERE, "Could not broadcast message to server socket!", ex);
+                LOGGER.severe("Could not broadcast message to server socket!");
             }
         });
     }

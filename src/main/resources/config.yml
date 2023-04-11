@@ -1,3 +1,6 @@
+#Config version, do not update this manually as it could break the config.
+version: 1.1.0
+
 #MySQL is mandatory for this plugin.
 #Login information
 host: localhost
@@ -77,11 +80,6 @@ region_inactivity: 30
 #Old database details
 #These are only necessary for UKnet1.0 to UKnet2.0 conversions.
 database_uknet: minecraft_uknet
-
-#Version warnings
-version:
-  earth: '&cThe Earth world is currently still using Minecraft 1.12.2 due to mod requirements, it is highly recommended to connect using this version with the BTE modpack. You can install the modpack by running the command &4/modpack&c.'
-  plot: '&cThe plotsystem is running on Minecraft 1.18.2. Connecting with older versions will limit your access to available blocks and any blocks added in newer versions will not display correctly.'
 
 #Modpack links
 modpack:

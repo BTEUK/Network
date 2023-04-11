@@ -7,7 +7,7 @@ import me.bteuk.network.commands.staff.Mute;
 import me.bteuk.network.commands.staff.Staff;
 import me.bteuk.network.commands.tabcompleter.LocationSelector;
 import me.bteuk.network.commands.tabcompleter.PlayerSelector;
-import me.bteuk.network.events.CommandPreProcess;
+import me.bteuk.network.listeners.CommandPreProcess;
 import me.bteuk.network.gui.NavigatorGui;
 import me.bteuk.network.listeners.*;
 import me.bteuk.network.listeners.global_teleport.MoveListener;
@@ -16,11 +16,8 @@ import me.bteuk.network.lobby.Lobby;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.sql.RegionSQL;
-import me.bteuk.network.utils.Statistics;
-import me.bteuk.network.utils.Time;
-import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.*;
 import me.bteuk.network.utils.enums.ServerType;
-import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.regions.RegionManager;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Material;
@@ -40,11 +37,9 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-public final class Network extends JavaPlugin {
+import static me.bteuk.network.utils.Constants.*;
 
-    //Server Name
-    public static String SERVER_NAME;
-    public static ServerType SERVER_TYPE;
+public final class Network extends JavaPlugin {
 
     private static Network instance;
     private static FileConfiguration config;
@@ -90,11 +85,6 @@ public final class Network extends JavaPlugin {
 
     //Tab
     public TabManager tab;
-
-    public static int MIN_Y;
-    public static int MAX_Y;
-
-    public static boolean REGIONS_ENABLED;
 
     @Override
     public void onEnable() {
@@ -143,17 +133,11 @@ public final class Network extends JavaPlugin {
             return;
         }
 
-        //Set the server name from config.
-        SERVER_NAME = config.getString("server_name");
-
-        //Set the server type from config.
-        SERVER_TYPE = ServerType.valueOf(config.getString("server_type"));
-
         if (!globalSQL.hasRow("SELECT name FROM server_data WHERE name='" + SERVER_NAME + "';")) {
 
             //Add server to database and enable server.
             if (globalSQL.update(
-                    "INSERT INTO server_data(name,type) VALUES('" + SERVER_NAME + "','" + SERVER_TYPE.toString() + "');"
+                    "INSERT INTO server_data(name,type) VALUES('" + SERVER_NAME + "','" + SERVER_TYPE + "');"
             )) {
 
                 //Enable plugin.
@@ -204,7 +188,6 @@ public final class Network extends JavaPlugin {
         new PlayerInteract(this);
 
         //Create regionManager if enabled.
-        REGIONS_ENABLED = config.getBoolean("regions_enabled");
         if (REGIONS_ENABLED) {
             regionManager = new RegionManager(regionSQL);
         }
@@ -242,10 +225,7 @@ public final class Network extends JavaPlugin {
 
 
         //Setup tpll if enabled in config.
-        if (config.getBoolean("tpll.enabled")) {
-            //Set max and min y.
-            MIN_Y = config.getInt("tpll.min_y");
-            MAX_Y = config.getInt("tpll.max_y");
+        if (TPLL_ENABLED) {
 
             getCommand("tpll").setExecutor(new Tpll(config.getBoolean("requires_permission")));
         }
