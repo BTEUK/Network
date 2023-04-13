@@ -14,20 +14,20 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import static me.bteuk.network.utils.NetworkConfig.CONFIG;
+
 public class Navigation_database {
 
     public Connection conn() throws SQLException {
 
-        FileConfiguration config = Network.getInstance().getConfig();
-
-        String host = config.getString("host");
-        int port = config.getInt("port");
-        String username = config.getString("username");
-        String password = config.getString("password");
+        String host = CONFIG.getString("host");
+        int port = CONFIG.getInt("port");
+        String username = CONFIG.getString("username");
+        String password = CONFIG.getString("password");
 
         BasicDataSource dataSource = new BasicDataSource();
 
-        dataSource.setUrl("jdbc:mysql://" + host + ":" + port + "/" + config.getString("database_uknet") + "?&useSSL=false&");
+        dataSource.setUrl("jdbc:mysql://" + host + ":" + port + "/" + CONFIG.getString("database_uknet") + "?&useSSL=false&");
         dataSource.setUsername(username);
         dataSource.setPassword(password);
 
@@ -61,7 +61,7 @@ public class Navigation_database {
 
         //Get the name of the Earth world.
         //Get the earth server name.
-        String earth = Network.getInstance().getConfig().getString("earth_world");
+        String earth = CONFIG.getString("earth_world");
         String server = globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';");
 
         Categories category;

@@ -14,6 +14,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
+import static me.bteuk.network.utils.Constants.SERVER_NAME;
+
 public class Warp implements CommandExecutor {
 
     @Override
@@ -42,7 +44,7 @@ public class Warp implements CommandExecutor {
             //Get server, if server is not current server,
             // teleport the player to the correct server with join event to teleport them to the location.
             String server = Network.getInstance().globalSQL.getString("SELECT server FROM coordinates WHERE id=" + coordinate_id + ";");
-            if (server.equals(Network.SERVER_NAME)) {
+            if (server.equals(SERVER_NAME)) {
                 //Server is equal.
 
                 //Get location from coordinate id.

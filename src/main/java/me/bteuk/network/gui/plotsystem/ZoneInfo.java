@@ -16,6 +16,8 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
+import static me.bteuk.network.utils.Constants.SERVER_NAME;
+
 public class ZoneInfo extends Gui {
 
     private final int zoneID;
@@ -63,7 +65,7 @@ public class ZoneInfo extends Gui {
 
                     //If the plot is on the current server teleport them directly.
                     //Else teleport them to the correct server and them teleport them to the plot.
-                    if (server.equals(Network.SERVER_NAME)) {
+                    if (server.equals(SERVER_NAME)) {
 
                         EventManager.createTeleportEvent(false, u.player.getUniqueId().toString(), "plotsystem", "teleport zone " + zoneID, u.player.getLocation());
 

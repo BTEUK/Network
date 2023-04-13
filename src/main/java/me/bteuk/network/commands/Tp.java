@@ -13,6 +13,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
+import static me.bteuk.network.utils.Constants.SERVER_NAME;
+
 public class Tp implements CommandExecutor {
 
     @Override
@@ -50,7 +52,7 @@ public class Tp implements CommandExecutor {
 
                     //If the player is on your server teleport.
                     //Else switch server and add teleport join event.
-                    if (Network.getInstance().globalSQL.getString("SELECT server FROM online_users WHERE uuid='" + uuid + "';").equals(Network.SERVER_NAME)) {
+                    if (Network.getInstance().globalSQL.getString("SELECT server FROM online_users WHERE uuid='" + uuid + "';").equals(SERVER_NAME)) {
 
                         //Get player location.
                         Player player = Bukkit.getPlayer(UUID.fromString(uuid));

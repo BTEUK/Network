@@ -19,6 +19,8 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
+import static me.bteuk.network.utils.Constants.SERVER_NAME;
+
 public class PlotInfo extends Gui {
 
     private final int plotID;
@@ -66,7 +68,7 @@ public class PlotInfo extends Gui {
 
                     //If the plot is on the current server teleport them directly.
                     //Else teleport them to the correct server and them teleport them to the plot.
-                    if (server.equals(Network.SERVER_NAME)) {
+                    if (server.equals(SERVER_NAME)) {
 
                         EventManager.createTeleportEvent(false, u.player.getUniqueId().toString(), "plotsystem", "teleport plot " + plotID, u.player.getLocation());
 

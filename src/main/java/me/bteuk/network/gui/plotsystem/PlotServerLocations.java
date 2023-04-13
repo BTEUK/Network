@@ -16,6 +16,8 @@ import org.bukkit.Material;
 
 import java.util.ArrayList;
 
+import static me.bteuk.network.utils.Constants.SERVER_NAME;
+
 public class PlotServerLocations extends Gui {
 
     private int plotDifficulty;
@@ -255,7 +257,7 @@ public class PlotServerLocations extends Gui {
 
                             //If the plot is on the current server teleport them directly.
                             //Else teleport them to the correct server and then teleport them to the plot.
-                            if (server.equals(Network.SERVER_NAME)) {
+                            if (server.equals(SERVER_NAME)) {
 
                                 u.player.closeInventory();
 

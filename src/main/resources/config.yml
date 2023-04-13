@@ -46,8 +46,8 @@ chat:
 tpll:
   enabled: true
   requires_permission: false
-  min_y: 0
-  max_y: 255
+  min_y: -128
+  max_y: 1360
 
 #Enable regions and cross-server teleport.
 #Regions must be enabled for cross-server teleport to function.

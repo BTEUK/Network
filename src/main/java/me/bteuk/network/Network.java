@@ -38,11 +38,11 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import static me.bteuk.network.utils.Constants.*;
+import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public final class Network extends JavaPlugin {
 
     private static Network instance;
-    private static FileConfiguration config;
 
     //If the server can shutdown.
     public boolean allow_shutdown;
@@ -91,13 +91,19 @@ public final class Network extends JavaPlugin {
 
         //Config Setup
         Network.instance = this;
-        Network.config = this.getConfig();
 
         allow_shutdown = true;
 
+        //Sets the config if the file has not yet been created.
         saveDefaultConfig();
 
-        if (!config.getBoolean("enabled")) {
+        //Update the config to the latest version if it's outdated.
+        //It will copy over any keys that remain the same.
+        //This will also set the status variable to access the config project-wide.
+        NetworkConfig networkConfig = new NetworkConfig();
+        networkConfig.updateConfig();
+
+        if (!CONFIG.getBoolean("enabled")) {
 
             getLogger().warning("The config must be configured before the plugin can be enabled!");
             getLogger().warning("Please edit the database values in the config, give the server a unique name and then set 'enabled: true'");
@@ -110,19 +116,19 @@ public final class Network extends JavaPlugin {
         try {
 
             //Global Database
-            String global_database = config.getString("database.global");
+            String global_database = CONFIG.getString("database.global");
             BasicDataSource global_dataSource = mysqlSetup(global_database);
             globalSQL = new GlobalSQL(global_dataSource);
             initDb("dbsetup_global.sql", global_dataSource);
 
             //Region Database
-            String region_database = config.getString("database.region");
+            String region_database = CONFIG.getString("database.region");
             BasicDataSource region_dataSource = mysqlSetup(region_database);
             regionSQL = new RegionSQL(region_dataSource);
             initDb("dbsetup_regions.sql", region_dataSource);
 
             //Plot Database
-            String plot_database = config.getString("database.plot");
+            String plot_database = CONFIG.getString("database.plot");
             BasicDataSource plot_dataSource = mysqlSetup(plot_database);
             plotSQL = new PlotSQL(plot_dataSource);
             initDb("dbsetup_plots.sql", plot_dataSource);
@@ -168,8 +174,8 @@ public final class Network extends JavaPlugin {
         networkUsers = new ArrayList<>();
 
         //Setup custom chat.
-        socketIP = config.getString("socket.IP");
-        socketPort = config.getInt("socket.port");
+        socketIP = CONFIG.getString("socket.IP");
+        socketPort = CONFIG.getInt("socket.port");
 
         chat = new CustomChat(this, socketIP, socketPort);
 
@@ -227,7 +233,7 @@ public final class Network extends JavaPlugin {
         //Setup tpll if enabled in config.
         if (TPLL_ENABLED) {
 
-            getCommand("tpll").setExecutor(new Tpll(config.getBoolean("requires_permission")));
+            getCommand("tpll").setExecutor(new Tpll(CONFIG.getBoolean("requires_permission")));
         }
 
         //Enable commands.
@@ -381,10 +387,10 @@ public final class Network extends JavaPlugin {
     //Creates the mysql connection.
     private BasicDataSource mysqlSetup(String database) throws SQLException {
 
-        String host = config.getString("host");
-        int port = config.getInt("port");
-        String username = config.getString("username");
-        String password = config.getString("password");
+        String host = CONFIG.getString("host");
+        int port = CONFIG.getInt("port");
+        String username = CONFIG.getString("username");
+        String password = CONFIG.getString("password");
 
         BasicDataSource dataSource = new BasicDataSource();
 

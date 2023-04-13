@@ -11,6 +11,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
+import static me.bteuk.network.utils.NetworkConfig.CONFIG;
+
 //This class deals with players joining and leaving the network.
 public class Connect {
 
@@ -33,9 +35,9 @@ public class Connect {
         this.plotSQL = plotSQL;
 
         //Get join and leave message from config.
-        joinMessage = instance.getConfig().getString("chat.join");
-        firstJoinMessage = instance.getConfig().getString("chat.firstjoin");
-        leaveMessage = instance.getConfig().getString("chat.leave");
+        joinMessage = CONFIG.getString("chat.join");
+        firstJoinMessage = CONFIG.getString("chat.firstjoin");
+        leaveMessage = CONFIG.getString("chat.leave");
 
         blocked = false;
 

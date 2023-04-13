@@ -13,6 +13,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.UUID;
 
+import static me.bteuk.network.utils.Constants.SERVER_NAME;
+
 public class LeaveServer implements Listener {
 
     Network instance;
@@ -81,7 +83,7 @@ public class LeaveServer implements Listener {
 
         //If the player is not in the server_switch table they have disconnected from the network.
         if (!globalSQL.hasRow("SELECT uuid FROM server_switch WHERE uuid='" + e.getPlayer().getUniqueId()
-                + "' AND from_server='" + instance.SERVER_NAME + "';")) {
+                + "' AND from_server='" + SERVER_NAME + "';")) {
 
             //Run leave network sequence.
             connect.leaveEvent(e.getPlayer());

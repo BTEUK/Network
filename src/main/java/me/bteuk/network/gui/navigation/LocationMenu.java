@@ -21,6 +21,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 
+import static me.bteuk.network.utils.Constants.SERVER_NAME;
+import static me.bteuk.network.utils.NetworkConfig.CONFIG;
+
 public class LocationMenu extends Gui {
 
     private LinkedHashSet<String> locations;
@@ -86,7 +89,7 @@ public class LocationMenu extends Gui {
         return new LinkedHashSet<>(Network.getInstance().globalSQL.getStringList("SELECT location_data.location FROM location_data INNER JOIN coordinates ON location_data.coordinate=coordinates.id " +
                 "WHERE ((((coordinates.x/1000)-" + (l.getX() / 1000) + ")*((coordinates.x/1000)-" + (l.getX() / 1000) + ")) + " +
                 "(((coordinates.z/1000)-" + (l.getZ() / 1000) + ")*((coordinates.z/1000)-" + (l.getZ() / 1000) + "))) < " +
-                (Network.getInstance().getConfig().getInt("navigation_radius") * Network.getInstance().getConfig().getInt("navigation_radius")) +
+                (CONFIG.getInt("navigation_radius") * CONFIG.getInt("navigation_radius")) +
                 " ORDER BY ((((coordinates.x/1000)-" + (l.getX() / 1000) + ")*((coordinates.x/1000)-" + (l.getX() / 1000) + ")) + " +
                 "(((coordinates.z/1000)-" + (l.getZ() / 1000) + ")*((coordinates.z/1000)-" + (l.getZ() / 1000) + "))) ASC;"));
 
@@ -221,7 +224,7 @@ public class LocationMenu extends Gui {
 
                         //If the plot is on the current server teleport them directly.
                         //Else teleport them to the correct server and them teleport them to the plot.
-                        if (server.equals(Network.SERVER_NAME)) {
+                        if (server.equals(SERVER_NAME)) {
 
                             //Close inventory.
                             u.player.closeInventory();

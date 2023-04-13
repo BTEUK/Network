@@ -6,6 +6,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.logging.Logger;
 
+import static me.bteuk.network.utils.NetworkConfig.CONFIG;
+
 //This class houses static variables that need to be accessed throughout the plugin.
 public class Constants {
 
@@ -22,22 +24,26 @@ public class Constants {
     //Tpll
     public static final boolean TPLL_ENABLED;
 
+    //World height.
+    public static final int MAX_Y;
+    public static final int MIN_Y;
+
     static {
 
         LOGGER = Network.getInstance().getLogger();
 
-        //Get the config, this is used to set the static variables.
-        FileConfiguration config = Network.getInstance().getConfig();
-
         //Set the server name from config.
-        SERVER_NAME = config.getString("server_name");
+        SERVER_NAME = CONFIG.getString("server_name");
 
         //Set the server type from config.
-        SERVER_TYPE = ServerType.valueOf(config.getString("server_type"));
+        SERVER_TYPE = ServerType.valueOf(CONFIG.getString("server_type"));
 
-        REGIONS_ENABLED = config.getBoolean("regions_enabled");
+        REGIONS_ENABLED = CONFIG.getBoolean("regions_enabled");
 
-        TPLL_ENABLED = config.getBoolean("tpll.enabled");
+        TPLL_ENABLED = CONFIG.getBoolean("tpll.enabled");
+
+        MAX_Y = CONFIG.getInt("tpll.max_y");
+        MIN_Y = CONFIG.getInt("tpll.min_y");
 
     }
 }

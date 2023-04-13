@@ -12,6 +12,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import static me.bteuk.network.utils.Constants.SERVER_NAME;
+
 public class Back implements CommandExecutor {
 
     @Override
@@ -38,7 +40,7 @@ public class Back implements CommandExecutor {
 
         //Check if the server is this server.
         String server = Network.getInstance().globalSQL.getString("SELECT server FROM coordinates WHERE id=" + coordinateID + ";");
-        if (Network.SERVER_NAME.equals(server)) {
+        if (SERVER_NAME.equals(server)) {
 
             //Get location.
             Location l = Network.getInstance().globalSQL.getCoordinate(coordinateID);

@@ -16,6 +16,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
+import static me.bteuk.network.utils.Constants.SERVER_NAME;
+import static me.bteuk.network.utils.NetworkConfig.CONFIG;
+
 public class RegionRequest extends Gui {
 
     private final RegionSQL regionSQL;
@@ -129,7 +132,7 @@ public class RegionRequest extends Gui {
                     Location l = globalSQL.getCoordinate(regionSQL.getInt("SELECT coordinate_id FROM region_requests WHERE region='" + request.region + "' AND uuid='" + request.uuid + "';"));
 
                     //If the player is on the earth server get the coordinate.
-                    if (Network.SERVER_NAME.equals(globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';"))) {
+                    if (SERVER_NAME.equals(globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';"))) {
 
                         //Close inventory.
                         u.player.closeInventory();
@@ -145,7 +148,7 @@ public class RegionRequest extends Gui {
 
                         //Create teleport event.
                         EventManager.createTeleportEvent(true, u.player.getUniqueId().toString(), "network", "teleport " +
-                                Network.getInstance().getConfig().getString("earth_world") + " " + l.getX() + " " + l.getZ() + " " +
+                                CONFIG.getString("earth_world") + " " + l.getX() + " " + l.getZ() + " " +
                                 l.getYaw() + " " + l.getPitch(), u.player.getLocation());
 
                         //Switch server.

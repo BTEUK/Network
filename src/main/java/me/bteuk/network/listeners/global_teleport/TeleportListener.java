@@ -16,7 +16,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
+import static me.bteuk.network.utils.Constants.SERVER_NAME;
 import static me.bteuk.network.utils.Constants.SERVER_TYPE;
+import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public class TeleportListener implements Listener {
 
@@ -31,10 +33,8 @@ public class TeleportListener implements Listener {
 
         Bukkit.getServer().getPluginManager().registerEvents(this, instance);
 
-        FileConfiguration config = instance.getConfig();
-
-        regionsEnabled = config.getBoolean("regions_enabled");
-        earthWorld = config.getString("earth_world");
+        regionsEnabled = CONFIG.getBoolean("regions_enabled");
+        earthWorld = CONFIG.getString("earth_world");
 
         regionManager = instance.getRegionManager();
 
@@ -68,7 +68,7 @@ public class TeleportListener implements Listener {
 
             //Check whether the player is teleporting to a server and world that uses regions.
             //If the player is on the earth server check if they are teleporting to the earth world.
-            if (Network.SERVER_NAME.equals(Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';"))) {
+            if (SERVER_NAME.equals(Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';"))) {
                 if (e.getTo().getWorld().getName().equals(earthWorld)) {
 
                     //Get region.

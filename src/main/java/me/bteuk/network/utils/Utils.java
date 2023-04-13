@@ -27,6 +27,9 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static me.bteuk.network.utils.Constants.MAX_Y;
+import static me.bteuk.network.utils.Constants.MIN_Y;
+
 public class Utils {
 
     public static String chat(String message) {
@@ -157,7 +160,7 @@ public class Utils {
 
     public static int getHighestYAt(World w, int x, int z) {
 
-        for (int i = (Network.MAX_Y - 1); i >= Network.MIN_Y; i--) {
+        for (int i = (MAX_Y - 1); i >= MIN_Y; i--) {
             if (w.getBlockAt(x, i, z).getType() != Material.AIR) {
                 return i + 1;
             }

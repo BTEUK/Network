@@ -16,6 +16,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
+import static me.bteuk.network.utils.Constants.SERVER_NAME;
+
 public class JoinServer implements Listener {
 
     Network instance;
@@ -43,19 +45,19 @@ public class JoinServer implements Listener {
         if (globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid='" + e.getPlayer().getUniqueId() + "';")) {
 
             //Update server.
-            globalSQL.update("UPDATE online_users SET server='" + Network.SERVER_NAME + "' WHERE uuid='" + e.getPlayer().getUniqueId() + "';");
+            globalSQL.update("UPDATE online_users SET server='" + SERVER_NAME + "' WHERE uuid='" + e.getPlayer().getUniqueId() + "';");
 
             //Remove their server_switch entry. Delayed by 1 second to make sure the previous server has run their PlayerQuitEvent.
             Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> globalSQL.update("DELETE FROM server_switch WHERE uuid='" + e.getPlayer().getUniqueId() + "';"), 20L);
 
             //Update the last_ping.
-            globalSQL.update("UPDATE online_users SET last_ping=" + Time.currentTime() + " WHERE uuid='" + e.getPlayer().getUniqueId() + "' AND server='" + Network.SERVER_NAME + "';");
+            globalSQL.update("UPDATE online_users SET last_ping=" + Time.currentTime() + " WHERE uuid='" + e.getPlayer().getUniqueId() + "' AND server='" + SERVER_NAME + "';");
 
         } else {
 
             //Add user to table and run network connect.
             globalSQL.update("INSERT INTO online_users(uuid,join_time,last_ping,server,primary_role,display_name) VALUES('" + e.getPlayer().getUniqueId() +
-                    "'," + Time.currentTime() + "," + Time.currentTime() + ",'" + Network.SERVER_NAME + "','" + Roles.getPrimaryRole(e.getPlayer()) + "','" +
+                    "'," + Time.currentTime() + "," + Time.currentTime() + ",'" + SERVER_NAME + "','" + Roles.getPrimaryRole(e.getPlayer()) + "','" +
                     PlaceholderAPI.setPlaceholders(e.getPlayer(), "%luckperms_prefix%") + " " + e.getPlayer().getName() + "');");
             connect.joinEvent(e.getPlayer());
         }

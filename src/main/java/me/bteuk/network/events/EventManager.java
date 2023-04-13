@@ -4,6 +4,8 @@ import me.bteuk.network.Network;
 import me.bteuk.network.commands.Back;
 import org.bukkit.Location;
 
+import static me.bteuk.network.utils.Constants.SERVER_NAME;
+
 public class EventManager {
 
     public static void event(String uuid, String[] event, String message) {
@@ -54,7 +56,7 @@ public class EventManager {
         if (join) {
             createJoinEvent(uuid, type, event);
         } else {
-            createEvent(uuid, type, Network.SERVER_NAME, event);
+            createEvent(uuid, type, SERVER_NAME, event);
         }
     }
 
@@ -66,7 +68,7 @@ public class EventManager {
         if (join) {
             createJoinEvent(uuid, type, event, message);
         } else {
-            createEvent(uuid, type, Network.SERVER_NAME, event, message);
+            createEvent(uuid, type, SERVER_NAME, event, message);
         }
     }
 }

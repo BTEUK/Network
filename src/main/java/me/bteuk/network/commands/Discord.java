@@ -1,6 +1,7 @@
 package me.bteuk.network.commands;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.utils.NetworkConfig;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
@@ -14,8 +15,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
+import static me.bteuk.network.utils.Constants.LOGGER;
+import static me.bteuk.network.utils.NetworkConfig.CONFIG;
+
 public class Discord implements CommandExecutor {
 
+    @Deprecated
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
 
@@ -25,6 +30,17 @@ public class Discord implements CommandExecutor {
 
                 //Get user.
                 NetworkUser user = Network.getInstance().getUser(p);
+
+                //Check if user is null.
+                if (user == null) {
+
+                    LOGGER.severe("User " + p.getName() + " is null, command " + command.getName() + " can't be executed!");
+                    LOGGER.severe("This will also impact all other Network-related functions.");
+
+                    p.sendMessage(Utils.error("An error occurred, please contact a server admin!"));
+                    return true;
+
+                }
 
                 if (args[0].equalsIgnoreCase("link")) {
 
@@ -73,8 +89,8 @@ public class Discord implements CommandExecutor {
             }
         }
 
-        TextComponent discord = new TextComponent(Utils.chat("&aJoin our discord: &7" + Network.getInstance().getConfig().getString("discord")));
-        discord.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, Network.getInstance().getConfig().getString("discord")));
+        TextComponent discord = new TextComponent(Utils.chat("&aJoin our discord: &7" + CONFIG.getString("discord")));
+        discord.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, CONFIG.getString("discord")));
         sender.spigot().sendMessage(discord);
 
         return true;

@@ -28,6 +28,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import static me.bteuk.network.utils.Constants.SERVER_NAME;
+import static me.bteuk.network.utils.NetworkConfig.CONFIG;
+
 public class Tpll implements CommandExecutor {
 
     private final boolean requires_permission;
@@ -44,14 +47,13 @@ public class Tpll implements CommandExecutor {
 
     public Tpll(boolean requires_permission) {
         this.requires_permission = requires_permission;
-        this.isEarth = Network.getInstance().globalSQL.hasRow("SELECT name FROM server_data WHERE name='" + Network.SERVER_NAME + "' AND type='earth'");
+        this.isEarth = Network.getInstance().globalSQL.hasRow("SELECT name FROM server_data WHERE name='" + SERVER_NAME + "' AND type='earth'");
         earthServer = Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='earth';");
-        earthWorld = Network.getInstance().getConfig().getString("earth_world");
+        earthWorld = CONFIG.getString("earth_world");
 
         regionManager = Network.getInstance().getRegionManager();
 
-        FileConfiguration config = Network.getInstance().getConfig();
-        regionsEnabled = config.getBoolean("regions_enabled");
+        regionsEnabled = CONFIG.getBoolean("regions_enabled");
 
     }
 
@@ -240,7 +242,7 @@ public class Tpll implements CommandExecutor {
                     int zTransform = Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
 
                     //If they are on the correct server, teleport them directly, else switch their server.
-                    if (server.equals(Network.SERVER_NAME)) {
+                    if (server.equals(SERVER_NAME)) {
 
                         //Set current location for /back
                         Back.setPreviousCoordinate(p.getUniqueId().toString(), p.getLocation());

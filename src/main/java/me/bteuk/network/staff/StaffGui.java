@@ -13,6 +13,8 @@ import org.bukkit.Material;
 
 import java.util.ArrayList;
 
+import static me.bteuk.network.utils.Constants.SERVER_NAME;
+
 public class StaffGui extends Gui {
 
     private final NetworkUser user;
@@ -190,11 +192,11 @@ public class StaffGui extends Gui {
                                             Network.getInstance().plotSQL.getString("SELECT location FROM plot_data WHERE id=" + nPlot + ";") + "';");
 
                                     //If they are not in the same server as the plot teleport them to that server and start the reviewing process.
-                                    if (server.equals(Network.SERVER_NAME)) {
+                                    if (server.equals(SERVER_NAME)) {
 
                                         u.player.closeInventory();
                                         Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('"
-                                                + u.player.getUniqueId() + "','plotsystem','" + Network.SERVER_NAME + "','review plot " + nPlot + "');");
+                                                + u.player.getUniqueId() + "','plotsystem','" + SERVER_NAME + "','review plot " + nPlot + "');");
 
                                     } else {
 

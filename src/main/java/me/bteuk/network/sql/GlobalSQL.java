@@ -9,6 +9,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import static me.bteuk.network.utils.Constants.SERVER_NAME;
+
 public class GlobalSQL {
 
     private final BasicDataSource dataSource;
@@ -236,7 +238,7 @@ public class GlobalSQL {
     //Add new coordinate to database and return the id.
     public int addCoordinate(Location l) {
 
-        return (addCoordinate(Network.SERVER_NAME, l.getWorld().getName(), l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch()));
+        return (addCoordinate(SERVER_NAME, l.getWorld().getName(), l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch()));
 
     }
 
@@ -310,7 +312,7 @@ public class GlobalSQL {
     //Update an existing coordinate.
     public void updateCoordinate(int coordinateID, Location l) {
 
-        updateCoordinate(coordinateID, Network.SERVER_NAME, l);
+        updateCoordinate(coordinateID, SERVER_NAME, l);
 
     }
 

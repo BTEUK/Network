@@ -18,6 +18,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
+import static me.bteuk.network.utils.Constants.SERVER_NAME;
 import static me.bteuk.network.utils.Constants.SERVER_TYPE;
 
 public class AddLocation extends Gui {
@@ -205,7 +206,7 @@ public class AddLocation extends Gui {
                         //If location is on this server teleport the player, else switch server.
                         //Teleport to location.
                         String server = Network.getInstance().globalSQL.getString("SELECT server FROM coordinates WHERE id=" + coordinate_id + ";");
-                        if (Network.SERVER_NAME.equalsIgnoreCase(server)) {
+                        if (SERVER_NAME.equalsIgnoreCase(server)) {
                             //Get location from coordinate id.
                             Location l = Network.getInstance().globalSQL.getCoordinate(coordinate_id);
 

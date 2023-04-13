@@ -18,6 +18,8 @@ import org.bukkit.World;
 
 import java.util.ArrayList;
 
+import static me.bteuk.network.utils.Constants.SERVER_NAME;
+
 public class PlotsystemLocations extends Gui {
 
     private final PlotSQL plotSQL;
@@ -71,7 +73,7 @@ public class PlotsystemLocations extends Gui {
 
                         String server = plotSQL.getString("SELECT server FROM location_data WHERE name='" + name + "';");
 
-                        if (server.equals(Network.SERVER_NAME)) {
+                        if (server.equals(SERVER_NAME)) {
 
                             u.player.closeInventory();
 

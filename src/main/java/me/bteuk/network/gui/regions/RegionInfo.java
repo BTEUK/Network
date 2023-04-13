@@ -17,6 +17,8 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
+import static me.bteuk.network.utils.Constants.SERVER_NAME;
+
 public class RegionInfo extends Gui {
 
     private final Region region;
@@ -106,7 +108,7 @@ public class RegionInfo extends Gui {
                 u -> {
 
                     //If the player is on the earth server get the coordinate.
-                    if (Network.SERVER_NAME.equals(globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';"))) {
+                    if (SERVER_NAME.equals(globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';"))) {
 
                         //Close inventory.
                         u.player.closeInventory();

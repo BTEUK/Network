@@ -28,6 +28,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Set;
 
+import static me.bteuk.network.utils.NetworkConfig.CONFIG;
+
 public class Lobby {
 
     private final Network instance;
@@ -244,11 +246,9 @@ public class Lobby {
 
     public void setSpawn() {
 
-        FileConfiguration config = instance.getConfig();
-
         try {
-            spawn = new Location(Bukkit.getWorld(config.getString("spawn.world")), config.getDouble("spawn.x"), config.getDouble("spawn.y"),
-                    config.getDouble("spawn.z"), (float) config.getDouble("spawn.yaw"), (float) config.getDouble("spawn.pitch"));
+            spawn = new Location(Bukkit.getWorld(CONFIG.getString("spawn.world")), CONFIG.getDouble("spawn.x"), CONFIG.getDouble("spawn.y"),
+                    CONFIG.getDouble("spawn.z"), (float) CONFIG.getDouble("spawn.yaw"), (float) CONFIG.getDouble("spawn.pitch"));
         } catch (Exception e) {
             instance.getLogger().warning("Spawn location could not be set!");
             //Set default spawn.

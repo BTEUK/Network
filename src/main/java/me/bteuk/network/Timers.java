@@ -7,7 +7,6 @@ import me.bteuk.network.utils.*;
 import me.bteuk.network.utils.regions.Inactivity;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -17,6 +16,7 @@ import java.util.UUID;
 
 import static me.bteuk.network.utils.Constants.REGIONS_ENABLED;
 import static me.bteuk.network.utils.Constants.SERVER_NAME;
+import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public class Timers {
 
@@ -62,7 +62,6 @@ public class Timers {
     public Timers(Network instance, GlobalSQL globalSQL, Connect connect) {
 
         this.instance = instance;
-        FileConfiguration config = instance.getConfig();
         this.users = instance.getUsers();
 
         this.globalSQL = globalSQL;
@@ -74,19 +73,19 @@ public class Timers {
         events = new ArrayList<>();
 
         //days * 24 hours * 60 minutes * 60 seconds * 1000 milliseconds
-        inactivity = config.getInt("region_inactivity") * 24L * 60L * 60L * 1000L;
+        inactivity = CONFIG.getInt("region_inactivity") * 24L * 60L * 60L * 1000L;
         inactive_owners = new ArrayList<>();
 
         //Minutes * 60 seconds * 1000 milliseconds
-        afk = config.getInt("afk") * 60L * 1000L;
+        afk = CONFIG.getInt("afk") * 60L * 1000L;
 
         //Get roles from config.
         roles = new HashMap<>();
-        roles.put("architect", config.getLong("role_id.architect"));
-        roles.put("builder", config.getLong("role_id.builder"));
-        roles.put("jrbuilder", config.getLong("role_id.jrbuilder"));
-        roles.put("apprentice", config.getLong("role_id.apprentice"));
-        roles.put("applicant", config.getLong("role_id.applicant"));
+        roles.put("architect", CONFIG.getLong("role_id.architect"));
+        roles.put("builder", CONFIG.getLong("role_id.builder"));
+        roles.put("jrbuilder", CONFIG.getLong("role_id.jrbuilder"));
+        roles.put("apprentice", CONFIG.getLong("role_id.apprentice"));
+        roles.put("applicant", CONFIG.getLong("role_id.applicant"));
 
     }
 

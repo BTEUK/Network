@@ -11,6 +11,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 
+import static me.bteuk.network.utils.NetworkConfig.CONFIG;
+
 public class ExploreGui extends Gui {
 
     private final NetworkUser u;
@@ -142,7 +144,7 @@ public class ExploreGui extends Gui {
         setItem(22, Utils.createItem(Material.COMPASS, 1,
                         Utils.title("Nearby Locations"),
                         Utils.line("Click to view locations"),
-                        Utils.line("in a " + Network.getInstance().getConfig().getInt("navigation_radius") + "km radius.")),
+                        Utils.line("in a " + CONFIG.getInt("navigation_radius") + "km radius.")),
                 u -> openLocation("Nearby Locations", u, "Nearby"));
 
         //Find Locations

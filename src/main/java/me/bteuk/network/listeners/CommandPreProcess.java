@@ -15,6 +15,8 @@ import org.bukkit.event.server.ServerCommandEvent;
 
 import java.util.ArrayList;
 
+import static me.bteuk.network.utils.Constants.SERVER_NAME;
+
 public class CommandPreProcess implements Listener {
 
     Network instance;
@@ -76,7 +78,7 @@ public class CommandPreProcess implements Listener {
     public void onServerClose(ArrayList<NetworkUser> users) {
 
         //Disable server in server table.
-        instance.globalSQL.update("UPDATE server_data SET online=0 WHERE name='" + Network.SERVER_NAME + "';");
+        instance.globalSQL.update("UPDATE server_data SET online=0 WHERE name='" + SERVER_NAME + "';");
 
         //Block the LeaveServer listener so it doesn't trigger since it causes an error.
         //It needs to be active to prevent the leave message to show in chat.

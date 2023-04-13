@@ -22,6 +22,7 @@ import org.bukkit.Material;
 
 import static me.bteuk.network.utils.Constants.SERVER_NAME;
 import static me.bteuk.network.utils.Constants.SERVER_TYPE;
+import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public class BuildGui extends Gui {
 
@@ -270,7 +271,7 @@ public class BuildGui extends Gui {
                                     if (!u.player.hasPermission("uknet.regions.staff_request.bypass")) {
 
                                         //If staff approval is always required do that or if the region was previously claimed.
-                                        if (Network.getInstance().getConfig().getBoolean("staff_request.always") || u.region.wasClaimed()) {
+                                        if (CONFIG.getBoolean("staff_request.always") || u.region.wasClaimed()) {
 
                                             u.region.requestRegion(u, true);
                                             u.player.closeInventory();
@@ -282,7 +283,7 @@ public class BuildGui extends Gui {
                                             int z = Integer.parseInt(u.region.regionName().split(",")[1]);
 
                                             //Get the radius.
-                                            int radius = Network.getInstance().getConfig().getInt("staff_request.radius");
+                                            int radius = CONFIG.getInt("staff_request.radius");
 
                                             //For zero radius, skip.
                                             if (radius != 0) {

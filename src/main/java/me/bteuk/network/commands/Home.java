@@ -14,6 +14,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
+import static me.bteuk.network.utils.Constants.SERVER_NAME;
+
 public class Home implements CommandExecutor {
     private GlobalSQL globalSQL;
 
@@ -48,7 +50,7 @@ public class Home implements CommandExecutor {
             String server = globalSQL.getString("SELECT server FROM coordinates WHERE id=" + coordinate_id + ";");
 
             //Check if server is current.
-            if (Network.SERVER_NAME.equals(server)) {
+            if (SERVER_NAME.equals(server)) {
 
                 //Get default home location from the coordinate id.
                 Location l = globalSQL.getCoordinate(coordinate_id);
@@ -93,7 +95,7 @@ public class Home implements CommandExecutor {
             String server = globalSQL.getString("SELECT server FROM coordinates WHERE id=" + coordinate_id + ";");
 
             //Check if server is current.
-            if (Network.SERVER_NAME.equals(server)) {
+            if (SERVER_NAME.equals(server)) {
 
                 //Get default home location from the coordinate id.
                 Location l = globalSQL.getCoordinate(coordinate_id);

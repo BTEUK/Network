@@ -19,10 +19,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
 
+import static me.bteuk.network.utils.NetworkConfig.CONFIG;
+
 public class DatabaseRegions {
 
     private final EarthGeneratorSettings bteGeneratorSettings = EarthGeneratorSettings.parse(EarthGeneratorSettings.BTE_DEFAULT_SETTINGS);
-    private final World world = Bukkit.getWorld(Network.getInstance().getConfig().getString("earth_world"));
+    private final World world = Bukkit.getWorld(CONFIG.getString("earth_world"));
 
     /*
 
@@ -37,16 +39,14 @@ public class DatabaseRegions {
     //Get old database connection.
     public Connection conn() throws SQLException {
 
-        FileConfiguration config = Network.getInstance().getConfig();
-
-        String host = config.getString("host");
-        int port = config.getInt("port");
-        String username = config.getString("username");
-        String password = config.getString("password");
+        String host = CONFIG.getString("host");
+        int port = CONFIG.getInt("port");
+        String username = CONFIG.getString("username");
+        String password = CONFIG.getString("password");
 
         BasicDataSource dataSource = new BasicDataSource();
 
-        dataSource.setUrl("jdbc:mysql://" + host + ":" + port + "/" + config.getString("database_uknet") + "?&useSSL=false&");
+        dataSource.setUrl("jdbc:mysql://" + host + ":" + port + "/" + CONFIG.getString("database_uknet") + "?&useSSL=false&");
         dataSource.setUsername(username);
         dataSource.setPassword(password);
 

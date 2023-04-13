@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
 
+import static me.bteuk.network.utils.NetworkConfig.CONFIG;
+
 public class WGRegions {
 
     //Adds all members of region in the database to the correct ingame regions.
@@ -26,7 +28,7 @@ public class WGRegions {
 
         //Get regions.
         RegionContainer container = wg.getPlatform().getRegionContainer();
-        com.sk89q.worldguard.protection.managers.RegionManager regions = container.get(BukkitAdapter.adapt(Bukkit.getWorld(Network.getInstance().getConfig().getString("earth_world"))));
+        com.sk89q.worldguard.protection.managers.RegionManager regions = container.get(BukkitAdapter.adapt(Bukkit.getWorld(CONFIG.getString("earth_world"))));
 
         if (regions == null) {
             return;

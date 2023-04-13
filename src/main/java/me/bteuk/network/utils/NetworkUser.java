@@ -6,6 +6,9 @@ import me.bteuk.network.utils.regions.Region;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import static me.bteuk.network.utils.Constants.SERVER_NAME;
+import static me.bteuk.network.utils.NetworkConfig.CONFIG;
+
 public class NetworkUser {
 
     //Player instance.
@@ -102,15 +105,15 @@ public class NetworkUser {
         Network.getInstance().globalSQL.update("UPDATE player_data SET builder_role='" + Roles.builderRole(player) + "' WHERE uuid='" + player.getUniqueId() + "';");
 
         //Check if the player is in a region.
-        if (Network.SERVER_NAME.equals(Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH'"))) {
+        if (SERVER_NAME.equals(Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH'"))) {
             //Check if they are in the earth world.
-            if (player.getLocation().getWorld().getName().equals(Network.getInstance().getConfig().getString("earth_world"))) {
+            if (player.getLocation().getWorld().getName().equals(CONFIG.getString("earth_world"))) {
                 region = Network.getInstance().getRegionManager().getRegion(player.getLocation());
                 //Add region to database if not exists.
                 region.addToDatabase();
                 inRegion = true;
             }
-        } else if (Network.SERVER_NAME.equals(Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='PLOT';"))) {
+        } else if (SERVER_NAME.equals(Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='PLOT';"))) {
             //Check if the player is in a buildable plot world and apply coordinate transform if true.
             if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';")) {
                 dx = -Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';");

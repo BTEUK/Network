@@ -12,6 +12,7 @@ import org.bukkit.Bukkit;
 import java.util.ArrayList;
 
 import static me.bteuk.network.utils.Constants.SERVER_TYPE;
+import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public record Region(String regionName) {
 
@@ -123,7 +124,7 @@ public record Region(String regionName) {
                     + " WHERE region='" + regionName + "' AND uuid='" + uuid + "';");
 
             //Leave region in WorldGuard.
-            WorldGuard.addMember(regionName, uuid, Bukkit.getWorld(Network.getInstance().getConfig().getString("earth_world")));
+            WorldGuard.addMember(regionName, uuid, Bukkit.getWorld(CONFIG.getString("earth_world")));
 
         }
 
@@ -211,7 +212,7 @@ public record Region(String regionName) {
 
     //Set the region to default.
     public void setDefault(String removeRole) {
-        WorldGuard.removeGroup(regionName, "jrbuilder", Bukkit.getWorld(Network.getInstance().getConfig().getString("earth_world")));
+        WorldGuard.removeGroup(regionName, "jrbuilder", Bukkit.getWorld(CONFIG.getString("earth_world")));
         Network.getInstance().regionSQL.update("UPDATE regions SET status='default' WHERE region='" + regionName + "';");
     }
 
@@ -238,7 +239,7 @@ public record Region(String regionName) {
         removeMembers("&aThe region &3%tag% &ais now open, you no longer need to claimed it to build here.");
 
         //Set open.
-        WorldGuard.addGroup(regionName, "jrbuilder", Bukkit.getWorld(Network.getInstance().getConfig().getString("earth_world")));
+        WorldGuard.addGroup(regionName, "jrbuilder", Bukkit.getWorld(CONFIG.getString("earth_world")));
         Network.getInstance().regionSQL.update("UPDATE regions SET status='open' WHERE region='" + regionName + "';");
 
     }
@@ -262,7 +263,7 @@ public record Region(String regionName) {
             //Create region in worldguard.
             WorldGuard.createRegion(regionName, Integer.parseInt(regionName.split(",")[0]) * 512, Integer.parseInt(regionName.split(",")[1]) * 512,
                     Integer.parseInt(regionName.split(",")[0]) * 512 + 511, Integer.parseInt(regionName.split(",")[1]) * 512 + 511,
-                    Bukkit.getWorld(Network.getInstance().getConfig().getString("earth_world")));
+                    Bukkit.getWorld(CONFIG.getString("earth_world")));
         }
     }
 
@@ -275,7 +276,7 @@ public record Region(String regionName) {
             //Create region in worldguard.
             WorldGuard.createRegion(regionName, Integer.parseInt(regionName.split(",")[0]) * 512, Integer.parseInt(regionName.split(",")[1]) * 512,
                     Integer.parseInt(regionName.split(",")[0]) * 512 + 511, Integer.parseInt(regionName.split(",")[1]) * 512 + 511,
-                    Bukkit.getWorld(Network.getInstance().getConfig().getString("earth_world")));
+                    Bukkit.getWorld(CONFIG.getString("earth_world")));
         }
     }
 
@@ -481,7 +482,7 @@ public record Region(String regionName) {
                     uuid + "'," + Time.currentTime() + ");");
 
             //Join region in WorldGuard.
-            WorldGuard.addMember(regionName, uuid, Bukkit.getWorld(Network.getInstance().getConfig().getString("earth_world")));
+            WorldGuard.addMember(regionName, uuid, Bukkit.getWorld(CONFIG.getString("earth_world")));
 
             //Send message to user.
             Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aYou have joined the region &3" + regionName + " &aas a member.');");
@@ -517,7 +518,7 @@ public record Region(String regionName) {
                     uuid + "',1," + Time.currentTime() + ");");
 
             //Join region in WorldGuard.
-            WorldGuard.addMember(regionName, uuid, Bukkit.getWorld(Network.getInstance().getConfig().getString("earth_world")));
+            WorldGuard.addMember(regionName, uuid, Bukkit.getWorld(CONFIG.getString("earth_world")));
 
             Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aYou have joined the region &3" + regionName + " &aas the owner.');");
 
@@ -543,7 +544,7 @@ public record Region(String regionName) {
                     + " WHERE region='" + regionName + "' AND uuid='" + uuid + "';");
 
             //Leave region in WorldGuard.
-            WorldGuard.removeMember(regionName, uuid, Bukkit.getWorld(Network.getInstance().getConfig().getString("earth_world")));
+            WorldGuard.removeMember(regionName, uuid, Bukkit.getWorld(CONFIG.getString("earth_world")));
 
         } else {
 

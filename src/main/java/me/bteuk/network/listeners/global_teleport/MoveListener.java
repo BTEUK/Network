@@ -18,6 +18,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
+import static me.bteuk.network.utils.Constants.SERVER_NAME;
+import static me.bteuk.network.utils.NetworkConfig.CONFIG;
+
 public class MoveListener implements Listener {
 
     private final boolean regionsEnabled;
@@ -32,11 +35,9 @@ public class MoveListener implements Listener {
 
         Bukkit.getServer().getPluginManager().registerEvents(this, instance);
 
-        FileConfiguration config = instance.getConfig();
-
-        regionsEnabled = config.getBoolean("regions_enabled");
-        teleportEnabled = config.getBoolean("global_teleport");
-        earthWorld = config.getString("earth_world");
+        regionsEnabled = CONFIG.getBoolean("regions_enabled");
+        teleportEnabled = CONFIG.getBoolean("global_teleport");
+        earthWorld = CONFIG.getString("earth_world");
 
         regionManager = instance.getRegionManager();
 
@@ -116,7 +117,7 @@ public class MoveListener implements Listener {
 
                                     //Set join event to teleport there.
                                     EventManager.createJoinEvent(u.player.getUniqueId().toString(), "network", "teleport " +
-                                            location + " " + (l.getX() + xTransform) + " " + (l.getZ() + zTransform) + " " + l.getYaw() + " " + l.getPitch() + " " + Network.SERVER_NAME);
+                                            location + " " + (l.getX() + xTransform) + " " + (l.getZ() + zTransform) + " " + l.getYaw() + " " + l.getPitch() + " " + SERVER_NAME);
 
                                 } else {
 
@@ -125,7 +126,7 @@ public class MoveListener implements Listener {
 
                                     //Set join event to teleport there.
                                     EventManager.createJoinEvent(u.player.getUniqueId().toString(), "network", "teleport " +
-                                            earthWorld + " " + l.getX() + " " + l.getZ() + " " + l.getYaw() + " " + l.getPitch() + " " + Network.SERVER_NAME);
+                                            earthWorld + " " + l.getX() + " " + l.getZ() + " " + l.getYaw() + " " + l.getPitch() + " " + SERVER_NAME);
 
                                 }
 
