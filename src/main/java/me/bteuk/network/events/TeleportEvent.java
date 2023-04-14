@@ -1,7 +1,6 @@
 package me.bteuk.network.events;
 
 import me.bteuk.network.Network;
-import me.bteuk.network.commands.Back;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.ServerType;

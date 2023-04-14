@@ -12,6 +12,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 
+import static me.bteuk.network.utils.Constants.LOGGER;
+
 public class DebugStick implements CommandExecutor {
 
     @Override
@@ -38,6 +40,13 @@ public class DebugStick implements CommandExecutor {
 
         //Get user.
         NetworkUser u = Network.getInstance().getUser(p);
+
+        //If u is null, cancel.
+        if (u == null) {
+            LOGGER.severe("User " + p.getName() + " can not be found!");
+            p.sendMessage("User can not be found, please relog!");
+            return true;
+        }
 
         //Check if the player already has the selection tool in their inventory.
         if (i.containsAtLeast(new ItemStack(Material.DEBUG_STICK), 1)) {

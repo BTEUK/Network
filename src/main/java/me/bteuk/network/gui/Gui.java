@@ -1,6 +1,5 @@
 package me.bteuk.network.gui;
 
-import me.bteuk.network.Network;
 import me.bteuk.network.utils.NetworkUser;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -93,4 +92,5 @@ public abstract class Gui implements GuiInterface {
     public Map<Integer, guiAction> getActions() {
         return actions;
     }
+
 }

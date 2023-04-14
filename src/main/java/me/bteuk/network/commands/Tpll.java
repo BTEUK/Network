@@ -19,12 +19,12 @@ import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -57,38 +57,19 @@ public class Tpll implements CommandExecutor {
 
     }
 
-    /**
-     * Gets all objects in a string array above a given index
-     *
-     * @param args  Initial array
-     * @param index Starting index
-     * @return Selected array
-     */
-    private String[] selectArray(String[] args, int index) {
-        List<String> array = new ArrayList<>();
-        for (int i = index; i < args.length; i++) {
-            array.add(args[i]);
-        }
+    private String[] selectArray(String[] args) {
+        List<String> array = new ArrayList<>(Arrays.asList(args).subList(1, args.length));
 
-        return array.toArray(array.toArray(new String[array.size()]));
+        return array.toArray(array.toArray(new String[0]));
     }
 
     private String[] inverseSelectArray(String[] args, int index) {
-        List<String> array = new ArrayList<>();
-        for (int i = 0; i < index; i++) {
-            array.add(args[i]);
-        }
+        List<String> array = new ArrayList<>(Arrays.asList(args).subList(0, index));
 
-        return array.toArray(array.toArray(new String[array.size()]));
+        return array.toArray(array.toArray(new String[0]));
 
     }
 
-    /**
-     * Gets a space seperated string from an array
-     *
-     * @param args A string array
-     * @return The space seperated String
-     */
     private String getRawArguments(String[] args) {
         if (args.length == 0) {
             return "";
@@ -142,7 +123,7 @@ public class Tpll implements CommandExecutor {
         LatLng defaultCoords = CoordinateParseUtils.parseVerbatimCoordinates(this.getRawArguments(args).trim());
 
         if (defaultCoords == null) {
-            LatLng possiblePlayerCoords = CoordinateParseUtils.parseVerbatimCoordinates(this.getRawArguments(this.selectArray(args, 1)));
+            LatLng possiblePlayerCoords = CoordinateParseUtils.parseVerbatimCoordinates(this.getRawArguments(this.selectArray(args)));
             if (possiblePlayerCoords != null) {
                 defaultCoords = possiblePlayerCoords;
             }
@@ -157,11 +138,11 @@ public class Tpll implements CommandExecutor {
             }
         }
 
-        LatLng possibleHeightNameCoords = CoordinateParseUtils.parseVerbatimCoordinates(this.getRawArguments(this.inverseSelectArray(this.selectArray(args, 1), this.selectArray(args, 1).length - 1)));
+        LatLng possibleHeightNameCoords = CoordinateParseUtils.parseVerbatimCoordinates(this.getRawArguments(this.inverseSelectArray(this.selectArray(args), this.selectArray(args).length - 1)));
         if (possibleHeightNameCoords != null) {
             defaultCoords = possibleHeightNameCoords;
             try {
-                altitude = Double.parseDouble(this.selectArray(args, 1)[this.selectArray(args, 1).length - 1]);
+                altitude = Double.parseDouble(this.selectArray(args)[this.selectArray(args).length - 1]);
             } catch (Exception ignored) {
             }
         }

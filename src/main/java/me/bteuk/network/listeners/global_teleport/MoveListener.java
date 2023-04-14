@@ -6,18 +6,19 @@ import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.enums.RegionStatus;
 import me.bteuk.network.utils.regions.Region;
 import me.bteuk.network.utils.regions.RegionManager;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
+import static me.bteuk.network.utils.Constants.LOGGER;
 import static me.bteuk.network.utils.Constants.SERVER_NAME;
 import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
@@ -49,6 +50,7 @@ public class MoveListener implements Listener {
         blocked = true;
     }
 
+    @Deprecated
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent e) {
 
@@ -59,6 +61,14 @@ public class MoveListener implements Listener {
 
         Player p = e.getPlayer();
         NetworkUser u = Network.getInstance().getUser(p);
+
+        //If u is null, cancel.
+        if (u == null) {
+            LOGGER.severe("User " + p.getName() + " can not be found!");
+            p.sendMessage("User can not be found, please relog!");
+            e.setCancelled(true);
+            return;
+        }
 
         //Cancel event if player is switching server.
         if (u.switching) {
@@ -106,7 +116,7 @@ public class MoveListener implements Listener {
                                 //Region is on another server, teleport them accordingly.
                                 //If the new region is on a plot server, check for coordinate transform.
                                 String server;
-                                if (region.isPlot()) {
+                                if (region.status() == RegionStatus.PLOT) {
 
                                     //Get server and world of region.
                                     server = Network.getInstance().plotSQL.getString("SELECT server FROM regions WHERE region='" + region.regionName() + "';");
@@ -158,7 +168,7 @@ public class MoveListener implements Listener {
                                 region.setLastEnter(p.getUniqueId().toString());
 
                                 //If the region is inactive, set it to active.
-                                if (region.isInactive()) {
+                                if (region.status() == RegionStatus.INACTIVE) {
                                     region.setDefault();
                                     p.sendMessage(Utils.success("This region is no longer \"Inactive\", it has been set back to default settings."));
                                 }
@@ -170,7 +180,7 @@ public class MoveListener implements Listener {
                                 region.setLastEnter(p.getUniqueId().toString());
 
                                 //If the region is inactive, make this member to owner.
-                                if (region.isInactive()) {
+                                if (region.status() == RegionStatus.INACTIVE) {
                                     //Make the previous owner a member.
                                     region.makeMember();
 
@@ -186,7 +196,7 @@ public class MoveListener implements Listener {
                                 }
 
                                 //Check if the region is open and the player is at least jr.builder.
-                            } else if (region.isOpen() && p.hasPermission("group.jrbuilder")) {
+                            } else if (region.status() == RegionStatus.OPEN && p.hasPermission("group.jrbuilder")) {
 
                                 p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.success("You have entered &3" + region.getTag(p.getUniqueId().toString()) + " &aand left &3" + u.region.getTag(p.getUniqueId().toString()) + "&a, you can build in this region.")));
 

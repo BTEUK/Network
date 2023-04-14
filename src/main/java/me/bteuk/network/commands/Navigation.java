@@ -15,6 +15,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
+import static me.bteuk.network.utils.Constants.LOGGER;
+
 public class Navigation implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
@@ -32,10 +34,17 @@ public class Navigation implements CommandExecutor {
             return true;
         }
 
+        //If u is null, cancel.
+        NetworkUser u = Network.getInstance().getUser(p);
+        if (u == null) {
+            LOGGER.severe("User " + p.getName() + " can not be found!");
+            p.sendMessage("User can not be found, please relog!");
+            return true;
+        }
+
         //Add
         if (args[0].equalsIgnoreCase("add")) {
             if (p.hasPermission("uknet.navigation.request")) {
-                NetworkUser u = Network.getInstance().getUser(p);
                 if (u.mainGui != null) {
                     u.mainGui.delete();
                 }
@@ -57,7 +66,6 @@ public class Navigation implements CommandExecutor {
                     if (Network.getInstance().globalSQL.hasRow("SELECT location FROM location_data WHERE location='" + location + "';")) {
                         //Open update location menu.
                         //They must be staff to access this.
-                        NetworkUser u = Network.getInstance().getUser(p);
                         if (u.staffGui != null) {
                             u.staffGui.delete();
                         }

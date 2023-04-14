@@ -11,6 +11,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import static me.bteuk.network.utils.Constants.LOGGER;
+
 public class AFK implements CommandExecutor {
 
     @Override
@@ -26,6 +28,13 @@ public class AFK implements CommandExecutor {
 
         //Get user
         NetworkUser u = Network.getInstance().getUser(p);
+
+        //If u is null, cancel.
+        if (u == null) {
+            LOGGER.severe("User " + p.getName() + " can not be found!");
+            p.sendMessage("User can not be found, please relog!");
+            return true;
+        }
 
         //Switch afk status.
         if (u.afk) {

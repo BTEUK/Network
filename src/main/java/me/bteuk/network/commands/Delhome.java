@@ -12,7 +12,7 @@ import java.util.Arrays;
 
 public class Delhome implements CommandExecutor {
 
-    private GlobalSQL globalSQL;
+    private final GlobalSQL globalSQL;
 
     public Delhome(GlobalSQL globalSQL) {
         this.globalSQL = globalSQL;

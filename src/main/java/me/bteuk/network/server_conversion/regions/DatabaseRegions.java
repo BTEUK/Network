@@ -1,6 +1,7 @@
 package me.bteuk.network.server_conversion.regions;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.utils.enums.RegionStatus;
 import me.bteuk.network.utils.regions.Region;
 import me.bteuk.network.utils.regions.RegionManager;
 import net.buildtheearth.terraminusminus.dataset.IScalarDataset;
@@ -17,6 +18,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 import static me.bteuk.network.utils.NetworkConfig.CONFIG;
@@ -24,7 +26,7 @@ import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 public class DatabaseRegions {
 
     private final EarthGeneratorSettings bteGeneratorSettings = EarthGeneratorSettings.parse(EarthGeneratorSettings.BTE_DEFAULT_SETTINGS);
-    private final World world = Bukkit.getWorld(CONFIG.getString("earth_world"));
+    private final World world = Bukkit.getWorld(Objects.requireNonNull(CONFIG.getString("earth_world")));
 
     /*
 
@@ -107,7 +109,7 @@ public class DatabaseRegions {
             while (results.next()) {
 
                 //If the region is not open, add the user to the region.
-                if (!regionManager.getRegion(results.getString("region")).isOpen()) {
+                if (!(regionManager.getRegion(results.getString("region")).status() == RegionStatus.OPEN)) {
 
                     //If this region already has a member, copy their coordinate id to prevent duplicate entries in the database.
                     if (Network.getInstance().regionSQL.hasRow("SELECT region FROM region_members WHERE region='" + results.getString("id") + "';")) {
@@ -181,7 +183,7 @@ public class DatabaseRegions {
             while (results.next()) {
 
                 //If the region is not open, add the user to the region.
-                if (!regionManager.getRegion(results.getString("region")).isOpen()) {
+                if (!(regionManager.getRegion(results.getString("region")).status() == RegionStatus.OPEN)) {
 
                     //If this region already has a member, copy their coordinate id to prevent duplicate entries in the database.
                     if (Network.getInstance().regionSQL.hasRow("SELECT region FROM region_members WHERE region='" + results.getString("id") + "';")) {

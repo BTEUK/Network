@@ -6,6 +6,7 @@ import me.bteuk.network.gui.Gui;
 import me.bteuk.network.sql.RegionSQL;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.enums.RegionStatus;
 import me.bteuk.network.utils.regions.Region;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -21,8 +22,6 @@ public class RegionMenu extends Gui {
     private final RegionSQL regionSQL;
 
     private int page;
-
-    private Region region;
 
     public RegionMenu(NetworkUser user) {
 
@@ -104,12 +103,13 @@ public class RegionMenu extends Gui {
             }
 
             //If i is less than owner.size it means that we are still iterating through the owners, else we are iterating through the members.
+            Region region;
             if (i < owner.size()) {
 
                 region = Network.getInstance().getRegionManager().getRegion(owner.get(i));
 
                 //If the region is inactive change the colour of the icon so the user knows it's inactive.
-                if (region.isInactive()) {
+                if (region.status() == RegionStatus.INACTIVE) {
                     setItem(slot, Utils.createItem(Material.ORANGE_CONCRETE, 1,
                                     Utils.title("Region " + region.getTag(user.player.getUniqueId().toString())),
                                     Utils.line("You are the owner of this region."),
@@ -150,7 +150,7 @@ public class RegionMenu extends Gui {
                 region = Network.getInstance().getRegionManager().getRegion(member.get((finalI - owner.size())));
 
                 //If the region is inactive change the colour of the icon so the user knows it's inactive.
-                if (region.isInactive()) {
+                if (region.status() == RegionStatus.INACTIVE) {
 
                     setItem(slot, Utils.createItem(Material.LIME_CONCRETE, 1,
                                     Utils.title("Region " + region.getTag(user.player.getUniqueId().toString())),

@@ -3,6 +3,7 @@ package me.bteuk.network.listeners.global_teleport;
 import me.bteuk.network.Network;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.enums.RegionStatus;
 import me.bteuk.network.utils.enums.ServerType;
 import me.bteuk.network.utils.regions.Region;
 import me.bteuk.network.utils.regions.RegionManager;
@@ -10,14 +11,12 @@ import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
-import static me.bteuk.network.utils.Constants.SERVER_NAME;
-import static me.bteuk.network.utils.Constants.SERVER_TYPE;
+import static me.bteuk.network.utils.Constants.*;
 import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public class TeleportListener implements Listener {
@@ -46,6 +45,7 @@ public class TeleportListener implements Listener {
         blocked = true;
     }
 
+    @Deprecated
     @EventHandler
     public void onPlayerTeleport(PlayerTeleportEvent e) {
 
@@ -56,6 +56,15 @@ public class TeleportListener implements Listener {
 
         Player p = e.getPlayer();
         NetworkUser u = Network.getInstance().getUser(p);
+
+        //If u is null, cancel.
+        if (u == null) {
+            LOGGER.severe("User " + p.getName() + " can not be found!");
+            p.sendMessage("User can not be found, please relog!");
+            e.setCancelled(true);
+            return;
+        }
+
 
         //Cancel event if player is switching server.
         if (u.switching) {
@@ -91,7 +100,7 @@ public class TeleportListener implements Listener {
                                     region.setLastEnter(p.getUniqueId().toString());
 
                                     //If the region is inactive, set it to active.
-                                    if (region.isInactive()) {
+                                    if (region.status() == RegionStatus.INACTIVE) {
                                         region.setDefault();
                                         p.sendMessage(Utils.success("This region is no longer \"Inactive\", it has been set back to default settings."));
                                     }
@@ -103,7 +112,7 @@ public class TeleportListener implements Listener {
                                     region.setLastEnter(p.getUniqueId().toString());
 
                                     //If the region is inactive, make this member to owner.
-                                    if (region.isInactive()) {
+                                    if (region.status() == RegionStatus.INACTIVE) {
                                         //Make the previous owner a member.
                                         region.makeMember();
 
@@ -119,7 +128,7 @@ public class TeleportListener implements Listener {
                                     }
 
                                     //Check if the region is open and the player is at least jr.builder.
-                                } else if (region.isOpen() && p.hasPermission("group.jrbuilder")) {
+                                } else if (region.status() == RegionStatus.OPEN && p.hasPermission("group.jrbuilder")) {
 
                                     p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.success("You have entered &3" + region.getTag(p.getUniqueId().toString()) + " &aand left &3" + u.region.getTag(p.getUniqueId().toString()) + "&a, you can build in this region.")));
 
@@ -156,7 +165,7 @@ public class TeleportListener implements Listener {
                                 region.setLastEnter(p.getUniqueId().toString());
 
                                 //If the region is inactive, set it to active.
-                                if (region.isInactive()) {
+                                if (region.status() == RegionStatus.INACTIVE) {
                                     region.setDefault();
                                     p.sendMessage(Utils.success("This region is no longer \"Inactive\", it has been set back to default settings."));
                                 }
@@ -168,7 +177,7 @@ public class TeleportListener implements Listener {
                                 region.setLastEnter(p.getUniqueId().toString());
 
                                 //If the region is inactive, make this member to owner.
-                                if (region.isInactive()) {
+                                if (region.status() == RegionStatus.INACTIVE) {
                                     //Make the previous owner a member.
                                     region.makeMember();
 
@@ -184,7 +193,7 @@ public class TeleportListener implements Listener {
                                 }
 
                                 //Check if the region is open and the player is at least jr.builder.
-                            } else if (region.isOpen() && p.hasPermission("group.jrbuilder")) {
+                            } else if (region.status() == RegionStatus.OPEN && p.hasPermission("group.jrbuilder")) {
 
                                 p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.success("You have entered &3" + region.getTag(p.getUniqueId().toString()) + "&a, you can build in this region.")));
 

@@ -1,6 +1,5 @@
 package me.bteuk.network.commands;
 
-import me.bteuk.network.Network;
 import me.bteuk.network.events.EventManager;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.utils.SwitchServer;
@@ -13,11 +12,12 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import static me.bteuk.network.utils.Constants.SERVER_NAME;
 
 public class Home implements CommandExecutor {
-    private GlobalSQL globalSQL;
+    private final GlobalSQL globalSQL;
 
     public Home(GlobalSQL globalSQL) {
         this.globalSQL = globalSQL;
@@ -50,7 +50,7 @@ public class Home implements CommandExecutor {
             String server = globalSQL.getString("SELECT server FROM coordinates WHERE id=" + coordinate_id + ";");
 
             //Check if server is current.
-            if (SERVER_NAME.equals(server)) {
+            if (Objects.equals(SERVER_NAME, server)) {
 
                 //Get default home location from the coordinate id.
                 Location l = globalSQL.getCoordinate(coordinate_id);
@@ -95,7 +95,7 @@ public class Home implements CommandExecutor {
             String server = globalSQL.getString("SELECT server FROM coordinates WHERE id=" + coordinate_id + ";");
 
             //Check if server is current.
-            if (SERVER_NAME.equals(server)) {
+            if (Objects.equals(SERVER_NAME, server)) {
 
                 //Get default home location from the coordinate id.
                 Location l = globalSQL.getCoordinate(coordinate_id);

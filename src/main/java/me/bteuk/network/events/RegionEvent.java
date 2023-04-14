@@ -2,6 +2,7 @@ package me.bteuk.network.events;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.enums.RegionStatus;
 import me.bteuk.network.utils.regions.Region;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -27,7 +28,7 @@ public class RegionEvent {
                 if (event[2].equals("plotsystem")) {
 
                     //If region is not already set to plotsystem.
-                    if (!region.isPlot()) {
+                    if (!(region.status() == RegionStatus.PLOT)) {
 
                         //Set region to plotsystem.
                         //This will kick any members.
@@ -37,7 +38,7 @@ public class RegionEvent {
                 } else if (event[2].equals("default")) {
 
                     //If region is not already set to default.
-                    if (!region.isDefault()) {
+                    if (!(region.status() == RegionStatus.DEFAULT)) {
 
                         //Set region to default.
                         region.setDefault();
@@ -108,9 +109,6 @@ public class RegionEvent {
                 break;
             }
             case "join": {
-
-                //Get player.
-                Player p = Bukkit.getPlayer(UUID.fromString(uuid));
 
                 //Get the region.
                 region = Network.getInstance().getRegionManager().getRegion(event[2]);

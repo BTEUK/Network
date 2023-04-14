@@ -1,7 +1,6 @@
 package me.bteuk.network.commands;
 
 import me.bteuk.network.Network;
-import me.bteuk.network.utils.NetworkConfig;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;

@@ -11,6 +11,7 @@ import me.bteuk.network.gui.regions.RegionInfo;
 import me.bteuk.network.gui.regions.RegionMenu;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.SwitchServer;
+import me.bteuk.network.utils.enums.RegionStatus;
 import me.bteuk.network.utils.enums.ServerType;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.regions.Region;
@@ -225,7 +226,7 @@ public class BuildGui extends Gui {
                     if (user.region.hasActiveOwner()) {
 
                         //Check if the region is public.
-                        if (user.region.isPublic()) {
+                        if (user.region.status() == RegionStatus.PUBLIC) {
 
                             setItem(5, Utils.createItem(Material.DARK_OAK_DOOR, 1,
                                             Utils.title("Join Region"),
@@ -338,7 +339,7 @@ public class BuildGui extends Gui {
                 } else {
 
                     //If the region is open.
-                    if (user.region.isOpen()) {
+                    if (user.region.status() == RegionStatus.OPEN) {
                         setItem(5, Utils.createItem(Material.SPYGLASS, 1,
                                 Utils.title("Open Region"),
                                 Utils.line("This region is open to all Jr.Builder+."),

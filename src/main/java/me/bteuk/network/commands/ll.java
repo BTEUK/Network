@@ -15,11 +15,14 @@ import org.jetbrains.annotations.NotNull;
 
 import java.text.DecimalFormat;
 
+import static me.bteuk.network.utils.Constants.LOGGER;
+
 public class ll implements CommandExecutor {
 
     private final EarthGeneratorSettings bteGeneratorSettings = EarthGeneratorSettings.parse(EarthGeneratorSettings.BTE_DEFAULT_SETTINGS);
     private static final DecimalFormat DECIMAL_FORMATTER = new DecimalFormat("##.#####");
 
+    @Deprecated
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
 
@@ -33,6 +36,13 @@ public class ll implements CommandExecutor {
 
         //Get coordinates at the location of the player if they're in a region.
         NetworkUser u = Network.getInstance().getUser(p);
+
+        //If u is null, cancel.
+        if (u == null) {
+            LOGGER.severe("User " + p.getName() + " can not be found!");
+            p.sendMessage("User can not be found, please relog!");
+            return true;
+        }
 
         if (u.inRegion) {
 

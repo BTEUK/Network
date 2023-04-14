@@ -8,6 +8,7 @@ import me.bteuk.network.gui.InviteMembers;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.enums.RegionStatus;
 import me.bteuk.network.utils.enums.RegionType;
 import me.bteuk.network.utils.regions.Region;
 import me.bteuk.network.utils.regions.RegionTagListener;
@@ -166,7 +167,7 @@ public class RegionInfo extends Gui {
         if (region.isOwner(uuid)) {
 
             //If region is private, make public button, if public make private button.
-            if (region.isPublic()) {
+            if (region.status() == RegionStatus.PUBLIC) {
                 setItem(0, Utils.createItem(Material.IRON_TRAPDOOR, 1,
                                 Utils.title("Make Private"),
                                 Utils.line("New members will need your approval to join the region.")),

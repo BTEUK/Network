@@ -3,6 +3,7 @@ package me.bteuk.network.staff;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.enums.RegionStatus;
 import me.bteuk.network.utils.regions.Region;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -31,13 +32,13 @@ public class ManageRegion extends Gui {
                 Utils.title("Region " + region.regionName()),
                 Utils.line("Current owner: &7" + region.ownerName()),
                 Utils.line("Number of members: &7" + region.memberCount()),
-                Utils.line("&fRegion status: &7" + region.getStatus())));
+                Utils.line("&fRegion status: &7" + region.status().label)));
 
 
         //Set public if status is default or inactive.
         //Set private if status is public.
         if (user.player.hasPermission("uknet.regions.manage.public")) {
-            if (region.isDefault() || region.isInactive()) {
+            if (region.status() == RegionStatus.DEFAULT || region.status() == RegionStatus.INACTIVE) {
 
                 setItem(11, Utils.createItem(Material.OAK_DOOR, 1,
                                 Utils.title("Make region public"),
@@ -52,7 +53,7 @@ public class ManageRegion extends Gui {
 
                         });
 
-            } else if (region.isPublic()) {
+            } else if (region.status() == RegionStatus.PUBLIC) {
 
                 setItem(11, Utils.createItem(Material.IRON_DOOR, 1,
                                 Utils.title("Make region private"),
@@ -123,7 +124,7 @@ public class ManageRegion extends Gui {
         //Set region locked if region is default, public, open or inactive.
         //Set region unlocked if region is locked.
         if (user.player.hasPermission("uknet.regions.manage.lock")) {
-            if (region.isDefault() || region.isPublic() || region.isOpen() || region.isInactive()) {
+            if (region.status() == RegionStatus.DEFAULT || region.status() == RegionStatus.PUBLIC || region.status() == RegionStatus.OPEN || region.status() == RegionStatus.INACTIVE) {
 
                 setItem(12, Utils.createItem(Material.IRON_TRAPDOOR, 1,
                                 Utils.title("Lock Region"),
@@ -135,7 +136,7 @@ public class ManageRegion extends Gui {
                         u -> {
 
                             //If region is currently open, remove jrbuilder group.
-                            if (region.isOpen()) {
+                            if (region.status() == RegionStatus.OPEN) {
                                 region.setDefault("jrbuilder");
                             }
 
@@ -145,7 +146,7 @@ public class ManageRegion extends Gui {
 
                         });
 
-            } else if (region.isLocked()) {
+            } else if (region.status() == RegionStatus.LOCKED) {
 
                 setItem(12, Utils.createItem(Material.OAK_TRAPDOOR, 1,
                                 Utils.title("Unlock Region"),
@@ -165,7 +166,7 @@ public class ManageRegion extends Gui {
         //Set region open if status is default, public or inactive.
         //Set region default if status is open.
         if (user.player.hasPermission("uknet.regions.manage.open")) {
-            if (region.isDefault() || region.isPublic() || region.isInactive()) {
+            if (region.status() == RegionStatus.DEFAULT || region.status() == RegionStatus.PUBLIC || region.status() == RegionStatus.INACTIVE) {
 
                 setItem(13, Utils.createItem(Material.OAK_FENCE_GATE, 1,
                                 Utils.title("Make region open"),
@@ -179,7 +180,7 @@ public class ManageRegion extends Gui {
                             this.refresh();
                         });
 
-            } else if (region.isOpen()) {
+            } else if (region.status() == RegionStatus.OPEN) {
 
                 setItem(13, Utils.createItem(Material.OAK_FENCE, 1,
                                 Utils.title("Make region closed"),

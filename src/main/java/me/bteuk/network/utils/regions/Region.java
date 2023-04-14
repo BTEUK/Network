@@ -6,20 +6,18 @@ import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.WorldGuard;
+import me.bteuk.network.utils.enums.RegionStatus;
 import me.bteuk.network.utils.enums.ServerType;
 import org.bukkit.Bukkit;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
+import static me.bteuk.network.utils.Constants.EARTH_WORLD;
 import static me.bteuk.network.utils.Constants.SERVER_TYPE;
 import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public record Region(String regionName) {
-
-    //Get the status of the region.
-    public String getStatus() {
-        return Network.getInstance().regionSQL.getString("SELECT status FROM regions WHERE region='" + regionName + "';");
-    }
 
     //Get the tag of the region for a specific player, or name if no tag is set.
     public String getTag(String uuid) {
@@ -61,24 +59,9 @@ public record Region(String regionName) {
         return (Network.getInstance().regionSQL.hasRow("SELECT region FROM region_members WHERE region='" + regionName + "' AND uuid='" + uuid + "' AND is_owner=0;"));
     }
 
-    //Return whether the region is default or not.
-    public boolean isDefault() {
-        return (Network.getInstance().regionSQL.hasRow("SELECT region FROM regions WHERE region='" + regionName + "' AND status='default';"));
-    }
-
-    //Return whether the region is open or not.
-    public boolean isOpen() {
-        return (Network.getInstance().regionSQL.hasRow("SELECT region FROM regions WHERE region='" + regionName + "' AND status='open';"));
-    }
-
-    //Return whether the region is locked or not.
-    public boolean isLocked() {
-        return (Network.getInstance().regionSQL.hasRow("SELECT region FROM regions WHERE region='" + regionName + "' AND status='locked';"));
-    }
-
-    //Return whether the region is public or not.
-    public boolean isPublic() {
-        return (Network.getInstance().regionSQL.hasRow("SELECT region FROM regions WHERE region='" + regionName + "' AND status='public';"));
+    //Return the region status.
+    public RegionStatus status() {
+        return (RegionStatus.valueOf(Network.getInstance().regionSQL.getString("SELECT status FROM regions WHERE region='" + regionName + "';")));
     }
 
     //Return whether the region is claimable.
@@ -94,16 +77,6 @@ public record Region(String regionName) {
     //Set the region as inactive.
     public void setInactive() {
         Network.getInstance().regionSQL.update("UPDATE regions SET status='inactive' WHERE region='" + regionName + "';");
-    }
-
-    //Return whether the region is inactive.
-    public boolean isInactive() {
-        return (Network.getInstance().regionSQL.hasRow("SELECT region FROM regions WHERE region='" + regionName + "' AND status='inactive';"));
-    }
-
-    //Return whether the region is on the plot server.
-    public boolean isPlot() {
-        return (Network.getInstance().regionSQL.hasRow("SELECT region FROM regions WHERE region='" + regionName + "' AND status='plot';"));
     }
 
     //Set the region to be for plots.
@@ -124,7 +97,7 @@ public record Region(String regionName) {
                     + " WHERE region='" + regionName + "' AND uuid='" + uuid + "';");
 
             //Leave region in WorldGuard.
-            WorldGuard.addMember(regionName, uuid, Bukkit.getWorld(CONFIG.getString("earth_world")));
+            WorldGuard.addMember(regionName, uuid, Bukkit.getWorld(Objects.requireNonNull(EARTH_WORLD)));
 
         }
 
@@ -212,7 +185,7 @@ public record Region(String regionName) {
 
     //Set the region to default.
     public void setDefault(String removeRole) {
-        WorldGuard.removeGroup(regionName, "jrbuilder", Bukkit.getWorld(CONFIG.getString("earth_world")));
+        WorldGuard.removeGroup(regionName, removeRole, Bukkit.getWorld(Objects.requireNonNull(EARTH_WORLD)));
         Network.getInstance().regionSQL.update("UPDATE regions SET status='default' WHERE region='" + regionName + "';");
     }
 
@@ -239,7 +212,7 @@ public record Region(String regionName) {
         removeMembers("&aThe region &3%tag% &ais now open, you no longer need to claimed it to build here.");
 
         //Set open.
-        WorldGuard.addGroup(regionName, "jrbuilder", Bukkit.getWorld(CONFIG.getString("earth_world")));
+        WorldGuard.addGroup(regionName, "jrbuilder", Bukkit.getWorld(Objects.requireNonNull(EARTH_WORLD)));
         Network.getInstance().regionSQL.update("UPDATE regions SET status='open' WHERE region='" + regionName + "';");
 
     }
@@ -255,6 +228,7 @@ public record Region(String regionName) {
     }
 
     //Add the region to the database.
+
     public void addToDatabase() {
         //Check if it's not already in the database.
         if (!inDatabase()) {
@@ -263,7 +237,7 @@ public record Region(String regionName) {
             //Create region in worldguard.
             WorldGuard.createRegion(regionName, Integer.parseInt(regionName.split(",")[0]) * 512, Integer.parseInt(regionName.split(",")[1]) * 512,
                     Integer.parseInt(regionName.split(",")[0]) * 512 + 511, Integer.parseInt(regionName.split(",")[1]) * 512 + 511,
-                    Bukkit.getWorld(CONFIG.getString("earth_world")));
+                    Bukkit.getWorld(Objects.requireNonNull(EARTH_WORLD)));
         }
     }
 
@@ -276,7 +250,7 @@ public record Region(String regionName) {
             //Create region in worldguard.
             WorldGuard.createRegion(regionName, Integer.parseInt(regionName.split(",")[0]) * 512, Integer.parseInt(regionName.split(",")[1]) * 512,
                     Integer.parseInt(regionName.split(",")[0]) * 512 + 511, Integer.parseInt(regionName.split(",")[1]) * 512 + 511,
-                    Bukkit.getWorld(CONFIG.getString("earth_world")));
+                    Bukkit.getWorld(Objects.requireNonNull(EARTH_WORLD)));
         }
     }
 
@@ -405,7 +379,7 @@ public record Region(String regionName) {
     public void joinRegion(NetworkUser u) {
 
         //If region is public then it must already have an owner.
-        if (isPublic()) {
+        if (status() == RegionStatus.PUBLIC) {
 
             //Add new coordinate at the location of the player.
             int coordinateID = Network.getInstance().globalSQL.addCoordinate(u.player.getLocation());
@@ -426,7 +400,7 @@ public record Region(String regionName) {
         } else {
 
             //If the region is inactive, demote the previous owner to a member.
-            if (isInactive()) {
+            if (status() == RegionStatus.INACTIVE) {
 
                 String owner = getOwner();
 
@@ -482,7 +456,7 @@ public record Region(String regionName) {
                     uuid + "'," + Time.currentTime() + ");");
 
             //Join region in WorldGuard.
-            WorldGuard.addMember(regionName, uuid, Bukkit.getWorld(CONFIG.getString("earth_world")));
+            WorldGuard.addMember(regionName, uuid, Bukkit.getWorld(Objects.requireNonNull(EARTH_WORLD)));
 
             //Send message to user.
             Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aYou have joined the region &3" + regionName + " &aas a member.');");
@@ -490,7 +464,7 @@ public record Region(String regionName) {
         } else {
 
             //If the region is inactive, demote the previous owner to a member.
-            if (isInactive()) {
+            if (status() == RegionStatus.INACTIVE) {
 
                 String owner = getOwner();
 
@@ -518,7 +492,7 @@ public record Region(String regionName) {
                     uuid + "',1," + Time.currentTime() + ");");
 
             //Join region in WorldGuard.
-            WorldGuard.addMember(regionName, uuid, Bukkit.getWorld(CONFIG.getString("earth_world")));
+            WorldGuard.addMember(regionName, uuid, Bukkit.getWorld(Objects.requireNonNull(EARTH_WORLD)));
 
             Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aYou have joined the region &3" + regionName + " &aas the owner.');");
 
@@ -544,7 +518,7 @@ public record Region(String regionName) {
                     + " WHERE region='" + regionName + "' AND uuid='" + uuid + "';");
 
             //Leave region in WorldGuard.
-            WorldGuard.removeMember(regionName, uuid, Bukkit.getWorld(CONFIG.getString("earth_world")));
+            WorldGuard.removeMember(regionName, uuid, Bukkit.getWorld(Objects.requireNonNull(EARTH_WORLD)));
 
         } else {
 
@@ -591,7 +565,7 @@ public record Region(String regionName) {
             Network.getInstance().regionSQL.update("UPDATE region_members SET is_owner=1 WHERE region='" + regionName + "' AND uuid='" + uuid + "';");
 
             //If the region is currently set as inactive and the new owner isn't, set it to default.
-            if (isInactive() && hasActiveOwner()) {
+            if (status() == RegionStatus.INACTIVE && hasActiveOwner()) {
                 setDefault();
             }
         }

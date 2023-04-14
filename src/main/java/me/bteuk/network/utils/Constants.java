@@ -2,7 +2,6 @@ package me.bteuk.network.utils;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.utils.enums.ServerType;
-import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.logging.Logger;
 
@@ -28,6 +27,9 @@ public class Constants {
     public static final int MAX_Y;
     public static final int MIN_Y;
 
+    //Earth world name.
+    public static final String EARTH_WORLD;
+
     static {
 
         LOGGER = Network.getInstance().getLogger();
@@ -45,5 +47,11 @@ public class Constants {
         MAX_Y = CONFIG.getInt("tpll.max_y");
         MIN_Y = CONFIG.getInt("tpll.min_y");
 
+        if (CONFIG.getString("earth_world") == null) {
+            //Setting default value.
+            EARTH_WORLD = "earth";
+        } else {
+            EARTH_WORLD = CONFIG.getString("earth_world");
+        }
     }
 }

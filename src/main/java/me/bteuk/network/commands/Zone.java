@@ -2,7 +2,6 @@ package me.bteuk.network.commands;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.events.EventManager;
-import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.Utils;
 import org.bukkit.command.Command;
@@ -46,7 +45,6 @@ public class Zone implements CommandExecutor {
             return true;
         }
 
-        GlobalSQL globalSQL = Network.getInstance().globalSQL;
         PlotSQL plotSQL = Network.getInstance().plotSQL;
 
         //Check if they have an invite for this plot.

@@ -1,6 +1,5 @@
 package me.bteuk.network.commands;
 
-import me.bteuk.network.Network;
 import me.bteuk.network.utils.Roles;
 import me.bteuk.network.utils.Utils;
 import me.clip.placeholderapi.PlaceholderAPI;
