@@ -7,9 +7,8 @@ import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Roles;
 import me.bteuk.network.utils.Time;
-import me.bteuk.network.utils.Utils;
-import me.bteuk.network.utils.enums.ServerType;
 import me.clip.placeholderapi.PlaceholderAPI;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -38,7 +37,7 @@ public class JoinServer implements Listener {
     public void joinServerEvent(PlayerJoinEvent e) {
 
         //Cancel default join message to null.
-        e.setJoinMessage(null);
+        e.joinMessage(null);
 
         //If the player is not in the online_users table add them, and run a network connect.
         //If they are update the server.
@@ -71,7 +70,7 @@ public class JoinServer implements Listener {
         }
 
         //Add the player to the fake players list for other servers.
-        instance.chat.broadcastMessage("add " + e.getPlayer().getUniqueId(), "uknet:tab");
+        instance.chat.broadcastMessage(Component.text("add " + e.getPlayer().getUniqueId()), "uknet:tab");
 
         //Remove the player from the fake players list, if they are currently in it.
         instance.tab.removeFakePlayer(e.getPlayer().getUniqueId().toString());

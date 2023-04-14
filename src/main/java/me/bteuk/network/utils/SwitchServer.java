@@ -16,7 +16,7 @@ public class SwitchServer {
 
         //If server is null, cancel and notify player.
         if (server == null) {
-            p.sendMessage(Utils.chat("&cAn error occured, server does not exist."));
+            p.sendMessage(Utils.error("An error occured, server does not exist."));
             Network.getInstance().getLogger().warning("Player attempting to switch to non-existing server.");
 
             //Remove any join events that the player may have.

@@ -80,13 +80,13 @@ public class LightsOut extends Gui {
                 if (game[i][j]) {
 
                     //Light is on.
-                    setItem(i + j * 9, Utils.createItem(Material.SEA_LANTERN, 1, " "),
+                    setItem(i + j * 9, Utils.createItem(Material.SEA_LANTERN, 1, Component.empty()),
                             u -> invertLights(finalI, finalJ));
 
                 } else {
 
                     //Light is off.
-                    setItem(i + j * 9, Utils.createItem(Material.REDSTONE_LAMP, 1, " "),
+                    setItem(i + j * 9, Utils.createItem(Material.REDSTONE_LAMP, 1, Component.empty()),
                             u -> invertLights(finalI, finalJ));
 
                 }

@@ -5,8 +5,8 @@ import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.regions.Region;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -34,9 +34,9 @@ public class InviteEvent {
                     p.sendMessage(Utils.success("You have been invited to plot &3" + event[2] + " &aby &3" +
                             globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + plotSQL.getString("SELECT owner FROM plot_invites WHERE id=" + id + ";") + "';")));
 
-                    TextComponent message = new TextComponent(Utils.success("To join the plot click &3here&a!"));
-                    message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/plot join " + event[2]));
-                    p.spigot().sendMessage(message);
+                    Component message = Utils.success("To join the plot click here!");
+                    message = message.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/plot join " + event[2]));
+                    p.sendMessage(message);
 
                 }
             }
@@ -56,9 +56,10 @@ public class InviteEvent {
                     p.sendMessage(Utils.success("You have been invited to zone &3" + event[2] + " &aby &3" +
                             globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + plotSQL.getString("SELECT owner FROM zone_invites WHERE id=" + id + ";") + "';")));
 
-                    TextComponent message = new TextComponent(Utils.success("To join the zone click &3here&a!"));
-                    message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/zone join " + event[2]));
-                    p.spigot().sendMessage(message);
+
+                    Component message = Utils.success("To join the zone click here!");
+                    message = message.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/zone join " + event[2]));
+                    p.sendMessage(message);
 
                 }
             }
@@ -76,9 +77,9 @@ public class InviteEvent {
                     p.sendMessage(Utils.success("You have been invited to region &3" + event[2] + " &aby &3" +
                             globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + region.getOwner() + "';")));
 
-                    TextComponent message = new TextComponent(Utils.success("To join the region click &3here&a!"));
-                    message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/region join " + event[2]));
-                    p.spigot().sendMessage(message);
+                    Component message = Utils.success("To join the region click here!");
+                    message = message.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/region join " + event[2]));
+                    p.sendMessage(message);
 
                 }
             }

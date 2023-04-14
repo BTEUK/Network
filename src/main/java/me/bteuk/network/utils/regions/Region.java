@@ -8,6 +8,8 @@ import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.WorldGuard;
 import me.bteuk.network.utils.enums.RegionStatus;
 import me.bteuk.network.utils.enums.ServerType;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 
 import java.util.ArrayList;
@@ -15,7 +17,6 @@ import java.util.Objects;
 
 import static me.bteuk.network.utils.Constants.EARTH_WORLD;
 import static me.bteuk.network.utils.Constants.SERVER_TYPE;
-import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public record Region(String regionName) {
 
@@ -356,7 +357,12 @@ public record Region(String regionName) {
             //Send message to player.
             u.player.sendMessage(Utils.success("Requested to join region &3" + regionName + "&a, awaiting staff review."));
 
-            Network.getInstance().chat.broadcastMessage("&aA region join request has been submitted by &3" + u.player.getName() + "&a for region &3" + regionName + "&a.", "uknet:reviewer");
+            Network.getInstance().chat.broadcastMessage(
+                    Utils.success("A region join request has been submitted by ")
+                            .append(Component.text(u.player.getName(), NamedTextColor.DARK_AQUA))
+                            .append(Utils.success(" for region "))
+                            .append(Component.text(regionName, NamedTextColor.DARK_AQUA))
+                    , "uknet:reviewer");
 
         } else {
             //Owner request

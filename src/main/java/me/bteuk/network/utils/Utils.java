@@ -1,20 +1,14 @@
 package me.bteuk.network.utils;
 
-import me.bteuk.network.Network;
-import me.clip.placeholderapi.libs.kyori.adventure.text.ComponentBuilder;
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.serializer.ComponentSerializer;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.*;
-import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -22,109 +16,81 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static me.bteuk.network.utils.Constants.MAX_Y;
 import static me.bteuk.network.utils.Constants.MIN_Y;
 
 public class Utils {
 
-    public static String chat(String message) {
-        Pattern pattern = Pattern.compile("#[a-fA-F0-9]{6}");
-        Matcher matcher = pattern.matcher(message);
-
-        while (matcher.find()) {
-            String color = message.substring(matcher.start(), matcher.end());
-            message = message.replace(color, ChatColor.of(color) + "");
-            matcher = pattern.matcher(message);
-        }
-        return ChatColor.translateAlternateColorCodes('&', message);
-    }
-
     public static String tabName(String displayName) {
         return tabName(displayName.split(" ")[0], displayName.split(" ")[1]);
     }
 
     public static String tabName(String prefix, String name) {
-        Pattern pattern = Pattern.compile("#[a-fA-F0-9]{6}");
-        Matcher matcher = pattern.matcher(prefix);
-
-        //Replace &r in string.
-        prefix = prefix.replace("&r", "");
-
-        TextComponent text;
-        if (matcher.find()) {
-
-            String color = prefix.substring(matcher.start(), matcher.end());
-            prefix = prefix.replace(color, "");
-
-            text = Component.text(prefix, TextColor.fromHexString(color))
-                    .append(Component.text(" " + name, NamedTextColor.WHITE));
-
-        } else {
-
-            text = Component.text(prefix, NamedTextColor.WHITE)
-                    .append(Component.text(" " + name, NamedTextColor.WHITE));
-        }
-
-        return GsonComponentSerializer.gson().serialize(text);
+        Component component = LegacyComponentSerializer.legacyAmpersand().deserialize(prefix + " " + name);
+        return GsonComponentSerializer.gson().serialize(component);
     }
 
-    public static String title(String message) {
-        return chat("&b&l" + message);
+    public static Component title(String message) {
+        return Component.text(message, NamedTextColor.AQUA, TextDecoration.BOLD);
     }
 
-    public static String line(String message) {
-        return chat("&f" + message);
+    public static Component line(String message) {
+        return Component.text(message, NamedTextColor.WHITE);
     }
 
-    public static String error(String message) {
-        return chat("&c" + message);
+    public static Component error(String message) {
+        return Component.text(message, NamedTextColor.RED);
     }
 
-    public static String success(String message) {
-        return chat("&a" + message);
+    public static Component success(String message) {
+        return Component.text(message, NamedTextColor.GREEN);
     }
 
-    public static ItemStack createItem(Material material, int amount, String displayName, String... loreString) {
+    public static String toJson(Component component) {
+        return GsonComponentSerializer.gson().serialize(component);
+    }
+
+    //Adds the chat formatting to the message.
+    public static Component chatFormat(Player player, Component message) {
+        //Get prefix placeholder and convert from legacy format.
+        //Legacy format for RGB is like §#a25981
+        Component newMessage = LegacyComponentSerializer.legacyAmpersand().deserialize(PlaceholderAPI.setPlaceholders(player, "%luckperms_prefix% §f%player_name% §7§l> §r§f"));
+        return newMessage.append(message);
+    }
+
+    public static ItemStack createItem(Material material, int amount, Component displayName, Component... loreString) {
 
         ItemStack item;
-
-        List<String> lore = new ArrayList<String>();
 
         item = new ItemStack(material);
         item.setAmount(amount);
 
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(Utils.chat(displayName));
-        for (String s : loreString) {
-            lore.add(Utils.chat(s));
-        }
-        meta.setLore(lore);
+        meta.displayName(displayName);
+        List<Component> lore = new ArrayList<>(Arrays.asList(loreString));
+        meta.lore(lore);
         item.setItemMeta(meta);
 
         return item;
 
     }
 
-    public static ItemStack createPlayerSkull(String uuid, int amount, String displayName, String... loreString) {
+    public static ItemStack createPlayerSkull(String uuid, int amount, Component displayName, Component... loreString) {
 
         ItemStack item;
-
-        List<String> lore = new ArrayList<>();
 
         item = new ItemStack(Material.PLAYER_HEAD);
         item.setAmount(amount);
 
         SkullMeta meta = (SkullMeta) item.getItemMeta();
-        meta.setDisplayName(Utils.chat(displayName));
-        for (String s : loreString) {
-            lore.add(Utils.chat(s));
-        }
-        meta.setLore(lore);
+        meta.displayName(displayName);
+        List<Component> lore = new ArrayList<>(Arrays.asList(loreString));
+        meta.lore(lore);
+        item.setItemMeta(meta);
 
         OfflinePlayer p = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
 
@@ -135,11 +101,9 @@ public class Utils {
 
     }
 
-    public static ItemStack createPotion(Material material, PotionEffectType effect, int amount, String displayName, String... loreString) {
+    public static ItemStack createPotion(Material material, PotionEffectType effect, int amount, Component displayName, Component... loreString) {
 
         ItemStack item;
-
-        List<String> lore = new ArrayList<String>();
 
         item = new ItemStack(material);
         item.setAmount(amount);
@@ -147,11 +111,9 @@ public class Utils {
         PotionMeta meta = (PotionMeta) item.getItemMeta();
         meta.addCustomEffect(new PotionEffect(effect, Integer.MAX_VALUE, 1), true);
 
-        meta.setDisplayName(Utils.chat(displayName));
-        for (String s : loreString) {
-            lore.add(Utils.chat(s));
-        }
-        meta.setLore(lore);
+        meta.displayName(displayName);
+        List<Component> lore = new ArrayList<>(Arrays.asList(loreString));
+        meta.lore(lore);
         item.setItemMeta(meta);
 
         return item;

@@ -4,8 +4,8 @@ import me.bteuk.network.Network;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
+import java.util.Objects;
 
 import static me.bteuk.network.utils.Constants.LOGGER;
 import static me.bteuk.network.utils.NetworkConfig.CONFIG;
@@ -54,7 +55,7 @@ public class Discord implements CommandExecutor {
                     String time = String.valueOf(Time.currentTime());
                     String token = time.substring(time.length() - 6);
 
-                    Network.getInstance().chat.broadcastMessage("link " + user.player.getUniqueId() + " " + token, "uknet:discord");
+                    Network.getInstance().chat.broadcastMessage(Component.text("link " + user.player.getUniqueId() + " " + token), "uknet:discord");
 
                     user.player.sendMessage(Utils.success("To link your Discord please DM the code &3" + token + " &ato the UK Bot within the next 5 minutes."));
                     return true;
@@ -77,7 +78,7 @@ public class Discord implements CommandExecutor {
 
                     for (Map.Entry<String, Long> entry : Network.getInstance().timers.getRoles().entrySet()) {
 
-                        Network.getInstance().chat.broadcastMessage("removerole " + discord_id + " " + entry.getValue(), "uknet:discord");
+                        Network.getInstance().chat.broadcastMessage(Component.text("removerole " + discord_id + " " + entry.getValue()), "uknet:discord");
 
                     }
 
@@ -88,9 +89,9 @@ public class Discord implements CommandExecutor {
             }
         }
 
-        TextComponent discord = new TextComponent(Utils.chat("&aJoin our discord: &7" + CONFIG.getString("discord")));
-        discord.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, CONFIG.getString("discord")));
-        sender.spigot().sendMessage(discord);
+        Component discord = Utils.success("Join our discord: " + CONFIG.getString("discord"));
+        discord = discord.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, Objects.requireNonNull(CONFIG.getString("discord"))));
+        sender.sendMessage(discord);
 
         return true;
 

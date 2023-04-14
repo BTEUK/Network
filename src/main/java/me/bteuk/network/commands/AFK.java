@@ -5,6 +5,8 @@ import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Statistics;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -32,7 +34,7 @@ public class AFK implements CommandExecutor {
         //If u is null, cancel.
         if (u == null) {
             LOGGER.severe("User " + p.getName() + " can not be found!");
-            p.sendMessage("User can not be found, please relog!");
+            p.sendMessage(Utils.error("User can not be found, please relog!"));
             return true;
         }
 
@@ -42,7 +44,7 @@ public class AFK implements CommandExecutor {
             //Reset last logged time.
             u.last_time_log = u.last_movement = Time.currentTime();
             u.afk = false;
-            Network.getInstance().chat.broadcastMessage("&7" + u.player.getName() + " is no longer afk.", "uknet:globalchat");
+            Network.getInstance().chat.broadcastMessage(Component.text(u.player.getName() + " is no longer afk.", NamedTextColor.GRAY), "uknet:globalchat");
 
         } else {
 
@@ -52,7 +54,7 @@ public class AFK implements CommandExecutor {
             Statistics.save(u, Time.getDate(time), time);
 
             u.afk = true;
-            Network.getInstance().chat.broadcastMessage("&7" + u.player.getName() + " is now afk.", "uknet:globalchat");
+            Network.getInstance().chat.broadcastMessage(Component.text(u.player.getName() + " is now afk.", NamedTextColor.GRAY), "uknet:globalchat");
 
         }
 

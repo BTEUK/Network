@@ -3,10 +3,9 @@ package me.bteuk.network.listeners;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import me.bteuk.network.Network;
-import me.bteuk.network.utils.Constants;
-import me.bteuk.network.utils.NetworkUser;
-import me.bteuk.network.utils.Statistics;
-import me.bteuk.network.utils.Time;
+import me.bteuk.network.utils.*;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -15,6 +14,7 @@ import org.bukkit.event.server.ServerCommandEvent;
 
 import java.util.ArrayList;
 
+import static me.bteuk.network.utils.Constants.LOGGER;
 import static me.bteuk.network.utils.Constants.SERVER_NAME;
 
 public class CommandPreProcess implements Listener {
@@ -49,11 +49,20 @@ public class CommandPreProcess implements Listener {
             //If player is afk, unset it.
             //Reset last logged time.
             NetworkUser u = instance.getUser(e.getPlayer());
+
+            //If u is null, cancel.
+            if (u == null) {
+                LOGGER.severe("User " + e.getPlayer().getName() + " can not be found!");
+                e.getPlayer().sendMessage(Utils.error("User can not be found, please relog!"));
+                e.setCancelled(true);
+                return;
+            }
+
             u.last_movement = Time.currentTime();
             if (u.afk) {
                 u.last_time_log = Time.currentTime();
                 u.afk = false;
-                Network.getInstance().chat.broadcastMessage("&7" + u.player.getName() + " is no longer afk.", "uknet:globalchat");
+                Network.getInstance().chat.broadcastMessage(Component.text(u.player.getName() + " is no longer afk.", NamedTextColor.GRAY), "uknet:globalchat");
             }
 
         }
@@ -117,7 +126,7 @@ public class CommandPreProcess implements Listener {
                 if (u.afk) {
                     u.last_time_log = Time.currentTime();
                     u.afk = false;
-                    Network.getInstance().chat.broadcastMessage("&7" + u.player.getName() + " is no longer afk.", "uknet:globalchat");
+                    Network.getInstance().chat.broadcastMessage(Component.text(u.player.getName() + " is no longer afk.", NamedTextColor.GRAY), "uknet:globalchat");
                 }
 
                 u.last_movement = Time.currentTime();

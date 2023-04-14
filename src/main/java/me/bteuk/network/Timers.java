@@ -1,12 +1,13 @@
 package me.bteuk.network;
 
-import com.destroystokyo.paper.profile.PlayerProfile;
 import me.bteuk.network.events.EventManager;
 import me.bteuk.network.listeners.Connect;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.utils.*;
 import me.bteuk.network.utils.regions.Inactivity;
 import me.clip.placeholderapi.PlaceholderAPI;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 
@@ -155,7 +156,7 @@ public class Timers {
 
                     //Update tab for all players to update display name.
                     //This is done with the tab chat channel.
-                    instance.chat.broadcastMessage("update " + user.player.getUniqueId(), "uknet:tab");
+                    instance.chat.broadcastMessage(Component.text("update " + user.player.getUniqueId()), "uknet:tab");
 
                 }
 
@@ -178,7 +179,7 @@ public class Timers {
 
                     for (String message : messages) {
 
-                        user.player.sendMessage(Utils.chat(message));
+                        user.player.sendMessage(Component.text(message));
 
                     }
 
@@ -196,7 +197,7 @@ public class Timers {
                     Statistics.save(user, Time.getDate(time), time);
 
                     //Send message to chat and discord.
-                    Network.getInstance().chat.broadcastMessage("&7" + user.player.getName() + " is now afk.", "uknet:globalchat");
+                    Network.getInstance().chat.broadcastMessage(Component.text(user.player.getName() + " is now afk.", NamedTextColor.GRAY), "uknet:globalchat");
 
                 }
             }
@@ -305,9 +306,9 @@ public class Timers {
         for (Map.Entry<String, Long> entry : Network.getInstance().timers.getRoles().entrySet()) {
 
             if (role.equals(entry.getKey())) {
-                instance.chat.broadcastMessage("addrole " + discord_id + " " + entry.getValue(), "uknet:discord");
+                instance.chat.broadcastMessage(Component.text("addrole " + discord_id + " " + entry.getValue()), "uknet:discord");
             } else {
-                instance.chat.broadcastMessage("removerole " + discord_id + " " + entry.getValue(), "uknet:discord");
+                instance.chat.broadcastMessage(Component.text("removerole " + discord_id + " " + entry.getValue()), "uknet:discord");
             }
         }
     }

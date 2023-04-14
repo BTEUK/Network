@@ -7,8 +7,8 @@ import me.bteuk.network.utils.enums.RegionStatus;
 import me.bteuk.network.utils.enums.ServerType;
 import me.bteuk.network.utils.regions.Region;
 import me.bteuk.network.utils.regions.RegionManager;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -89,7 +89,12 @@ public class TeleportListener implements Listener {
                                 //If the player is the region owner update last enter and tell set the message.
                                 if (region.isOwner(p.getUniqueId().toString())) {
 
-                                    p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.success("You have entered &3" + region.getTag(p.getUniqueId().toString()) + " &aand left &3" + u.region.getTag(p.getUniqueId().toString()) + "&a, you are the owner of this region.")));
+                                    p.sendActionBar(
+                                            Utils.success("You have entered ")
+                                                    .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                                    .append(Utils.success(" and left "))
+                                                    .append(Component.text(u.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                                    .append(Utils.success(", you are the owner of this region.")));
                                     region.setLastEnter(p.getUniqueId().toString());
 
                                     //If the region is inactive, set it to active.
@@ -101,7 +106,12 @@ public class TeleportListener implements Listener {
                                     //Check if the player is a region members.
                                 } else if (region.isMember(p.getUniqueId().toString())) {
 
-                                    p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.success("You have entered &3" + region.getTag(p.getUniqueId().toString()) + " &aand left &3" + u.region.getTag(p.getUniqueId().toString()) + "&a, you are a member of this region.")));
+                                    p.sendActionBar(
+                                            Utils.success("You have entered ")
+                                                    .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                                    .append(Utils.success(" and left "))
+                                                    .append(Component.text(u.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                                    .append(Utils.success(", you are a member of this region.")));
                                     region.setLastEnter(p.getUniqueId().toString());
 
                                     //If the region is inactive, make this member to owner.
@@ -123,12 +133,21 @@ public class TeleportListener implements Listener {
                                     //Check if the region is open and the player is at least jr.builder.
                                 } else if (region.status() == RegionStatus.OPEN && p.hasPermission("group.jrbuilder")) {
 
-                                    p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.success("You have entered &3" + region.getTag(p.getUniqueId().toString()) + " &aand left &3" + u.region.getTag(p.getUniqueId().toString()) + "&a, you can build in this region.")));
+                                    p.sendActionBar(
+                                            Utils.success("You have entered ")
+                                                    .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                                    .append(Utils.success(" and left "))
+                                                    .append(Component.text(u.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                                    .append(Utils.success(", you can build in this region.")));
 
                                 } else {
 
                                     //Send default enter message.
-                                    p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.success("You have entered &3" + region.getTag(p.getUniqueId().toString()) + " &aand left &3" + u.region.getTag(p.getUniqueId().toString()) + "&a.")));
+                                    p.sendActionBar(
+                                            Utils.success("You have entered ")
+                                                    .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                                    .append(Utils.success(" and left "))
+                                                    .append(Component.text(u.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA)));
 
                                 }
 
@@ -154,7 +173,10 @@ public class TeleportListener implements Listener {
                             //If the player is the region owner update last enter and tell set the message.
                             if (region.isOwner(p.getUniqueId().toString())) {
 
-                                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.success("You have entered &3" + region.getTag(p.getUniqueId().toString()) + "&a, you are the owner of this region.")));
+                                p.sendActionBar(
+                                        Utils.success("You have entered ")
+                                                .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                                .append(Utils.success(", you are the owner of this region.")));
                                 region.setLastEnter(p.getUniqueId().toString());
 
                                 //If the region is inactive, set it to active.
@@ -166,7 +188,10 @@ public class TeleportListener implements Listener {
                                 //Check if the player is a region members.
                             } else if (region.isMember(p.getUniqueId().toString())) {
 
-                                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.success("You have entered &3" + region.getTag(p.getUniqueId().toString()) + "&a, you are a member of this region.")));
+                                p.sendActionBar(
+                                        Utils.success("You have entered ")
+                                                .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                                .append(Utils.success(", you are a member of this region.")));
                                 region.setLastEnter(p.getUniqueId().toString());
 
                                 //If the region is inactive, make this member to owner.
@@ -188,12 +213,17 @@ public class TeleportListener implements Listener {
                                 //Check if the region is open and the player is at least jr.builder.
                             } else if (region.status() == RegionStatus.OPEN && p.hasPermission("group.jrbuilder")) {
 
-                                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.success("You have entered &3" + region.getTag(p.getUniqueId().toString()) + "&a, you can build in this region.")));
+                                p.sendActionBar(
+                                        Utils.success("You have entered ")
+                                                .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                                .append(Utils.success(", you can build in this region.")));
 
                             } else {
 
                                 //Send default enter message.
-                                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.success("You have entered &3" + region.getTag(p.getUniqueId().toString()) + "&a.")));
+                                p.sendActionBar(
+                                        Utils.success("You have entered ")
+                                                .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA)));
 
                             }
 
@@ -215,7 +245,9 @@ public class TeleportListener implements Listener {
                 } else if (u.inRegion) {
 
                     //Send default leave message.
-                    p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.success("You have left &3" + u.region.regionName() + "&a.")));
+                    p.sendActionBar(
+                            Utils.success("You have left ")
+                                    .append(Component.text(u.region.regionName(), NamedTextColor.DARK_AQUA)));
 
                     //Set inRegion to false.
                     u.inRegion = false;
@@ -246,7 +278,11 @@ public class TeleportListener implements Listener {
                         if (!u.region.equals(region)) {
 
                             //Send default enter message.
-                            p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.success("You have entered &3" + region.regionName() + "&a and left &3" + u.region.regionName() + "&a.")));
+                            p.sendActionBar(
+                                    Utils.success("You have entered ")
+                                            .append(Component.text(region.regionName(), NamedTextColor.DARK_AQUA))
+                                            .append(Utils.success(" and left "))
+                                            .append(Component.text(u.region.regionName(), NamedTextColor.DARK_AQUA)));
 
                             //Update the region the player is in.
                             u.region = region;
@@ -255,7 +291,9 @@ public class TeleportListener implements Listener {
                     } else {
 
                         //Send default enter message.
-                        p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.success("You have entered &3" + region.regionName() + "&a.")));
+                        p.sendActionBar(
+                                Utils.success("You have entered ")
+                                        .append(Component.text(region.regionName(), NamedTextColor.DARK_AQUA)));
 
                         //Update the region the player is in.
                         u.region = region;
@@ -265,7 +303,9 @@ public class TeleportListener implements Listener {
                 } else if (u.inRegion) {
 
                     //Send default leave message.
-                    p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.success("You have left &3" + u.region.regionName() + "&a.")));
+                    p.sendActionBar(
+                            Utils.success("You have left ")
+                                    .append(Component.text(u.region.regionName(), NamedTextColor.DARK_AQUA)));
 
                     //Set inRegion to false.
                     u.inRegion = false;

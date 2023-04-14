@@ -19,6 +19,7 @@ import me.bteuk.network.sql.RegionSQL;
 import me.bteuk.network.utils.*;
 import me.bteuk.network.utils.enums.ServerType;
 import me.bteuk.network.utils.regions.RegionManager;
+import net.kyori.adventure.text.Component;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -184,7 +185,7 @@ public final class Network extends JavaPlugin {
 
         //Create navigator.
         navigatorGui = new NavigatorGui();
-        navigator = Utils.createItem(Material.NETHER_STAR, 1, Utils.chat("&b&lNavigator"), Utils.chat("&fClick to open the navigator."));
+        navigator = Utils.createItem(Material.NETHER_STAR, 1, Utils.title("Navigator"), Utils.line("Click to open the navigator."));
 
         //Register events.
         new JoinServer(this, globalSQL, connect);
@@ -333,7 +334,7 @@ public final class Network extends JavaPlugin {
 
                 //Update tab for all players.
                 //This is done with the tab chat channel.
-                instance.chat.broadcastMessage("remove " + uuid, "uknet:tab");
+                instance.chat.broadcastMessage(Component.text("remove " + uuid), "uknet:tab");
 
                 //Log playercount in database
                 instance.globalSQL.update("INSERT INTO player_count(log_time,players) VALUES(" + Time.currentTime() + "," +

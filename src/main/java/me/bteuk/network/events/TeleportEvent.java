@@ -5,6 +5,7 @@ import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.ServerType;
 import me.bteuk.network.utils.regions.Region;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -57,7 +58,7 @@ public class TeleportEvent {
                 if (message == null) {
                     p.sendMessage(Utils.success("Teleported to previous location."));
                 } else {
-                    p.sendMessage(Utils.chat(message));
+                    p.sendMessage(GsonComponentSerializer.gson().deserialize(message));
                 }
             }
             case "location", "location_request" -> {
@@ -184,7 +185,7 @@ public class TeleportEvent {
                 if (message == null) {
                     p.sendMessage(Utils.success("Teleported to &3" + DECIMAL_FORMATTER.format(x) + ", " + y + ", " + DECIMAL_FORMATTER.format(z)));
                 } else {
-                    p.sendMessage(Utils.chat(message));
+                    p.sendMessage(GsonComponentSerializer.gson().deserialize(message));
                 }
             }
         }

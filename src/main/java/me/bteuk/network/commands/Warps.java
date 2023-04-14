@@ -2,6 +2,8 @@ package me.bteuk.network.commands;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.utils.Utils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -78,12 +80,12 @@ public class Warps implements CommandExecutor {
             //This is calculated by it either being the 16th entry, or the last in the list.
             if (((locations.indexOf(location) + 1) % 16) == 0 || (locations.indexOf(location) + 1 == locations.size())) {
 
-                message.append(Utils.chat("&7" + location));
+                message.append(Component.text(location, NamedTextColor.GRAY));
                 break;
 
             } else {
 
-                message.append(Utils.chat("&7" + location + "&f, "));
+                message.append(Component.text(location, NamedTextColor.GRAY).append(Utils.line(", ")));
 
             }
         }

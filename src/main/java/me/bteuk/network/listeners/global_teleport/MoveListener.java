@@ -9,8 +9,8 @@ import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.RegionStatus;
 import me.bteuk.network.utils.regions.Region;
 import me.bteuk.network.utils.regions.RegionManager;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -77,7 +77,7 @@ public class MoveListener implements Listener {
         if (u.afk) {
             u.last_time_log = u.last_movement;
             u.afk = false;
-            Network.getInstance().chat.broadcastMessage("&7" + u.player.getName() + " is no longer afk.", "uknet:globalchat");
+            Network.getInstance().chat.broadcastMessage(Component.text(u.player.getName() + " is no longer afk.", NamedTextColor.GRAY), "uknet:globalchat");
         }
 
         //If regions are enabled, check for movement between regions.
@@ -159,7 +159,12 @@ public class MoveListener implements Listener {
                             //If the player is the region owner update last enter and tell set the message.
                             if (region.isOwner(p.getUniqueId().toString())) {
 
-                                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.success("You have entered &3" + region.getTag(p.getUniqueId().toString()) + " &aand left &3" + u.region.getTag(p.getUniqueId().toString()) + "&a, you are the owner of this region.")));
+                                p.sendActionBar(
+                                        Utils.success("You have entered ")
+                                                .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                                .append(Utils.success(" and left "))
+                                                .append(Component.text(u.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                                .append(Utils.success(", you are the owner of this region.")));
                                 region.setLastEnter(p.getUniqueId().toString());
 
                                 //If the region is inactive, set it to active.
@@ -171,7 +176,12 @@ public class MoveListener implements Listener {
                                 //Check if the player is a region members.
                             } else if (region.isMember(p.getUniqueId().toString())) {
 
-                                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.success("You have entered &3" + region.getTag(p.getUniqueId().toString()) + " &aand left &3" + u.region.getTag(p.getUniqueId().toString()) + "&a, you are a member of this region.")));
+                                p.sendActionBar(
+                                        Utils.success("You have entered ")
+                                                .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                                .append(Utils.success(" and left "))
+                                                .append(Component.text(u.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                                .append(Utils.success(", you are a member of this region.")));
                                 region.setLastEnter(p.getUniqueId().toString());
 
                                 //If the region is inactive, make this member to owner.
@@ -193,12 +203,21 @@ public class MoveListener implements Listener {
                                 //Check if the region is open and the player is at least jr.builder.
                             } else if (region.status() == RegionStatus.OPEN && p.hasPermission("group.jrbuilder")) {
 
-                                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.success("You have entered &3" + region.getTag(p.getUniqueId().toString()) + " &aand left &3" + u.region.getTag(p.getUniqueId().toString()) + "&a, you can build in this region.")));
+                                p.sendActionBar(
+                                        Utils.success("You have entered ")
+                                                .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                                .append(Utils.success(" and left "))
+                                                .append(Component.text(u.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                                .append(Utils.success(", you can build in this region.")));
 
                             } else {
 
                                 //Send default enter message.
-                                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.success("You have entered &3" + region.getTag(p.getUniqueId().toString()) + " &aand left &3" + u.region.getTag(p.getUniqueId().toString()) + "&a.")));
+                                p.sendActionBar(
+                                        Utils.success("You have entered ")
+                                                .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                                .append(Utils.success(" and left "))
+                                                .append(Component.text(u.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA)));
 
                             }
 

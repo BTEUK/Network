@@ -4,6 +4,7 @@ import me.bteuk.network.Network;
 import me.bteuk.network.staff.StaffGui;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -18,7 +19,7 @@ public class Staff implements CommandExecutor {
         //Check if the sender is a player.
         if (!(sender instanceof Player p)) {
 
-            sender.sendMessage(Utils.chat("&cThis command can only be used by a player."));
+            sender.sendMessage(Utils.error("This command can only be used by a player."));
             return true;
 
         }
@@ -26,7 +27,7 @@ public class Staff implements CommandExecutor {
         //Check if user is member of staff.
         if (!(p.hasPermission("uknet.staff"))) {
 
-            p.sendMessage(Utils.chat("&cYou do not have permission to use this command."));
+            p.sendMessage(Utils.error("You do not have permission to use this command."));
             return true;
 
         }
@@ -47,12 +48,11 @@ public class Staff implements CommandExecutor {
                 //Invert enabled/disabled of staff chat.
                 u.staffChat = !u.staffChat;
                 Network.getInstance().globalSQL.update("UPDATE player_data SET staff_chat=1-staff_chat WHERE uuid='"+ p.getUniqueId() + "';");
-                return true;
             } else {
                 //Send message in staff chat.
-                Network.getInstance().chat.broadcastPlayerMessage(p, String.join(" ", args), "uknet:staff");
-                return true;
+                Network.getInstance().chat.broadcastPlayerMessage(p, Component.text(String.join(" ", args)), "uknet:staff");
             }
+            return true;
         }
 
         //If the player has a previous gui, open that.

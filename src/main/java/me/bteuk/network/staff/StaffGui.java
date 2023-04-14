@@ -59,10 +59,10 @@ public class StaffGui extends Gui {
                             u.staffGui.open(u);
 
                         } else {
-                            u.player.sendMessage(Utils.chat("&cYou must be a reviewer to review location requests."));
+                            u.player.sendMessage(Utils.error("You must be a reviewer to review location requests."));
                         }
                     } else {
-                        u.player.sendMessage(Utils.chat("&cThere are currently no location requests."));
+                        u.player.sendMessage(Utils.error("There are currently no location requests."));
                     }
                 });
 
@@ -141,10 +141,10 @@ public class StaffGui extends Gui {
                             u.staffGui.open(u);
 
                         } else {
-                            u.player.sendMessage(Utils.chat("&cYou must be a reviewer to review region requests."));
+                            u.player.sendMessage(Utils.error("You must be a reviewer to review region requests."));
                         }
                     } else {
-                        u.player.sendMessage(Utils.chat("&cThere are currently no region requests."));
+                        u.player.sendMessage(Utils.error("There are currently no region requests."));
                     }
 
                 });
@@ -152,18 +152,22 @@ public class StaffGui extends Gui {
         //Click to review plot.
         //Show review plot button in gui.
         int plot_count = Network.getInstance().plotSQL.getInt("SELECT count(id) FROM plot_data WHERE status='submitted';");
-        String message = "";
+        Component message;
 
         if (plot_count == 1) {
-            message = "&fThere is currently &71 &fsubmitted plot.";
+            message = Utils.line("There is currently ")
+                    .append(Component.text("1", NamedTextColor.GRAY))
+                    .append(Utils.line(" submitted plot."));
         } else {
-            message = "&fThere are currently &7" + plot_count + " &fsubmitted plots.";
+            message = Utils.line("There are currently ")
+                    .append(Component.text(plot_count, NamedTextColor.GRAY))
+                    .append(Utils.line(" submitted plots."));
         }
 
         setItem(13, Utils.createItem(Material.WRITABLE_BOOK, 1,
                         Utils.title("Review Plot"),
                         Utils.line("Click to review a submitted plot."),
-                        Utils.chat(message)),
+                        message),
                 u -> {
 
                     //Check if there is a plot available to review,
@@ -212,7 +216,7 @@ public class StaffGui extends Gui {
 
                                     }
                                 } else {
-                                    u.player.sendMessage(Utils.chat("&cYou must be a reviewer to review plots."));
+                                    u.player.sendMessage(Utils.error("You must be a reviewer to review plots."));
                                 }
 
                                 //Stop iterating.
@@ -221,11 +225,11 @@ public class StaffGui extends Gui {
 
                             //If counter is equal to the size of the array then all plots have been cycled through without result.
                             if (counter == nPlots.size()) {
-                                u.player.sendMessage(Utils.chat("&cYou are the owner or a member of all remaining submitted plots."));
+                                u.player.sendMessage(Utils.error("You are the owner or a member of all remaining submitted plots."));
                             }
                         }
                     } else {
-                        u.player.sendMessage(Utils.chat("&cThere are currently no submitted plots."));
+                        u.player.sendMessage(Utils.error("There are currently no submitted plots."));
                     }
                 });
 

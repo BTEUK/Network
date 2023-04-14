@@ -14,6 +14,8 @@ import net.buildtheearth.terraminusminus.generator.EarthGeneratorSettings;
 import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
 import net.buildtheearth.terraminusminus.util.geo.CoordinateParseUtils;
 import net.buildtheearth.terraminusminus.util.geo.LatLng;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -232,7 +234,11 @@ public class Tpll implements CommandExecutor {
                         //Add tpll to statistics.
                         Statistics.addTpll(p.getUniqueId().toString(), Time.getDate(Time.currentTime()));
 
-                        p.sendMessage(Utils.chat("&7Teleporting to &9" + DECIMAL_FORMATTER.format(finalDefaultCoords.getLat()) + "&7, &9" + DECIMAL_FORMATTER.format(finalDefaultCoords.getLng())));
+                        p.sendMessage(
+                                Utils.success("Teleporting to ")
+                                        .append(Component.text(DECIMAL_FORMATTER.format(finalDefaultCoords.getLat()), NamedTextColor.DARK_AQUA))
+                                        .append(Utils.success(", "))
+                                        .append(Component.text(DECIMAL_FORMATTER.format(finalDefaultCoords.getLng()), NamedTextColor.DARK_AQUA)));
                         p.teleport(loc);
 
                     } else {
@@ -267,7 +273,11 @@ public class Tpll implements CommandExecutor {
                             //Add tpll to statistics.
                             Statistics.addTpll(p.getUniqueId().toString(), Time.getDate(Time.currentTime()));
 
-                            p.sendMessage(Utils.chat("&7Teleporting to &9" + DECIMAL_FORMATTER.format(finalDefaultCoords.getLat()) + "&7, &9" + DECIMAL_FORMATTER.format(finalDefaultCoords.getLng())));
+                            p.sendMessage(
+                                    Utils.success("Teleporting to ")
+                                            .append(Component.text(DECIMAL_FORMATTER.format(finalDefaultCoords.getLat()), NamedTextColor.DARK_AQUA))
+                                            .append(Utils.success(", "))
+                                            .append(Component.text(DECIMAL_FORMATTER.format(finalDefaultCoords.getLng()), NamedTextColor.DARK_AQUA)));
                             p.teleport(loc);
 
 
@@ -299,7 +309,11 @@ public class Tpll implements CommandExecutor {
                 //Add tpll to statistics.
                 Statistics.addTpll(p.getUniqueId().toString(), Time.getDate(Time.currentTime()));
 
-                p.sendMessage(Utils.chat("&7Teleporting to &9" + DECIMAL_FORMATTER.format(finalDefaultCoords.getLat()) + "&7, &9" + DECIMAL_FORMATTER.format(finalDefaultCoords.getLng())));
+                p.sendMessage(
+                        Utils.success("Teleporting to ")
+                                .append(Component.text(DECIMAL_FORMATTER.format(finalDefaultCoords.getLat()), NamedTextColor.DARK_AQUA))
+                                .append(Utils.success(", "))
+                                .append(Component.text(DECIMAL_FORMATTER.format(finalDefaultCoords.getLng()), NamedTextColor.DARK_AQUA)));
                 p.teleport(loc);
             }
         }));

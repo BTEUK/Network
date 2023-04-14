@@ -325,28 +325,14 @@ public class AddLocation extends Gui {
                             coordinate_id = Network.getInstance().globalSQL.addCoordinate(l);
 
                             //If category is england.
-                            if (category == Categories.ENGLAND) {
-                                //If player is reviewer, skip review.
-                                if (u.player.hasPermission("uknet.navigation.add")) {
+                            if (u.player.hasPermission("uknet.navigation.add")) {
 
-                                    addLocation(u);
+                                addLocation(u);
 
-                                } else {
-
-                                    requestLocation(u);
-
-                                }
                             } else {
-                                //If player is reviewer, skip review.
-                                if (u.player.hasPermission("uknet.navigation.add")) {
 
-                                    addLocation(u);
+                                requestLocation(u);
 
-                                } else {
-
-                                    requestLocation(u);
-
-                                }
                             }
                         }
 
@@ -439,8 +425,8 @@ public class AddLocation extends Gui {
                     });
         } else if (type == AddLocationType.REVIEW) {
             setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                            Utils.chat("&b&lReturn"),
-                            Utils.chat("&fReturn to location requests.")),
+                            Utils.title("Return"),
+                            Utils.line("Return to location requests.")),
                     u -> {
 
                         //Delete gui and return to previous menu.
@@ -452,8 +438,8 @@ public class AddLocation extends Gui {
                     });
         } else {
             setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                            Utils.chat("&b&lReturn"),
-                            Utils.chat("&fReturn to staff menu.")),
+                            Utils.title("Return"),
+                            Utils.line("Return to staff menu.")),
                     u -> {
 
                         //Delete gui and return to previous menu.
@@ -536,7 +522,7 @@ public class AddLocation extends Gui {
         }
 
         //Notify reviewers.
-        Network.getInstance().chat.broadcastMessage("&aA new location has been requested.", "uknet:reviewer");
+        Network.getInstance().chat.broadcastMessage(Utils.success("A new location has been requested."), "uknet:reviewer");
 
         u.player.sendMessage(Utils.success("Location &3" + name + " &arequested."));
 
