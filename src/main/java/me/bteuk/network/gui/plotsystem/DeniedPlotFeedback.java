@@ -5,12 +5,11 @@ import me.bteuk.network.gui.Gui;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.Utils;
+import net.kyori.adventure.inventory.Book;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BookMeta;
 
 import java.util.ArrayList;
 
@@ -72,29 +71,28 @@ public class DeniedPlotFeedback extends Gui {
 
                     {
 
-                        //Close inventory.
+                        //Close the inventory.
                         u.player.closeInventory();
 
                         //Create book.
-                        ItemStack writtenBook = new ItemStack(Material.WRITTEN_BOOK);
-                        BookMeta bookMeta = (BookMeta) writtenBook.getItemMeta();
-                        bookMeta.setTitle(Utils.chat("&b&lPlot " + plotID + " Attempt " + finalI));
-
-                        //Get book author, aka the reviewer.
-                        String author = globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
-                                plotSQL.getString("SELECT reviewer FROM deny_data WHERE id=" + plotID + " AND uuid='" + uuid + "' AND attempt=" + finalI + ";") + "';");
-                        bookMeta.setAuthor(author);
+                        Component title = Component.text("Plot " + plotID + " Attempt " + finalI, NamedTextColor.AQUA, TextDecoration.BOLD);
+                        Component author = Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
+                                plotSQL.getString("SELECT reviewer FROM deny_data WHERE id=" + plotID + " AND uuid='" + uuid + "' AND attempt=" + finalI + ";") + "';"));
 
                         //Get pages of the book.
-                        ArrayList<String> pages = plotSQL.getStringList("SELECT contents FROM book_data WHERE id="
+                        ArrayList<String> sPages = plotSQL.getStringList("SELECT contents FROM book_data WHERE id="
                                 + plotSQL.getInt("SELECT book_id FROM deny_data WHERE id=" + plotID + " AND uuid='" + uuid + "' AND attempt=" + finalI + ";") + ";");
 
-                        //Set the pages of the book.
-                        bookMeta.setPages(pages);
-                        writtenBook.setItemMeta(bookMeta);
+                        //Create a list of components from the list of strings.
+                        ArrayList<Component> pages = new ArrayList<>();
+                        for (String page : sPages) {
+                            pages.add(Component.text(page));
+                        }
+
+                        Book book = Book.book(title, author, pages);
 
                         //Open the book.
-                        u.player.openBook(writtenBook);
+                        u.player.openBook(book);
 
                     });
 

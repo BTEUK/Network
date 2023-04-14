@@ -13,7 +13,10 @@ The reason the lobby functions have been separated is to prevent unnecessary res
 
 import me.bteuk.network.Network;
 import me.bteuk.network.utils.NetworkUser;
-import me.bteuk.network.utils.Utils;
+import net.kyori.adventure.inventory.Book;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -21,11 +24,10 @@ import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BookMeta;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Set;
 
 import static me.bteuk.network.utils.NetworkConfig.CONFIG;
@@ -37,7 +39,7 @@ public class Lobby {
     private final ArrayList<Portal> portals;
     private int portalTask;
 
-    private ItemStack rulesBook;
+    private Book rulesBook;
 
     public Location spawn;
 
@@ -84,7 +86,7 @@ public class Lobby {
             return;
         }
 
-        Set<String> portalNames = portalsConfig.getConfigurationSection("portals").getKeys(false);
+        Set<String> portalNames = Objects.requireNonNull(portalsConfig.getConfigurationSection("portals")).getKeys(false);
 
         //Create the portal from the config.
         for (String portalName : portalNames) {
@@ -99,7 +101,7 @@ public class Lobby {
                         portalsConfig.getInt("portals." + portalName + ".max.x"),
                         portalsConfig.getInt("portals." + portalName + ".max.y"),
                         portalsConfig.getInt("portals." + portalName + ".max.z"),
-                        portalsConfig.getString("portals." + portalName + ".executes").split(",")
+                        Objects.requireNonNull(portalsConfig.getString("portals." + portalName + ".executes")).split(",")
                 ));
 
             } catch (Exception e) {
@@ -175,29 +177,26 @@ public class Lobby {
             return;
         }
 
-        Set<String> rules = rulesConfig.getConfigurationSection("rules").getKeys(false);
+        Set<String> rules = Objects.requireNonNull(rulesConfig.getConfigurationSection("rules")).getKeys(false);
 
-        //Set all the pages of the book.
-        rulesBook = new ItemStack(Material.WRITTEN_BOOK);
-        BookMeta bookMeta = (BookMeta) rulesBook.getItemMeta();
-        bookMeta.setTitle(Utils.title("Rules"));
+        //Create book.
+        Component title = Component.text("Rules", NamedTextColor.AQUA, TextDecoration.BOLD);
+        Component author = Component.text("Unknown");
 
-        //Get book author.
-        bookMeta.setAuthor(rulesConfig.getString("author"));
+        String sAuthor = rulesConfig.getString("author");
+        if (sAuthor != null) {
+            author = Component.text(sAuthor);
+        }
 
-        //Get pages of the book.
-        ArrayList<String> pages = new ArrayList<>();
-        rules.forEach(str -> {
-            pages.add(rulesConfig.getString("rules." + str));
-        });
+        //Set pages of the book.
+        ArrayList<Component> pages = new ArrayList<>();
+        rules.forEach(str -> pages.add(Component.text(Objects.requireNonNull(rulesConfig.getString("rules." + str)))));
 
-        //Set the pages of the book.
-        bookMeta.setPages(pages);
-        rulesBook.setItemMeta(bookMeta);
+        rulesBook = Book.book(title, author, pages);
 
     }
 
-    public ItemStack getRules() {
+    public Book getRules() {
         return rulesBook;
     }
 
@@ -247,7 +246,7 @@ public class Lobby {
     public void setSpawn() {
 
         try {
-            spawn = new Location(Bukkit.getWorld(CONFIG.getString("spawn.world")), CONFIG.getDouble("spawn.x"), CONFIG.getDouble("spawn.y"),
+            spawn = new Location(Bukkit.getWorld(Objects.requireNonNull(CONFIG.getString("spawn.world"))), CONFIG.getDouble("spawn.x"), CONFIG.getDouble("spawn.y"),
                     CONFIG.getDouble("spawn.z"), (float) CONFIG.getDouble("spawn.yaw"), (float) CONFIG.getDouble("spawn.pitch"));
         } catch (Exception e) {
             instance.getLogger().warning("Spawn location could not be set!");
