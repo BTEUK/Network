@@ -7,7 +7,6 @@ import me.bteuk.network.utils.*;
 import me.bteuk.network.utils.regions.Inactivity;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 
@@ -197,7 +196,7 @@ public class Timers {
                     Statistics.save(user, Time.getDate(time), time);
 
                     //Send message to chat and discord.
-                    Network.getInstance().chat.broadcastMessage(Component.text(user.player.getName() + " is now afk.", NamedTextColor.GRAY), "uknet:globalchat");
+                    Network.getInstance().chat.broadcastAFK(user.player, true);
 
                 }
             }
@@ -301,14 +300,15 @@ public class Timers {
         return roles;
     }
 
+    //TODO: Only run this on role add/remove as well as discord link/unlink.
     public void discordSync(long discord_id, String role) {
         //Remove all roles except current role.
         for (Map.Entry<String, Long> entry : Network.getInstance().timers.getRoles().entrySet()) {
 
             if (role.equals(entry.getKey())) {
-                instance.chat.broadcastMessage(Component.text("addrole " + discord_id + " " + entry.getValue()), "uknet:discord");
+                instance.chat.broadcastMessage(Component.text("addrole " + discord_id + " " + entry.getValue()), "uknet:discord_linking");
             } else {
-                instance.chat.broadcastMessage(Component.text("removerole " + discord_id + " " + entry.getValue()), "uknet:discord");
+                instance.chat.broadcastMessage(Component.text("removerole " + discord_id + " " + entry.getValue()), "uknet:discord_linking");
             }
         }
     }

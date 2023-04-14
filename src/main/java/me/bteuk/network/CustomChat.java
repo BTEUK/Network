@@ -45,8 +45,17 @@ public class CustomChat implements Listener, PluginMessageListener {
         instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:staff", this);
         instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:connect", this);
         instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:disconnect", this);
-        instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord", this);
+
         instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:tab", this);
+
+        //Discord specific channels.
+        instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord", this);
+        instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord_staff", this);
+
+        instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord_connect", this);
+        instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord_disconnect", this);
+
+        instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord_linking", this);
 
         LOGGER.info("Successfully enabled Global Chat!");
 
@@ -59,8 +68,17 @@ public class CustomChat implements Listener, PluginMessageListener {
         instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:staff");
         instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:connect");
         instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:disconnect");
-        instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord");
+
         instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:tab");
+
+        //Discord specific channels.
+        instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord", this);
+        instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord_staff", this);
+
+        instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord_connect", this);
+        instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord_disconnect", this);
+
+        instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord_linking", this);
 
     }
 
@@ -93,14 +111,16 @@ public class CustomChat implements Listener, PluginMessageListener {
             if (u.afk) {
                 u.last_time_log = u.last_movement;
                 u.afk = false;
-                Network.getInstance().chat.broadcastMessage(Component.text(u.player.getName() + " is no longer afk.", NamedTextColor.GRAY), "uknet:globalchat");
+                broadcastAFK(u.player, false);
             }
 
             if (u.staffChat) {
                 broadcastPlayerMessage(e.getPlayer(), e.message(), "uknet:staff");
+                broadcastPlayerMessage(e.getPlayer(), e.message(), "uknet:discord_staff");
             } else {
                 Statistics.addMessage(e.getPlayer().getUniqueId().toString(), Time.getDate(Time.currentTime()));
                 broadcastPlayerMessage(e.getPlayer(), e.message(), "uknet:globalchat");
+                broadcastPlayerMessage(e.getPlayer(), e.message(), "uknet:discord");
             }
         }
     }
@@ -182,9 +202,9 @@ public class CustomChat implements Listener, PluginMessageListener {
                             for (Map.Entry<String, Long> entry : Network.getInstance().timers.getRoles().entrySet()) {
 
                                 if (role.equals(entry.getKey())) {
-                                    broadcastMessage(Component.text("addrole " + args[2] + " " + entry.getValue()), "uknet:discord");
+                                    broadcastMessage(Component.text("addrole " + args[2] + " " + entry.getValue()), "uknet:discord_linking");
                                 } else {
-                                    broadcastMessage(Component.text("removerole " + args[2] + " " + entry.getValue()), "uknet:discord");
+                                    broadcastMessage(Component.text("removerole " + args[2] + " " + entry.getValue()), "uknet:discord_linking");
                                 }
 
                             }
@@ -240,7 +260,7 @@ public class CustomChat implements Listener, PluginMessageListener {
                 ObjectOutputStream objectOutput = new ObjectOutputStream(output);
 
                 // Send player message
-                objectOutput.writeObject(GsonComponentSerializer.gson().serialize(message));
+                objectOutput.writeObject(Utils.toJson(message));
                 objectOutput.writeObject(channel);
                 objectOutput.flush();
 
@@ -249,5 +269,16 @@ public class CustomChat implements Listener, PluginMessageListener {
                 LOGGER.severe("Could not broadcast message to server socket!");
             }
         });
+    }
+
+    //Send afk or no longer afk message to players ingame and discord.
+    public void broadcastAFK(Player p, boolean afk) {
+        if (afk) {
+            broadcastMessage(Component.text(p.getName() + " is now afk.", NamedTextColor.GRAY), "uknet:globalchat");
+            broadcastMessage(Component.text("*" + p.getName() + " is now afk.*"), "uknet:discord");
+        } else {
+            broadcastMessage(Component.text(p.getName() + " is no longer afk.", NamedTextColor.GRAY), "uknet:globalchat");
+            broadcastMessage(Component.text("*" + p.getName() + " is no longer afk.*"), "uknet:discord");
+        }
     }
 }

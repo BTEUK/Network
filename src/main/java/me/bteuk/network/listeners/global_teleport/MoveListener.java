@@ -77,7 +77,7 @@ public class MoveListener implements Listener {
         if (u.afk) {
             u.last_time_log = u.last_movement;
             u.afk = false;
-            Network.getInstance().chat.broadcastMessage(Component.text(u.player.getName() + " is no longer afk.", NamedTextColor.GRAY), "uknet:globalchat");
+            Network.getInstance().chat.broadcastAFK(u.player, false);
         }
 
         //If regions are enabled, check for movement between regions.

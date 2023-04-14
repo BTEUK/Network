@@ -6,6 +6,8 @@ import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.TextureUtils;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -52,7 +54,10 @@ public class Connect {
 
             //Send global welcome message.
             //Add a slight delay so message can be seen by player joining.
-            Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> instance.chat.broadcastMessage(TextureUtils.getAvatarUrl(p.getPlayerProfile()) + " " + firstJoinMessage.replace("%player%", p.getName()), "uknet:connect"), 1L);
+            Bukkit.getScheduler().runTaskLater(Network.getInstance(), () ->
+                    instance.chat.broadcastMessage(Component.text(TextureUtils.getAvatarUrl(p.getPlayerProfile()) + " ")
+                                    .append(LegacyComponentSerializer.legacyAmpersand().deserialize(firstJoinMessage.replace("%player%", p.getName())))
+                            , "uknet:discord_connect"), 1L);
 
         } else {
 
@@ -61,7 +66,10 @@ public class Connect {
 
             //Send global connect message.
             //Add a slight delay so message can be seen by player joining.
-            Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> instance.chat.broadcastMessage(TextureUtils.getAvatarUrl(p.getPlayerProfile()) + " " + joinMessage.replace("%player%", p.getName()), "uknet:connect"), 1L);
+            Bukkit.getScheduler().runTaskLater(Network.getInstance(), () ->
+                    instance.chat.broadcastMessage(Component.text(TextureUtils.getAvatarUrl(p.getPlayerProfile()) + " ")
+                                    .append(LegacyComponentSerializer.legacyAmpersand().deserialize(joinMessage.replace("%player%", p.getName())))
+                            , "uknet:discord_connect"), 1L);
 
         }
 
@@ -108,14 +116,16 @@ public class Connect {
         String player_skin = globalSQL.getString("SELECT player_skin FROM player_data WHERE uuid='" + uuid + "';");
 
         //Run disconnect message.
-        instance.chat.broadcastMessage(TextureUtils.getAvatarUrl(name, p.getUniqueId(), player_skin) + " " + leaveMessage.replace("%player%", name), "uknet:disconnect");
+        instance.chat.broadcastMessage(Component.text(TextureUtils.getAvatarUrl(name, p.getUniqueId(), player_skin) + " ")
+                        .append(LegacyComponentSerializer.legacyAmpersand().deserialize(leaveMessage.replace("%player%", name)))
+                , "uknet:discord_disconnect");
 
         //Remove player from online_users.
         globalSQL.update("DELETE FROM online_users WHERE uuid='" + uuid + "';");
 
         //Update tab for all players.
         //This is done with the tab chat channel.
-        instance.chat.broadcastMessage("remove " + p.getUniqueId(), "uknet:tab");
+        instance.chat.broadcastMessage(Component.text("remove " + p.getUniqueId()), "uknet:tab");
 
         //Log playercount in database
         globalSQL.update("INSERT INTO player_count(log_time,players) VALUES(" + Time.currentTime() + "," +

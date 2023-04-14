@@ -55,7 +55,7 @@ public class Discord implements CommandExecutor {
                     String time = String.valueOf(Time.currentTime());
                     String token = time.substring(time.length() - 6);
 
-                    Network.getInstance().chat.broadcastMessage(Component.text("link " + user.player.getUniqueId() + " " + token), "uknet:discord");
+                    Network.getInstance().chat.broadcastMessage(Component.text("link " + user.player.getUniqueId() + " " + token), "uknet:discord_linking");
 
                     user.player.sendMessage(Utils.success("To link your Discord please DM the code &3" + token + " &ato the UK Bot within the next 5 minutes."));
                     return true;
@@ -78,7 +78,7 @@ public class Discord implements CommandExecutor {
 
                     for (Map.Entry<String, Long> entry : Network.getInstance().timers.getRoles().entrySet()) {
 
-                        Network.getInstance().chat.broadcastMessage(Component.text("removerole " + discord_id + " " + entry.getValue()), "uknet:discord");
+                        Network.getInstance().chat.broadcastMessage(Component.text("removerole " + discord_id + " " + entry.getValue()), "uknet:discord_linking");
 
                     }
 

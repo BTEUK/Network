@@ -62,7 +62,7 @@ public class CommandPreProcess implements Listener {
             if (u.afk) {
                 u.last_time_log = Time.currentTime();
                 u.afk = false;
-                Network.getInstance().chat.broadcastMessage(Component.text(u.player.getName() + " is no longer afk.", NamedTextColor.GRAY), "uknet:globalchat");
+                Network.getInstance().chat.broadcastAFK(u.player, false);
             }
 
         }
@@ -126,7 +126,7 @@ public class CommandPreProcess implements Listener {
                 if (u.afk) {
                     u.last_time_log = Time.currentTime();
                     u.afk = false;
-                    Network.getInstance().chat.broadcastMessage(Component.text(u.player.getName() + " is no longer afk.", NamedTextColor.GRAY), "uknet:globalchat");
+                    Network.getInstance().chat.broadcastAFK(u.player, false);
                 }
 
                 u.last_movement = Time.currentTime();

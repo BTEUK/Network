@@ -58,7 +58,7 @@ public class Utils {
     public static Component chatFormat(Player player, Component message) {
         //Get prefix placeholder and convert from legacy format.
         //Legacy format for RGB is like §#a25981
-        Component newMessage = LegacyComponentSerializer.legacyAmpersand().deserialize(PlaceholderAPI.setPlaceholders(player, "%luckperms_prefix% §f%player_name% §7§l> §r§f"));
+        Component newMessage = LegacyComponentSerializer.legacyAmpersand().deserialize(PlaceholderAPI.setPlaceholders(player, "%luckperms_prefix% &f%player_name% &7&l> &r&f"));
         return newMessage.append(message);
     }
 

@@ -51,6 +51,7 @@ public class Staff implements CommandExecutor {
             } else {
                 //Send message in staff chat.
                 Network.getInstance().chat.broadcastPlayerMessage(p, Component.text(String.join(" ", args)), "uknet:staff");
+                Network.getInstance().chat.broadcastPlayerMessage(p, Component.text(String.join(" ", args)), "uknet:discord_staff");
             }
             return true;
         }
