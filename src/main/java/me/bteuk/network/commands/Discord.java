@@ -6,6 +6,7 @@ import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -46,7 +47,8 @@ public class Discord implements CommandExecutor {
 
                     //Check if account isn't already linked, send info to unlink.
                     if (user.isLinked) {
-                        p.sendMessage(Utils.error("You are already linked, to unlink do &4/discord unlink"));
+                        p.sendMessage(Utils.error("You are already linked, to unlink do ")
+                                .append(Component.text("/discord unlink", NamedTextColor.DARK_RED)));
                         return true;
                     }
 
@@ -57,14 +59,17 @@ public class Discord implements CommandExecutor {
 
                     Network.getInstance().chat.broadcastMessage(Component.text("link " + user.player.getUniqueId() + " " + token), "uknet:discord_linking");
 
-                    user.player.sendMessage(Utils.success("To link your Discord please DM the code &3" + token + " &ato the UK Bot within the next 5 minutes."));
+                    user.player.sendMessage(Utils.success("To link your Discord please DM the code ")
+                            .append(Component.text(token, NamedTextColor.DARK_AQUA))
+                            .append(Utils.success(" &ato the UK Bot within the next 5 minutes.")));
                     return true;
 
                 } else if (args[0].equalsIgnoreCase("unlink")) {
 
                     //Check if account is not linked, then ask user to link first.
                     if (!user.isLinked) {
-                        p.sendMessage(Utils.error("You are not linked, to link do &4/discord link"));
+                        p.sendMessage(Utils.error("You are not linked, to link do ")
+                                .append(Component.text("/discord link", NamedTextColor.DARK_RED)));
                         return true;
                     }
 

@@ -7,6 +7,8 @@ import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.AddLocationType;
 import me.bteuk.network.utils.enums.Categories;
 import me.bteuk.network.utils.enums.Regions;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -80,7 +82,9 @@ public class Navigation implements CommandExecutor {
                         u.staffGui = new AddLocation(AddLocationType.UPDATE, location, coordinate_id, category, subcategory);
                         u.staffGui.open(u);
                     } else {
-                        p.sendMessage(Utils.error("The location &4" + location + " &cdoes not exist."));
+                        p.sendMessage(Utils.error("The location ")
+                                .append(Component.text(location, NamedTextColor.DARK_RED))
+                                .append(Utils.error(" does not exist.")));
                     }
                 } else {
                     p.sendMessage(Utils.error("/navigation update <location>"));
@@ -101,9 +105,13 @@ public class Navigation implements CommandExecutor {
                     if (Network.getInstance().globalSQL.hasRow("SELECT location FROM location_data WHERE location='" + location + "';")) {
                         //Delete location.
                         Network.getInstance().globalSQL.update("DELETE FROM location_data WHERE location='" + location + "';");
-                        p.sendMessage(Utils.success("Location &3" + location + " &aremoved."));
+                        p.sendMessage(Utils.success("Location ")
+                                .append(Component.text(location, NamedTextColor.DARK_AQUA))
+                                .append(Utils.error(" removed.")));
                     } else {
-                        p.sendMessage(Utils.error("The location &4" + location + " &cdoes not exist."));
+                        p.sendMessage(Utils.error("The location ")
+                                .append(Component.text(location, NamedTextColor.DARK_RED))
+                                .append(Utils.error(" does not exist.")));
                     }
                 } else {
                     p.sendMessage(Utils.error("/navigation remove <location>"));
@@ -126,14 +134,20 @@ public class Navigation implements CommandExecutor {
                         if (Network.getInstance().globalSQL.hasRow("SELECT location FROM location_data WHERE location='" + location + "' AND suggested=1;")) {
                             //Location is already suggested, remove that.
                             Network.getInstance().globalSQL.update("UPDATE location_data SET suggested=0 WHERE location='" + location + "';");
-                            p.sendMessage(Utils.success("The location &3" + location + " &awill no longer be suggested."));
+                            p.sendMessage(Utils.success("The location ")
+                                    .append(Component.text(location, NamedTextColor.DARK_AQUA))
+                                    .append(Utils.error(" will no longer be suggested.")));
                         } else {
                             //Set location as suggested.
                             Network.getInstance().globalSQL.update("UPDATE location_data SET suggested=1 WHERE location='" + location + "';");
-                            p.sendMessage(Utils.success("The location &3" + location + " &awill now be suggested."));
+                            p.sendMessage(Utils.success("The location ")
+                                    .append(Component.text(location, NamedTextColor.DARK_AQUA))
+                                    .append(Utils.error(" will now be suggested.")));
                         }
                     } else {
-                        p.sendMessage(Utils.error("The location &4" + location + " &cdoes not exist."));
+                        p.sendMessage(Utils.error("The location ")
+                                .append(Component.text(location, NamedTextColor.DARK_RED))
+                                .append(Utils.error(" does not exist.")));
                     }
                 } else {
                     p.sendMessage(Utils.error("/navigation suggested <location>"));

@@ -4,6 +4,8 @@ import me.bteuk.network.Network;
 import me.bteuk.network.events.EventManager;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -63,11 +65,12 @@ public class Tp implements CommandExecutor {
                             Back.setPreviousCoordinate(p.getUniqueId().toString(), p.getLocation());
 
                             p.teleport(player.getLocation());
-                            p.sendMessage(Utils.success("Teleported to &3" +
-                                    args[0]));
+                            p.sendMessage(Utils.success("Teleported to ")
+                                    .append(Component.text(args[0], NamedTextColor.DARK_AQUA)));
 
                         } else {
-                            p.sendMessage(Utils.error(args[0] + " is no longer online."));
+                            p.sendMessage(Component.text(args[0], NamedTextColor.DARK_RED)
+                                    .append(Utils.error(" is no longer online.")));
                         }
 
                     } else {
@@ -79,15 +82,18 @@ public class Tp implements CommandExecutor {
 
 
                 } else {
-                    p.sendMessage(Utils.error(args[0] + " has teleport disabled."));
+                    p.sendMessage(Component.text(args[0], NamedTextColor.DARK_RED)
+                            .append(Utils.error(" has teleport disabled.")));
                 }
 
             } else {
-                p.sendMessage(Utils.error(args[0] + " is not online."));
+                p.sendMessage(Component.text(args[0], NamedTextColor.DARK_RED)
+                        .append(Utils.error(" is not online.")));
             }
 
         } else {
-            p.sendMessage(Utils.error(args[0] + " does not exist."));
+            p.sendMessage(Component.text(args[0], NamedTextColor.DARK_RED)
+                    .append(Utils.error(" does not exist.")));
         }
         return true;
     }

@@ -4,6 +4,8 @@ import me.bteuk.network.Network;
 import me.bteuk.network.staff.Moderation;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -33,7 +35,8 @@ public class Mute implements CommandExecutor {
         //Check player.
         //If uuid exists for name.
         if (!Network.getInstance().globalSQL.hasRow("SELECT uuid FROM player_data WHERE name='" + args[0] + "';")) {
-            sender.sendMessage(Utils.error("&4" + args[0] + " &cis not a valid player."));
+            sender.sendMessage(Component.text(args[0], NamedTextColor.DARK_RED)
+                    .append(Utils.error(" is not a valid player.")));
             return true;
         }
 
@@ -127,7 +130,12 @@ public class Mute implements CommandExecutor {
         Moderation mod = new Moderation();
         mod.mute(uuid, end_time, reason);
 
-        sender.sendMessage(Utils.success("Muted &3" + args[0] + " &auntil &3" + Time.getDateTime(end_time) + " &afor reason: &3" + reason));
+        sender.sendMessage(Utils.success("Muted ")
+                .append(Component.text(args[0], NamedTextColor.DARK_AQUA))
+                .append(Utils.success(" until "))
+                .append(Component.text(Time.getDateTime(end_time), NamedTextColor.DARK_AQUA))
+                .append(Utils.success(" for reason: "))
+                .append(Component.text(reason, NamedTextColor.DARK_AQUA)));
 
         return false;
     }

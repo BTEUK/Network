@@ -3,6 +3,8 @@ package me.bteuk.network.commands;
 import me.bteuk.network.Network;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.regions.Region;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -10,7 +12,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import static me.bteuk.network.utils.Constants.EARTH_WORLD;
-import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public class RegionCommand implements CommandExecutor {
 
@@ -57,7 +58,8 @@ public class RegionCommand implements CommandExecutor {
                     //Send error.
                     p.sendMessage(Utils.error("You do not have permission to join regions."));
                     p.sendMessage(Utils.error("To join regions you need at least Jr.Builder."));
-                    p.sendMessage(Utils.error("For more information type &4/help building"));
+                    p.sendMessage(Utils.error("For more information type ")
+                            .append(Component.text("/help building", NamedTextColor.DARK_RED)));
 
                 }
 
@@ -70,7 +72,9 @@ public class RegionCommand implements CommandExecutor {
             return true;
         } else {
 
-            p.sendMessage(Utils.error("The region " + args[1] + " does not exist."));
+            p.sendMessage(Utils.error("The region ")
+                    .append(Component.text(args[1], NamedTextColor.DARK_RED))
+                    .append(Utils.error(" does not exist.")));
             return true;
 
         }

@@ -4,6 +4,8 @@ import me.bteuk.network.events.EventManager;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -39,7 +41,8 @@ public class Home implements CommandExecutor {
 
             //If a default home is set, teleport to it.
             if (!globalSQL.hasRow("SELECT uuid FROM home WHERE uuid='" + p.getUniqueId() + "' AND name IS NULL;")) {
-                p.sendMessage(Utils.error("You do not have a default home set, you can set it typing &4/sethome"));
+                p.sendMessage(Utils.error("You do not have a default home set, you can set it typing ")
+                        .append(Component.text("/sethome", NamedTextColor.DARK_RED)));
                 return true;
             }
 
@@ -75,7 +78,8 @@ public class Home implements CommandExecutor {
 
             //Check for permission.
             if (!p.hasPermission("uknet.navigation.homes")) {
-                p.sendMessage(Utils.error("You do not have permission to set multiple homes, you can only use your default home with &4/home"));
+                p.sendMessage(Utils.error("You do not have permission to set multiple homes, you can only use your default home with ")
+                        .append(Component.text("/home", NamedTextColor.DARK_RED)));
                 return true;
             }
 
@@ -84,7 +88,8 @@ public class Home implements CommandExecutor {
 
             //Check if home with this name exists.
             if (!globalSQL.hasRow("SELECT uuid FROM home WHERE uuid='" + p.getUniqueId() + "' AND name='" + name + "';")) {
-                p.sendMessage(Utils.error("You do not have a home with the name &4" + name));
+                p.sendMessage(Utils.error("You do not have a home with the name ")
+                        .append(Component.text(name, NamedTextColor.DARK_RED)));
                 return true;
             }
 
@@ -102,7 +107,8 @@ public class Home implements CommandExecutor {
 
                 //Teleport to the location.
                 p.teleport(l);
-                p.sendMessage(Utils.success("Teleported to your home &3" + name + "&a."));
+                p.sendMessage(Utils.success("Teleported to your home ")
+                        .append(Component.text(name, NamedTextColor.DARK_AQUA)));
 
             } else {
 

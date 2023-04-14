@@ -2,6 +2,8 @@ package me.bteuk.network.commands;
 
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.utils.Utils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -34,7 +36,8 @@ public class Delhome implements CommandExecutor {
 
             //Check if the default home exists.
             if (!globalSQL.hasRow("SELECT uuid FROM home WHERE uuid='" + p.getUniqueId() + "' AND name IS NULL;")) {
-                p.sendMessage(Utils.error("You not have a default home set, set one with &4/sethome"));
+                p.sendMessage(Utils.error("You not have a default home set, set one with ")
+                        .append(Component.text("/sethome", NamedTextColor.DARK_RED)));
                 return true;
             }
 
@@ -52,7 +55,8 @@ public class Delhome implements CommandExecutor {
 
             //Check for permission.
             if (!p.hasPermission("uknet.navigation.homes")) {
-                p.sendMessage(Utils.error("You do not have permission to delete multiple homes, only to delete a default home using &4/delhome"));
+                p.sendMessage(Utils.error("You do not have permission to delete multiple homes, only to delete a default home using ")
+                        .append(Component.text("/delhome", NamedTextColor.DARK_RED)));
                 return true;
             }
 
@@ -64,13 +68,15 @@ public class Delhome implements CommandExecutor {
 
             //Check is home with this name exists.
             if (!globalSQL.hasRow("SELECT uuid FROM home WHERE uuid='" + p.getUniqueId() + "' AND name='" + name + "';")) {
-                p.sendMessage(Utils.error("You do not have a home set with the name &4" + name + "&c."));
+                p.sendMessage(Utils.error("You do not have a home set with the name ")
+                        .append(Component.text(name, NamedTextColor.DARK_RED)));
                 return true;
             }
 
             //Delete home
             globalSQL.update("DELETE FROM home WHERE uuid='" + p.getUniqueId() + "' AND name='" + name + "';");
-            p.sendMessage(Utils.success("&3" + name + " &ahome removed."));
+            p.sendMessage(Component.text(name, NamedTextColor.DARK_AQUA)
+                    .append(Utils.success(" home removed.")));
 
             //Delete coordinate id.
             globalSQL.update("DELETE FROM coordinates WHERE id=" + coordinate_id + ";");

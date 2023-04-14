@@ -4,6 +4,8 @@ import me.bteuk.network.Network;
 import me.bteuk.network.events.EventManager;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -72,7 +74,9 @@ public class Warp implements CommandExecutor {
 
                 //Teleport to location.
                 p.teleport(l);
-                p.sendMessage(Utils.success("Teleported to &3" + location));
+                p.sendMessage(Utils.success("Teleported to ")
+                        .append(Component.text(location, NamedTextColor.DARK_AQUA)));
+
             } else {
 
                 //Server is different.
@@ -83,7 +87,9 @@ public class Warp implements CommandExecutor {
             }
 
         } else {
-            p.sendMessage(Utils.error("The location &4" + location + " &cdoes not exist."));
+            p.sendMessage(Utils.error("The location ")
+                    .append(Component.text(location, NamedTextColor.DARK_RED))
+                    .append(Utils.error(" does not exist.")));
         }
 
         return true;

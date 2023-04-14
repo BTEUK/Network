@@ -7,6 +7,7 @@ import net.buildtheearth.terraminusminus.generator.EarthGeneratorSettings;
 import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -50,7 +51,10 @@ public class ll implements CommandExecutor {
 
                 double[] coords = bteGeneratorSettings.projection().toGeo(p.getLocation().getX() + u.dx, p.getLocation().getZ() + u.dz);
 
-                p.sendMessage(Utils.success("Your coordinates are &3" + DECIMAL_FORMATTER.format(coords[1]) + "," + DECIMAL_FORMATTER.format(coords[0])));
+                p.sendMessage(Utils.success("Your coordinates are ")
+                        .append(Component.text(DECIMAL_FORMATTER.format(coords[1]), NamedTextColor.DARK_AQUA))
+                        .append(Utils.success(","))
+                        .append(Component.text(DECIMAL_FORMATTER.format(coords[0]), NamedTextColor.DARK_AQUA)));
                 Component message = Utils.success("Click here to view the coordinates in Google Maps.");
                 message = message.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://www.google.com/maps/@?api=1&map_action=map&basemap=satellite&zoom=21&center=" + coords[1] + "," + coords[0]));
                 p.sendMessage(message);

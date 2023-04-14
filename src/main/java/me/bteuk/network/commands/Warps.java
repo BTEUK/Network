@@ -50,14 +50,17 @@ public class Warps implements CommandExecutor {
 
         //Get the first 16 locations and add them to a string.
         //If the page is greater than 1 and there are enough locations to support that, then post that page.
-        StringBuilder message = new StringBuilder();
 
         if (((page - 1) * 16) >= locations.size()){
 
             if (locations.size() <= 16) {
-                p.sendMessage(Utils.error("There is only &41 &cpage of warps."));
+                p.sendMessage(Utils.error("There is only ")
+                        .append(Component.text("1", NamedTextColor.DARK_RED))
+                        .append(Utils.error(" page of warps.")));
             } else {
-                p.sendMessage(Utils.error("There are only &4" + pages + " &cpages of warps."));
+                p.sendMessage(Utils.error("There are only ")
+                        .append(Component.text(pages, NamedTextColor.DARK_RED))
+                        .append(Utils.error(" pages of warps.")));
             }
 
             return true;
@@ -65,7 +68,11 @@ public class Warps implements CommandExecutor {
         }
 
         //Show this page of warps.
-        message.append(Utils.line("Page &7" + page + "&f/&7" + pages + "&f:\n"));
+        Component message = Utils.line("Page ")
+                .append(Component.text(page, NamedTextColor.GRAY))
+                .append(Utils.line("/"))
+                .append(Component.text(pages, NamedTextColor.GRAY))
+                .append(Utils.line(":\n"));
 
         //Number of entries to skip.
         int skip = (page - 1) * 16;
@@ -80,29 +87,31 @@ public class Warps implements CommandExecutor {
             //This is calculated by it either being the 16th entry, or the last in the list.
             if (((locations.indexOf(location) + 1) % 16) == 0 || (locations.indexOf(location) + 1 == locations.size())) {
 
-                message.append(Component.text(location, NamedTextColor.GRAY));
+                message = message.append(Component.text(location, NamedTextColor.GRAY));
                 break;
 
             } else {
 
-                message.append(Component.text(location, NamedTextColor.GRAY).append(Utils.line(", ")));
+                message = message.append(Component.text(location, NamedTextColor.GRAY).append(Utils.line(", ")));
 
             }
         }
 
-        p.sendMessage(message.toString());
+        p.sendMessage(message);
 
         //If this isn't the first page show command for previous page.
         if (page > 1) {
 
-            p.sendMessage(Utils.line("To view the previous page type: &7/warps " + (page - 1)));
+            p.sendMessage(Utils.line("To view the previous page type: ")
+                    .append(Component.text("/warps " + (page - 1), NamedTextColor.GRAY)));
 
         }
 
         //If this isn't the last page show command for the next page.
         if ((page * 16) < locations.size()) {
 
-            p.sendMessage(Utils.line("To view the next page type: &7/warps " + (page + 1)));
+            p.sendMessage(Utils.line("To view the next page type: ")
+                    .append(Component.text("/warps " + (page + 1), NamedTextColor.GRAY)));
 
         }
 

@@ -1,6 +1,8 @@
 package me.bteuk.network.commands;
 
 import me.bteuk.network.utils.Utils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -41,12 +43,14 @@ public class Speed implements CommandExecutor {
         if (isFly) {
 
             p.setFlySpeed(speed);
-            p.sendMessage(Utils.success("Set flying speed to &3" + args[0]));
+            p.sendMessage(Utils.success("Set flying speed to ")
+                    .append(Component.text(args[0], NamedTextColor.DARK_AQUA)));
 
         } else {
 
             p.setWalkSpeed(speed);
-            p.sendMessage(Utils.success("Set walking speed to &3" + args[0]));
+            p.sendMessage(Utils.success("Set walking speed to ")
+                    .append(Component.text(args[0], NamedTextColor.DARK_AQUA)));
 
         }
 

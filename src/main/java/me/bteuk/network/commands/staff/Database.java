@@ -13,6 +13,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.jetbrains.annotations.NotNull;
 
+import static me.bteuk.network.utils.Constants.LOGGER;
+
 public class Database implements CommandExecutor {
 
     @Override
@@ -57,7 +59,7 @@ public class Database implements CommandExecutor {
                 //Run this async.
                 Bukkit.getScheduler().runTaskAsynchronously(Network.getInstance(), () -> {
 
-                    Network.getInstance().getLogger().info("Started region conversion async, this could take a while.");
+                    LOGGER.info("Started region conversion async, this could take a while.");
 
                     DatabaseRegions dr = new DatabaseRegions();
                     dr.getRegions();

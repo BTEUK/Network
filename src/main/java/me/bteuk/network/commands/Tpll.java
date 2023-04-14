@@ -299,7 +299,7 @@ public class Tpll implements CommandExecutor {
                     } else {
 
                         //You can't enter this region.
-                        p.sendMessage(Utils.error("The terrain for this region has not been generated, you must be Jr.Builder or higher to load new terrain."));
+                        p.sendMessage(Utils.error("The terrain for this region has not been generated, you must be at least Jr.Builder to load new terrain."));
 
                     }
                 }

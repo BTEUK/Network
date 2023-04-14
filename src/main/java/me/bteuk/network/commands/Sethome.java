@@ -3,7 +3,8 @@ package me.bteuk.network.commands;
 import me.bteuk.network.Network;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.utils.Utils;
-import me.bteuk.network.utils.enums.ServerType;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -37,7 +38,8 @@ public class Sethome implements CommandExecutor {
 
             //If already has a default home set, the player first has to delete it.
             if (globalSQL.hasRow("SELECT uuid FROM home WHERE uuid='" + p.getUniqueId() + "' AND name IS NULL;")) {
-                p.sendMessage(Utils.error("You already have a default home set, to delete it type &4/delhome"));
+                p.sendMessage(Utils.error("You already have a default home set, to delete it type ")
+                        .append(Component.text("/delhome", NamedTextColor.DARK_RED)));
                 return true;
             }
 
@@ -46,13 +48,15 @@ public class Sethome implements CommandExecutor {
 
             globalSQL.update("INSERT INTO home(coordinate_id,uuid) VALUES(" + coordinate_id + ",'" + p.getUniqueId() + "');");
 
-            p.sendMessage(Utils.success("Default home set to current location, to teleport here type &3/home"));
+            p.sendMessage(Utils.success("Default home set to current location, to teleport here type ")
+                    .append(Component.text("/home", NamedTextColor.DARK_AQUA)));
 
         } else {
 
             //Check for permission.
             if (!p.hasPermission("uknet.navigation.homes")) {
-                p.sendMessage(Utils.error("You do not have permission to set multiple homes, only to set a default home using &4/sethome"));
+                p.sendMessage(Utils.error("You do not have permission to set multiple homes, only to set a default home using ")
+                        .append(Component.text("/sethome", NamedTextColor.DARK_RED)));
                 return true;
             }
 
@@ -66,7 +70,10 @@ public class Sethome implements CommandExecutor {
             }
 
             if (globalSQL.hasRow("SELECT uuid FROM home WHERE uuid='" + p.getUniqueId() + "' AND name='" + name + "';")) {
-                p.sendMessage(Utils.error("You already have a home set with the name &4" + name + "&c, you can delete it by typing &4/delhome " + name));
+                p.sendMessage(Utils.error("You already have a home set with the name ")
+                        .append(Component.text(name, NamedTextColor.DARK_RED))
+                        .append(Utils.error(", you can delete it by typing "))
+                        .append(Component.text("/delhome " + name, NamedTextColor.DARK_RED)));
                 return true;
             }
 
@@ -75,7 +82,8 @@ public class Sethome implements CommandExecutor {
 
             globalSQL.update("INSERT INTO home(coordinate_id,uuid,name) VALUES(" + coordinate_id + ",'" + p.getUniqueId() + "','" + name + "');");
 
-            p.sendMessage(Utils.success("Home set to current location, to teleport here type &3/home " + name));
+            p.sendMessage(Utils.success("Home set to current location, to teleport here type ")
+                    .append(Component.text("/home " + name, NamedTextColor.DARK_AQUA)));
 
         }
 
