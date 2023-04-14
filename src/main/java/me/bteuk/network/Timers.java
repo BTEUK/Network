@@ -1,5 +1,6 @@
 package me.bteuk.network;
 
+import com.destroystokyo.paper.profile.PlayerProfile;
 import me.bteuk.network.events.EventManager;
 import me.bteuk.network.listeners.Connect;
 import me.bteuk.network.sql.GlobalSQL;
@@ -212,6 +213,7 @@ public class Timers {
 
                     //Run network disconnect and remove their entry.
                     globalSQL.update("DELETE FROM server_switch WHERE uuid='" + uuid + "';");
+
                     connect.leaveEvent(Bukkit.getOfflinePlayer(UUID.fromString(uuid)));
 
                 }

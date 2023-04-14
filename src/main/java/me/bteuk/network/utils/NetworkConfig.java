@@ -4,6 +4,7 @@ import me.bteuk.network.Network;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
+import java.util.Objects;
 import java.util.Set;
 
 import static me.bteuk.network.utils.Constants.LOGGER;
@@ -21,7 +22,7 @@ public class NetworkConfig {
 
     //Check for latest config version.
     private boolean latestConfigVersion() {
-        return (CONFIG.getString("version").equals(CONFIG.getDefaults().getString("version")));
+        return (Objects.equals(CONFIG.getString("version"), Objects.requireNonNull(CONFIG.getDefaults()).getString("version")));
     }
 
     //Update config if the version is outdated.
@@ -58,11 +59,26 @@ public class NetworkConfig {
             //Set the new config.
             CONFIG = newConfig;
 
+            //Update the database.
+            updateDatabase();
+
             LOGGER.info("Updated config to version " + newConfig.getString("version"));
 
         } else {
             LOGGER.info("The config is up to date!");
         }
+    }
+
+    //Update database if the config was outdated, this implies the database is also outdated.
+    private void updateDatabase() {
+
+        //Check for specific table columns that could be missing,
+        //All changes have to be tested from 1.0.0.
+
+        //Version 1.1.0.
+        //Add skin texture id column.
+        Network.getInstance().globalSQL.update("ALTER TABLE player_data ADD COLUMN player_skin TEXT NULL DEFAULT NULL;");
+
     }
 
     //Reload the config.

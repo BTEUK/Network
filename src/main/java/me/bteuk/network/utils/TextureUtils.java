@@ -5,7 +5,9 @@ import com.destroystokyo.paper.profile.ProfileProperty;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -17,8 +19,14 @@ public class TextureUtils {
 
     public static String getTexture(PlayerProfile profile) {
 
-
         String textureProperty = getTextureProperty(profile.getProperties());
+
+        return getTexture(textureProperty);
+
+    }
+
+    public static String getTexture(String textureProperty) {
+
         if (textureProperty != null) {
 
             byte[] decodedBytes = Base64.getDecoder().decode(textureProperty);
@@ -27,16 +35,6 @@ public class TextureUtils {
             Matcher matcher = TEXTURE_URL_PATTERN.matcher(textureData);
             if (matcher.find()) return matcher.group("texture");
         }
-
-        return null;
-    }
-
-    public static String getTexture(org.bukkit.profile.PlayerProfile profile) {
-
-        String textureData = profile.getTextures().getSkin().toString();
-
-        Matcher matcher = TEXTURE_URL_PATTERN.matcher(textureData);
-        if (matcher.find()) return matcher.group("texture");
 
         return null;
     }
@@ -52,13 +50,11 @@ public class TextureUtils {
     }
 
     public static String getAvatarUrl(PlayerProfile profile) {
-        String avatarUrl = constructAvatarUrl(profile.getName(), profile.getId(), getTexture(profile));
-        return avatarUrl;
+        return constructAvatarUrl(profile.getName(), Objects.requireNonNull(profile.getId()), getTexture(profile));
     }
 
-    public static String getAvatarUrl(org.bukkit.profile.PlayerProfile profile) {
-        String avatarUrl = constructAvatarUrl(profile.getName(), profile.getUniqueId(), getTexture(profile));
-        return avatarUrl;
+    public static String getAvatarUrl(String name, UUID uuid, String texture) {
+        return constructAvatarUrl(name, uuid, texture);
     }
 
     private static String constructAvatarUrl(String username, UUID uuid, String texture) {
@@ -66,17 +62,13 @@ public class TextureUtils {
         String defaultUrl = "https://crafatar.com/avatars/{uuid-nodashes}.png?size={size}&overlay#{texture}";
         //String offlineUrl = "https://cravatar.eu/helmavatar/{username}/{size}.png#{texture}";
 
-        try {
-            username = URLEncoder.encode(username, "utf8");
-        } catch (UnsupportedEncodingException ignored) {
-        }
+        username = URLEncoder.encode(username, StandardCharsets.UTF_8);
 
-        String usedBaseUrl = defaultUrl;
         defaultUrl = defaultUrl
                 .replace("{texture}", texture != null ? texture : "")
                 .replace("{username}", username)
                 .replace("{uuid}", uuid != null ? uuid.toString() : "")
-                .replace("{uuid-nodashes}", uuid.toString().replace("-", ""))
+                .replace("{uuid-nodashes}", Objects.requireNonNull(uuid).toString().replace("-", ""))
                 .replace("{size}", "128");
 
         return defaultUrl;

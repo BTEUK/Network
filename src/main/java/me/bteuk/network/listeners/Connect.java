@@ -1,6 +1,5 @@
 package me.bteuk.network.listeners;
 
-import com.destroystokyo.paper.profile.PlayerProfile;
 import me.bteuk.network.Network;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
@@ -25,8 +24,6 @@ public class Connect {
     private final String firstJoinMessage;
     private final String leaveMessage;
 
-    private boolean blocked;
-
     public Connect(Network instance, GlobalSQL globalSQL, PlotSQL plotSQL) {
 
         this.instance = instance;
@@ -39,8 +36,6 @@ public class Connect {
         firstJoinMessage = CONFIG.getString("chat.firstjoin");
         leaveMessage = CONFIG.getString("chat.leave");
 
-        blocked = false;
-
     }
 
     /*
@@ -52,8 +47,8 @@ public class Connect {
         //If the user is not yet in the player_data table add them.
         if (!globalSQL.hasRow("SELECT uuid FROM player_data WHERE uuid='" + p.getUniqueId() + "';")) {
 
-            globalSQL.update("INSERT INTO player_data(uuid,name,last_online,last_submit) VALUES('" +
-                    p.getUniqueId() + "','" + p.getName() + "'," + Time.currentTime() + "," + 0 + ");");
+            globalSQL.update("INSERT INTO player_data(uuid,name,last_online,last_submit,player_skin) VALUES('" +
+                    p.getUniqueId() + "','" + p.getName() + "'," + Time.currentTime() + "," + 0 + ",'" + TextureUtils.getTexture(p.getPlayerProfile()) + "');");
 
             //Send global welcome message.
             //Add a slight delay so message can be seen by player joining.
@@ -61,8 +56,8 @@ public class Connect {
 
         } else {
 
-            //Update the online time and name.
-            globalSQL.update("UPDATE player_data SET name='" + p.getName() + "',last_online=" + Time.currentTime() + " WHERE uuid='" + p.getUniqueId() + "';");
+            //Update the online time, name and player skin.
+            globalSQL.update("UPDATE player_data SET name='" + p.getName() + "',last_online=" + Time.currentTime() + ",player_skin='" + TextureUtils.getTexture(p.getPlayerProfile()) + "' WHERE uuid='" + p.getUniqueId() + "';");
 
             //Send global connect message.
             //Add a slight delay so message can be seen by player joining.
@@ -110,11 +105,10 @@ public class Connect {
 
         //Get the player name and send global disconnect message.
         String name = globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
+        String player_skin = globalSQL.getString("SELECT player_skin FROM player_data WHERE uuid='" + uuid + "';");
 
-        p.getPlayerProfile().update().thenAcceptAsync(updatedProfile ->
-                        instance.chat.broadcastMessage(TextureUtils.getAvatarUrl(updatedProfile) + " " + leaveMessage.replace("%player%", name), "uknet:disconnect")
-                , runnable -> Bukkit.getScheduler().runTask(instance, runnable));
-
+        //Run disconnect message.
+        instance.chat.broadcastMessage(TextureUtils.getAvatarUrl(name, p.getUniqueId(), player_skin) + " " + leaveMessage.replace("%player%", name), "uknet:disconnect");
 
         //Remove player from online_users.
         globalSQL.update("DELETE FROM online_users WHERE uuid='" + uuid + "';");
