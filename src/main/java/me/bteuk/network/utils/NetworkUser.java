@@ -6,8 +6,8 @@ import me.bteuk.network.utils.regions.Region;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import static me.bteuk.network.utils.Constants.EARTH_WORLD;
 import static me.bteuk.network.utils.Constants.SERVER_NAME;
-import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public class NetworkUser {
 
@@ -107,7 +107,7 @@ public class NetworkUser {
         //Check if the player is in a region.
         if (SERVER_NAME.equals(Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH'"))) {
             //Check if they are in the earth world.
-            if (player.getLocation().getWorld().getName().equals(CONFIG.getString("earth_world"))) {
+            if (player.getLocation().getWorld().getName().equals(EARTH_WORLD)) {
                 region = Network.getInstance().getRegionManager().getRegion(player.getLocation());
                 //Add region to database if not exists.
                 region.addToDatabase();

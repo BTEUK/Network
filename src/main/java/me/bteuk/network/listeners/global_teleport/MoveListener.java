@@ -18,15 +18,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-import static me.bteuk.network.utils.Constants.LOGGER;
-import static me.bteuk.network.utils.Constants.SERVER_NAME;
+import static me.bteuk.network.utils.Constants.*;
 import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public class MoveListener implements Listener {
 
-    private final boolean regionsEnabled;
     private final boolean teleportEnabled;
-    private final String earthWorld;
 
     private final RegionManager regionManager;
 
@@ -36,9 +33,7 @@ public class MoveListener implements Listener {
 
         Bukkit.getServer().getPluginManager().registerEvents(this, instance);
 
-        regionsEnabled = CONFIG.getBoolean("regions_enabled");
         teleportEnabled = CONFIG.getBoolean("global_teleport");
-        earthWorld = CONFIG.getString("earth_world");
 
         regionManager = instance.getRegionManager();
 
@@ -86,7 +81,7 @@ public class MoveListener implements Listener {
         }
 
         //If regions are enabled, check for movement between regions.
-        if (regionsEnabled) {
+        if (REGIONS_ENABLED) {
 
             //If the player is currently not in a region then that implies they are in a world without regions, so movement will not effect this.
             //Not being in a region also means that region is null.
@@ -136,7 +131,7 @@ public class MoveListener implements Listener {
 
                                     //Set join event to teleport there.
                                     EventManager.createJoinEvent(u.player.getUniqueId().toString(), "network", "teleport " +
-                                            earthWorld + " " + l.getX() + " " + l.getZ() + " " + l.getYaw() + " " + l.getPitch() + " " + SERVER_NAME);
+                                            EARTH_WORLD + " " + l.getX() + " " + l.getZ() + " " + l.getYaw() + " " + l.getPitch() + " " + SERVER_NAME);
 
                                 }
 

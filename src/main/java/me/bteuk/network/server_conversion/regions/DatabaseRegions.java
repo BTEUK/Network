@@ -21,12 +21,13 @@ import java.sql.SQLException;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
+import static me.bteuk.network.utils.Constants.EARTH_WORLD;
 import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public class DatabaseRegions {
 
     private final EarthGeneratorSettings bteGeneratorSettings = EarthGeneratorSettings.parse(EarthGeneratorSettings.BTE_DEFAULT_SETTINGS);
-    private final World world = Bukkit.getWorld(Objects.requireNonNull(CONFIG.getString("earth_world")));
+    private final World world = Bukkit.getWorld(EARTH_WORLD);
 
     /*
 

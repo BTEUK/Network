@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import static me.bteuk.network.utils.Constants.EARTH_WORLD;
 import static me.bteuk.network.utils.Constants.SERVER_NAME;
 import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
@@ -40,7 +41,6 @@ public class Tpll implements CommandExecutor {
 
     private final boolean isEarth;
     private final String earthServer;
-    private final String earthWorld;
 
     private final RegionManager regionManager;
     private final boolean regionsEnabled;
@@ -49,7 +49,6 @@ public class Tpll implements CommandExecutor {
         this.requires_permission = requires_permission;
         this.isEarth = Network.getInstance().globalSQL.hasRow("SELECT name FROM server_data WHERE name='" + SERVER_NAME + "' AND type='earth'");
         earthServer = Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='earth';");
-        earthWorld = CONFIG.getString("earth_world");
 
         regionManager = Network.getInstance().getRegionManager();
 
@@ -263,7 +262,7 @@ public class Tpll implements CommandExecutor {
                             //Set current location for /back
                             Back.setPreviousCoordinate(p.getUniqueId().toString(), p.getLocation());
 
-                            Location loc = new Location(Bukkit.getWorld(earthWorld), (proj[0]), s, (proj[1]), p.getLocation().getYaw(), p.getLocation().getPitch());
+                            Location loc = new Location(Bukkit.getWorld(EARTH_WORLD), (proj[0]), s, (proj[1]), p.getLocation().getYaw(), p.getLocation().getPitch());
 
                             //Add tpll to statistics.
                             Statistics.addTpll(p.getUniqueId().toString(), Time.getDate(Time.currentTime()));
@@ -276,7 +275,7 @@ public class Tpll implements CommandExecutor {
 
                             //Set join event to teleport there.
                             EventManager.createTeleportEvent(true, p.getUniqueId().toString(), "network", "teleport "
-                                    + earthWorld + " " + proj[0] + " " + proj[1] + " "
+                                    + EARTH_WORLD + " " + proj[0] + " " + proj[1] + " "
                                     + p.getLocation().getYaw() + " " + p.getLocation().getPitch(), p.getLocation());
 
                             //Add tpll to statistics.

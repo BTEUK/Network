@@ -9,6 +9,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import static me.bteuk.network.utils.Constants.EARTH_WORLD;
 import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public class RegionCommand implements CommandExecutor {
@@ -48,7 +49,7 @@ public class RegionCommand implements CommandExecutor {
 
                     //Add server event to join plot.
                     Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + p.getUniqueId() + "'," + "'network'" + ",'" +
-                            CONFIG.getString("earth_world") +
+                            EARTH_WORLD +
                             "','region join " + region.regionName() + "');");
 
                 } else {

@@ -1,22 +1,19 @@
 package me.bteuk.network.server_conversion.regions;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
-import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import me.bteuk.network.Network;
-import me.bteuk.network.utils.regions.Region;
-import me.bteuk.network.utils.regions.RegionManager;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
 
-import static me.bteuk.network.utils.NetworkConfig.CONFIG;
+import static me.bteuk.network.utils.Constants.EARTH_WORLD;
+import static me.bteuk.network.utils.Constants.LOGGER;
 
 public class WGRegions {
 
@@ -28,7 +25,14 @@ public class WGRegions {
 
         //Get regions.
         RegionContainer container = wg.getPlatform().getRegionContainer();
-        com.sk89q.worldguard.protection.managers.RegionManager regions = container.get(BukkitAdapter.adapt(Bukkit.getWorld(CONFIG.getString("earth_world"))));
+        World world = Bukkit.getWorld(EARTH_WORLD);
+
+        if (world == null) {
+            LOGGER.warning("Earth can't be found!");
+            return;
+        }
+
+        com.sk89q.worldguard.protection.managers.RegionManager regions = container.get(BukkitAdapter.adapt(world));
 
         if (regions == null) {
             return;

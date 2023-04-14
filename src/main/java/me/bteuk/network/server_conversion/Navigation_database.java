@@ -5,15 +5,14 @@ import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.utils.enums.Categories;
 import me.bteuk.network.utils.enums.Counties;
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.bukkit.configuration.file.FileConfiguration;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Locale;
 
+import static me.bteuk.network.utils.Constants.EARTH_WORLD;
 import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public class Navigation_database {
@@ -59,9 +58,7 @@ public class Navigation_database {
         //Add the locations to the new database.
         GlobalSQL globalSQL = Network.getInstance().globalSQL;
 
-        //Get the name of the Earth world.
         //Get the earth server name.
-        String earth = CONFIG.getString("earth_world");
         String server = globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';");
 
         Categories category;
@@ -73,7 +70,7 @@ public class Navigation_database {
             //Get new category.
             if (l.category.equalsIgnoreCase("London")) {
                 category = Categories.ENGLAND;
-            } else if (l.category.toUpperCase().equals("NORTHERN-IRELAND")) {
+            } else if (l.category.equalsIgnoreCase("NORTHERN-IRELAND")) {
                 category = Categories.NORTHERN_IRELAND;
             }  else {
                 //Get the category from the existing category, converted to uppercase.
@@ -99,7 +96,7 @@ public class Navigation_database {
             }
 
             //Create coordinate_id.
-            coordinate_id = globalSQL.addCoordinate(server, earth, l.x, l.y, l.z, l.yaw, l.pitch);
+            coordinate_id = globalSQL.addCoordinate(server, EARTH_WORLD, l.x, l.y, l.z, l.yaw, l.pitch);
 
             //Add location to new database.
             if (category == Categories.ENGLAND) {
