@@ -30,9 +30,12 @@ public class ManageRegion extends Gui {
 
         setItem(4, Utils.createItem(Material.BOOK, 1,
                 Utils.title("Region " + region.regionName()),
-                Utils.line("Current owner: &7" + region.ownerName()),
-                Utils.line("Number of members: &7" + region.memberCount()),
-                Utils.line("&fRegion status: &7" + region.status().label)));
+                Utils.line("Current owner: ")
+                        .append(Component.text(region.ownerName(), NamedTextColor.GRAY)),
+                Utils.line("Number of members: ")
+                        .append(Component.text(region.memberCount(), NamedTextColor.GRAY)),
+                Utils.line("Region status: ")
+                        .append(Component.text(region.status().label, NamedTextColor.GRAY))));
 
 
         //Set public if status is default or inactive.

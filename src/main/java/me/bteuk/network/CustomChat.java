@@ -88,9 +88,10 @@ public class CustomChat implements Listener, PluginMessageListener {
         //If player is muted cancel.
         if (moderation.isMuted(e.getPlayer().getUniqueId().toString())) {
             e.setCancelled(true);
-            e.getPlayer().sendMessage("&cYou are muted for &4" +
-                    moderation.getMutedReason(e.getPlayer().getUniqueId() + " &cuntil &4" +
-                            moderation.getMuteDuration(e.getPlayer().getUniqueId().toString())));
+            e.getPlayer().sendMessage(Utils.error("You are muted for ")
+                    .append(Component.text(moderation.getMutedReason(e.getPlayer().getUniqueId().toString()), NamedTextColor.DARK_RED))
+                    .append(Utils.error(" until "))
+                    .append(Component.text(moderation.getMuteDuration(e.getPlayer().getUniqueId().toString()), NamedTextColor.DARK_RED)));
         }
 
         if (!e.isCancelled()) {

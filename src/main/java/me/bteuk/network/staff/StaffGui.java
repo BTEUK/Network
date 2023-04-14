@@ -34,17 +34,22 @@ public class StaffGui extends Gui {
         //Check if any location requests exist.
         //To make sure the string makes grammatical sense we check if the number is 1, in this case we change 'are' to 'is'.
         int lRequestCount = Network.getInstance().globalSQL.getInt("SELECT COUNT(location) FROM location_requests");
-        String lRequestString = "There are currently &7" + lRequestCount + " &flocation requests.";
+        Component lRequestString;
         if (lRequestCount == 1) {
-            lRequestString = lRequestString.replace("are", "is");
-            lRequestString = lRequestString.replace("requests", "request");
+            lRequestString = Utils.line("There is currently ")
+                    .append(Component.text(1, NamedTextColor.GRAY))
+                    .append(Utils.line(" location request."));
+        } else {
+            lRequestString = Utils.line("There are currently ")
+                    .append(Component.text(lRequestCount, NamedTextColor.GRAY))
+                    .append(Utils.line(" location requests."));
         }
 
         //Create item.
         setItem(14, Utils.createItem(Material.ENDER_CHEST, 1,
                         Utils.title("Location Requests"),
                         Utils.line("Opens a menu to view all location requests for navigation."),
-                        Utils.line(lRequestString)),
+                        lRequestString),
                 u -> {
 
                     //Check if the user has the relevant permissions.
@@ -119,15 +124,21 @@ public class StaffGui extends Gui {
         //Check if any location requests exist.
         //To make sure the string makes grammatical sense we check if the number is 1, in this case we change 'are' to 'is'.
         int rRequestCount = Network.getInstance().regionSQL.getInt("SELECT COUNT(region) FROM region_requests WHERE staff_accept=0");
-        String rRequestString = "There are currently &7" + rRequestCount + " &fregion join requests by Jr.Builders.";
+        Component rRequestString;
         if (rRequestCount == 1) {
-            rRequestString = rRequestString.replace("are", "is");
-            rRequestString = rRequestString.replace("requests", "request");
+            rRequestString = Utils.line("There is currently ")
+                    .append(Component.text(1, NamedTextColor.GRAY))
+                    .append(Utils.line(" region join request by Jr.Builders."));
+        } else {
+            rRequestString = Utils.line("There are currently ")
+                    .append(Component.text(lRequestCount, NamedTextColor.GRAY))
+                    .append(Utils.line(" region join requests by Jr.Builders."));
         }
+
         setItem(11, Utils.createItem(Material.CHEST_MINECART, 1,
                         Utils.title("Review Region Requests"),
                         Utils.line("Opens a menu to review active region join requests by Jr.Builders."),
-                        Utils.line(rRequestString)),
+                        rRequestString),
                 u -> {
 
                     if (Network.getInstance().regionSQL.hasRow("SELECT region FROM region_requests WHERE staff_accept=0;")) {

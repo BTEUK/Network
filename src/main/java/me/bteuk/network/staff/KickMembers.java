@@ -103,8 +103,9 @@ public class KickMembers extends Gui {
                         region.leaveRegion(uuid, "&cYou have been kicked from region &4" + region.getTag(uuid));
 
                         //Send message to user.
-                        u.player.sendMessage(Utils.success("Kicked &3" +
-                                globalSQL.getString("SELECT name FROM player_data WHERE uuid ='" + region.getOwner() + "';") + " &afrom the region"));
+                        u.player.sendMessage(Utils.success("Kicked ")
+                                .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid ='" + region.getOwner() + "';"), NamedTextColor.DARK_AQUA))
+                                .append(Utils.success(" from the region")));
 
                         //Refresh the gui.
                         this.refresh();
@@ -125,7 +126,8 @@ public class KickMembers extends Gui {
         //Return to plot info menu.
         setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
                         Utils.title("Return"),
-                        Utils.line("Return to manage region &7" + region.regionName() + ".")),
+                        Utils.line("Return to manage region ")
+                                .append(Component.text(region.regionName(), NamedTextColor.GRAY))),
                 u ->
 
                 {

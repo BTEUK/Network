@@ -110,8 +110,8 @@ public class TransferOwner extends Gui {
                         region.updateRequests();
 
                         //Send message to user.
-                        u.player.sendMessage(Utils.success("Transferred ownership of the region to &3" +
-                                globalSQL.getString("SELECT name FROM player_data WHERE uuid ='" + region.getOwner() + "';")));
+                        u.player.sendMessage(Utils.success("Transferred ownership of the region to ")
+                                .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid ='" + region.getOwner() + "';"), NamedTextColor.DARK_AQUA)));
 
                         //Refresh the gui.
                         this.refresh();
@@ -132,7 +132,8 @@ public class TransferOwner extends Gui {
         //Return to plot info menu.
         setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
                         Utils.title("Return"),
-                        Utils.line("Return to manage region &7" + region.regionName() + ".")),
+                        Utils.line("Return to manage region ")
+                                .append(Component.text(region.regionName(), NamedTextColor.GRAY))),
                 u ->
 
                 {

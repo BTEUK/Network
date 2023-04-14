@@ -1,7 +1,6 @@
 package me.bteuk.network.utils;
 
 import me.bteuk.network.Network;
-import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;

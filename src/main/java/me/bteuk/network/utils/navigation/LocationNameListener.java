@@ -1,16 +1,19 @@
 package me.bteuk.network.utils.navigation;
 
+import io.papermc.paper.event.player.AsyncChatEvent;
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.navigation.AddLocation;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.AddLocationType;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.scheduler.BukkitTask;
+
+import java.util.Objects;
 
 public class LocationNameListener implements Listener {
 
@@ -38,13 +41,13 @@ public class LocationNameListener implements Listener {
                     NetworkUser u = Network.getInstance().getUser(p);
                     //Open staff gui if it's update or review.
                     if (gui.getType() == AddLocationType.ADD) {
-                        if (u.mainGui != null) {
+                        if (Objects.requireNonNull(u).mainGui != null) {
                             if (u.mainGui instanceof AddLocation) {
                                 u.mainGui.open(u);
                             }
                         }
                     } else {
-                        if (u.staffGui != null) {
+                        if (Objects.requireNonNull(u).staffGui != null) {
                             if (u.staffGui instanceof AddLocation) {
                                 u.staffGui.open(u);
                             }
@@ -59,7 +62,7 @@ public class LocationNameListener implements Listener {
     }
 
     @EventHandler
-    public void ChatEvent(AsyncPlayerChatEvent e) {
+    public void ChatEvent(AsyncChatEvent e) {
 
         //Check if this is the correct player.
         if (e.getPlayer().equals(p)) {
@@ -67,15 +70,16 @@ public class LocationNameListener implements Listener {
             e.setCancelled(true);
 
             //Check if message is under 64 character.
-            if (e.getMessage().length() > 64) {
+            if (PlainTextComponentSerializer.plainText().serialize(e.message()).length() > 64) {
                 e.getPlayer().sendMessage(Utils.error("The location name can't be longer than 64 characters."));
             } else {
 
                 //Set location name.
-                gui.setName(e.getMessage());
+                gui.setName(PlainTextComponentSerializer.plainText().serialize(e.message()));
 
                 //Send message to player.
-                p.sendMessage(Utils.success("Set location name to &3" + e.getMessage()));
+                p.sendMessage(Utils.success("Set location name to ")
+                        .append(e.message()));
 
                 //Unregister listener and task.
                 task.cancel();
@@ -84,7 +88,7 @@ public class LocationNameListener implements Listener {
                 //If AddLocation gui still exists, reopen it.
                 NetworkUser u = Network.getInstance().getUser(p);
                 if (gui.getType() == AddLocationType.ADD) {
-                    if (u.mainGui != null) {
+                    if (Objects.requireNonNull(u).mainGui != null) {
                         if (u.mainGui instanceof AddLocation) {
                             Bukkit.getScheduler().runTask(Network.getInstance(), () -> {
                                 u.mainGui.refresh();
@@ -93,7 +97,7 @@ public class LocationNameListener implements Listener {
                         }
                     }
                 } else {
-                    if (u.staffGui != null) {
+                    if (Objects.requireNonNull(u).staffGui != null) {
                         if (u.staffGui instanceof AddLocation) {
                             Bukkit.getScheduler().runTask(Network.getInstance(), () -> {
                                 u.staffGui.refresh();
@@ -107,6 +111,6 @@ public class LocationNameListener implements Listener {
     }
 
     public void unregister() {
-        AsyncPlayerChatEvent.getHandlerList().unregister(this);
+        AsyncChatEvent.getHandlerList().unregister(this);
     }
 }

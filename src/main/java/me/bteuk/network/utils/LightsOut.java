@@ -1,9 +1,6 @@
 package me.bteuk.network.utils;
 
 import me.bteuk.network.gui.Gui;
-import me.bteuk.network.utils.NetworkUser;
-import me.bteuk.network.utils.Time;
-import me.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -22,8 +19,6 @@ public class LightsOut extends Gui {
     private final NetworkUser u;
 
     private final long startTime;
-
-    private final boolean[][] solution = new boolean[9][6];
 
     public LightsOut(NetworkUser u) {
 
@@ -64,8 +59,11 @@ public class LightsOut extends Gui {
         this.delete();
 
         u.player.sendMessage(Utils.success("Congratulations, you beat Lights Out!"));
-        u.player.sendMessage(Utils.success("You took &3" + Time.minutes(timeDiff) + " &a" + Time.minuteString(timeDiff)
-                + " and &3" + Time.seconds(timeDiff) + " &a" + Time.secondString(timeDiff) + "."));
+        u.player.sendMessage(Utils.success("You took ")
+                .append(Component.text(Time.minutes(timeDiff), NamedTextColor.DARK_AQUA))
+                .append(Utils.success(" " + Time.minuteString(timeDiff) + " and "))
+                .append(Component.text(Time.seconds(timeDiff), NamedTextColor.DARK_AQUA))
+                .append(Utils.success(" " + Time.secondString(timeDiff) + ".")));
 
     }
 
@@ -124,7 +122,7 @@ public class LightsOut extends Gui {
 
         //Check if solution is complete.
         //If it is then stop end the game.
-        if (Arrays.deepEquals(game, solution)) {
+        if (Arrays.deepEquals(game, new boolean[9][6])) {
 
             endGame();
 

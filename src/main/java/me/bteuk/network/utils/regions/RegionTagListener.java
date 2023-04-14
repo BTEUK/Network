@@ -1,15 +1,20 @@
 package me.bteuk.network.utils.regions;
 
+import io.papermc.paper.event.player.AsyncChatEvent;
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.regions.RegionInfo;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.scheduler.BukkitTask;
+
+import java.util.Objects;
 
 public class RegionTagListener implements Listener {
 
@@ -37,7 +42,7 @@ public class RegionTagListener implements Listener {
     }
 
     @EventHandler
-    public void ChatEvent(AsyncPlayerChatEvent e) {
+    public void ChatEvent(AsyncChatEvent e) {
 
         //Check if this is the correct player.
         if (e.getPlayer().equals(p)) {
@@ -45,15 +50,18 @@ public class RegionTagListener implements Listener {
             e.setCancelled(true);
 
             //Check if message is under 64 character.
-            if (e.getMessage().length() > 64) {
+            if (PlainTextComponentSerializer.plainText().serialize(e.message()).length() > 64) {
                 e.getPlayer().sendMessage(Utils.error("The region tag can't be longer than 64 characters."));
             } else {
 
                 //Set region tag.
-                region.setTag(p.getUniqueId().toString(), e.getMessage());
+                region.setTag(p.getUniqueId().toString(), PlainTextComponentSerializer.plainText().serialize(e.message()));
 
                 //Send message to player.
-                p.sendMessage(Utils.success("Set tag for region &3" + region.regionName() + "&a to &3" + e.getMessage()));
+                p.sendMessage(Utils.success("Set tag for region ")
+                        .append(Component.text(region.regionName(), NamedTextColor.DARK_AQUA))
+                        .append(Utils.success(" to "))
+                        .append(e.message()));
 
                 //Unregister listener and task.
                 task.cancel();
@@ -61,7 +69,7 @@ public class RegionTagListener implements Listener {
 
                 //Reset the regionInfo gui
                 NetworkUser u = Network.getInstance().getUser(p);
-                u.mainGui.delete();
+                Objects.requireNonNull(u).mainGui.delete();
                 u.mainGui = new RegionInfo(region, p.getUniqueId().toString());
 
             }
@@ -69,6 +77,6 @@ public class RegionTagListener implements Listener {
     }
 
     public void unregister() {
-        AsyncPlayerChatEvent.getHandlerList().unregister(this);
+        AsyncChatEvent.getHandlerList().unregister(this);
     }
 }
