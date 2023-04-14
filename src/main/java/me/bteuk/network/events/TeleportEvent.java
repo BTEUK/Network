@@ -5,7 +5,9 @@ import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.ServerType;
 import me.bteuk.network.utils.regions.Region;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -40,12 +42,12 @@ public class TeleportEvent {
                 if (player != null) {
 
                     p.teleport(player.getLocation());
-                    p.sendMessage(Utils.success("Teleported to &3" +
-                            Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + event[2] + "';")));
+                    p.sendMessage(Utils.success("Teleported to ")
+                            .append(Component.text(Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + event[2] + "';"), NamedTextColor.DARK_AQUA)));
 
                 } else {
-                    p.sendMessage(Utils.error(Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + event[2] + "';") +
-                            " is not online."));
+                    p.sendMessage(Component.text(Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + event[2] + "';"), NamedTextColor.DARK_RED)
+                            .append(Utils.error(" is not online.")));
                 }
             }
 
@@ -58,7 +60,7 @@ public class TeleportEvent {
                 if (message == null) {
                     p.sendMessage(Utils.success("Teleported to previous location."));
                 } else {
-                    p.sendMessage(GsonComponentSerializer.gson().deserialize(message));
+                    p.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(message));
                 }
             }
             case "location", "location_request" -> {
@@ -94,7 +96,8 @@ public class TeleportEvent {
                 }
 
                 p.teleport(l);
-                p.sendMessage(Utils.success("Teleported to &3" + location));
+                p.sendMessage(Utils.success("Teleported to ")
+                        .append(Component.text(location, NamedTextColor.DARK_AQUA)));
 
             }
             case "region" -> {
@@ -111,7 +114,8 @@ public class TeleportEvent {
 
                 //Teleport player.
                 p.teleport(l);
-                p.sendMessage(Utils.success("Teleported to region &3" + region.getTag(uuid)));
+                p.sendMessage(Utils.success("Teleported to region ")
+                        .append(Component.text(region.getTag(uuid), NamedTextColor.DARK_AQUA)));
 
             }
             case "server" -> //Switch to server.
@@ -183,9 +187,14 @@ public class TeleportEvent {
 
                 //If custom message is set, send that to player, else send default message.
                 if (message == null) {
-                    p.sendMessage(Utils.success("Teleported to &3" + DECIMAL_FORMATTER.format(x) + ", " + y + ", " + DECIMAL_FORMATTER.format(z)));
+                    p.sendMessage(Utils.success("Teleported to ")
+                            .append(Component.text(DECIMAL_FORMATTER.format(x), NamedTextColor.DARK_AQUA))
+                            .append(Utils.success(", "))
+                            .append(Component.text(y, NamedTextColor.DARK_AQUA))
+                            .append(Utils.success(", "))
+                            .append(Component.text(DECIMAL_FORMATTER.format(z), NamedTextColor.DARK_AQUA)));
                 } else {
-                    p.sendMessage(GsonComponentSerializer.gson().deserialize(message));
+                    p.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(message));
                 }
             }
         }

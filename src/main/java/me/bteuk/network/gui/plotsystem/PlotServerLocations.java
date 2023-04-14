@@ -154,9 +154,12 @@ public class PlotServerLocations extends Gui {
                             Utils.line("Click to teleport to a plot in this location"),
                             Utils.line("subject to the settings shown above."),
                             Utils.line("Available plots of each difficulty:"),
-                            Utils.line("Easy: &7" + plotSQL.getInt("SELECT count(id) FROM plot_data WHERE location='" + location + "' AND status='unclaimed' AND difficulty=1;")),
-                            Utils.line("Medium: &7" + plotSQL.getInt("SELECT count(id) FROM plot_data WHERE location='" + location + "' AND status='unclaimed' AND difficulty=2;")),
-                            Utils.line("Hard: &7" + plotSQL.getInt("SELECT count(id) FROM plot_data WHERE location='" + location + "' AND status='unclaimed' AND difficulty=3;"))),
+                            Utils.line("Easy: ")
+                                    .append(Component.text(plotSQL.getInt("SELECT count(id) FROM plot_data WHERE location='" + location + "' AND status='unclaimed' AND difficulty=1;"), NamedTextColor.GRAY)),
+                            Utils.line("Medium: ")
+                                    .append(Component.text(plotSQL.getInt("SELECT count(id) FROM plot_data WHERE location='" + location + "' AND status='unclaimed' AND difficulty=2;"), NamedTextColor.GRAY)),
+                            Utils.line("Hard: ")
+                                    .append(Component.text(plotSQL.getInt("SELECT count(id) FROM plot_data WHERE location='" + location + "' AND status='unclaimed' AND difficulty=3;"), NamedTextColor.GRAY))),
                     u ->
 
                     {

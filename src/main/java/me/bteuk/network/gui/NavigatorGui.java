@@ -42,7 +42,8 @@ public class NavigatorGui extends Gui {
         setItem(8, Utils.createItem(Material.NETHER_STAR, 1,
                         Utils.title("Toggle Navigator"),
                         Utils.line("Click to toggle the navigator in your inventory."),
-                        Utils.line("You can always open this menu with &7/navigator")),
+                        Utils.line("You can always open this menu with ")
+                                .append(Component.text("/navigator", NamedTextColor.GRAY))),
                 u -> {
 
                     if (u.navigator) {
@@ -72,7 +73,10 @@ public class NavigatorGui extends Gui {
         setItem(7, Utils.createPotion(Material.SPLASH_POTION, PotionEffectType.NIGHT_VISION, 1,
                         Utils.title("Toggle Nightvision"),
                         Utils.line("Click to toggle nightvision."),
-                        Utils.line("You can also use the command &7/nightvision &for &7/nv&f.")),
+                        Utils.line("You can also use the command ")
+                                .append(Component.text("/nightvision", NamedTextColor.GRAY))
+                                .append(Utils.line(" or "))
+                                .append(Component.text("/nv", NamedTextColor.GRAY))),
                 u -> Nightvision.toggleNightvision(u.player));
 
         setItem(0, Utils.createItem(Material.REDSTONE_LAMP, 1,

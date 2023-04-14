@@ -231,7 +231,8 @@ public class BuildGui extends Gui {
                             setItem(5, Utils.createItem(Material.DARK_OAK_DOOR, 1,
                                             Utils.title("Join Region"),
                                             Utils.line("Click to join the region you are standing in."),
-                                            Utils.line("The region is owned by " + user.region.ownerName() + "."),
+                                            Utils.line("The region is owned by ")
+                                                    .append(Component.text(user.region.ownerName(), NamedTextColor.GRAY)),
                                             Utils.line("The region is public, so they don't need to accept your request.")),
                                     u -> {
 
@@ -246,7 +247,8 @@ public class BuildGui extends Gui {
                             setItem(5, Utils.createItem(Material.DARK_OAK_DOOR, 1,
                                             Utils.title("Join Region"),
                                             Utils.line("Click to request to join the region you are standing in."),
-                                            Utils.line("The region is owned by " + user.region.ownerName() + "."),
+                                            Utils.line("The region is owned by ")
+                                                    .append(Component.text(user.region.ownerName(), NamedTextColor.GRAY)),
                                             Utils.line("They must accept the request for you to join.")),
                                     u -> {
 
@@ -363,7 +365,8 @@ public class BuildGui extends Gui {
                         Utils.title("Unable to Join Region"),
                         Utils.line("To be able to join a region you"),
                         Utils.line("must gain at least Jr.Builder or above."),
-                        Utils.line("For more information type &7/help building")));
+                        Utils.line("For more information type ")
+                                .append(Component.text("/help building", NamedTextColor.GRAY))));
 
             }
         } else {

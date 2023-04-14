@@ -108,24 +108,38 @@ public class AcceptedPlotFeedback extends Gui {
                 //No feedback
                 setItem(slot, Utils.createItem(Material.BOOK, 1,
                         Utils.title("Plot " + plot),
-                        Utils.line("Accepted by &7" + globalSQL.getString("SELECT name FROM player_data WHERE uuid='"
-                                + plotSQL.getString("SELECT reviewer FROM accept_data WHERE id=" + plot + ";") + "';")),
-                        Utils.line("Difficulty: &7" + PlotValues.difficultyName(plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plot + ";"))),
-                        Utils.line("Size: &7" + PlotValues.sizeName(plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + plot + ";"))),
-                        Utils.line("Accuracy: &7" + plotSQL.getInt("SELECT accuracy FROM accept_data WHERE id=" + plot + ";") + "&f/&75"),
-                        Utils.line("Quality: &7" + plotSQL.getInt("SELECT quality FROM accept_data WHERE id=" + plot + ";") + "&f/&75")));
+                        Utils.line("Accepted by: ")
+                                .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='"
+                                        + plotSQL.getString("SELECT reviewer FROM accept_data WHERE id=" + plot + ";") + "';"), NamedTextColor.GRAY)),
+                        Utils.line("Difficulty: ")
+                                .append(Component.text(PlotValues.difficultyName(plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plot + ";")), NamedTextColor.GRAY)),
+                        Utils.line("Size: ")
+                                .append(Component.text(PlotValues.sizeName(plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + plot + ";")), NamedTextColor.GRAY)),
+                        Utils.line("Accuracy: ")
+                                .append(Component.text(plotSQL.getInt("SELECT accuracy FROM accept_data WHERE id=" + plot + ";"), NamedTextColor.GRAY))
+                                .append(Utils.line("/5")),
+                        Utils.line("Quality: ")
+                                .append(Component.text(plotSQL.getInt("SELECT quality FROM accept_data WHERE id=" + plot + ";"), NamedTextColor.GRAY))
+                                .append(Utils.line("/5"))));
 
             } else {
 
                 //There is feedback
                 setItem(slot, Utils.createItem(Material.WRITTEN_BOOK, 1,
                                 Utils.title("Plot " + plot),
-                                Utils.line("Accepted by &7" + globalSQL.getString("SELECT name FROM player_data WHERE uuid='"
-                                        + plotSQL.getString("SELECT reviewer FROM accept_data WHERE id=" + plot + ";") + "';")),
-                                Utils.line("Difficulty: &7" + PlotValues.difficultyName(plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plot + ";"))),
-                                Utils.line("Size: &7" + PlotValues.sizeName(plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + plot + ";"))),
-                                Utils.line("Accuracy: &7" + plotSQL.getInt("SELECT accuracy FROM accept_data WHERE id=" + plot + ";") + "&f/&75"),
-                                Utils.line("Quality: &7" + plotSQL.getInt("SELECT quality FROM accept_data WHERE id=" + plot + ";") + "&f/&75"),
+                                Utils.line("Accepted by: ")
+                                        .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='"
+                                                + plotSQL.getString("SELECT reviewer FROM accept_data WHERE id=" + plot + ";") + "';"), NamedTextColor.GRAY)),
+                                Utils.line("Difficulty: ")
+                                        .append(Component.text(PlotValues.difficultyName(plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plot + ";")), NamedTextColor.GRAY)),
+                                Utils.line("Size: ")
+                                        .append(Component.text(PlotValues.sizeName(plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + plot + ";")), NamedTextColor.GRAY)),
+                                Utils.line("Accuracy: ")
+                                        .append(Component.text(plotSQL.getInt("SELECT accuracy FROM accept_data WHERE id=" + plot + ";"), NamedTextColor.GRAY))
+                                        .append(Utils.line("/5")),
+                                Utils.line("Quality: ")
+                                        .append(Component.text(plotSQL.getInt("SELECT quality FROM accept_data WHERE id=" + plot + ";"), NamedTextColor.GRAY))
+                                        .append(Utils.line("/5")),
                                 Utils.line("Click to view feedback for this plot.")),
                         u ->
 

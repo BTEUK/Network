@@ -53,7 +53,9 @@ public class RegionRequests extends Gui {
 
         //If page is greater than 1 add a previous page button.
         if (page > 1) {
-            setItem(18, Utils.createItem(Material.ARROW, 1, Utils.title("Previous Page"), Utils.line("Open the previous page of region requests.")), u ->
+            setItem(18, Utils.createItem(Material.ARROW, 1,
+                    Utils.title("Previous Page"),
+                    Utils.line("Open the previous page of region requests.")), u ->
 
             {
 
@@ -77,7 +79,9 @@ public class RegionRequests extends Gui {
             //If the slot is greater than the number that fit in a page, create a new page.
             if (slot > 34) {
 
-                setItem(26, Utils.createItem(Material.ARROW, 1, Utils.title("Next Page"), Utils.line("Open the next page of regions requests.")), u ->
+                setItem(26, Utils.createItem(Material.ARROW, 1,
+                        Utils.title("Next Page"),
+                        Utils.line("Open the next page of regions requests.")), u ->
 
                 {
 
@@ -94,7 +98,10 @@ public class RegionRequests extends Gui {
             }
 
             int finalI = i;
-            setItem(slot, Utils.createItem(Material.LIME_CONCRETE, 1, Utils.title("Region " + requests.get(i).region), Utils.line("Requested by &7" + Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + requests.get(i).uuid + "';")), Utils.line("Click to open the menu for this request.")), u -> {
+            setItem(slot, Utils.createItem(Material.LIME_CONCRETE, 1,
+                    Utils.title("Region " + requests.get(i).region),
+                    Utils.line("Requested by ")
+                            .append(Component.text(Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + requests.get(i).uuid + "';"), NamedTextColor.GRAY)), Utils.line("Click to open the menu for this request.")), u -> {
 
                 //Delete this gui.
                 this.delete();
@@ -131,7 +138,9 @@ public class RegionRequests extends Gui {
         //Return
         if (staff) {
 
-            setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1, Utils.title("Return"), Utils.line("Open the staff menu.")), u ->
+            setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
+                    Utils.title("Return"),
+                    Utils.line("Open the staff menu.")), u ->
 
             {
 
@@ -146,7 +155,9 @@ public class RegionRequests extends Gui {
             });
         } else {
 
-            setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1, Utils.title("Return"), Utils.line("Open the region menu.")), u ->
+            setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
+                    Utils.title("Return"),
+                    Utils.line("Open the region menu.")), u ->
 
             {
 

@@ -107,7 +107,8 @@ public class AddLocation extends Gui {
             setItem(11, Utils.createItem(Material.SPRUCE_SIGN, 1,
                             Utils.title("Update Location Name"),
                             Utils.line("Edit the location name."),
-                            Utils.line("The current name is &7" + name + "&f."),
+                            Utils.line("The current name is: ")
+                                    .append(Component.text(name, NamedTextColor.GRAY)),
                             Utils.line("You can type the name in chat.")),
 
                     u -> {
@@ -144,7 +145,8 @@ public class AddLocation extends Gui {
         setItem(15, Utils.createItem(Material.MAP, 1,
                         Utils.title("Select Category"),
                         Utils.line("Click to cycle through categories."),
-                        Utils.line("Current category is: &7" + category.label),
+                        Utils.line("Current category is: ")
+                                .append(Component.text(category.label, NamedTextColor.GRAY)),
                         Utils.line("Available categories are:"),
                         Utils.line("England, Scotland, Wales, Northern Ireland and Other")),
 
@@ -178,7 +180,8 @@ public class AddLocation extends Gui {
                             Utils.title("Select County"),
                             Utils.line("Click to select a county."),
                             Utils.line("This will update the region."),
-                            Utils.line("The current region is &7" + county.region.label)),
+                            Utils.line("Current region is: ")
+                                    .append(Component.text(county.region.label, NamedTextColor.GRAY))),
 
                     u -> {
 
@@ -463,7 +466,9 @@ public class AddLocation extends Gui {
                     "VALUES('" + name + "','" + category + "'," + coordinate_id + ");");
         }
 
-        u.player.sendMessage(Utils.success("Location &3" + name + " &aadded to exploration menu."));
+        u.player.sendMessage(Utils.success("Location ")
+                .append(Component.text(name, NamedTextColor.DARK_AQUA))
+                .append(Utils.success(" added to exploration menu.")));
 
         //Delete gui.
         this.delete();
@@ -482,7 +487,8 @@ public class AddLocation extends Gui {
             globalSQL.update("UPDATE location_data SET location='" + name + "',category='" + category + "' WHERE location='" + old_name + "';");
         }
 
-        u.player.sendMessage(Utils.success("Updated location &3" + name));
+        u.player.sendMessage(Utils.success("Updated location ")
+                .append(Component.text(name, NamedTextColor.DARK_AQUA)));
 
         //Delete gui.
         this.delete();
@@ -507,7 +513,8 @@ public class AddLocation extends Gui {
         }
 
         //Notify player.
-        u.player.sendMessage(Utils.success("Accepted location request &3" + name + "&a."));
+        u.player.sendMessage(Utils.success("Accepted location request ")
+                .append(Component.text(name, NamedTextColor.DARK_AQUA)));
 
     }
 
@@ -524,7 +531,9 @@ public class AddLocation extends Gui {
         //Notify reviewers.
         Network.getInstance().chat.broadcastMessage(Utils.success("A new location has been requested."), "uknet:reviewer");
 
-        u.player.sendMessage(Utils.success("Location &3" + name + " &arequested."));
+        u.player.sendMessage(Utils.success("Location ")
+                .append(Component.text(name, NamedTextColor.DARK_AQUA))
+                .append(Utils.success(" requested.")));
 
         //Delete gui.
         this.delete();

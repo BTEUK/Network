@@ -135,7 +135,8 @@ public class EnglandMenu extends Gui {
         if (gui.isEmpty()) {
 
             gui.delete();
-            u.player.sendMessage(Utils.error("No locations added to the menu in &4" + name + "&c."));
+            u.player.sendMessage(Utils.error("No locations added to the menu in ")
+                    .append(Component.text(name, NamedTextColor.DARK_RED)));
 
         } else {
 

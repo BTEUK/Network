@@ -6,6 +6,7 @@ import me.bteuk.network.gui.Gui;
 import me.bteuk.network.gui.InviteMembers;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
+import me.bteuk.network.utils.PlotValues;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
@@ -43,12 +44,16 @@ public class ZoneInfo extends Gui {
         GlobalSQL globalSQL = Network.getInstance().globalSQL;
 
         setItem(4, Utils.createItem(Material.BOOK, 1,
-                Utils.title("Zone &7" + zoneID),
-                Utils.line("Zone Owner: &7" + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
-                        plotSQL.getString("SELECT uuid FROM zone_members WHERE id=" + zoneID + " AND is_owner=1;") + "';")),
-                Utils.line("Plot Members: &7" + plotSQL.getInt("SELECT COUNT(uuid) FROM zone_members WHERE id=" + zoneID + " AND is_owner=0;")),
-                Utils.line("Expiration: &7" + Time.getDateTime(plotSQL.getLong("SELECT expiration FROM zones WHERE id=" + zoneID + ";"))),
-                Utils.line("Public: &7" + (plotSQL.hasRow("SELECT id FROM zones WHERE id=" + zoneID + " AND is_public=1") ? "True" : "False"))));
+                Utils.title("Zone " + zoneID),
+                Utils.line("Zone Owner: ")
+                        .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
+                                plotSQL.getString("SELECT uuid FROM zone_members WHERE id=" + zoneID + " AND is_owner=1;") + "';"), NamedTextColor.GRAY)),
+                Utils.line("Zone Members: ")
+                        .append(Component.text(plotSQL.getInt("SELECT COUNT(uuid) FROM zone_members WHERE id=" + zoneID + " AND is_owner=0;"), NamedTextColor.GRAY)),
+                Utils.line("Expiration: ")
+                        .append(Component.text(Time.getDateTime(plotSQL.getLong("SELECT expiration FROM zones WHERE id=" + zoneID + ";")), NamedTextColor.GRAY)),
+                Utils.line("Public: ")
+                        .append(Component.text((plotSQL.hasRow("SELECT id FROM zones WHERE id=" + zoneID + " AND is_public=1") ? "True" : "False"), NamedTextColor.GRAY))));
 
         setItem(8, Utils.createItem(Material.ENDER_PEARL, 1,
                         Utils.title("Teleport to Zone"),

@@ -164,7 +164,8 @@ public class InviteMembers extends Gui {
 
             setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
                             Utils.title("Return"),
-                            Utils.line("Return to the menu of region &7" + region.getTag(region.getOwner()) + "&f.")),
+                            Utils.line("Return to the menu of region ")
+                                    .append(Component.text(region.getTag(region.getOwner()), NamedTextColor.GRAY))),
                     u ->
 
                     {

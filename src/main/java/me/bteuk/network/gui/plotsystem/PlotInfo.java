@@ -12,10 +12,9 @@ import me.bteuk.network.utils.enums.RegionType;
 import net.buildtheearth.terraminusminus.generator.EarthGeneratorSettings;
 import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
@@ -46,12 +45,16 @@ public class PlotInfo extends Gui {
         GlobalSQL globalSQL = Network.getInstance().globalSQL;
 
         setItem(4, Utils.createItem(Material.BOOK, 1,
-                Utils.title("Plot &7" + plotID),
-                Utils.line("Plot Owner: &7" + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
-                        plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plotID + " AND is_owner=1;") + "';")),
-                Utils.line("Plot Members: &7" + plotSQL.getInt("SELECT COUNT(uuid) FROM plot_members WHERE id=" + plotID + " AND is_owner=0;")),
-                Utils.line("Difficulty: &7" + PlotValues.difficultyName(plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plotID + ";"))),
-                Utils.line("Size: &7" + PlotValues.sizeName(plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + plotID + ";")))));
+                Utils.title("Plot " + plotID),
+                Utils.line("Plot Owner: ")
+                        .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
+                                plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plotID + " AND is_owner=1;") + "';"), NamedTextColor.GRAY)),
+                Utils.line("Plot Members: ")
+                        .append(Component.text(plotSQL.getInt("SELECT COUNT(uuid) FROM plot_members WHERE id=" + plotID + " AND is_owner=0;"), NamedTextColor.GRAY)),
+                Utils.line("Difficulty: ")
+                        .append(Component.text(PlotValues.difficultyName(plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plotID + ";")), NamedTextColor.GRAY)),
+                Utils.line("Size: ")
+                        .append(Component.text(PlotValues.sizeName(plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + plotID + ";")), NamedTextColor.GRAY))));
 
         setItem(24, Utils.createItem(Material.ENDER_PEARL, 1,
                         Utils.title("Teleport to Plot"),
@@ -122,10 +125,10 @@ public class PlotInfo extends Gui {
                         double[] coords = bteGeneratorSettings.projection().toGeo(x, z);
 
                         //Generate link to google maps.
-                        TextComponent message = new TextComponent("Click here to open the plot in Google Maps");
-                        message.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.google.com/maps/@?api=1&map_action=map&basemap=satellite&zoom=21&center=" + coords[1] + "," + coords[0]));
+                        Component message = Component.text("Click here to open the plot in Google Maps");
+                        message = message.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://www.google.com/maps/@?api=1&map_action=map&basemap=satellite&zoom=21&center=" + coords[1] + "," + coords[0]));
 
-                        u.player.spigot().sendMessage(message);
+                        u.player.sendMessage(message);
 
                     } catch (OutOfProjectionBoundsException e) {
                         e.printStackTrace();

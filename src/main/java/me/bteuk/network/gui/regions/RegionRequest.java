@@ -43,9 +43,9 @@ public class RegionRequest extends Gui {
 
         setItem(4, Utils.createItem(Material.BOOK, 1,
                 Utils.title("Region " + request.region),
-                Utils.line("Requested by &7" +
-                        Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
-                                request.uuid + "';"))));
+                Utils.line("Requested by ")
+                        .append(Component.text(Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
+                                request.uuid + "';"), NamedTextColor.GRAY))));
 
         setItem(11, Utils.createItem(Material.LIME_CONCRETE, 1,
                         Utils.title("Accept Request"),
@@ -143,7 +143,8 @@ public class RegionRequest extends Gui {
 
                         //Teleport player.
                         u.player.teleport(l);
-                        u.player.sendMessage(Utils.success("Teleported to region &3" + request.region));
+                        u.player.sendMessage(Utils.success("Teleported to region ")
+                                .append(Component.text(request.region, NamedTextColor.DARK_AQUA)));
 
                     } else {
 

@@ -49,14 +49,19 @@ public class RegionInfo extends Gui {
         if (region.regionName().equals(region.getTag(uuid))) {
             setItem(4, Utils.createItem(Material.BOOK, 1,
                     Utils.title("Region " + region.regionName()),
-                    Utils.line("Region Owner &7" + region.ownerName()),
-                    Utils.line("Region Members &7" + region.memberCount())));
+                    Utils.line("Region Owner ")
+                            .append(Component.text(region.ownerName(), NamedTextColor.GRAY)),
+                    Utils.line("Region Members ")
+                            .append(Component.text(region.memberCount(), NamedTextColor.GRAY))));
         } else {
             setItem(4, Utils.createItem(Material.BOOK, 1,
                     Utils.title("Region " + region.regionName()),
-                    Utils.line("Region Tag &7" + region.getTag(uuid)),
-                    Utils.line("Region Owner &7" + region.ownerName()),
-                    Utils.line("Region Members &7" + region.memberCount())));
+                    Utils.line("Region Tag ")
+                            .append(Component.text(region.getTag(uuid), NamedTextColor.GRAY)),
+                    Utils.line("Region Owner ")
+                            .append(Component.text(region.ownerName(), NamedTextColor.GRAY)),
+                    Utils.line("Region Members ")
+                            .append(Component.text(region.memberCount(), NamedTextColor.GRAY))));
         }
 
         //Leave Region.
@@ -119,7 +124,8 @@ public class RegionInfo extends Gui {
 
                         Location l = globalSQL.getCoordinate(region.getCoordinateID(uuid));
                         u.player.teleport(l);
-                        u.player.sendMessage(Utils.success("Teleported to region &3" + region.getTag(uuid)));
+                        u.player.sendMessage(Utils.success("Teleported to region ")
+                                .append(Component.text(region.getTag(uuid), NamedTextColor.DARK_AQUA)));
 
                     } else {
 
@@ -153,7 +159,9 @@ public class RegionInfo extends Gui {
 
                             //Create coordinate id for location of player and set that as the new coordinate id.
                             region.setCoordinateID(uuid, coordinateID);
-                            u.player.sendMessage(Utils.success("Set teleport location for region &3" + region.getTag(uuid) + " &aat your current location."));
+                            u.player.sendMessage(Utils.success("Set teleport location for region ")
+                                    .append(Component.text(region.getTag(uuid), NamedTextColor.DARK_AQUA))
+                                    .append(Utils.success(" at your current location.")));
 
                         } else {
                             u.player.sendMessage(Utils.error("You are not standing in the correct region."));
@@ -176,7 +184,9 @@ public class RegionInfo extends Gui {
                             //Set the region as private and refresh gui.
                             region.setDefault();
 
-                            u.player.sendMessage(Utils.success("Region &3" + region.getTag(uuid) + " &ais now private."));
+                            u.player.sendMessage(Utils.success("Region ")
+                                    .append(Component.text(region.getTag(uuid), NamedTextColor.DARK_AQUA))
+                                    .append(Utils.success(" is now private.")));
                             this.refresh();
 
                         });
@@ -198,7 +208,9 @@ public class RegionInfo extends Gui {
                                         + region + "');");
                             }
 
-                            u.player.sendMessage(Utils.success("Region &3" + region.getTag(uuid) + " &ais now public."));
+                            u.player.sendMessage(Utils.success("Region ")
+                                    .append(Component.text(region.getTag(uuid), NamedTextColor.DARK_AQUA))
+                                    .append(Utils.success(" is now public.")));
                             this.refresh();
 
                         });

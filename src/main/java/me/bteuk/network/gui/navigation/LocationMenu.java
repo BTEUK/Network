@@ -193,7 +193,7 @@ public class LocationMenu extends Gui {
 
                 setItem(26, Utils.createItem(Material.ARROW, 1,
                                 Utils.title("Next Page"),
-                                Utils.line("&fOpen the next page of locations.")),
+                                Utils.line("Open the next page of locations.")),
                         u ->
 
                         {
@@ -253,7 +253,8 @@ public class LocationMenu extends Gui {
                             Back.setPreviousCoordinate(u.player.getUniqueId().toString(), u.player.getLocation());
 
                             u.player.teleport(l);
-                            u.player.sendMessage(Utils.success("Teleported to &3" + location));
+                            u.player.sendMessage(Utils.success("Teleported to ")
+                                    .append(Component.text(location, NamedTextColor.DARK_AQUA)));
 
                         } else {
 

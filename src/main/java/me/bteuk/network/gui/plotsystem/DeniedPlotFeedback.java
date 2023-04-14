@@ -64,8 +64,9 @@ public class DeniedPlotFeedback extends Gui {
             setItem(slot, Utils.createItem(Material.WRITTEN_BOOK, 1,
                             Utils.title("Feedback for submission " + i),
                             Utils.line("Click to view feedback for this submission."),
-                            Utils.line("Reviewed by &7" + globalSQL.getString("SELECT name FROM player_data WHERE uuid='"
-                                    + plotSQL.getString("SELECT reviewer FROM deny_data WHERE id=" + plotID + " AND uuid='" + uuid + "' AND attempt=" + i + ";") + "';"))),
+                            Utils.line("Reviewed by ")
+                                    .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='"
+                                            + plotSQL.getString("SELECT reviewer FROM deny_data WHERE id=" + plotID + " AND uuid='" + uuid + "' AND attempt=" + i + ";") + "';"), NamedTextColor.GRAY))),
 
                     u ->
 
