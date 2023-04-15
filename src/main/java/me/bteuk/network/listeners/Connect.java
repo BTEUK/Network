@@ -54,10 +54,13 @@ public class Connect {
 
             //Send global welcome message.
             //Add a slight delay so message can be seen by player joining.
-            Bukkit.getScheduler().runTaskLater(Network.getInstance(), () ->
-                    instance.chat.broadcastMessage(Component.text(TextureUtils.getAvatarUrl(p.getPlayerProfile()) + " ")
-                                    .append(LegacyComponentSerializer.legacyAmpersand().deserialize(firstJoinMessage.replace("%player%", p.getName())))
-                            , "uknet:discord_connect"), 1L);
+            Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
+
+                instance.chat.broadcastMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(firstJoinMessage.replace("%player%", p.getName())), "uknet:connect");
+
+                instance.chat.broadcastMessage(Component.text(TextureUtils.getAvatarUrl(p.getPlayerProfile()) + " ")
+                        .append(LegacyComponentSerializer.legacyAmpersand().deserialize(firstJoinMessage.replace("%player%", p.getName()))), "uknet:discord_connect");
+            }, 20L);
 
         } else {
 
@@ -66,10 +69,14 @@ public class Connect {
 
             //Send global connect message.
             //Add a slight delay so message can be seen by player joining.
-            Bukkit.getScheduler().runTaskLater(Network.getInstance(), () ->
-                    instance.chat.broadcastMessage(Component.text(TextureUtils.getAvatarUrl(p.getPlayerProfile()) + " ")
-                                    .append(LegacyComponentSerializer.legacyAmpersand().deserialize(joinMessage.replace("%player%", p.getName())))
-                            , "uknet:discord_connect"), 1L);
+            Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
+
+                instance.chat.broadcastMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(joinMessage.replace("%player%", p.getName())), "uknet:connect");
+
+                instance.chat.broadcastMessage(Component.text(TextureUtils.getAvatarUrl(p.getPlayerProfile()) + " ")
+                                .append(LegacyComponentSerializer.legacyAmpersand().deserialize(joinMessage.replace("%player%", p.getName())))
+                        , "uknet:discord_connect");
+            }, 1L);
 
         }
 
@@ -116,6 +123,8 @@ public class Connect {
         String player_skin = globalSQL.getString("SELECT player_skin FROM player_data WHERE uuid='" + uuid + "';");
 
         //Run disconnect message.
+        instance.chat.broadcastMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(leaveMessage.replace("%player%", name)), "uknet:disconnect");
+
         instance.chat.broadcastMessage(Component.text(TextureUtils.getAvatarUrl(name, p.getUniqueId(), player_skin) + " ")
                         .append(LegacyComponentSerializer.legacyAmpersand().deserialize(leaveMessage.replace("%player%", name)))
                 , "uknet:discord_disconnect");

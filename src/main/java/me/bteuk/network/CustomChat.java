@@ -6,6 +6,7 @@ import me.bteuk.network.utils.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -51,6 +52,7 @@ public class CustomChat implements Listener, PluginMessageListener {
         //Discord specific channels.
         instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord", this);
         instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord_staff", this);
+        instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord_reviewer", this);
 
         instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord_connect", this);
         instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord_disconnect", this);
@@ -74,6 +76,7 @@ public class CustomChat implements Listener, PluginMessageListener {
         //Discord specific channels.
         instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord", this);
         instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord_staff", this);
+        instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord_reviewer", this);
 
         instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord_connect", this);
         instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord_disconnect", this);
@@ -223,7 +226,7 @@ public class CustomChat implements Listener, PluginMessageListener {
                 //Run a tab update, the structure is the following.
                 //'update/add/remove <uuid>'
                 //This allows us to only update what is necessary.
-                Network.getInstance().tab.updateAll(sMessage);
+                Network.getInstance().tab.updateAll(PlainTextComponentSerializer.plainText().serialize(component));
 
 
         }
