@@ -1,7 +1,6 @@
 package me.bteuk.network.sql;
 
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.bukkit.Bukkit;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -173,7 +172,7 @@ public class PlotSQL {
 
             int[][] corners = new int[results.getInt(1)][2];
 
-            corners = getPlotCorners(corners, plotID);
+            getPlotCorners(corners, plotID);
 
             return corners;
 

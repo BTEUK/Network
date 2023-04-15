@@ -3,6 +3,7 @@ package me.bteuk.network.listeners;
 import me.bteuk.network.Network;
 import me.bteuk.network.commands.Navigator;
 import me.bteuk.network.utils.NetworkUser;
+import me.bteuk.network.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,9 +15,11 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 
+import static me.bteuk.network.utils.Constants.LOGGER;
+
 public class PlayerInteract implements Listener {
 
-    Network instance;
+    private final Network instance;
 
     public PlayerInteract(Network instance) {
 
@@ -29,6 +32,13 @@ public class PlayerInteract implements Listener {
     public void onPlayerInteract(PlayerInteractEvent e) {
 
         NetworkUser u = instance.getUser(e.getPlayer());
+
+        //If u is null, cancel.
+        if (u == null) {
+            LOGGER.severe("User " + e.getPlayer().getName() + " can not be found!");
+            e.getPlayer().sendMessage(Utils.error("User can not be found, please relog!"));
+            return;
+        }
 
         if (e.getItem() != null) {
             if (e.getItem().equals(instance.navigator)) {
@@ -48,6 +58,13 @@ public class PlayerInteract implements Listener {
         }
 
         NetworkUser u = instance.getUser((Player) e.getWhoClicked());
+
+        //If u is null, cancel.
+        if (u == null) {
+            LOGGER.severe("User " + e.getWhoClicked().getName() + " can not be found!");
+            e.getWhoClicked().sendMessage(Utils.error("User can not be found, please relog!"));
+            return;
+        }
 
         //If item is navigator then open it.
         if (e.getCurrentItem().equals(instance.navigator)) {

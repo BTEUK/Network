@@ -19,10 +19,10 @@ import static me.bteuk.network.utils.Constants.SERVER_NAME;
 
 public class JoinServer implements Listener {
 
-    Network instance;
-    Connect connect;
+    private final Network instance;
+    private final Connect connect;
 
-    GlobalSQL globalSQL;
+    private final GlobalSQL globalSQL;
 
     public JoinServer(Network instance, GlobalSQL globalSQL, Connect connect) {
 

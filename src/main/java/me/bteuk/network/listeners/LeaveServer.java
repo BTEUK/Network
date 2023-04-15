@@ -6,6 +6,7 @@ import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Statistics;
 import me.bteuk.network.utils.Time;
+import me.bteuk.network.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -13,14 +14,15 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.UUID;
 
+import static me.bteuk.network.utils.Constants.LOGGER;
 import static me.bteuk.network.utils.Constants.SERVER_NAME;
 
 public class LeaveServer implements Listener {
 
-    Network instance;
-    Connect connect;
+    private final Network instance;
+    private final Connect connect;
 
-    GlobalSQL globalSQL;
+    private final GlobalSQL globalSQL;
 
     private boolean blocked;
 
@@ -43,13 +45,20 @@ public class LeaveServer implements Listener {
     public void leaveServerEvent(PlayerQuitEvent e) {
 
         //Set default leave message to null.
-        e.setQuitMessage(null);
+        e.quitMessage(null);
 
         if (blocked) {
             return;
         }
 
         NetworkUser u = instance.getUser(e.getPlayer());
+
+        //If u is null, cancel.
+        if (u == null) {
+            LOGGER.severe("User " + e.getPlayer().getName() + " can not be found!");
+            e.getPlayer().sendMessage(Utils.error("User can not be found, please relog!"));
+            return;
+        }
 
         //Reset last logged time.
         if (u.afk) {

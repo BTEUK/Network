@@ -7,6 +7,7 @@ import me.bteuk.network.utils.*;
 import me.bteuk.network.utils.regions.Inactivity;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 
@@ -178,7 +179,7 @@ public class Timers {
 
                     for (String message : messages) {
 
-                        user.player.sendMessage(Component.text(message));
+                        user.player.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(message));
 
                     }
 

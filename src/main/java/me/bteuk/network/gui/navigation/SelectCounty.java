@@ -14,7 +14,7 @@ import java.util.Comparator;
 
 public class SelectCounty extends Gui {
 
-    private AddLocation addLocation;
+    private final AddLocation addLocation;
 
     public SelectCounty(AddLocation addLocation) {
 

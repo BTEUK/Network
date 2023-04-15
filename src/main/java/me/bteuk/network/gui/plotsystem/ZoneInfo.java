@@ -6,7 +6,6 @@ import me.bteuk.network.gui.Gui;
 import me.bteuk.network.gui.InviteMembers;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
-import me.bteuk.network.utils.PlotValues;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;

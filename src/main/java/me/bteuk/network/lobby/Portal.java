@@ -44,11 +44,7 @@ public class Portal {
 
     //Check if the location parameter is located inside the portal.
     public boolean in(Location l) {
-        if (x1 <= l.getX() && x2 >= l.getX() && y1 <= l.getY() && y2 >= l.getY() && z1 <= l.getZ() && z2 >= l.getZ()) {
-            return true;
-        } else {
-            return false;
-        }
+        return x1 <= l.getX() && x2 >= l.getX() && y1 <= l.getY() && y2 >= l.getY() && z1 <= l.getZ() && z2 >= l.getZ();
     }
 
     //Runs the portal events for a specific player.

@@ -8,7 +8,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 
 public class VoidTeleport implements Listener {
 
-    private Lobby lobby;
+    private final Lobby lobby;
 
     public VoidTeleport(Network instance, Lobby lobby) {
 

@@ -17,7 +17,7 @@ import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 //This class deals with players joining and leaving the network.
 public class Connect {
 
-    Network instance;
+    private final Network instance;
 
     private final GlobalSQL globalSQL;
     private final PlotSQL plotSQL;

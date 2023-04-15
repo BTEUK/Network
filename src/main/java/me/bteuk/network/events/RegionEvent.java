@@ -1,14 +1,9 @@
 package me.bteuk.network.events;
 
 import me.bteuk.network.Network;
-import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.RegionStatus;
 import me.bteuk.network.utils.regions.Region;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.Player;
-
-import java.util.UUID;
 
 public class RegionEvent {
 

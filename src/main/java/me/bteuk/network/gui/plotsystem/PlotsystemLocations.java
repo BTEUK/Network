@@ -17,6 +17,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import static me.bteuk.network.utils.Constants.SERVER_NAME;
 
@@ -79,7 +80,7 @@ public class PlotsystemLocations extends Gui {
 
                             //Teleport to the location.
                             World world = Bukkit.getWorld(name);
-                            double y = world.getHighestBlockYAt((int) x, (int) z);
+                            double y = Objects.requireNonNull(world).getHighestBlockYAt((int) x, (int) z);
                             y++;
 
                             EventManager.createTeleportEvent(false, u.player.getUniqueId().toString(), "network", "teleport " + name + " " + x + " " + y + " " + z + " "

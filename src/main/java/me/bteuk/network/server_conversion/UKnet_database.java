@@ -1,11 +1,8 @@
 package me.bteuk.network.server_conversion;
 
-import me.bteuk.network.Network;
-import me.bteuk.network.sql.GlobalSQL;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -111,10 +108,10 @@ public class UKnet_database {
 
 class Player {
 
-    String uuid;
-    String name;
-    String role;
-    long last_join;
+    public final String uuid;
+    public final String name;
+    public final String role;
+    public final long last_join;
 
     public Player(String uuid, String name, String role, long last_join) {
 

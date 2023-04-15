@@ -18,7 +18,6 @@ import org.bukkit.Material;
 
 import static me.bteuk.network.utils.Constants.EARTH_WORLD;
 import static me.bteuk.network.utils.Constants.SERVER_NAME;
-import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public class RegionRequest extends Gui {
 

@@ -1,7 +1,5 @@
 package me.bteuk.network.listeners;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 import me.bteuk.network.Network;
 import me.bteuk.network.utils.*;
 import org.bukkit.Bukkit;
@@ -10,6 +8,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import static me.bteuk.network.utils.Constants.LOGGER;
@@ -17,7 +18,7 @@ import static me.bteuk.network.utils.Constants.SERVER_NAME;
 
 public class CommandPreProcess implements Listener {
 
-    Network instance;
+    private final Network instance;
 
     public CommandPreProcess(Network instance) {
         this.instance = instance;
@@ -116,9 +117,8 @@ public class CommandPreProcess implements Listener {
 
         for (NetworkUser u : users) {
 
+            u.last_movement = Time.currentTime();
             if (server != null) {
-
-                u.last_movement = Time.currentTime();
 
                 //Reset last logged time.
                 if (u.afk) {
@@ -127,17 +127,20 @@ public class CommandPreProcess implements Listener {
                     Network.getInstance().chat.broadcastAFK(u.player, false);
                 }
 
-                u.last_movement = Time.currentTime();
 
                 //Switch the player to that server.
-                ByteArrayDataOutput out = ByteStreams.newDataOutput();
-                out.writeUTF("Connect");
-                out.writeUTF(server);
-                u.player.sendPluginMessage(instance, "BungeeCord", out.toByteArray());
+                try {
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    DataOutputStream out = new DataOutputStream(stream);
+                    out.writeUTF("Connect");
+                    out.writeUTF(server);
+                    u.player.sendPluginMessage(instance, "BungeeCord", stream.toByteArray());
+                } catch (IOException e) {
+                    LOGGER.severe("IOException when attempting to switch player to another server.");
+                    return;
+                }
 
             } else {
-
-                u.last_movement = Time.currentTime();
 
                 //Reset last logged time.
                 if (u.afk) {

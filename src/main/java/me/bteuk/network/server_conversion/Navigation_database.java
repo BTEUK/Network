@@ -117,14 +117,14 @@ public class Navigation_database {
 
 class Location {
 
-    String name;
-    String category;
-    String subcategory;
-    double x;
-    double y;
-    double z;
-    float pitch;
-    float yaw;
+    public final String name;
+    public final String category;
+    public final String subcategory;
+    public final double x;
+    public final double y;
+    public final double z;
+    public final float pitch;
+    public final float yaw;
 
     public Location(String name, String category, String subcategory, double x, double y, double z, float pitch, float yaw) {
         this.name = name;

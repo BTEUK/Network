@@ -12,7 +12,7 @@ import static me.bteuk.network.utils.Constants.SERVER_NAME;
 public class NetworkUser {
 
     //Player instance.
-    public Player player;
+    public final Player player;
 
     //Main gui, includes everything that is part of the navigator.
     public Gui mainGui;

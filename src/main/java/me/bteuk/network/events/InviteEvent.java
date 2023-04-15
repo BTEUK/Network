@@ -14,7 +14,6 @@ import java.util.UUID;
 
 public class InviteEvent {
 
-    @Deprecated
     public static void event(String uuid, String[] event) {
 
         switch (event[1]) {

@@ -127,21 +127,17 @@ public class Lobby {
                 for (Portal portal : portals) {
 
                     if (portal.in(user.player.getLocation())) {
+                        user.inPortal = true;
                         if (!user.wasInPortal) {
 
                             //Set user to in portal.
-                            user.inPortal = true;
                             user.wasInPortal = true;
 
                             //If they are run the portal events.
                             portal.event(user.player);
-                            break;
 
-                        } else {
-                            //User is still in a portal, but don't execute the portal event.
-                            user.inPortal = true;
-                            break;
                         }
+                        break;
                     }
                 }
 
@@ -231,7 +227,7 @@ public class Lobby {
         }
 
         //Add listener
-        new TakeBookEvent(instance, this);
+        new TakeBookEvent(instance);
 
     }
 

@@ -2,8 +2,8 @@ package me.bteuk.network.utils.regions;
 
 public class Inactivity {
 
-    public Region region;
-    public String uuid;
+    public final Region region;
+    public final String uuid;
 
     public Inactivity(Region region, String uuid) {
 

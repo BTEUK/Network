@@ -13,8 +13,8 @@ import java.util.UUID;
 
 public abstract class Gui implements GuiInterface {
 
-    public static Map<UUID, Gui> inventoriesByUUID = new HashMap<>();
-    public static Map<UUID, UUID> openInventories = new HashMap<>();
+    public static final Map<UUID, Gui> inventoriesByUUID = new HashMap<>();
+    public static final Map<UUID, UUID> openInventories = new HashMap<>();
 
     //Information about the gui.
     private final UUID uuid;
@@ -79,14 +79,6 @@ public abstract class Gui implements GuiInterface {
 
     public UUID getUuid() {
         return uuid;
-    }
-
-    public static Map<UUID, Gui> getInventoriesByUUID() {
-        return inventoriesByUUID;
-    }
-
-    public static Map<UUID, UUID> getOpenInventories() {
-        return openInventories;
     }
 
     public Map<Integer, guiAction> getActions() {

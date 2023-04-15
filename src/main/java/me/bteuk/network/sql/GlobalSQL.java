@@ -1,13 +1,11 @@
 package me.bteuk.network.sql;
 
-import me.bteuk.network.Network;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import static me.bteuk.network.utils.Constants.SERVER_NAME;
 

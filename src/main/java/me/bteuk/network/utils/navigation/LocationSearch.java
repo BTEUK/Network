@@ -1,22 +1,15 @@
 package me.bteuk.network.utils.navigation;
 
+import io.papermc.paper.event.player.AsyncChatEvent;
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.navigation.LocationMenu;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
-import me.bteuk.network.utils.enums.Categories;
-import me.bteuk.network.utils.enums.Counties;
-import org.apache.commons.lang.StringUtils;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.scheduler.BukkitTask;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 
 public class LocationSearch implements Listener {
 
@@ -42,7 +35,7 @@ public class LocationSearch implements Listener {
     }
 
     @EventHandler
-    public void ChatEvent(AsyncPlayerChatEvent e) {
+    public void ChatEvent(AsyncChatEvent e) {
 
         //Check if this is the correct player.
         if (e.getPlayer().equals(u.player)) {
@@ -50,11 +43,11 @@ public class LocationSearch implements Listener {
             e.setCancelled(true);
 
             //Check if message is under 64 character.
-            if (e.getMessage().length() > 64) {
+            if (PlainTextComponentSerializer.plainText().serialize(e.message()).length() > 64) {
                 e.getPlayer().sendMessage(Utils.error("The phrase can't be longer than 64 characters."));
             } else {
 
-                LocationMenu gui = new LocationMenu("Search: " + e.getMessage(), u, e.getMessage(), "Explore");
+                LocationMenu gui = new LocationMenu("Search: " + PlainTextComponentSerializer.plainText().serialize(e.message()), u, PlainTextComponentSerializer.plainText().serialize(e.message()), "Explore");
 
 
                 //If there are no locations notify the user.
@@ -83,6 +76,6 @@ public class LocationSearch implements Listener {
     }
 
     public void unregister() {
-        AsyncPlayerChatEvent.getHandlerList().unregister(this);
+        AsyncChatEvent.getHandlerList().unregister(this);
     }
 }

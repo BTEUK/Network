@@ -2,8 +2,8 @@ package me.bteuk.network.utils.regions;
 
 public class Request {
 
-    public String region;
-    public String uuid;
+    public final String region;
+    public final String uuid;
 
     public Request(String region, String uuid) {
 

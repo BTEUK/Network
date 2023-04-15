@@ -7,7 +7,6 @@ import me.bteuk.network.commands.staff.Mute;
 import me.bteuk.network.commands.staff.Staff;
 import me.bteuk.network.commands.tabcompleter.LocationSelector;
 import me.bteuk.network.commands.tabcompleter.PlayerSelector;
-import me.bteuk.network.listeners.CommandPreProcess;
 import me.bteuk.network.gui.NavigatorGui;
 import me.bteuk.network.listeners.*;
 import me.bteuk.network.listeners.global_teleport.MoveListener;
@@ -22,7 +21,6 @@ import me.bteuk.network.utils.regions.RegionManager;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -70,9 +68,6 @@ public final class Network extends JavaPlugin {
 
     //Timers
     public Timers timers;
-
-    //Network connect
-    private Connect connect;
 
     //Lobby
     private Lobby lobby;
@@ -181,7 +176,8 @@ public final class Network extends JavaPlugin {
         chat = new CustomChat(this, socketIP, socketPort);
 
         //Setup connect.
-        connect = new Connect(this, globalSQL, plotSQL);
+        //Network connect
+        Connect connect = new Connect(this, globalSQL, plotSQL);
 
         //Create navigator.
         navigatorGui = new NavigatorGui();

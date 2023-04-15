@@ -3,6 +3,7 @@ package me.bteuk.network.listeners;
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.utils.NetworkUser;
+import me.bteuk.network.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -12,9 +13,11 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 
 import java.util.UUID;
 
+import static me.bteuk.network.utils.Constants.LOGGER;
+
 public class GuiListener implements Listener {
 
-    Network instance;
+    private final Network instance;
 
     public GuiListener(Network instance) {
 
@@ -33,6 +36,14 @@ public class GuiListener implements Listener {
         }
 
         NetworkUser u = instance.getUser((Player) e.getWhoClicked());
+
+        //If u is null, cancel.
+        if (u == null) {
+            LOGGER.severe("User " + e.getWhoClicked().getName() + " can not be found!");
+            e.getWhoClicked().sendMessage(Utils.error("User can not be found, please relog!"));
+            return;
+        }
+
         UUID playerUUID = u.player.getUniqueId();
 
         UUID inventoryUUID = Gui.openInventories.get(playerUUID);
@@ -40,7 +51,7 @@ public class GuiListener implements Listener {
         if (inventoryUUID != null){
 
             e.setCancelled(true);
-            Gui gui = Gui.getInventoriesByUUID().get(inventoryUUID);
+            Gui gui = Gui.inventoriesByUUID.get(inventoryUUID);
             Gui.guiAction action = gui.getActions().get(e.getRawSlot());
 
             if (action != null){

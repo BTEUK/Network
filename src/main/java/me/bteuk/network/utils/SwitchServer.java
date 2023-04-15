@@ -1,11 +1,14 @@
 package me.bteuk.network.utils;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 import me.bteuk.network.Network;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
+import static me.bteuk.network.utils.Constants.LOGGER;
 import static me.bteuk.network.utils.Constants.SERVER_NAME;
 
 public class SwitchServer {
@@ -13,6 +16,13 @@ public class SwitchServer {
     public static void switchServer(Player p, String server) {
 
         NetworkUser u = Network.getInstance().getUser(p);
+
+        //If u is null, cancel.
+        if (u == null) {
+            LOGGER.severe("User " + p.getName() + " can not be found!");
+            p.sendMessage(Utils.error("User can not be found, please relog!"));
+            return;
+        }
 
         //If server is null, cancel and notify player.
         if (server == null) {
@@ -47,10 +57,16 @@ public class SwitchServer {
                 p.getUniqueId() + "','" + SERVER_NAME + "','" + server + "'," + Time.currentTime() + ");");
 
         //Switch Server
-        ByteArrayDataOutput out = ByteStreams.newDataOutput();
-        out.writeUTF("Connect");
-        out.writeUTF(server);
-        p.sendPluginMessage(Network.getInstance(), "BungeeCord", out.toByteArray());
+        try {
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            DataOutputStream out = new DataOutputStream(stream);
+            out.writeUTF("Connect");
+            out.writeUTF(server);
+            u.player.sendPluginMessage(Network.getInstance(), "BungeeCord", stream.toByteArray());
+        } catch (IOException e) {
+            LOGGER.severe("IOException when attempting to switch player to another server.");
+            return;
+        }
 
         //Set delayed check to see whether the player is still on this server or not.
         //If they are cancel the server switch.
