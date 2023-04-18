@@ -22,7 +22,8 @@ public class NetworkConfig {
 
     //Get old config version.
     private String configVersion() {
-        String version = Objects.requireNonNull(CONFIG.getString("version"));
+
+        String version = CONFIG.getString("version");
         //If null return default.
         return Objects.requireNonNullElse(version, "1.0.0");
     }
@@ -31,7 +32,7 @@ public class NetworkConfig {
     private String latestVersion() {
         String version = Objects.requireNonNull(CONFIG.getDefaults()).getString("version");
         //If null return default.
-        return Objects.requireNonNullElse(version, "1.0.0");
+        return Objects.requireNonNullElse(version, "1.1.0");
     }
 
     //Update config if the version is outdated.
@@ -39,7 +40,7 @@ public class NetworkConfig {
 
         String version = configVersion();
 
-        if (!Objects.equals(version, latestVersion())) {
+        if (!version.equals(latestVersion())) {
             LOGGER.info("Your config version is outdated, updating to latest version!");
 
             //Get old config values, these are needed to add them back after updating.

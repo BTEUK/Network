@@ -99,3 +99,6 @@ commands:
   zone:
     usage: /<command>
     description: Zone command.
+  server:
+    usage: /<command>
+    description: Switch server by command.

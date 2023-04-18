@@ -41,6 +41,8 @@ public class CommandPreProcess implements Listener {
             } else {
                 return;
             }
+        } else if (e.getMessage().startsWith("/server")) {
+            e.setMessage(e.getMessage().replace("/server", "/network:server"));
         }
 
         if (!e.getMessage().startsWith("/afk")) {

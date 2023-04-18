@@ -7,6 +7,7 @@ import me.bteuk.network.commands.staff.Mute;
 import me.bteuk.network.commands.staff.Staff;
 import me.bteuk.network.commands.tabcompleter.LocationSelector;
 import me.bteuk.network.commands.tabcompleter.PlayerSelector;
+import me.bteuk.network.commands.tabcompleter.ServerSelector;
 import me.bteuk.network.gui.NavigatorGui;
 import me.bteuk.network.listeners.*;
 import me.bteuk.network.listeners.global_teleport.MoveListener;
@@ -246,6 +247,9 @@ public final class Network extends JavaPlugin {
         getCommand("staff").setExecutor(new Staff());
         getCommand("ban").setExecutor(new Ban());
         getCommand("mute").setExecutor(new Mute());
+
+        getCommand("server").setExecutor(new Server());
+        getCommand("server").setTabCompleter(new ServerSelector());
 
         getCommand("teleport").setExecutor(new Tp());
         getCommand("teleport").setTabCompleter(new PlayerSelector());
