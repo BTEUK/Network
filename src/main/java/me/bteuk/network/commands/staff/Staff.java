@@ -5,6 +5,7 @@ import me.bteuk.network.staff.StaffGui;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -50,8 +51,8 @@ public class Staff implements CommandExecutor {
                 Network.getInstance().globalSQL.update("UPDATE player_data SET staff_chat=1-staff_chat WHERE uuid='"+ p.getUniqueId() + "';");
             } else {
                 //Send message in staff chat.
-                Network.getInstance().chat.broadcastPlayerMessage(p, Component.text(String.join(" ", args)), "uknet:staff");
-                Network.getInstance().chat.broadcastPlayerMessage(p, Component.text(String.join(" ", args)), "uknet:discord_staff");
+                Network.getInstance().chat.broadcastPlayerMessage(p, Component.text(String.join(" ", args), NamedTextColor.WHITE), "uknet:staff");
+                Network.getInstance().chat.broadcastPlayerMessage(p, Component.text(String.join(" ", args), NamedTextColor.WHITE), "uknet:discord_staff");
             }
             return true;
         }

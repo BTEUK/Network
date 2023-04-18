@@ -35,19 +35,19 @@ public class Utils {
     }
 
     public static Component title(String message) {
-        return Component.text(message, NamedTextColor.AQUA, TextDecoration.BOLD);
+        return Component.text(message, NamedTextColor.AQUA, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false);
     }
 
     public static Component line(String message) {
-        return Component.text(message, NamedTextColor.WHITE);
+        return Component.text(message, NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false);
     }
 
     public static Component error(String message) {
-        return Component.text(message, NamedTextColor.RED);
+        return Component.text(message, NamedTextColor.RED).decoration(TextDecoration.ITALIC, false);
     }
 
     public static Component success(String message) {
-        return Component.text(message, NamedTextColor.GREEN);
+        return Component.text(message, NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false);
     }
 
     public static String toJson(Component component) {

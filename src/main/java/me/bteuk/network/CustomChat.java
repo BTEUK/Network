@@ -119,12 +119,12 @@ public class CustomChat implements Listener, PluginMessageListener {
             }
 
             if (u.staffChat) {
-                broadcastPlayerMessage(e.getPlayer(), e.message(), "uknet:staff");
-                broadcastPlayerMessage(e.getPlayer(), e.message(), "uknet:discord_staff");
+                broadcastPlayerMessage(e.getPlayer(), e.message().color(NamedTextColor.WHITE), "uknet:staff");
+                broadcastPlayerMessage(e.getPlayer(), e.message().color(NamedTextColor.WHITE), "uknet:discord_staff");
             } else {
                 Statistics.addMessage(e.getPlayer().getUniqueId().toString(), Time.getDate(Time.currentTime()));
-                broadcastPlayerMessage(e.getPlayer(), e.message(), "uknet:globalchat");
-                broadcastPlayerMessage(e.getPlayer(), e.message(), "uknet:discord");
+                broadcastPlayerMessage(e.getPlayer(), e.message().color(NamedTextColor.WHITE), "uknet:globalchat");
+                broadcastPlayerMessage(e.getPlayer(), e.message().color(NamedTextColor.WHITE), "uknet:discord");
             }
         }
     }
