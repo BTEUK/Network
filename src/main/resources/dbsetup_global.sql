@@ -5,6 +5,29 @@ CREATE TABLE IF NOT EXISTS unique_data
     PRIMARY KEY(data_key)
 );
 
+CREATE TABLE IF NOT EXISTS server_data
+(
+    name        VARCHAR(64)   NOT NULL,
+    type        ENUM('PLOT','EARTH',
+    'LOBBY','TUTORIAL')     NOT NULL,
+    online      TINYINT(1)      NULL DEFAULT 0,
+    PRIMARY KEY(name)
+);
+
+CREATE TABLE IF NOT EXISTS coordinates
+(
+    id          INT         AUTO_INCREMENT,
+    server      VARCHAR(64) NOT NULL,
+    world       VARCHAR(64) NOT NULL,
+    x           DOUBLE      NOT NULL,
+    y           DOUBLE      NULL DEFAULT 0.0,
+    z           DOUBLE      NOT NULL,
+    yaw         FLOAT       NULL DEFAULT 0.0,
+    pitch       FLOAT       NULL DEFAULT 0.0,
+    PRIMARY KEY(id),
+    CONSTRAINT fk_coordinates_1 FOREIGN KEY(server) REFERENCES server_data(name)
+);
+
 CREATE TABLE IF NOT EXISTS player_data
 (
 	uuid       CHAR(36)      NOT NULL,
@@ -19,8 +42,7 @@ CREATE TABLE IF NOT EXISTS player_data
     nightvision_enabled TINYINT(1)  NOT NULL DEFAULT 0,
     staff_chat          TINYINT(1)  NOT NULL DEFAULT 0,
     previous_coordinate INT     NOT NULL DEFAULT 0,
-    PRIMARY KEY (uuid),
-    FOREIGN KEY(previous_coordinate) REFERENCES coordinates(id)
+    PRIMARY KEY (uuid)
 );
 
 CREATE TABLE IF NOT EXISTS messages
@@ -28,7 +50,7 @@ CREATE TABLE IF NOT EXISTS messages
     recipient   CHAR(36)        NOT NULL,
     message     VARCHAR(256)    NOT NULL,
     PRIMARY KEY(recipient,message),
-    FOREIGN KEY(recipient) REFERENCES player_data(uuid)
+    CONSTRAINT fk_messages_1 FOREIGN KEY(recipient) REFERENCES player_data(uuid)
 );
 
 CREATE TABLE IF NOT EXISTS join_events
@@ -39,7 +61,7 @@ CREATE TABLE IF NOT EXISTS join_events
     event       VARCHAR(256)    NOT NULL,
     message     VARCHAR(256)    NULL DEFAULT NULL,
     PRIMARY KEY(uuid),
-    FOREIGN KEY(uuid) REFERENCES player_data(uuid)
+    CONSTRAINT fk_join_events_1 FOREIGN KEY(uuid) REFERENCES player_data(uuid)
 );
 
 CREATE TABLE IF NOT EXISTS server_events
@@ -51,7 +73,7 @@ CREATE TABLE IF NOT EXISTS server_events
     event       VARCHAR(256)    NOT NULL,
     message     VARCHAR(256)    NULL DEFAULT NULL,
     UNIQUE(uuid,event),
-    FOREIGN KEY(uuid) REFERENCES player_data(uuid)
+    CONSTRAINT fk_server_events_1 FOREIGN KEY(uuid) REFERENCES player_data(uuid)
 );
 
 CREATE TABLE IF NOT EXISTS statistics
@@ -62,7 +84,7 @@ CREATE TABLE IF NOT EXISTS statistics
     messages    INT             NULL DEFAULT 0,
     tpll        INT             NULL DEFAULT 0,
     PRIMARY KEY(uuid,on_date),
-    FOREIGN KEY(uuid) REFERENCES player_data(uuid)
+    CONSTRAINT fk_statistics_1 FOREIGN KEY(uuid) REFERENCES player_data(uuid)
 );
 
 CREATE TABLE IF NOT EXISTS online_users
@@ -74,8 +96,8 @@ CREATE TABLE IF NOT EXISTS online_users
     primary_role    VARCHAR(64) NOT NULL,
     display_name    VARCHAR(64) NOT NULL,
     PRIMARY KEY(uuid),
-    FOREIGN KEY(uuid) REFERENCES player_data(uuid),
-    FOREIGN KEY(server) REFERENCES server_data(name)
+    CONSTRAINT fk_online_users_1 FOREIGN KEY(uuid) REFERENCES player_data(uuid),
+    CONSTRAINT fk_online_users_2 FOREIGN KEY(server) REFERENCES server_data(name)
 );
 
 CREATE TABLE IF NOT EXISTS server_switch
@@ -85,23 +107,9 @@ CREATE TABLE IF NOT EXISTS server_switch
     to_server   VARCHAR(64)     NOT NULL,
     switch_time BIGINT          NOT NULL,
     PRIMARY KEY(uuid),
-    FOREIGN KEY(uuid) REFERENCES player_data(uuid),
-    FOREIGN KEY(from_server) REFERENCES server_data(name),
-    FOREIGN KEY(to_server) REFERENCES server_data(name)
-);
-
-CREATE TABLE IF NOT EXISTS coordinates
-(
-    id          INT         AUTO_INCREMENT,
-    server      VARCHAR(64) NOT NULL,
-    world       VARCHAR(64) NOT NULL,
-    x           DOUBLE      NOT NULL,
-    y           DOUBLE      NULL DEFAULT 0.0,
-    z           DOUBLE      NOT NULL,
-    yaw         FLOAT       NULL DEFAULT 0.0,
-    pitch       FLOAT       NULL DEFAULT 0.0,
-    PRIMARY KEY(id),
-    FOREIGN KEY(server) REFERENCES server_data(name)
+    CONSTRAINT fk_server_switch_1 FOREIGN KEY(uuid) REFERENCES player_data(uuid),
+    CONSTRAINT fk_server_switch_2 FOREIGN KEY(from_server) REFERENCES server_data(name),
+    CONSTRAINT fk_server_switch_3 FOREIGN KEY(to_server) REFERENCES server_data(name)
 );
 
 CREATE TABLE IF NOT EXISTS location_data
@@ -112,7 +120,7 @@ CREATE TABLE IF NOT EXISTS location_data
     coordinate  INT             NOT NULL,
     suggested   TINYINT(1)      NULL DEFAULT 0,
     PRIMARY KEY(location),
-    FOREIGN KEY(coordinate) REFERENCES coordinates(id)
+    CONSTRAINT fk_location_data_1 FOREIGN KEY(coordinate) REFERENCES coordinates(id)
 );
 
 CREATE TABLE IF NOT EXISTS location_requests
@@ -122,16 +130,7 @@ CREATE TABLE IF NOT EXISTS location_requests
     subcategory VARCHAR(128)    NULL DEFAULT NULL,
     coordinate  INT             NOT NULL,
     PRIMARY KEY(location),
-    FOREIGN KEY(coordinate) REFERENCES coordinates(id)
-);
-
-CREATE TABLE IF NOT EXISTS server_data
-(
-    name        VARCHAR(64)   NOT NULL,
-    type        ENUM('PLOT','EARTH',
-    'LOBBY','TUTORIAL')     NOT NULL,
-    online      TINYINT(1)      NULL DEFAULT 0,
-    PRIMARY KEY(name)
+    CONSTRAINT fk_location_requests_1 FOREIGN KEY(coordinate) REFERENCES coordinates(id)
 );
 
 CREATE TABLE IF NOT EXISTS moderation
@@ -143,7 +142,7 @@ CREATE TABLE IF NOT EXISTS moderation
     type        ENUM('ban',
     'mute')                     NOT NULL,
     PRIMARY KEY(uuid,start_time),
-    FOREIGN KEY(uuid) REFERENCES player_data(uuid)
+    CONSTRAINT fk_moderation_1 FOREIGN KEY(uuid) REFERENCES player_data(uuid)
 );
 
 CREATE TABLE IF NOT EXISTS coins
@@ -151,7 +150,7 @@ CREATE TABLE IF NOT EXISTS coins
     uuid        VARCHAR(36)     NOT NULL,
     coins       INT             NULL DEFAULT 0,
     PRIMARY KEY(uuid),
-    FOREIGN KEY(uuid) REFERENCES player_data(uuid)
+    CONSTRAINT fk_coins_1 FOREIGN KEY(uuid) REFERENCES player_data(uuid)
 );
 
 CREATE TABLE IF NOT EXISTS discord
@@ -159,7 +158,7 @@ CREATE TABLE IF NOT EXISTS discord
     uuid        VARCHAR(36)     NOT NULL,
     discord_id  BIGINT          NOT NULL,
     PRIMARY KEY(uuid),
-    FOREIGN KEY(uuid) REFERENCES player_data(uuid)
+    CONSTRAINT fk_discord_1 FOREIGN KEY(uuid) REFERENCES player_data(uuid)
 );
 
 CREATE TABLE IF NOT EXISTS player_count
@@ -175,6 +174,6 @@ CREATE TABLE IF NOT EXISTS home
     uuid        VARCHAR(36) NOT NULL,
     name        VARCHAR(64) NULL,
     PRIMARY KEY(coordinate_id),
-    FOREIGN KEY(coordinate_id) REFERENCES coordinates(id),
-    FOREIGN KEY(uuid) REFERENCES player_data(uuid)
+    CONSTRAINT fk_home_1 FOREIGN KEY(coordinate_id) REFERENCES coordinates(id),
+    CONSTRAINT fk_home_2 FOREIGN KEY(uuid) REFERENCES player_data(uuid)
 );

@@ -15,7 +15,7 @@ public class DatabaseUpdates {
             version = Network.getInstance().globalSQL.getString("SELECT data_value FROM unique_data WHERE data_key='version';");
         } else {
             //Insert the latest database version as version.
-            Network.getInstance().globalSQL.update("INSERT INTO unique_data(data_value,data_key) VALUES('version','1.1.0'");
+            Network.getInstance().globalSQL.update("INSERT INTO unique_data(data_key, data_value) VALUES('version','1.1.0')");
         }
 
         //Check for specific table columns that could be missing,
@@ -61,31 +61,31 @@ public class DatabaseUpdates {
 
         //Add foreign constraints.
 
-        //id to player_data (coordinate), location_data (coordinate), location_requests (coordinate) and home (coordinate_id)
+        //id to location_data (coordinate), location_requests (coordinate) and home (coordinate_id)
         // since it references an id from the coordinates table.
-        Network.getInstance().globalSQL.update("ALTER TABLE player_data ADD FOREIGN KEY (previous_coordinate) REFERENCES coordinates(id);");
-        Network.getInstance().globalSQL.update("ALTER TABLE location_data ADD FOREIGN KEY (coordinate) REFERENCES coordinates(id);");
-        Network.getInstance().globalSQL.update("ALTER TABLE location_requests ADD FOREIGN KEY (coordinate) REFERENCES coordinates(id);");
-        Network.getInstance().globalSQL.update("ALTER TABLE home ADD FOREIGN KEY (coordinate_id) REFERENCES coordinates(id);");
+        Network.getInstance().globalSQL.update("ALTER TABLE location_data ADD CONSTRAINT fk_location_data_1 FOREIGN KEY (coordinate) REFERENCES coordinates(id);");
+        Network.getInstance().globalSQL.update("ALTER TABLE location_requests ADD CONSTRAINT fk_location_requests_1 FOREIGN KEY (coordinate) REFERENCES coordinates(id);");
+        Network.getInstance().globalSQL.update("ALTER TABLE home ADD fk_home_1 FOREIGN KEY (coordinate_id) REFERENCES coordinates(id);");
 
         //uuid to join_events, server_events, statistics, online_users, server_switch, moderation, coins, discord and home
         // since it references a player that will always be in the player_data table.
-        Network.getInstance().globalSQL.update("ALTER TABLE join_events ADD FOREIGN KEY (uuid) REFERENCES player_data(uuid);");
-        Network.getInstance().globalSQL.update("ALTER TABLE server_events ADD FOREIGN KEY (uuid) REFERENCES player_data(uuid);");
-        Network.getInstance().globalSQL.update("ALTER TABLE statistics ADD FOREIGN KEY (uuid) REFERENCES player_data(uuid);");
-        Network.getInstance().globalSQL.update("ALTER TABLE online_users ADD FOREIGN KEY (uuid) REFERENCES player_data(uuid);");
-        Network.getInstance().globalSQL.update("ALTER TABLE join_events ADD FOREIGN KEY (uuid) REFERENCES player_data(uuid);");
-        Network.getInstance().globalSQL.update("ALTER TABLE moderation ADD FOREIGN KEY (uuid) REFERENCES player_data(uuid);");
-        Network.getInstance().globalSQL.update("ALTER TABLE coins ADD FOREIGN KEY (uuid) REFERENCES player_data(uuid);");
-        Network.getInstance().globalSQL.update("ALTER TABLE discord ADD FOREIGN KEY (uuid) REFERENCES player_data(uuid);");
-        Network.getInstance().globalSQL.update("ALTER TABLE home ADD FOREIGN KEY (uuid) REFERENCES player_data(uuid);");
+        Network.getInstance().globalSQL.update("ALTER TABLE messages ADD fk_messages_1 FOREIGN KEY (recipient) REFERENCES player_data(uuid);");
+        Network.getInstance().globalSQL.update("ALTER TABLE join_events ADD fk_join_events_1 FOREIGN KEY (uuid) REFERENCES player_data(uuid);");
+        Network.getInstance().globalSQL.update("ALTER TABLE server_events ADD fk_server_events_1 FOREIGN KEY (uuid) REFERENCES player_data(uuid);");
+        Network.getInstance().globalSQL.update("ALTER TABLE statistics ADD fk_statistics_1 FOREIGN KEY (uuid) REFERENCES player_data(uuid);");
+        Network.getInstance().globalSQL.update("ALTER TABLE online_users ADD fk_online_users_1 FOREIGN KEY (uuid) REFERENCES player_data(uuid);");
+        Network.getInstance().globalSQL.update("ALTER TABLE server_switch ADD fk_server_switch_1 FOREIGN KEY (uuid) REFERENCES player_data(uuid);");
+        Network.getInstance().globalSQL.update("ALTER TABLE moderation ADD fk_moderation_1 FOREIGN KEY (uuid) REFERENCES player_data(uuid);");
+        Network.getInstance().globalSQL.update("ALTER TABLE coins ADD fk_coins_1 FOREIGN KEY (uuid) REFERENCES player_data(uuid);");
+        Network.getInstance().globalSQL.update("ALTER TABLE discord ADD fk_discord_1 FOREIGN KEY (uuid) REFERENCES player_data(uuid);");
+        Network.getInstance().globalSQL.update("ALTER TABLE home ADD fk_home_2 FOREIGN KEY (uuid) REFERENCES player_data(uuid);");
 
         //name to online_users (server), server_switch (from_server and to_server), coordinates (server)
         // since it references servers in the server_data table.
-        Network.getInstance().globalSQL.update("ALTER TABLE online_users ADD FOREIGN KEY (server) REFERENCES server_data(name);");
-        Network.getInstance().globalSQL.update("ALTER TABLE server_switch ADD FOREIGN KEY (from_server) REFERENCES server_data(name);");
-        Network.getInstance().globalSQL.update("ALTER TABLE server_switch ADD FOREIGN KEY (to_server) REFERENCES server_data(name);");
-        Network.getInstance().globalSQL.update("ALTER TABLE coordinates ADD FOREIGN KEY (server) REFERENCES server_data(name);");
+        Network.getInstance().globalSQL.update("ALTER TABLE online_users ADD fk_online_users_2 FOREIGN KEY (server) REFERENCES server_data(name);");
+        Network.getInstance().globalSQL.update("ALTER TABLE server_switch ADD fk_server_switch_2 FOREIGN KEY (from_server) REFERENCES server_data(name);");
+        Network.getInstance().globalSQL.update("ALTER TABLE server_switch ADD fk_server_switch_3 FOREIGN KEY (to_server) REFERENCES server_data(name);");
+        Network.getInstance().globalSQL.update("ALTER TABLE coordinates ADD fk_coordinates_1 FOREIGN KEY (server) REFERENCES server_data(name);");
 
 
     }

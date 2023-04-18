@@ -6,6 +6,7 @@ import me.bteuk.network.gui.navigation.AddLocation;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.AddLocationType;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -79,7 +80,7 @@ public class LocationNameListener implements Listener {
 
                 //Send message to player.
                 p.sendMessage(Utils.success("Set location name to ")
-                        .append(e.message()));
+                        .append(e.message().color(NamedTextColor.DARK_AQUA)));
 
                 //Unregister listener and task.
                 task.cancel();

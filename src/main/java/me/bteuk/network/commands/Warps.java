@@ -3,7 +3,10 @@ package me.bteuk.network.commands;
 import me.bteuk.network.Network;
 import me.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -68,11 +71,42 @@ public class Warps implements CommandExecutor {
         }
 
         //Show this page of warps.
-        Component message = Utils.line("Page ")
-                .append(Component.text(page, NamedTextColor.GRAY))
-                .append(Utils.line("/"))
-                .append(Component.text(pages, NamedTextColor.GRAY))
-                .append(Utils.line(":\n"));
+        Component message = Component.text("Page ", NamedTextColor.GREEN)
+                .append(Component.text(page, TextColor.color(245, 221, 100)))
+                .append(Component.text("/", NamedTextColor.GREEN))
+                .append(Component.text(pages, TextColor.color(245, 221, 100)));
+
+        //If this isn't the first page show command for previous page.
+        if (page > 1) {
+
+            //Create previousPage button with hover and click event.
+            Component previousPage = Component.text("⏪⏪⏪", TextColor.color(212, 113, 15));
+            previousPage = previousPage.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Utils.line("Click to view the previous page of warps.")));
+            previousPage = previousPage.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/warps " + (page - 1 )));
+            previousPage = previousPage.append(Component.text(" "));
+
+            //Add previousPage button at the start of the first line.
+            message = previousPage.append(message);
+
+        }
+
+        //If this isn't the last page show command for the next page.
+        if ((page * 16) < locations.size()) {
+
+            //Create previousPage button with hover and click event.
+            Component nextPage = Component.text("⏩⏩⏩\n", TextColor.color(212, 113, 15));
+            nextPage = nextPage.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Utils.line("Click to view the next page of warps.")));
+            nextPage = nextPage.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/warps " + (page + 1 )));
+
+            //Add previousPage button at the start of the first line.
+            message = message.append(Component.text(" "));
+            message = message.append(nextPage);
+
+        } else {
+
+            message = message.append(Component.text("\n"));
+
+        }
 
         //Number of entries to skip.
         int skip = (page - 1) * 16;
@@ -87,34 +121,28 @@ public class Warps implements CommandExecutor {
             //This is calculated by it either being the 16th entry, or the last in the list.
             if (((locations.indexOf(location) + 1) % 16) == 0 || (locations.indexOf(location) + 1 == locations.size())) {
 
-                message = message.append(Component.text(location, NamedTextColor.GRAY));
+                message = message.append(createWarp(location));
                 break;
 
             } else {
 
-                message = message.append(Component.text(location, NamedTextColor.GRAY).append(Utils.line(", ")));
+                message = message.append(createWarp(location)).append(Component.text(", ", NamedTextColor.WHITE));
 
             }
         }
 
         p.sendMessage(message);
 
-        //If this isn't the first page show command for previous page.
-        if (page > 1) {
-
-            p.sendMessage(Utils.line("To view the previous page type: ")
-                    .append(Component.text("/warps " + (page - 1), NamedTextColor.GRAY)));
-
-        }
-
-        //If this isn't the last page show command for the next page.
-        if ((page * 16) < locations.size()) {
-
-            p.sendMessage(Utils.line("To view the next page type: ")
-                    .append(Component.text("/warps " + (page + 1), NamedTextColor.GRAY)));
-
-        }
-
         return true;
+    }
+
+    private Component createWarp(String name) {
+
+        Component warp = Component.text(name, TextColor.color(245, 221, 100));
+        warp = warp.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text("Click to teleport to " + name)));
+        warp = warp.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/warp " + name));
+
+        return warp;
+
     }
 }
