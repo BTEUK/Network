@@ -35,7 +35,7 @@ public class NetworkConfig {
     }
 
     //Update config if the version is outdated.
-    public String updateConfig() {
+    public void updateConfig() {
 
         String version = configVersion();
 
@@ -54,7 +54,7 @@ public class NetworkConfig {
 
                 //Something went wrong.
                 LOGGER.warning("The old config file could not be deleted!");
-                return version;
+                return;
 
             }
 
@@ -85,53 +85,5 @@ public class NetworkConfig {
         } else {
             LOGGER.info("The config is up to date!");
         }
-
-        return version;
-    }
-
-    //Update database if the config was outdated, this implies the database is also outdated.
-    public void updateDatabase(String oldVersion) {
-
-        //Check for specific table columns that could be missing,
-        //All changes have to be tested from 1.0.0.
-        //We update 1 version at a time.
-
-        //Convert config version to integer, so we can easily use them.
-        int oldVersionInt = getVersionInt(oldVersion);
-
-        //Update sequentially.
-
-        //1.0.0 -> 1.1.0
-        if (oldVersionInt <= 1) {
-            update1_2();
-        }
-    }
-
-    private int getVersionInt(String version) {
-
-        switch(version) {
-
-            //1.1.0 = 2
-            case "1.1.0" -> {
-                return 2;
-            }
-
-            //Default is 1.0.0 = 1;
-            default -> {
-                return 1;
-            }
-
-        }
-
-    }
-
-    private void update1_2() {
-
-        LOGGER.info("Updating database from 1.0.0 to 1.1.0");
-
-        //Version 1.1.0.
-        //Add skin texture id column.
-        Network.getInstance().globalSQL.update("ALTER TABLE player_data ADD COLUMN player_skin TEXT NULL DEFAULT NULL;");
-
     }
 }

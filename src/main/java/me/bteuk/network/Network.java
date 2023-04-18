@@ -12,6 +12,7 @@ import me.bteuk.network.listeners.*;
 import me.bteuk.network.listeners.global_teleport.MoveListener;
 import me.bteuk.network.listeners.global_teleport.TeleportListener;
 import me.bteuk.network.lobby.Lobby;
+import me.bteuk.network.sql.DatabaseUpdates;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.sql.RegionSQL;
@@ -97,7 +98,7 @@ public final class Network extends JavaPlugin {
         //It will copy over any keys that remain the same.
         //This will also set the status variable to access the config project-wide.
         NetworkConfig networkConfig = new NetworkConfig();
-        String oldVersion = networkConfig.updateConfig();
+        networkConfig.updateConfig();
 
         if (!CONFIG.getBoolean("enabled")) {
 
@@ -136,7 +137,7 @@ public final class Network extends JavaPlugin {
         }
 
         //Update database.
-        networkConfig.updateDatabase(oldVersion);
+        new DatabaseUpdates().updateDatabase();
 
         if (!globalSQL.hasRow("SELECT name FROM server_data WHERE name='" + SERVER_NAME + "';")) {
 
