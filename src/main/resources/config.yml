@@ -81,13 +81,6 @@ region_inactivity: 30
 #These are only necessary for UKnet1.0 to UKnet2.0 conversions.
 database_uknet: minecraft_uknet
 
-#Modpack links
-modpack:
-  windows: 'https://s3.buildtheearth.net/public/installer/latest/BTEInstaller-windows.zip'
-  mac: 'https://s3.buildtheearth.net/public/installer/latest/BTEInstaller-mac.dmg'
-  linux: 'https://s3.buildtheearth.net/public/installer/latest/BTEInstaller-linux.AppImage'
-  universal: 'https://s3.buildtheearth.net/public/installer/latest/BTEInstaller-universal.jar'
-
 #Discord link
 discord: 'https://discord.gg/5m56EgEVW6'
 
@@ -98,3 +91,6 @@ role_id:
   jrbuilder:
   apprentice:
   applicant:
+
+#Test value to check if update works.
+test: "new"

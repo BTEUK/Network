@@ -97,7 +97,7 @@ public final class Network extends JavaPlugin {
         //It will copy over any keys that remain the same.
         //This will also set the status variable to access the config project-wide.
         NetworkConfig networkConfig = new NetworkConfig();
-        networkConfig.updateConfig();
+        String oldVersion = networkConfig.updateConfig();
 
         if (!CONFIG.getBoolean("enabled")) {
 
@@ -134,6 +134,9 @@ public final class Network extends JavaPlugin {
             getLogger().severe("Failed to connect to the database, please check that you have set the config values correctly.");
             return;
         }
+
+        //Update database.
+        networkConfig.updateDatabase(oldVersion);
 
         if (!globalSQL.hasRow("SELECT name FROM server_data WHERE name='" + SERVER_NAME + "';")) {
 
