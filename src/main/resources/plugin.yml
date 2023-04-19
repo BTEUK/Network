@@ -102,3 +102,7 @@ commands:
   server:
     usage: /<command>
     description: Switch server by command.
+  gamemode:
+    aliases: [gm]
+    usage: /<command>
+    description: Switch gamemode.
