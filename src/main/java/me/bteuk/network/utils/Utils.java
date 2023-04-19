@@ -141,42 +141,43 @@ public class Utils {
 
     public static void giveItem(Player p, ItemStack item, String name) {
 
-        int emptySlot = getEmptyHotbarSlot(p);
-        int fallbackSlot;
-        boolean containsItem = p.getInventory().containsAtLeast(item, 1);
-
         ItemStack currentItem = p.getInventory().getItemInMainHand();
 
-        //If held item equals navigator in slot 8, then set fallback slot to slot 7.
-        if (p.getInventory().getHeldItemSlot() == 8 && currentItem.equals(Network.getInstance().navigator)) {
-            fallbackSlot = 7;
-        } else {
-            fallbackSlot = p.getInventory().getHeldItemSlot();
-        }
+        int emptySlot = getEmptyHotbarSlot(p);
 
-        //Check if hotbar has an empty slot.
-        if (emptySlot == -1) {
+        boolean hasNavigator = (p.getInventory().getHeldItemSlot() == 8 && currentItem.equals(Network.getInstance().navigator));
+        boolean hasItemAlready = p.getInventory().containsAtLeast(item, 1);
 
-            //Clear previous slot.
-            if (containsItem) {
-                p.getInventory().clear(p.getInventory().first(item));
+        //If we already have the item switch to current slot.
+        if (hasItemAlready) {
+
+            //Switch item to current slot.
+            int slot = p.getInventory().first(item);
+
+            if (hasNavigator) {
+
+                p.getInventory().setItem(slot, p.getInventory().getItem(7));
+                p.getInventory().setItem(7, item);
+                p.sendMessage(Utils.success("Set ").append(Component.text(name, NamedTextColor.DARK_AQUA).append(Utils.success(" to slot 8"))));
+
+            } else {
+
+                p.getInventory().setItem(slot, p.getInventory().getItemInMainHand());
+                p.getInventory().setItemInMainHand(item);
+                p.sendMessage(Utils.success("Set ").append(Component.text(name, NamedTextColor.DARK_AQUA).append(Utils.success(" to main hand."))));
+
             }
-
-            //Set item to fallback slot.
-            p.getInventory().setItem(emptySlot, item);
-            p.sendMessage(Utils.success("Set ").append(Component.text(name, NamedTextColor.DARK_AQUA).append(Utils.success(" to slot " + (fallbackSlot+1)))));
-
-
-        } else {
-
-            //Switch current item to previous slot.
-            if (containsItem) {
-                p.getInventory().setItem(p.getInventory().first(item), p.getInventory().getItem(fallbackSlot));
-            }
-
+        } else if (emptySlot >= 0) {
+            //The current slot is empty. This also implies no navigator, and thus the item does not yet exist in the inventory.
             //Set item to empty slot.
             p.getInventory().setItem(emptySlot, item);
-            p.sendMessage(Utils.success("Set ").append(Component.text(name, NamedTextColor.DARK_AQUA).append(Utils.success(" to slot " + (emptySlot+1)))));
+            p.sendMessage(Utils.success("Set ").append(Component.text(name, NamedTextColor.DARK_AQUA).append(Utils.success(" to slot " + (emptySlot + 1)))));
+
+        } else {
+
+            //Player has no empty slots and is holding the navigator, set to item to slot 7.
+            p.getInventory().setItem(7, item);
+            p.sendMessage(Utils.success("Set ").append(Component.text(name, NamedTextColor.DARK_AQUA).append(Utils.success(" to slot 8"))));
 
         }
     }
