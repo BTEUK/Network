@@ -2,6 +2,8 @@ package me.bteuk.network.listeners;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.utils.*;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -168,6 +170,9 @@ public class CommandPreProcess implements Listener {
                 //Log playercount in database
                 instance.globalSQL.update("INSERT INTO player_count(log_time,players) VALUES(" + Time.currentTime() + "," +
                         instance.globalSQL.getInt("SELECT count(uuid) FROM online_users;") + ");");
+
+                //Kick the player.
+                u.player.kick(Component.text("The server is restarting!", NamedTextColor.RED));
 
             }
 

@@ -106,3 +106,6 @@ commands:
     aliases: [gm]
     usage: /<command>
     description: Switch gamemode.
+  phead:
+    usage: /<command>
+    description: Get the player head of someone who has connected to the server.

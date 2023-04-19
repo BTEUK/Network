@@ -35,9 +35,6 @@ public class DebugStick implements CommandExecutor {
 
         }
 
-        //Get the player inventory and check whether they already have the selection tool.
-        PlayerInventory i = p.getInventory();
-
         //Get user.
         NetworkUser u = Network.getInstance().getUser(p);
 
@@ -48,29 +45,8 @@ public class DebugStick implements CommandExecutor {
             return true;
         }
 
-        //Check if the player already has the selection tool in their inventory.
-        if (i.containsAtLeast(new ItemStack(Material.DEBUG_STICK), 1)) {
-
-            //Get the selection tool from their inventory and swap it with the item in their hand.
-            i.setItem(i.first(new ItemStack(Material.DEBUG_STICK)), i.getItemInMainHand());
-            i.setItemInMainHand(new ItemStack(Material.DEBUG_STICK));
-
-            p.sendMessage(Utils.success("Switched to debug stick from inventory."));
-
-        } else if (u.navigator && i.getHeldItemSlot() == 8) {
-
-            i.setItem(7, new ItemStack(Material.DEBUG_STICK));
-
-            u.player.sendMessage(Utils.success("Set debug stick to slot 8."));
-
-        } else {
-
-            //If they don't have the selection tool already set it in their main hand.
-            i.setItemInMainHand(new ItemStack(Material.DEBUG_STICK));
-
-            p.sendMessage(Utils.success("Set debug stick to main hand."));
-
-        }
+        //Add debug stick to inventory.
+        Utils.giveItem(p, new ItemStack(Material.DEBUG_STICK), "Debug Stick");
 
         return true;
     }

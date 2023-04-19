@@ -71,10 +71,7 @@ public class Warps implements CommandExecutor {
         }
 
         //Show this page of warps.
-        Component message = Component.text("Page ", NamedTextColor.GREEN)
-                .append(Component.text(page, TextColor.color(245, 221, 100)))
-                .append(Component.text("/", NamedTextColor.GREEN))
-                .append(Component.text(pages, TextColor.color(245, 221, 100)));
+        Component message = Component.text("");
 
         //If this isn't the first page show command for previous page.
         if (page > 1) {
@@ -83,12 +80,17 @@ public class Warps implements CommandExecutor {
             Component previousPage = Component.text("⏪⏪⏪", TextColor.color(212, 113, 15));
             previousPage = previousPage.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Utils.line("Click to view the previous page of warps.")));
             previousPage = previousPage.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/warps " + (page - 1 )));
-            previousPage = previousPage.append(Component.text(" "));
 
             //Add previousPage button at the start of the first line.
-            message = previousPage.append(message);
+            message = message.append(previousPage);
+            message = message.append(Component.text(" "));
 
         }
+
+        message = message.append(Component.text("Page ", NamedTextColor.GREEN)
+                .append(Component.text(page, TextColor.color(245, 221, 100)))
+                .append(Component.text("/", NamedTextColor.GREEN))
+                .append(Component.text(pages, TextColor.color(245, 221, 100))));
 
         //If this isn't the last page show command for the next page.
         if ((page * 16) < locations.size()) {

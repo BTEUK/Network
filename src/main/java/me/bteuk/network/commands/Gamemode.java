@@ -2,6 +2,7 @@ package me.bteuk.network.commands;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.enums.ServerType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -18,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 import static me.bteuk.network.utils.Constants.LOGGER;
+import static me.bteuk.network.utils.Constants.SERVER_TYPE;
 
 public class Gamemode implements CommandExecutor, TabCompleter {
 
@@ -27,7 +29,7 @@ public class Gamemode implements CommandExecutor, TabCompleter {
     //Constructor to enable the command.
     public Gamemode(Network instance) {
 
-        gamemodes = new ArrayList<>(Arrays.asList("creative", "spectactor", "adverture", "survival"));
+        gamemodes = new ArrayList<>(Arrays.asList("creative", "spectator", "adventure", "survival"));
 
         //Register command.
         PluginCommand command = instance.getCommand("gamemode");
@@ -56,6 +58,13 @@ public class Gamemode implements CommandExecutor, TabCompleter {
 
         }
 
+        //Check allowed server type.
+        if (SERVER_TYPE != ServerType.PLOT && SERVER_TYPE != ServerType.EARTH) {
+
+            p.sendMessage(Utils.error("You do not have permission to use this command here."));
+
+        }
+
         //Check if the player has permission.
         if (!p.hasPermission("uknet.gamemode")) {
 
@@ -77,11 +86,11 @@ public class Gamemode implements CommandExecutor, TabCompleter {
                 //If the player is in the gamemode, highlight it.
                 if (p.getGameMode() == GameMode.valueOf(gamemodes.get(i).toUpperCase(Locale.ROOT))) {
                     gamemode = Component.text(StringUtils.capitalize(gamemodes.get(i)), TextColor.color(245, 173, 100));
-                    gamemode = gamemode.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/gamemode " + gamemodes.get(i)));
-                    gamemode = gamemode.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Utils.line("Click to switch to " + gamemodes.get(i))));
+                    gamemode = gamemode.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Utils.line("You are already in this gamemode.")));
                 } else {
                     gamemode = Component.text(StringUtils.capitalize(gamemodes.get(i)), TextColor.color(245, 221, 100));
-                    gamemode = gamemode.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Utils.line("You are already in this gamemode.")));
+                    gamemode = gamemode.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/gamemode " + gamemodes.get(i)));
+                    gamemode = gamemode.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Utils.line("Click to switch to " + StringUtils.capitalize(gamemodes.get(i)))));
                 }
 
                 message = message.append(gamemode);
@@ -110,6 +119,7 @@ public class Gamemode implements CommandExecutor, TabCompleter {
 
             //Set the player to this gamemode.
             p.setGameMode(GameMode.valueOf(args[0].toUpperCase(Locale.ROOT)));
+            p.sendMessage(Utils.success("Set gamemode to ").append(Component.text(StringUtils.capitalize(args[0].toLowerCase(Locale.ROOT)), NamedTextColor.DARK_AQUA)));
 
         }
 

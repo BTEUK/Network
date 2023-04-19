@@ -1,5 +1,6 @@
 package me.bteuk.network.utils;
 
+import me.bteuk.network.Network;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -128,5 +129,81 @@ public class Utils {
             }
         }
         return Integer.MIN_VALUE;
+    }
+
+    //Gives a player an item, it will be set in their main hand, if it does not already exist there.
+
+    //If the main hand is empty, set it there.
+    //If then main hand is slot 8 and includes the navigator, find the first empty slot available and set it there.
+    //If no empty slots are available set it to slot 7.
+    //If the main hand has an item swap the current item to an empty slot in the inventory.
+    //If no empty slots are available overwrite it.
+
+    public static void giveItem(Player p, ItemStack item, String name) {
+
+        int emptySlot = getEmptyHotbarSlot(p);
+        int fallbackSlot;
+        boolean containsItem = p.getInventory().containsAtLeast(item, 1);
+
+        ItemStack currentItem = p.getInventory().getItemInMainHand();
+
+        //If held item equals navigator in slot 8, then set fallback slot to slot 7.
+        if (p.getInventory().getHeldItemSlot() == 8 && currentItem.equals(Network.getInstance().navigator)) {
+            fallbackSlot = 7;
+        } else {
+            fallbackSlot = p.getInventory().getHeldItemSlot();
+        }
+
+        //Check if hotbar has an empty slot.
+        if (emptySlot == -1) {
+
+            //Clear previous slot.
+            if (containsItem) {
+                p.getInventory().clear(p.getInventory().first(item));
+            }
+
+            //Set item to fallback slot.
+            p.getInventory().setItem(emptySlot, item);
+            p.sendMessage(Utils.success("Set ").append(Component.text(name, NamedTextColor.DARK_AQUA).append(Utils.success(" to slot " + (fallbackSlot+1)))));
+
+
+        } else {
+
+            //Switch current item to previous slot.
+            if (containsItem) {
+                p.getInventory().setItem(p.getInventory().first(item), p.getInventory().getItem(fallbackSlot));
+            }
+
+            //Set item to empty slot.
+            p.getInventory().setItem(emptySlot, item);
+            p.sendMessage(Utils.success("Set ").append(Component.text(name, NamedTextColor.DARK_AQUA).append(Utils.success(" to slot " + (emptySlot+1)))));
+
+        }
+    }
+
+    //Return an empty hotbar slot, if no empty slot exists return -1.
+    public static int getEmptyHotbarSlot(Player p) {
+
+        //If main hand is empty return that slot.
+        ItemStack heldItem = p.getInventory().getItemInMainHand();
+        if (heldItem.getType() == Material.AIR) {
+            return p.getInventory().getHeldItemSlot();
+        }
+
+        //Check if hotbar has an empty slot.
+        for (int i = 0; i < 9; i++) {
+
+            ItemStack item = p.getInventory().getItem(i);
+
+            if (item == null) {
+                return i;
+            }
+            if (item.getType() == Material.AIR) {
+                return i;
+            }
+        }
+
+        //No slot could be found, return -1.
+        return -1;
     }
 }
