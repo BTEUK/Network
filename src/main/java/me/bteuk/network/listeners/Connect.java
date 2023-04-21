@@ -3,15 +3,18 @@ package me.bteuk.network.listeners;
 import me.bteuk.network.Network;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
+import me.bteuk.network.utils.Roles;
 import me.bteuk.network.utils.TextureUtils;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
+import static me.bteuk.network.utils.Constants.SERVER_NAME;
 import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
 //This class deals with players joining and leaving the network.
@@ -80,6 +83,11 @@ public class Connect {
 
         }
 
+        //Add user to table.
+        globalSQL.update("INSERT INTO online_users(uuid,join_time,last_ping,server,primary_role,display_name) VALUES('" + p.getUniqueId() +
+                "'," + Time.currentTime() + "," + Time.currentTime() + ",'" + SERVER_NAME + "','" + Roles.getPrimaryRole(p) + "','" +
+                PlaceholderAPI.setPlaceholders(p, "%luckperms_prefix%") + " " + p.getName() + "');");
+
         if (p.hasPermission("group.reviewer")) {
             //Show the number of submitted plots.
             int plots = instance.plotSQL.getInt("SELECT COUNT(id) FROM plot_data WHERE status='submitted';");
@@ -93,7 +101,7 @@ public class Connect {
             }
 
             //Show the number of submitted regions requests.
-            int regions = instance.regionSQL.getInt("SELECT COUNT(id) FROM region_requests WHERE staff_accept=0;");
+            int regions = instance.regionSQL.getInt("SELECT COUNT(region) FROM region_requests WHERE staff_accept=0;");
 
             if (regions != 0) {
                 if (regions == 1) {
@@ -104,7 +112,7 @@ public class Connect {
             }
 
             //Show the number of submitted navigation requests;
-            int navigation = instance.regionSQL.getInt("SELECT COUNT(id) FROM location_requests;");
+            int navigation = instance.globalSQL.getInt("SELECT COUNT(location) FROM location_requests;");
 
             if (navigation != 0) {
                 if (navigation == 1) {

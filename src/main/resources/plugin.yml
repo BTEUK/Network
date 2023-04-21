@@ -109,3 +109,6 @@ commands:
   phead:
     usage: /<command>
     description: Get the player head of someone who has connected to the server.
+  homes:
+    usage: /<command>
+    description: Like warps, but for homes, shows all homes the player has set.
