@@ -54,12 +54,12 @@ public class JoinServer implements Listener {
 
         } else {
 
-            //Add user to table and run network connect.
-            globalSQL.update("INSERT INTO online_users(uuid,join_time,last_ping,server,primary_role,display_name) VALUES('" + e.getPlayer().getUniqueId() +
-                    "'," + Time.currentTime() + "," + Time.currentTime() + ",'" + SERVER_NAME + "','" + Roles.getPrimaryRole(e.getPlayer()) + "','" +
-                    PlaceholderAPI.setPlaceholders(e.getPlayer(), "%luckperms_prefix%") + " " + e.getPlayer().getName() + "');");
             connect.joinEvent(e.getPlayer());
         }
+
+        //Add user to the list.
+        NetworkUser u = new NetworkUser(e.getPlayer());
+        instance.addUser(u);
 
         //If this is the first player on the server, add all players from other servers to tab.
         if (instance.getServer().getOnlinePlayers().size() == 1) {
@@ -77,10 +77,6 @@ public class JoinServer implements Listener {
 
         //Load tab for the player, this will add the fake players.
         Bukkit.getScheduler().runTask(instance, () -> instance.tab.loadTab(e.getPlayer()));
-
-        //Add user to the list.
-        NetworkUser u = new NetworkUser(e.getPlayer());
-        instance.addUser(u);
 
         //Check if the player has any join events, if try run them.
         //Delay by 1 second for all plugins to run their join events.

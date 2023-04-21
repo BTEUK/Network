@@ -149,10 +149,10 @@ public class Timers {
 
                 } else {
 
-                    //Update display name and last ping
+                    //Update display name, primary role and last ping
                     globalSQL.update("UPDATE online_users SET last_ping=" + time + ",display_name='" +
                             PlaceholderAPI.setPlaceholders(user.player, "%luckperms_prefix%") + " " + user.player.getName() +
-                            "' WHERE uuid='" + user.player.getUniqueId() + "' AND server='" + SERVER_NAME + "';");
+                            "',primary_role='" + Roles.getPrimaryRole(user.player) + "' WHERE uuid='" + user.player.getUniqueId() + "' AND server='" + SERVER_NAME + "';");
 
                     //Update tab for all players to update display name.
                     //This is done with the tab chat channel.

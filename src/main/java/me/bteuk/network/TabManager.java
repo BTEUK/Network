@@ -8,6 +8,7 @@ import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.PlayerInfoData;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.comphenix.protocol.wrappers.WrappedGameProfile;
+import me.bteuk.network.utils.Roles;
 import me.bteuk.network.utils.Utils;
 import org.bukkit.entity.Player;
 
@@ -102,13 +103,34 @@ public class TabManager {
             case "remove" -> //Remove the fake player from tab, if the player isn't in the fake player list it won't do anything.
                     removeFakePlayer(info[1]);
 
-            //TODO UPDATE
+            case "update" -> //Update the player info in tab, this can be for fake or real players. Usually this would imply a change in prefix.
+                    updatePlayer(info[1]);
 
         }
 
     }
 
-    public void updateDisplayName() {
+    public void updatePlayer(String uuid) {
+
+        //First remove the player from tab and then readd them again.
+        //This allows the packet to be intercepted and the new displayname to be added.
+
+        //Get name from database
+        String name = instance.globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
+
+        WrappedGameProfile profile = new WrappedGameProfile(UUID.fromString(uuid), name);
+
+        PlayerInfoData playerInfoData = new PlayerInfoData(profile, 0, EnumWrappers.NativeGameMode.CREATIVE, null);
+
+        PacketContainer packetOut = pm.createPacket(PacketType.Play.Server.PLAYER_INFO);
+        packetOut.getPlayerInfoAction().write(0, EnumWrappers.PlayerInfoAction.REMOVE_PLAYER);
+        packetOut.getPlayerInfoDataLists().write(0, Collections.singletonList(playerInfoData));
+        pm.broadcastServerPacket(packetOut);
+
+        PacketContainer packetIn = pm.createPacket(PacketType.Play.Server.PLAYER_INFO);
+        packetIn.getPlayerInfoAction().write(0, EnumWrappers.PlayerInfoAction.ADD_PLAYER);
+        packetIn.getPlayerInfoDataLists().write(0, Collections.singletonList(playerInfoData));
+        pm.broadcastServerPacket(packetIn);
 
     }
 
@@ -154,9 +176,13 @@ public class TabManager {
                     PlayerInfoData info = infoList.get(0);
 
                     String displayName = instance.globalSQL.getString("SELECT display_name FROM online_users WHERE uuid='" + info.getProfile().getUUID() + "';");
+                    String name = instance.globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + info.getProfile().getUUID() + "';");
+
+                    //Add prefix char to the name so it gets sorted by role first.
+                    name = Roles.tabSorting(instance.globalSQL.getString("SELECT primary_role FROM online_users WHERE uuid='" + info.getProfile().getUUID() + "';")) + name;
 
                     infoList.clear();
-                    infoList.add(new PlayerInfoData(info.getProfile(), 0, EnumWrappers.NativeGameMode.CREATIVE, WrappedChatComponent.fromJson(Utils.tabName(displayName))));
+                    infoList.add(new PlayerInfoData(new WrappedGameProfile(info.getProfile().getUUID(), name), 0, EnumWrappers.NativeGameMode.CREATIVE, WrappedChatComponent.fromJson(Utils.tabName(displayName))));
 
                     packet.getPlayerInfoDataLists().write(0, infoList);
 

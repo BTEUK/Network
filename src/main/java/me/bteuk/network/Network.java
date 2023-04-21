@@ -278,10 +278,6 @@ public final class Network extends JavaPlugin {
 
         getCommand("afk").setExecutor(new AFK());
 
-        getCommand("sethome").setExecutor(new Sethome(globalSQL));
-        getCommand("home").setExecutor(new Home(globalSQL));
-        getCommand("delhome").setExecutor(new Delhome(globalSQL));
-
         getCommand("clear").setExecutor(new Clear());
         getCommand("debugstick").setExecutor(new DebugStick());
 
@@ -292,6 +288,12 @@ public final class Network extends JavaPlugin {
 
         //Phead command.
         new Phead(this);
+
+        //Homes commands.
+        new Sethome(this, globalSQL);
+        new Home(this, globalSQL);
+        new Delhome(this, globalSQL);
+        new Homes(this);
 
         //Register commandpreprocess to make sure /network:region runs and not that of another plugin.
         new CommandPreProcess(this);

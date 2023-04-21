@@ -9,17 +9,34 @@ import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
+import static me.bteuk.network.utils.Constants.LOGGER;
+
 public class Sethome implements CommandExecutor {
 
     private final GlobalSQL globalSQL;
 
-    public Sethome(GlobalSQL globalSQL) {
+    //Constructor to enable the command.
+    public Sethome(Network instance, GlobalSQL globalSQL) {
+
         this.globalSQL = globalSQL;
+
+        //Register command.
+        PluginCommand command = instance.getCommand("sethome");
+
+        if (command == null) {
+            LOGGER.warning("Sethome command not added to plugin.yml, it will therefore not be enabled.");
+            return;
+        }
+
+        //Set executor.
+        command.setExecutor(this);
+
     }
 
     @Override

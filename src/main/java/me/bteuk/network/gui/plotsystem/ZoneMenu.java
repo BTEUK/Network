@@ -88,6 +88,9 @@ public class ZoneMenu extends Gui {
                                             plotSQL.getString("SELECT location FROM zones WHERE id=" + zones.get(finalI) + ";") + "';"),
                                     "join zone " + zones.get(finalI));
 
+                            //Close inventory to prevent double clicking.
+                            u.player.closeInventory();
+
 
                         });
 

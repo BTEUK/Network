@@ -278,11 +278,11 @@ public class CustomChat implements Listener, PluginMessageListener {
     //Send afk or no longer afk message to players ingame and discord.
     public void broadcastAFK(Player p, boolean afk) {
         if (afk) {
-            broadcastMessage(Component.text(p.getName() + " is now afk.", NamedTextColor.GRAY), "uknet:globalchat");
-            broadcastMessage(Component.text("*" + p.getName() + " is now afk.*"), "uknet:discord");
+            broadcastMessage(Component.text(p.getName() + " is now afk", NamedTextColor.GRAY), "uknet:globalchat");
+            broadcastMessage(Component.text("*" + p.getName() + " is now afk*"), "uknet:discord");
         } else {
-            broadcastMessage(Component.text(p.getName() + " is no longer afk.", NamedTextColor.GRAY), "uknet:globalchat");
-            broadcastMessage(Component.text("*" + p.getName() + " is no longer afk.*"), "uknet:discord");
+            broadcastMessage(Component.text(p.getName() + " is no longer afk", NamedTextColor.GRAY), "uknet:globalchat");
+            broadcastMessage(Component.text("*" + p.getName() + " is no longer afk*"), "uknet:discord");
         }
     }
 }
