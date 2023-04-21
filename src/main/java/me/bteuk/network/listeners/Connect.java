@@ -81,6 +81,7 @@ public class Connect {
         }
 
         if (p.hasPermission("group.reviewer")) {
+            //Show the number of submitted plots.
             int plots = instance.plotSQL.getInt("SELECT COUNT(id) FROM plot_data WHERE status='submitted';");
 
             if (plots != 0) {
@@ -88,6 +89,28 @@ public class Connect {
                     p.sendMessage(Utils.success("There is &31 &aplot available for review."));
                 } else {
                     p.sendMessage(Utils.success("There are &3" + plots + " &aplots available for review."));
+                }
+            }
+
+            //Show the number of submitted regions requests.
+            int regions = instance.regionSQL.getInt("SELECT COUNT(id) FROM region_requests WHERE staff_accept=0;");
+
+            if (regions != 0) {
+                if (regions == 1) {
+                    p.sendMessage(Utils.success("There is &31 &aregion request to review."));
+                } else {
+                    p.sendMessage(Utils.success("There are &3" + regions + " &aregion requests to review."));
+                }
+            }
+
+            //Show the number of submitted navigation requests;
+            int navigation = instance.regionSQL.getInt("SELECT COUNT(id) FROM location_requests;");
+
+            if (navigation != 0) {
+                if (navigation == 1) {
+                    p.sendMessage(Utils.success("There is &31 &anavigation request to review."));
+                } else {
+                    p.sendMessage(Utils.success("There are &3" + navigation + " &anavigation requests to review."));
                 }
             }
         }
