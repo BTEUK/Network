@@ -44,7 +44,14 @@ public class BuildGui extends Gui {
         //Teleport to random unclaimed plot.
         setItem(20, Utils.createItem(Material.ENDER_PEARL, 1,
                         Utils.title("Random Plot"),
-                        Utils.line("Click teleport to a random claimable plot.")),
+                        Utils.line("Click teleport to a random claimable plot."),
+                        Utils.line("Available plots of each difficulty:"),
+                        Utils.line("Easy: ")
+                                .append(Component.text(Network.getInstance().plotSQL.getInt("SELECT count(id) FROM plot_data WHERE status='unclaimed' AND difficulty=1;"), NamedTextColor.GRAY)),
+                        Utils.line("Medium: ")
+                                .append(Component.text(Network.getInstance().plotSQL.getInt("SELECT count(id) FROM plot_data WHERE status='unclaimed' AND difficulty=2;"), NamedTextColor.GRAY)),
+                        Utils.line("Hard: ")
+                                .append(Component.text(Network.getInstance().plotSQL.getInt("SELECT count(id) FROM plot_data WHERE status='unclaimed' AND difficulty=3;"), NamedTextColor.GRAY))),
                 u -> {
 
                     int id;
