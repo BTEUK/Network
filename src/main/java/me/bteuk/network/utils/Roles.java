@@ -70,21 +70,33 @@ public final class Roles {
     }
 
     public static char tabSorting(String role) {
-        return switch (role) {
-            case "Admin" -> 'a';
-            case "Mod" -> 'b';
-            case "Support" -> 'c';
-            case "Dev" -> 'd';
-            case "Events" -> 'e';
-            case "PR" -> 'f';
-            case "Reviewer" -> 'g';
-            case "Architect" -> 'h';
-            case "Builder" -> 'i';
-            case "Jr.Builder" -> 'j';
-            case "Apprentice" -> 'k';
-            case "Applicant" -> 'l';
-            default -> 'm';
-        };
+        if (role.equals("Admin")) {
+            return 'a';
+        } else if (role.equals("Mod")) {
+            return 'b';
+        } else if (role.equals("Support")) {
+            return 'c';
+        } else if (role.equals("Dev")) {
+            return 'd';
+        } else if (role.equals("Events")) {
+            return 'e';
+        } else if (role.equals("PR")) {
+            return 'f';
+        } else if (role.equals("Reviewer")) {
+            return 'g';
+        } else if (role.equals("Architect")) {
+            return 'h';
+        } else if (role.equals("Builder")) {
+            return 'i';
+        } else if (role.equals("Jr.Builder")) {
+            return 'j';
+        } else if (role.equals("Apprentice")) {
+            return 'k';
+        } else if (role.equals("Applicant")) {
+            return 'l';
+        } else {
+            return 'm';
+        }
     }
 
     public static void promoteBuilder(String uuid, String pRole, String nRole) {
