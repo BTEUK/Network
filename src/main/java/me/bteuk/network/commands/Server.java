@@ -42,7 +42,7 @@ public class Server implements CommandExecutor {
         //If no args are given send a clickable list of servers.
         //Sort by online servers and highlight the player's current server.
         if (args.length == 0) {
-            ArrayList<String> servers = Network.getInstance().globalSQL.getStringList("SELECT name FROM server_data AND online=1 ORDER BY online DESC");
+            ArrayList<String> servers = Network.getInstance().globalSQL.getStringList("SELECT name FROM server_data ORDER BY online DESC");
 
             Component message = Component.text("Available servers: ", NamedTextColor.GREEN);
 

@@ -9,6 +9,7 @@ import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -94,9 +95,13 @@ public class Connect {
 
             if (plots != 0) {
                 if (plots == 1) {
-                    p.sendMessage(Utils.success("There is &31 &aplot available for review."));
+                    p.sendMessage(Utils.success("There is ")
+                            .append(Component.text(1, NamedTextColor.DARK_AQUA))
+                            .append(Utils.success(" plot available for review.")));
                 } else {
-                    p.sendMessage(Utils.success("There are &3" + plots + " &aplots available for review."));
+                    p.sendMessage(Utils.success("There are ")
+                            .append(Component.text(plots, NamedTextColor.DARK_AQUA))
+                            .append(Utils.success(" plot available for review.")));
                 }
             }
 
@@ -105,9 +110,13 @@ public class Connect {
 
             if (regions != 0) {
                 if (regions == 1) {
-                    p.sendMessage(Utils.success("There is &31 &aregion request to review."));
+                    p.sendMessage(Utils.success("There is ")
+                            .append(Component.text(1, NamedTextColor.DARK_AQUA))
+                            .append(Utils.success(" region request to review.")));
                 } else {
-                    p.sendMessage(Utils.success("There are &3" + regions + " &aregion requests to review."));
+                    p.sendMessage(Utils.success("There are ")
+                            .append(Component.text(regions, NamedTextColor.DARK_AQUA))
+                            .append(Utils.success(" region requests to review.")));
                 }
             }
 
@@ -116,9 +125,13 @@ public class Connect {
 
             if (navigation != 0) {
                 if (navigation == 1) {
-                    p.sendMessage(Utils.success("There is &31 &anavigation request to review."));
+                    p.sendMessage(Utils.success("There is ")
+                            .append(Component.text(1, NamedTextColor.DARK_AQUA))
+                            .append(Utils.success(" navigation request to review.")));
                 } else {
-                    p.sendMessage(Utils.success("There are &3" + navigation + " &anavigation requests to review."));
+                    p.sendMessage(Utils.success("There are ")
+                            .append(Component.text(navigation, NamedTextColor.DARK_AQUA))
+                            .append(Utils.success(" navigation requests to review.")));
                 }
             }
         }
