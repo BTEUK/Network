@@ -61,7 +61,7 @@ public class RegionTagListener implements Listener {
                 p.sendMessage(Utils.success("Set tag for region ")
                         .append(Component.text(region.regionName(), NamedTextColor.DARK_AQUA))
                         .append(Utils.success(" to "))
-                        .append(e.message()));
+                        .append(e.message().color(NamedTextColor.DARK_AQUA)));
 
                 //Unregister listener and task.
                 task.cancel();

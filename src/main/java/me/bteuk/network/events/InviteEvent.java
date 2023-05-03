@@ -7,6 +7,7 @@ import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.regions.Region;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -30,8 +31,11 @@ public class InviteEvent {
 
                     int id = Integer.parseInt(event[2]);
 
-                    p.sendMessage(Utils.success("You have been invited to plot &3" + event[2] + " &aby &3" +
-                            globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + plotSQL.getString("SELECT owner FROM plot_invites WHERE id=" + id + ";") + "';")));
+                    p.sendMessage(Utils.success("You have been invited to plot ")
+                            .append(Component.text(event[2], NamedTextColor.DARK_AQUA))
+                            .append(Utils.success(" by "))
+                            .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
+                                    plotSQL.getString("SELECT owner FROM plot_invites WHERE id=" + id + ";") + "';"), NamedTextColor.DARK_AQUA)));
 
                     Component message = Utils.success("To join the plot click here!");
                     message = message.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/plot join " + event[2]));
@@ -52,9 +56,11 @@ public class InviteEvent {
 
                     int id = Integer.parseInt(event[2]);
 
-                    p.sendMessage(Utils.success("You have been invited to zone &3" + event[2] + " &aby &3" +
-                            globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + plotSQL.getString("SELECT owner FROM zone_invites WHERE id=" + id + ";") + "';")));
-
+                    p.sendMessage(Utils.success("You have been invited to zpone ")
+                            .append(Component.text(event[2], NamedTextColor.DARK_AQUA))
+                            .append(Utils.success(" by "))
+                            .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
+                                    plotSQL.getString("SELECT owner FROM zone_invites WHERE id=" + id + ";") + "';"), NamedTextColor.DARK_AQUA)));
 
                     Component message = Utils.success("To join the zone click here!");
                     message = message.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/zone join " + event[2]));
@@ -73,8 +79,11 @@ public class InviteEvent {
                     GlobalSQL globalSQL = Network.getInstance().globalSQL;
                     Region region = Network.getInstance().getRegionManager().getRegion(event[2]);
 
-                    p.sendMessage(Utils.success("You have been invited to region &3" + event[2] + " &aby &3" +
-                            globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + region.getOwner() + "';")));
+                    p.sendMessage(Utils.success("You have been invited to region ")
+                            .append(Component.text(event[2], NamedTextColor.DARK_AQUA))
+                            .append(Utils.success(" by "))
+                            .append(Component.text(
+                                    globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + region.getOwner() + "';"), NamedTextColor.DARK_AQUA)));
 
                     Component message = Utils.success("To join the region click here!");
                     message = message.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/region join " + event[2]));

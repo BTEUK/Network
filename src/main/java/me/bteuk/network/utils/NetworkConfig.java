@@ -32,7 +32,7 @@ public class NetworkConfig {
     private String latestVersion() {
         String version = Objects.requireNonNull(CONFIG.getDefaults()).getString("version");
         //If null return default.
-        return Objects.requireNonNullElse(version, "1.1.0");
+        return Objects.requireNonNullElse(version, "1.1.1");
     }
 
     //Update config if the version is outdated.
@@ -67,6 +67,12 @@ public class NetworkConfig {
             for (Map.Entry<String, Object> value : values.entrySet()) {
 
                 if (CONFIG.contains(value.getKey())) {
+
+                    //Check if this is a configuration section, if true skip.
+                    if (CONFIG.isConfigurationSection(value.getKey())) {
+                        continue;
+                    }
+
                     //Skip the version since that needs to be the latest value.
                     if (value.getKey().equals("version")) {
                         continue;
@@ -77,7 +83,6 @@ public class NetworkConfig {
             }
 
             Network.getInstance().saveConfig();
-            Network.getInstance().reloadConfig();
 
             CONFIG = Network.getInstance().getConfig();
 

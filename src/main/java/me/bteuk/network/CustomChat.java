@@ -176,7 +176,8 @@ public class CustomChat implements Listener, PluginMessageListener {
             case "uknet:discord":
 
                 //This is for account linking.
-                String[] args = sMessage.split(" ");
+                String plainMessage = PlainTextComponentSerializer.plainText().serialize(component);
+                String[] args = plainMessage.split(" ");
 
                 if (args[0].equalsIgnoreCase("link")) {
 

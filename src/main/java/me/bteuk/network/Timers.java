@@ -83,6 +83,7 @@ public class Timers {
 
         //Get roles from config.
         roles = new HashMap<>();
+        roles.put("reviewer", CONFIG.getLong("role_id.reviewer"));
         roles.put("architect", CONFIG.getLong("role_id.architect"));
         roles.put("builder", CONFIG.getLong("role_id.builder"));
         roles.put("jrbuilder", CONFIG.getLong("role_id.jrbuilder"));

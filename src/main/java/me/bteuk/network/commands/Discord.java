@@ -61,7 +61,7 @@ public class Discord implements CommandExecutor {
 
                     user.player.sendMessage(Utils.success("To link your Discord please DM the code ")
                             .append(Component.text(token, NamedTextColor.DARK_AQUA))
-                            .append(Utils.success(" &ato the UK Bot within the next 5 minutes.")));
+                            .append(Utils.success(" to the UK Bot within the next 5 minutes.")));
                     return true;
 
                 } else if (args[0].equalsIgnoreCase("unlink")) {

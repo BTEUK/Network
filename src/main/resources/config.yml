@@ -1,5 +1,5 @@
 # Config version, do not update this manually as it could break the config.
-version: 1.1.0
+version: 1.1.1
 
 #MySQL is mandatory for this plugin.
 #Login information
@@ -86,8 +86,9 @@ discord: 'https://discord.gg/5m56EgEVW6'
 
 #Discord role ids
 role_id:
-  architect:
-  builder:
-  jrbuilder:
-  apprentice:
-  applicant:
+  reviewer: 815686457838272512
+  architect: 1050426152700878871
+  builder: 696773933256671373
+  jrbuilder: 837045714562973754
+  apprentice: 728017845652553799
+  applicant: 955520858577850458

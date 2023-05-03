@@ -62,6 +62,7 @@ public class Gamemode implements CommandExecutor, TabCompleter {
         if (SERVER_TYPE != ServerType.PLOT && SERVER_TYPE != ServerType.EARTH) {
 
             p.sendMessage(Utils.error("You do not have permission to use this command here."));
+            return true;
 
         }
 
