@@ -31,8 +31,8 @@ spawn:
 
 #Chat Socket
 socket:
-  IP:
-  port:
+  IP: localhost
+  port: 30589
 
 #Network messages
 #%player% is a placeholder for the player name.
