@@ -101,7 +101,7 @@ public class Connect {
                 } else {
                     p.sendMessage(Utils.success("There are ")
                             .append(Component.text(plots, NamedTextColor.DARK_AQUA))
-                            .append(Utils.success(" plot available for review.")));
+                            .append(Utils.success(" plots available for review.")));
                 }
             }
 

@@ -181,6 +181,10 @@ public class TabManager {
                     //Add prefix char to the name so it gets sorted by role first.
                     name = Roles.tabSorting(instance.globalSQL.getString("SELECT primary_role FROM online_users WHERE uuid='" + info.getProfile().getUUID() + "';")) + name;
 
+                    if (name.length() > 16) {
+                        name = name.substring(0, 16);
+                    }
+
                     infoList.clear();
                     infoList.add(new PlayerInfoData(new WrappedGameProfile(info.getProfile().getUUID(), name), 0, EnumWrappers.NativeGameMode.CREATIVE, WrappedChatComponent.fromJson(Utils.tabName(displayName))));
 
