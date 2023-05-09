@@ -86,6 +86,9 @@ public class TeleportListener implements Listener {
                             //Check if the player can enter the region.
                             if (region.inDatabase() || p.hasPermission("group.jrbuilder")) {
 
+                                //Add region to database if not exists.
+                                region.addToDatabase();
+
                                 //If the player is the region owner update last enter and tell set the message.
                                 if (region.isOwner(p.getUniqueId().toString())) {
 
@@ -151,9 +154,6 @@ public class TeleportListener implements Listener {
 
                                 }
 
-                                //Add region to database if not exists.
-                                region.addToDatabase();
-
                                 //Update the region the player is in.
                                 u.region = region;
 
@@ -169,6 +169,9 @@ public class TeleportListener implements Listener {
 
                         //Check if the player can enter the region.
                         if (region.inDatabase() || p.hasPermission("group.jrbuilder")) {
+
+                            //Add region to database if not exists.
+                            region.addToDatabase();
 
                             //If the player is the region owner update last enter and tell set the message.
                             if (region.isOwner(p.getUniqueId().toString())) {
@@ -226,9 +229,6 @@ public class TeleportListener implements Listener {
                                                 .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA)));
 
                             }
-
-                            //Add region to database if not exists.
-                            region.addToDatabase();
 
                             //Update the region the player is in.
                             u.region = region;

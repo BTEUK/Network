@@ -108,6 +108,9 @@ public class MoveListener implements Listener {
                             //Check if the player can enter the region.
                             if (region.inDatabase() || p.hasPermission("group.jrbuilder")) {
 
+                                //Add region to database if not exists.
+                                region.addToDatabase();
+
                                 //Region is on another server, teleport them accordingly.
                                 //If the new region is on a plot server, check for coordinate transform.
                                 String server;
@@ -155,6 +158,9 @@ public class MoveListener implements Listener {
 
                         //Check if the player can enter the region.
                         if (region.inDatabase() || p.hasPermission("group.jrbuilder")) {
+
+                            //Add region to database if not exists.
+                            region.addToDatabase();
 
                             //If the player is the region owner update last enter and tell set the message.
                             if (region.isOwner(p.getUniqueId().toString())) {
@@ -220,9 +226,6 @@ public class MoveListener implements Listener {
                                                 .append(Component.text(u.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA)));
 
                             }
-
-                            //Add region to database if not exists.
-                            region.addToDatabase();
 
                             //Update the region the player is in.
                             u.region = region;
