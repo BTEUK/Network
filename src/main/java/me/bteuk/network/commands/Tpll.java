@@ -58,14 +58,28 @@ public class Tpll implements CommandExecutor {
 
     }
 
+    /**
+     * Gets all objects in a string array above a given index
+     *
+     * @param args  Initial array
+     * @return Selected array
+     */
     private String[] selectArray(String[] args) {
-        List<String> array = new ArrayList<>(Arrays.asList(args).subList(1, args.length));
+        List<String> array = new ArrayList<>();
+
+        if (args.length > 1) {
+            array.addAll(Arrays.asList(args).subList(1, args.length));
+        }
 
         return array.toArray(array.toArray(new String[0]));
     }
 
     private String[] inverseSelectArray(String[] args, int index) {
-        List<String> array = new ArrayList<>(Arrays.asList(args).subList(0, index));
+        List<String> array = new ArrayList<>();
+
+        if (index > 0) {
+            array.addAll(Arrays.asList(args).subList(0, index));
+        }
 
         return array.toArray(array.toArray(new String[0]));
 
