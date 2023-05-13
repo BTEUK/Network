@@ -228,7 +228,7 @@ public class Timers {
             for (String uuid : uuids) {
 
                 //Run network disconnect and remove their entry.
-                connect.leaveEvent(Bukkit.getOfflinePlayer(uuid));
+                connect.leaveEvent(Bukkit.getOfflinePlayer(UUID.fromString(uuid)));
 
             }
 

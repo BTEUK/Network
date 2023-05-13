@@ -175,6 +175,12 @@ public class TabManager {
 
                     PlayerInfoData info = infoList.get(0);
 
+                    //If player is not online, skip.
+                    if (!instance.globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid='" + info.getProfile().getUUID() + "';")) {
+                        event.setCancelled(true);
+                        return;
+                    }
+
                     String displayName = instance.globalSQL.getString("SELECT display_name FROM online_users WHERE uuid='" + info.getProfile().getUUID() + "';");
                     String name = instance.globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + info.getProfile().getUUID() + "';");
 
