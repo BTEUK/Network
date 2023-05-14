@@ -16,8 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import static me.bteuk.network.utils.Constants.REGIONS_ENABLED;
-import static me.bteuk.network.utils.Constants.SERVER_NAME;
+import static me.bteuk.network.utils.Constants.*;
 import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public class Timers {
@@ -222,7 +221,8 @@ public class Timers {
             }
 
             //Check for users with a last ping greater than 10 seconds ago, disconnect them from the network.
-            uuids = globalSQL.getStringList("SELECT uuid FROM online_users WHERE last_ping<" + (time - (1000 * 10)) + ";");
+            //Only query players that should be on this server, else it could leave to premature disconnects if the server lags but another server thinks you're offline.
+            uuids = globalSQL.getStringList("SELECT uuid FROM online_users WHERE last_ping<" + (time - (1000 * 10)) + " AND server='" + SERVER_NAME + ";");
 
             //Iterate through uuids and check time.
             for (String uuid : uuids) {
