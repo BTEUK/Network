@@ -222,7 +222,7 @@ public class Timers {
 
             //Check for users with a last ping greater than 10 seconds ago, disconnect them from the network.
             //Only query players that should be on this server, else it could leave to premature disconnects if the server lags but another server thinks you're offline.
-            uuids = globalSQL.getStringList("SELECT uuid FROM online_users WHERE last_ping<" + (time - (1000 * 10)) + " AND server='" + SERVER_NAME + ";");
+            uuids = globalSQL.getStringList("SELECT uuid FROM online_users WHERE last_ping<" + (time - (1000 * 10)) + " AND server='" + SERVER_NAME + "';");
 
             //Iterate through uuids and check time.
             for (String uuid : uuids) {
