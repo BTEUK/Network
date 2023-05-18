@@ -13,6 +13,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
+
 public class Mute implements CommandExecutor {
 
     @Override
@@ -124,7 +126,7 @@ public class Mute implements CommandExecutor {
         long end_time = Time.currentTime() + time;
 
         //Combine all remaining args to create a reason.
-        String sArgs = String.join(" ", args);
+        String sArgs = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
         String reason = StringUtils.substring(sArgs, 2);
 
         Moderation mod = new Moderation();
