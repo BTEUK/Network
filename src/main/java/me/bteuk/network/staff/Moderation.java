@@ -55,7 +55,15 @@ public class Moderation {
         Network.getInstance().globalSQL.update("UPDATE moderation SET end_time=" + time + " WHERE uuid='" + uuid + "' AND end_time>" + time + " AND type='mute';");
     }
 
-    //If the player is currently banned, return true.
+    /**
+     * Check whether a player is banned.
+     *
+     * @param uuid
+     * the uuid of the player
+     *
+     * @return
+     * true if the player is currently banned, false if not
+     */
     public boolean isBanned(String uuid) {
         return (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM moderation WHERE uuid='" + uuid + "' AND end_time>" + Time.currentTime() + " AND type='ban';"));
     }

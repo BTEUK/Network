@@ -192,6 +192,8 @@ public final class Network extends JavaPlugin {
         new JoinServer(this, globalSQL, connect);
         leaveServer = new LeaveServer(this, globalSQL, connect);
 
+        new PreJoinServer(this);
+
         new GuiListener(this);
         new PlayerInteract(this);
 
