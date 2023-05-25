@@ -15,8 +15,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static me.bteuk.network.utils.Constants.LOGGER;
-import static me.bteuk.network.utils.Constants.SERVER_NAME;
+import static me.bteuk.network.utils.Constants.*;
 
 public class CommandPreProcess implements Listener {
 
@@ -31,20 +30,28 @@ public class CommandPreProcess implements Listener {
     @EventHandler
     public void onCommandPreProcess(PlayerCommandPreprocessEvent e) {
         //Replace /region with /network:region
-        if (e.getMessage().startsWith("/region")) {
-            if (Constants.REGIONS_ENABLED) {
+        if (isCommand(e.getMessage(), "/region")) {
+            if (REGIONS_ENABLED) {
                 e.setMessage(e.getMessage().replace("/region", "/network:region"));
             } else {
                 return;
             }
-        } else if (e.getMessage().startsWith("/tpll")) {
-            if (Constants.TPLL_ENABLED) {
+
+        } else if (isCommand(e.getMessage(), "/tpll")) {
+            if (TPLL_ENABLED) {
                 e.setMessage(e.getMessage().replace("/tpll", "/network:tpll"));
             } else {
                 return;
             }
-        } else if (e.getMessage().startsWith("/server")) {
+
+        } else if (isCommand(e.getMessage(), "/server")) {
             e.setMessage(e.getMessage().replace("/server", "/network:server"));
+
+        } else if (isCommand(e.getMessage(), "/hdb")) {
+            //If skulls plugin exists and is loaded.
+            if(Bukkit.getServer().getPluginManager().getPlugin("skulls") != null){
+                e.setMessage(e.getMessage().replace("/hdb", "/skulls"));
+            }
         }
 
         if (!e.getMessage().startsWith("/afk")) {
@@ -71,9 +78,24 @@ public class CommandPreProcess implements Listener {
         }
     }
 
+    /**
+     * Checks whether a command sent is equal to another command.
+     *
+     * @param message
+     * Command message by the sender
+     *
+     * @param command
+     * Command to check for
+     *
+     * @return true is equals, false otherwise
+     */
+    private boolean isCommand(String message, String command) {
+        return (message.startsWith(command + " ") || message.equalsIgnoreCase(command));
+    }
+
     @EventHandler
     public void serverCommand(ServerCommandEvent s) {
-        if (s.getCommand().startsWith("stop")) {
+        if (s.getCommand().equalsIgnoreCase("stop")) {
             if (!instance.allow_shutdown) {
                 instance.allow_shutdown = true;
                 onServerClose(instance.getUsers());
