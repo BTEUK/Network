@@ -1,15 +1,21 @@
 package me.bteuk.network.gui;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.commands.Back;
 import me.bteuk.network.commands.Nightvision;
+import me.bteuk.network.events.EventManager;
 import me.bteuk.network.gui.navigation.ExploreGui;
 import me.bteuk.network.utils.LightsOut;
+import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.enums.ServerType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.potion.PotionEffectType;
+
+import static me.bteuk.network.utils.Constants.SERVER_TYPE;
 
 public class NavigatorGui extends Gui {
 
@@ -17,7 +23,7 @@ public class NavigatorGui extends Gui {
 
         super(27, Component.text("Navigator", NamedTextColor.AQUA, TextDecoration.BOLD));
 
-        setItem(12, Utils.createItem(Material.DIAMOND_PICKAXE, 1,
+        setItem(3, Utils.createItem(Material.DIAMOND_PICKAXE, 1,
                         Utils.title("Build"),
                         Utils.line("Click to open the build menu.")),
                 u -> {
@@ -28,7 +34,7 @@ public class NavigatorGui extends Gui {
 
                 });
 
-        setItem(14, Utils.createItem(Material.SPRUCE_BOAT, 1,
+        setItem(5, Utils.createItem(Material.SPRUCE_BOAT, 1,
                         Utils.title("Explore"),
                         Utils.line("Click to open the explore menu.")),
                 u -> {
@@ -39,7 +45,7 @@ public class NavigatorGui extends Gui {
 
                 });
 
-        setItem(8, Utils.createItem(Material.NETHER_STAR, 1,
+        setItem(26, Utils.createItem(Material.NETHER_STAR, 1,
                         Utils.title("Toggle Navigator"),
                         Utils.line("Click to toggle the navigator in your inventory."),
                         Utils.line("You can always open this menu with ")
@@ -70,7 +76,7 @@ public class NavigatorGui extends Gui {
 
                 });
 
-        setItem(7, Utils.createPotion(Material.SPLASH_POTION, PotionEffectType.NIGHT_VISION, 1,
+        setItem(25, Utils.createPotion(Material.SPLASH_POTION, PotionEffectType.NIGHT_VISION, 1,
                         Utils.title("Toggle Nightvision"),
                         Utils.line("Click to toggle nightvision."),
                         Utils.line("You can also use the command ")
@@ -79,7 +85,7 @@ public class NavigatorGui extends Gui {
                                 .append(Component.text("/nv", NamedTextColor.GRAY))),
                 u -> Nightvision.toggleNightvision(u.player));
 
-        setItem(0, Utils.createItem(Material.REDSTONE_LAMP, 1,
+        setItem(19, Utils.createItem(Material.REDSTONE_LAMP, 1,
                         Utils.title("Lights Out"),
                         Utils.line("Play a game of Lights Out.")),
                 u -> {
@@ -97,13 +103,40 @@ public class NavigatorGui extends Gui {
                 });
 
         //Set rules.
-        setItem(26, Utils.createItem(Material.ENCHANTED_BOOK, 1,
+        setItem(21, Utils.createItem(Material.ENCHANTED_BOOK, 1,
                         Utils.title("Rules"),
                         Utils.line("Click to view the rules.")),
                 u -> {
 
                     u.player.closeInventory();
                     u.player.openBook(Network.getInstance().getLobby().getRules());
+
+                });
+
+        //Spawn
+        setItem(23, Utils.createItem(Material.RED_BED, 1,
+                        Utils.title("Spawn"),
+                        Utils.line("Teleport to spawn.")),
+                u ->
+
+                {
+
+                    u.player.closeInventory();
+
+                    //If server is Lobby, teleport to spawn.
+                    if (SERVER_TYPE == ServerType.LOBBY) {
+
+                        Back.setPreviousCoordinate(u.player.getUniqueId().toString(), u.player.getLocation());
+                        u.player.teleport(Network.getInstance().getLobby().spawn);
+                        u.player.sendMessage(Utils.success("Teleported to spawn."));
+
+                    } else {
+
+                        //Set teleport event to go to spawn.
+                        EventManager.createTeleportEvent(true, u.player.getUniqueId().toString(), "network", "teleport spawn", u.player.getLocation());
+                        SwitchServer.switchServer(u.player, Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='LOBBY';"));
+
+                    }
 
                 });
 
