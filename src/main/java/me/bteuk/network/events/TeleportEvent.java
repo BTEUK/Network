@@ -19,11 +19,11 @@ import java.util.UUID;
 
 import static me.bteuk.network.utils.Constants.SERVER_TYPE;
 
-public class TeleportEvent {
+public class TeleportEvent extends AbstractEvent {
 
-    private static final DecimalFormat DECIMAL_FORMATTER = new DecimalFormat("##.#####");
+    private final DecimalFormat DECIMAL_FORMATTER = new DecimalFormat("##.#####");
 
-    public static void event(String uuid, String[] event, String message) {
+    public void event(String uuid, String[] event, String message) {
 
         //Get player.
         Player p = Bukkit.getPlayer(UUID.fromString(uuid));

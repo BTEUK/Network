@@ -6,15 +6,25 @@ import org.bukkit.Location;
 
 import static me.bteuk.network.utils.Constants.SERVER_NAME;
 
-public class EventManager {
+public class EventManager extends AbstractEvent {
 
-    public static void event(String uuid, String[] event, String message) {
+    /**
+     * General implementation of an event, uses a switch expression to run the actual event.
+     *
+     * @param uuid
+     * the uuid of the player to whom this event applies
+     * @param event
+     * arguments of the event
+     * @param message
+     * optional message to send to the player after the event has executes successfully
+     */
+    public void event(String uuid, String[] event, String message) {
 
         //Start the execution process by looking at the event message structure.
         switch (event[0]) {
-            case "invite" -> InviteEvent.event(uuid, event);
-            case "teleport" -> TeleportEvent.event(uuid, event, message);
-            case "region" -> RegionEvent.event(uuid, event, message);
+            case "invite" -> new InviteEvent().event(uuid, event, message);
+            case "teleport" -> new TeleportEvent().event(uuid, event, message);
+            case "region" -> new RegionEvent().event(uuid, event, message);
         }
     }
 

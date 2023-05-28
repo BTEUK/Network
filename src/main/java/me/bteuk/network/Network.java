@@ -1,5 +1,6 @@
 package me.bteuk.network;
 
+import lombok.Getter;
 import me.bteuk.network.commands.*;
 import me.bteuk.network.commands.staff.Ban;
 import me.bteuk.network.commands.staff.Database;
@@ -69,7 +70,8 @@ public final class Network extends JavaPlugin {
     public int socketPort;
 
     //Timers
-    public Timers timers;
+    @Getter
+    private Timers timers;
 
     //Lobby
     private Lobby lobby;

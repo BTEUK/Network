@@ -115,7 +115,7 @@ public record Region(String regionName) {
 
     //Return whether the region has an owner.
     public boolean hasActiveOwner() {
-        return (Network.getInstance().regionSQL.hasRow("SELECT region FROM region_members WHERE region='" + regionName + "' AND is_owner=1 AND last_enter>=" + (Time.currentTime()-Network.getInstance().timers.inactivity) + ";"));
+        return (Network.getInstance().regionSQL.hasRow("SELECT region FROM region_members WHERE region='" + regionName + "' AND is_owner=1 AND last_enter>=" + (Time.currentTime()-Network.getInstance().getTimers().inactivity) + ";"));
     }
 
     //Return whether the region has a member.

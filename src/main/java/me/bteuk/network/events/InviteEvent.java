@@ -13,9 +13,9 @@ import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
-public class InviteEvent {
+public class InviteEvent extends AbstractEvent {
 
-    public static void event(String uuid, String[] event) {
+    public void event(String uuid, String[] event, String sMessage) {
 
         switch (event[1]) {
             case "plot" -> {

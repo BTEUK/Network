@@ -1,5 +1,6 @@
 package me.bteuk.network;
 
+import lombok.Getter;
 import me.bteuk.network.events.EventManager;
 import me.bteuk.network.listeners.Connect;
 import me.bteuk.network.sql.GlobalSQL;
@@ -61,6 +62,10 @@ public class Timers {
     //Discord roles
     private final HashMap<String, Long> roles;
 
+    //Event manager
+    @Getter
+    private final EventManager eventManager;
+
     public Timers(Network instance, GlobalSQL globalSQL, Connect connect) {
 
         this.instance = instance;
@@ -72,6 +77,7 @@ public class Timers {
 
         this.timers = new ArrayList<>();
 
+        eventManager = new EventManager();
         events = new ArrayList<>();
 
         //days * 24 hours * 60 minutes * 60 seconds * 1000 milliseconds
@@ -118,7 +124,7 @@ public class Timers {
                         String[] aEvent = event[1].split(" ");
 
                         //Send the event to the event handler.
-                        EventManager.event(event[0], aEvent, event[2]);
+                        eventManager.event(event[0], aEvent, event[2]);
 
                     }
 
@@ -305,7 +311,7 @@ public class Timers {
     //TODO: Only run this on role add/remove as well as discord link/unlink.
     public void discordSync(long discord_id, String role) {
         //Remove all roles except current role.
-        for (Map.Entry<String, Long> entry : Network.getInstance().timers.getRoles().entrySet()) {
+        for (Map.Entry<String, Long> entry : Network.getInstance().getTimers().getRoles().entrySet()) {
 
             if (role.equals(entry.getKey())) {
                 instance.chat.broadcastMessage(Component.text("addrole " + discord_id + " " + entry.getValue()), "uknet:discord_linking");

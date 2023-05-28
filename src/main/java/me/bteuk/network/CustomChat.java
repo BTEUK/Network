@@ -204,7 +204,7 @@ public class CustomChat implements Listener, PluginMessageListener {
                             String role = Roles.builderRole(p);
 
                             //Remove all roles except current role.
-                            for (Map.Entry<String, Long> entry : Network.getInstance().timers.getRoles().entrySet()) {
+                            for (Map.Entry<String, Long> entry : Network.getInstance().getTimers().getRoles().entrySet()) {
 
                                 if (role.equals(entry.getKey())) {
                                     broadcastMessage(Component.text("addrole " + args[2] + " " + entry.getValue()), "uknet:discord_linking");

@@ -5,9 +5,9 @@ import me.bteuk.network.utils.enums.RegionStatus;
 import me.bteuk.network.utils.regions.Region;
 import org.bukkit.Location;
 
-public class RegionEvent {
+public class RegionEvent extends AbstractEvent {
 
-    public static void event(String uuid, String[] event, String eMessage) {
+    public void event(String uuid, String[] event, String eMessage) {
 
         Region region;
 

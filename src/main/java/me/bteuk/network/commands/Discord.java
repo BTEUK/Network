@@ -81,7 +81,7 @@ public class Discord implements CommandExecutor {
                     Network.getInstance().globalSQL.update("DELETE FROM discord WHERE uuid='" + user.player.getUniqueId() + "';");
                     user.isLinked = false;
 
-                    for (Map.Entry<String, Long> entry : Network.getInstance().timers.getRoles().entrySet()) {
+                    for (Map.Entry<String, Long> entry : Network.getInstance().getTimers().getRoles().entrySet()) {
 
                         Network.getInstance().chat.broadcastMessage(Component.text("removerole " + discord_id + " " + entry.getValue()), "uknet:discord_linking");
 

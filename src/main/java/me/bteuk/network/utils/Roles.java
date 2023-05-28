@@ -107,7 +107,7 @@ public final class Roles {
             long discord_id = Network.getInstance().globalSQL.getLong("SELECT discord_id FROM discord WHERE uuid='" + uuid + "';");
 
             //Sync roles.
-            Network.getInstance().timers.discordSync(discord_id, nRole);
+            Network.getInstance().getTimers().discordSync(discord_id, nRole);
 
         }
     }
