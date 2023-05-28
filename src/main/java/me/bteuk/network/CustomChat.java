@@ -22,21 +22,17 @@ import java.util.UUID;
 
 import static me.bteuk.network.utils.Constants.LOGGER;
 
-public class CustomChat implements Listener, PluginMessageListener {
+public class CustomChat extends Moderation implements Listener, PluginMessageListener {
 
     private final Network instance;
     private final String IP;
     private final int port;
-
-    private final Moderation moderation;
 
     public CustomChat(Network instance, String IP, int port) {
 
         this.instance = instance;
         this.IP = IP;
         this.port = port;
-
-        moderation = new Moderation();
 
         instance.getServer().getPluginManager().registerEvents(this, instance);
 
@@ -89,12 +85,12 @@ public class CustomChat implements Listener, PluginMessageListener {
     public void onPlayerChatEvent(AsyncChatEvent e) {
 
         //If player is muted cancel.
-        if (moderation.isMuted(e.getPlayer().getUniqueId().toString())) {
+        if (isMuted(e.getPlayer().getUniqueId().toString())) {
             e.setCancelled(true);
             e.getPlayer().sendMessage(Utils.error("You are muted for ")
-                    .append(Component.text(moderation.getMutedReason(e.getPlayer().getUniqueId().toString()), NamedTextColor.DARK_RED))
+                    .append(Component.text(getMutedReason(e.getPlayer().getUniqueId().toString()), NamedTextColor.DARK_RED))
                     .append(Utils.error(" until "))
-                    .append(Component.text(moderation.getMuteDuration(e.getPlayer().getUniqueId().toString()), NamedTextColor.DARK_RED)));
+                    .append(Component.text(getMuteDuration(e.getPlayer().getUniqueId().toString()), NamedTextColor.DARK_RED)));
         }
 
         if (!e.isCancelled()) {

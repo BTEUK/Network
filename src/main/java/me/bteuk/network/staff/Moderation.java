@@ -8,9 +8,14 @@ This includes /ban /mute /kick
  */
 
 import me.bteuk.network.Network;
+import me.bteuk.network.exceptions.DurationFormatException;
 import me.bteuk.network.utils.Time;
 
-public class Moderation {
+/**
+ * Abstract class for moderation.
+ * Must be implemented to use.
+ */
+public abstract class Moderation {
 
     //Ban the player.
     public void ban(String uuid, long end_time, String reason) {
@@ -93,5 +98,96 @@ public class Moderation {
     public String getMuteDuration(String uuid) {
         long time = Network.getInstance().globalSQL.getLong("SELECT end_time FROM moderation WHERE uuid='" + uuid + "' AND end_time>" + Time.currentTime() + " AND type='mute';");
         return Time.getDateTime(time);
+    }
+
+    /**
+     * Convert a string to a long time for the ban duration.
+     *
+     * @param formattedInput
+     * input string in ymdh format
+     *
+     * @return
+     * duration in milliseconds after converting the input string
+     *
+     * @throws DurationFormatException
+     * if the input string is not formatted correctly
+     */
+    public long getDuration(String formattedInput) throws DurationFormatException {
+
+        //Add random letter at the end of the duration string, so it'll always split into 2 parts.
+        String sDuration = formattedInput + "q";
+
+        //Check for valid duration.
+        //ymdh format (year, month, day, hour)
+        String[] duration;
+        long time = 0;
+
+        //Check years
+        duration = sDuration.split("y");
+
+        if (duration.length == 2) {
+            try {
+
+                int years = Integer.parseInt(duration[0]);
+
+                //Convert years to milliseconds and add to time.
+                //We're assuming a year is 365 days.
+                time += years * 365 * 24 * 60 * 60 * 1000L;
+
+            } catch (NumberFormatException e) {
+                throw new DurationFormatException("Duration must be in ymdh format, for example 1y6m, which is 1 year and 6 months or 2d12h is 2 days and 12 hours.");
+            }
+        }
+
+        //Check months
+        duration = sDuration.split("m");
+
+        if (duration.length == 2) {
+            try {
+
+                int months = Integer.parseInt(duration[0]);
+
+                //Convert months to milliseconds and add to time.
+                //We're assuming a month is 30 days.
+                time += months * 30 * 24 * 60 * 60 * 1000L;
+
+            } catch (NumberFormatException e) {
+                throw new DurationFormatException("Duration must be in ymdh format, for example 1y6m, which is 1 year and 6 months or 2d12h is 2 days and 12 hours.");
+            }
+        }
+
+        //Check days
+        duration = sDuration.split("d");
+
+        if (duration.length == 2) {
+            try {
+
+                int days = Integer.parseInt(duration[0]);
+
+                //Convert days to milliseconds and add to time.
+                time += days * 24 * 60 * 60 * 1000L;
+
+            } catch (NumberFormatException e) {
+                throw new DurationFormatException("Duration must be in ymdh format, for example 1y6m, which is 1 year and 6 months or 2d12h is 2 days and 12 hours.");
+            }
+        }
+
+        //Check hours
+        duration = sDuration.split("h");
+
+        if (duration.length == 2) {
+            try {
+
+                int hours = Integer.parseInt(duration[0]);
+
+                //Convert hours to milliseconds and add to time.
+                time += hours * 60 * 60 * 1000L;
+
+            } catch (NumberFormatException e) {
+                throw new DurationFormatException("Duration must be in ymdh format, for example 1y6m, which is 1 year and 6 months or 2d12h is 2 days and 12 hours.");
+            }
+        }
+
+        return time;
     }
 }
