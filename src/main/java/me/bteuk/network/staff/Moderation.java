@@ -114,6 +114,10 @@ public abstract class Moderation {
      */
     public long getDuration(String formattedInput) throws DurationFormatException {
 
+        if (formattedInput == null) {
+            throw new NullPointerException();
+        }
+
         //Add random letter at the end of the duration string, so it'll always split into 2 parts.
         String sDuration = formattedInput + "q";
 
@@ -134,6 +138,9 @@ public abstract class Moderation {
                 //We're assuming a year is 365 days.
                 time += years * 365 * 24 * 60 * 60 * 1000L;
 
+                //Remove the first part from the string as we've already converted it.
+                sDuration = duration[1];
+
             } catch (NumberFormatException e) {
                 throw new DurationFormatException("Duration must be in ymdh format, for example 1y6m, which is 1 year and 6 months or 2d12h is 2 days and 12 hours.");
             }
@@ -151,6 +158,9 @@ public abstract class Moderation {
                 //We're assuming a month is 30 days.
                 time += months * 30 * 24 * 60 * 60 * 1000L;
 
+                //Remove the first part from the string as we've already converted it.
+                sDuration = duration[1];
+
             } catch (NumberFormatException e) {
                 throw new DurationFormatException("Duration must be in ymdh format, for example 1y6m, which is 1 year and 6 months or 2d12h is 2 days and 12 hours.");
             }
@@ -166,6 +176,9 @@ public abstract class Moderation {
 
                 //Convert days to milliseconds and add to time.
                 time += days * 24 * 60 * 60 * 1000L;
+
+                //Remove the first part from the string as we've already converted it.
+                sDuration = duration[1];
 
             } catch (NumberFormatException e) {
                 throw new DurationFormatException("Duration must be in ymdh format, for example 1y6m, which is 1 year and 6 months or 2d12h is 2 days and 12 hours.");
@@ -183,11 +196,19 @@ public abstract class Moderation {
                 //Convert hours to milliseconds and add to time.
                 time += hours * 60 * 60 * 1000L;
 
+                //Remove the first part from the string as we've already converted it.
+                sDuration = duration[1];
+
             } catch (NumberFormatException e) {
                 throw new DurationFormatException("Duration must be in ymdh format, for example 1y6m, which is 1 year and 6 months or 2d12h is 2 days and 12 hours.");
             }
         }
 
-        return time;
+        //If the time is 0, or the string does not end with just the character q, then the format was not correct.
+        if (time == 0 || !sDuration.equals("q")) {
+            throw new DurationFormatException("Duration must be in ymdh format, for example 1y6m, which is 1 year and 6 months or 2d12h is 2 days and 12 hours.");
+        } else {
+            return time;
+        }
     }
 }
