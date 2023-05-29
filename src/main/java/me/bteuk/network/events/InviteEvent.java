@@ -15,6 +15,7 @@ import java.util.UUID;
 
 public class InviteEvent extends AbstractEvent {
 
+    @Override
     public void event(String uuid, String[] event, String sMessage) {
 
         switch (event[1]) {

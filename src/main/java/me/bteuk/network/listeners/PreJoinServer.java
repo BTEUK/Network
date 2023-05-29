@@ -1,6 +1,7 @@
 package me.bteuk.network.listeners;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.exceptions.NotBannedException;
 import me.bteuk.network.staff.Moderation;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -19,9 +20,11 @@ public class PreJoinServer extends Moderation implements Listener {
     public void preJoin(AsyncPlayerPreLoginEvent e) {
         //If player is banned, stop them from logging in.
         if (isBanned(e.getUniqueId().toString())) {
-            e.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, Component.text("You are banned for " +
-                    getBannedReason(e.getUniqueId().toString()) + " until " +
-                    getBanDuration(e.getUniqueId().toString())));
+            try {
+                e.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, getBannedComponent(e.getUniqueId().toString()));
+            } catch (NotBannedException ex) {
+                ex.printStackTrace();
+            }
         }
 
         //Check if server is restarting.

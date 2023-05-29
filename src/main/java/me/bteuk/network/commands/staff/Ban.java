@@ -2,6 +2,7 @@ package me.bteuk.network.commands.staff;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.exceptions.DurationFormatException;
+import me.bteuk.network.exceptions.NotBannedException;
 import me.bteuk.network.staff.Moderation;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
@@ -63,7 +64,13 @@ public class Ban extends Moderation implements CommandExecutor {
         String sArgs = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
         String reason = StringUtils.substring(sArgs, 2);
 
-        ban(uuid, end_time, reason);
+        try {
+            ban(uuid, end_time, reason);
+        } catch (NotBannedException e) {
+            sender.sendMessage(Utils.error("An error occurred while banned this player, please contact an admin for support."));
+            e.printStackTrace();
+            return true;
+        }
 
         sender.sendMessage(Utils.success("Banned ")
                 .append(Component.text(args[0], NamedTextColor.DARK_AQUA))

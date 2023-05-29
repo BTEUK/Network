@@ -23,6 +23,7 @@ public class TeleportEvent extends AbstractEvent {
 
     private final DecimalFormat DECIMAL_FORMATTER = new DecimalFormat("##.#####");
 
+    @Override
     public void event(String uuid, String[] event, String message) {
 
         //Get player.

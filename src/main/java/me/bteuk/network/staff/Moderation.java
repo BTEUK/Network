@@ -8,8 +8,13 @@ This includes /ban /mute /kick
  */
 
 import me.bteuk.network.Network;
+import me.bteuk.network.events.EventManager;
 import me.bteuk.network.exceptions.DurationFormatException;
+import me.bteuk.network.exceptions.NotBannedException;
 import me.bteuk.network.utils.Time;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 /**
  * Abstract class for moderation.
@@ -18,7 +23,7 @@ import me.bteuk.network.utils.Time;
 public abstract class Moderation {
 
     //Ban the player.
-    public void ban(String uuid, long end_time, String reason) {
+    public void ban(String uuid, long end_time, String reason) throws NotBannedException {
 
         //Get time.
         long time = Time.currentTime();
@@ -30,7 +35,18 @@ public abstract class Moderation {
         Network.getInstance().globalSQL.update("INSERT INTO moderation(uuid,start_time,end_time,reason,type) VALUES('" + uuid + "'," + time + "," + end_time + ",'" + reason + "','ban');");
 
         //If the player is currently online, ban them.
-        //TODO Ban if online!
+        //Iterate through online users.
+        for (String s : Network.getInstance().globalSQL.getStringList("SELECT uuid FROM online_users;")) {
+            //If the uuid equals the uuid of the banned user.
+            //Then kick them with the ban message.
+            if (s.equals(uuid)) {
+
+                EventManager.createEvent(uuid, "network",
+                        Network.getInstance().globalSQL.getString("SELECT server FROM online_users WHERE uuid='" + uuid + "';"),
+                        "kick", LegacyComponentSerializer.legacyAmpersand().serialize(getBannedComponent(uuid))
+                );
+            }
+        }
     }
 
     //Mute the player.
@@ -63,11 +79,8 @@ public abstract class Moderation {
     /**
      * Check whether a player is banned.
      *
-     * @param uuid
-     * the uuid of the player
-     *
-     * @return
-     * true if the player is currently banned, false if not
+     * @param uuid the uuid of the player
+     * @return true if the player is currently banned, false if not
      */
     public boolean isBanned(String uuid) {
         return (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM moderation WHERE uuid='" + uuid + "' AND end_time>" + Time.currentTime() + " AND type='ban';"));
@@ -101,16 +114,30 @@ public abstract class Moderation {
     }
 
     /**
+     * Get Component for banned player to display.
+     * This assumes that the player is banned, else this will return null.
+     *
+     * @param uuid the uuid of the banned player
+     * @return the component of the banned message with reason and duration
+     * @throws NotBannedException if the player is not banned
+     */
+    public Component getBannedComponent(String uuid) throws NotBannedException {
+        if (isBanned(uuid)) {
+            return Component.text("You have been banned for ", NamedTextColor.RED)
+                    .append(Component.text(getBannedReason(uuid), NamedTextColor.DARK_RED))
+                    .append(Component.text(" until ", NamedTextColor.RED))
+                    .append(Component.text(getBanDuration(uuid), NamedTextColor.DARK_RED));
+        } else {
+            throw new NotBannedException("The user with uuid " + uuid + " is not banned.");
+        }
+    }
+
+    /**
      * Convert a string to a long time for the ban duration.
      *
-     * @param formattedInput
-     * input string in ymdh format
-     *
-     * @return
-     * duration in milliseconds after converting the input string
-     *
-     * @throws DurationFormatException
-     * if the input string is not formatted correctly
+     * @param formattedInput input string in ymdh format
+     * @return duration in milliseconds after converting the input string
+     * @throws DurationFormatException if the input string is not formatted correctly
      */
     public long getDuration(String formattedInput) throws DurationFormatException {
 

@@ -18,6 +18,7 @@ public class EventManager extends AbstractEvent {
      * @param message
      * optional message to send to the player after the event has executes successfully
      */
+    @Override
     public void event(String uuid, String[] event, String message) {
 
         //Start the execution process by looking at the event message structure.
@@ -25,6 +26,7 @@ public class EventManager extends AbstractEvent {
             case "invite" -> new InviteEvent().event(uuid, event, message);
             case "teleport" -> new TeleportEvent().event(uuid, event, message);
             case "region" -> new RegionEvent().event(uuid, event, message);
+            case "kick" -> new KickEvent().event(uuid, event, message);
         }
     }
 
@@ -38,6 +40,21 @@ public class EventManager extends AbstractEvent {
                 "VALUES('" + uuid + "','" + type + "','" + event + "','" + message + "');");
     }
 
+    /**
+     * Creates an event with the following input parameters:
+     *
+     * @param uuid
+     * the uuid of the player to which the event should apply
+     *
+     * @param type
+     * the type of event, this means the plugin which should run this event (network, plotsystem or a custom implementation)
+     *
+     * @param server
+     * the server name where the event should occur
+     *
+     * @param event
+     * the event arguments in String format
+     */
     public static void createEvent(String uuid, String type, String server, String event) {
         if (uuid == null) {
             Network.getInstance().globalSQL.update("INSERT INTO server_events(type,server,event) " +
@@ -48,6 +65,24 @@ public class EventManager extends AbstractEvent {
         }
     }
 
+    /**
+     * Creates an event with the following input parameters:
+     *
+     * @param uuid
+     * the uuid of the player to which the event should apply
+     *
+     * @param type
+     * the type of event, this means the plugin which should run this event (network, plotsystem or a custom implementation)
+     *
+     * @param server
+     * the server name where the event should occur
+     *
+     * @param event
+     * the event arguments in String format
+     *
+     * @param message
+     * message to be sent to the player on success
+     */
     public static void createEvent(String uuid, String type, String server, String event, String message) {
         if (uuid == null) {
             Network.getInstance().globalSQL.update("INSERT INTO server_events(type,server,event,message) " +
