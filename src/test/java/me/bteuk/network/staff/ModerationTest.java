@@ -46,5 +46,4 @@ class ModerationTest {
         assertThrows(NullPointerException.class,
                 () -> moderation.getDuration(null));
     }
-
 }
