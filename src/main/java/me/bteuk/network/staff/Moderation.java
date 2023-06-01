@@ -40,7 +40,6 @@ public abstract class Moderation {
             //If the uuid equals the uuid of the banned user.
             //Then kick them with the ban message.
             if (s.equals(uuid)) {
-
                 EventManager.createEvent(uuid, "network",
                         Network.getInstance().globalSQL.getString("SELECT server FROM online_users WHERE uuid='" + uuid + "';"),
                         "kick", LegacyComponentSerializer.legacyAmpersand().serialize(getBannedComponent(uuid))
