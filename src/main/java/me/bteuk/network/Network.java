@@ -2,13 +2,10 @@ package me.bteuk.network;
 
 import lombok.Getter;
 import me.bteuk.network.commands.*;
-import me.bteuk.network.commands.staff.Ban;
-import me.bteuk.network.commands.staff.Database;
-import me.bteuk.network.commands.staff.Mute;
-import me.bteuk.network.commands.staff.Staff;
-import me.bteuk.network.commands.tabcompleter.LocationSelector;
-import me.bteuk.network.commands.tabcompleter.PlayerSelector;
-import me.bteuk.network.commands.tabcompleter.ServerSelector;
+import me.bteuk.network.staff.commands.*;
+import me.bteuk.network.tabcompleters.LocationSelector;
+import me.bteuk.network.tabcompleters.PlayerSelector;
+import me.bteuk.network.tabcompleters.ServerSelector;
 import me.bteuk.network.gui.NavigatorGui;
 import me.bteuk.network.listeners.*;
 import me.bteuk.network.listeners.global_teleport.MoveListener;
@@ -240,6 +237,7 @@ public final class Network extends JavaPlugin {
         if (TPLL_ENABLED) {
 
             getCommand("tpll").setExecutor(new Tpll(CONFIG.getBoolean("requires_permission")));
+
         }
 
         //Enable commands.
@@ -247,10 +245,6 @@ public final class Network extends JavaPlugin {
         getCommand("zone").setExecutor(new Zone());
 
         getCommand("navigator").setExecutor(new Navigator());
-
-        getCommand("staff").setExecutor(new Staff());
-        getCommand("ban").setExecutor(new Ban());
-        getCommand("mute").setExecutor(new Mute());
 
         getCommand("server").setExecutor(new Server());
         getCommand("server").setTabCompleter(new ServerSelector());
@@ -294,10 +288,26 @@ public final class Network extends JavaPlugin {
         new Phead(this);
 
         //Homes commands.
-        new Sethome(this, globalSQL);
-        new Home(this, globalSQL);
-        new Delhome(this, globalSQL);
-        new Homes(this);
+        if (CONFIG.getBoolean("homes.enabled")) {
+            new Sethome(this, globalSQL);
+            new Home(this, globalSQL);
+            new Delhome(this, globalSQL);
+            new Homes(this);
+        }
+
+        //Staff command to open the staff gui and use staff chat.
+        new Staff(this);
+
+        //Moderation commands.
+        if (CONFIG.getBoolean("moderation.enabled")) {
+
+            new Ban(this);
+            new Unban(this);
+
+            new Mute(this);
+            new Unmute(this);
+
+        }
 
         //Register commandpreprocess to make sure /network:region runs and not that of another plugin.
         new CommandPreProcess(this);

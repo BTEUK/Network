@@ -1,4 +1,4 @@
-package me.bteuk.network.commands.tabcompleter;
+package me.bteuk.network.tabcompleters;
 
 import me.bteuk.network.Network;
 import org.bukkit.command.Command;

@@ -55,7 +55,7 @@ public abstract class Moderation {
         long time = Time.currentTime();
 
         //If the player is already banned, end the old ban.
-        if (isBanned(uuid)) {
+        if (isMuted(uuid)) {
             Network.getInstance().globalSQL.update("UPDATE moderation SET end_time=" + time + " WHERE uuid='" + uuid + "' AND end_time>" + time + " AND type='mute';");
         }
         Network.getInstance().globalSQL.update("INSERT INTO moderation(uuid,start_time,end_time,reason,type) VALUES('" + uuid + "'," + time + "," + end_time + ",'" + reason + "','mute');");

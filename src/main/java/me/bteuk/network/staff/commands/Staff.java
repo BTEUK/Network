@@ -1,6 +1,7 @@
-package me.bteuk.network.commands.staff;
+package me.bteuk.network.staff.commands;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.staff.StaffGui;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
@@ -9,10 +10,29 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import static me.bteuk.network.utils.Constants.LOGGER;
+
 public class Staff implements CommandExecutor {
+
+    //Constructor to enable the command.
+    public Staff(Network instance) {
+
+        //Register command.
+        PluginCommand command = instance.getCommand("staff");
+
+        if (command == null) {
+            LOGGER.warning("Home command not added to plugin.yml, it will therefore not be enabled.");
+            return;
+        }
+
+        //Set executor.
+        command.setExecutor(this);
+
+    }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args) {

@@ -1,6 +1,5 @@
 package me.bteuk.network.staff;
 
-import me.bteuk.network.commands.staff.Ban;
 import me.bteuk.network.exceptions.DurationFormatException;
 import org.junit.jupiter.api.Test;
 
@@ -11,8 +10,8 @@ class ModerationTest {
     @Test
     void checkDurationStringFormatting() throws DurationFormatException {
 
-        //Created an instance of Ban since Moderation is an abstract class.
-        Moderation moderation = new Ban();
+        //Created an instance of ModerationHelper since Moderation is an abstract class.
+        Moderation moderation = new ModerationHelper();
 
         //Check each value separately.
         assertEquals(1000L * 60 * 60 * 24 * 365 * 2, moderation.getDuration("2y"));

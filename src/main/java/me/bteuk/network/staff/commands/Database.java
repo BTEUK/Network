@@ -1,4 +1,4 @@
-package me.bteuk.network.commands.staff;
+package me.bteuk.network.staff.commands;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.server_conversion.Navigation_database;

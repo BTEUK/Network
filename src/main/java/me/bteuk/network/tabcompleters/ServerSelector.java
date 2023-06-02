@@ -1,4 +1,4 @@
-package me.bteuk.network.commands.tabcompleter;
+package me.bteuk.network.tabcompleters;
 
 import me.bteuk.network.Network;
 import org.bukkit.command.Command;
@@ -11,13 +11,15 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LocationSelector implements TabCompleter {
+import static me.bteuk.network.utils.Constants.SERVER_NAME;
+
+public class ServerSelector implements TabCompleter {
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
 
-        //Get array of locations.
-        ArrayList<String> locations = Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data;");
+        //Get array of online players, excluding yourself.
+        ArrayList<String> servers = Network.getInstance().globalSQL.getStringList("SELECT name FROM server_data WHERE server<>'" + SERVER_NAME + ";");
         ArrayList<String> returns = new ArrayList<>();
 
         //If args is empty then return full array.
@@ -25,11 +27,11 @@ public class LocationSelector implements TabCompleter {
         //Else return null, the tp command only has 1 valid arg.
         if (args.length == 0) {
 
-            return locations;
+            return servers;
 
         } else if (args.length == 1) {
 
-            StringUtil.copyPartialMatches(args[0], locations, returns);
+            StringUtil.copyPartialMatches(args[0], servers, returns);
             return returns;
 
         } else {
