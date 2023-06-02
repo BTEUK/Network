@@ -162,9 +162,11 @@ public class Timers {
                             PlaceholderAPI.setPlaceholders(user.player, "%luckperms_prefix%") + " " + user.player.getName() +
                             "',primary_role='" + Roles.getPrimaryRole(user.player) + "' WHERE uuid='" + user.player.getUniqueId() + "' AND server='" + SERVER_NAME + "';");
 
-                    //Update tab for all players to update display name.
-                    //This is done with the tab chat channel.
-                    instance.chat.broadcastMessage(Component.text("update " + user.player.getUniqueId()), "uknet:tab");
+                    if (TAB) {
+                        //Update tab for all players to update display name.
+                        //This is done with the tab chat channel.
+                        instance.chat.broadcastMessage(Component.text("update " + user.player.getUniqueId()), "uknet:tab");
+                    }
 
                 }
 

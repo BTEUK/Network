@@ -319,7 +319,9 @@ public final class Network extends JavaPlugin {
         getCommand("region").setExecutor(new RegionCommand());
 
         //Enable tab.
-        tab = new TabManager(this);
+        if (TAB) {
+            tab = new TabManager(this);
+        }
 
         //Enable server in server table.
         globalSQL.update("UPDATE server_data SET online=1 WHERE name='" + SERVER_NAME + "';");
@@ -363,9 +365,11 @@ public final class Network extends JavaPlugin {
                 //Remove player from online_users.
                 instance.globalSQL.update("DELETE FROM online_users WHERE uuid='" + uuid + "';");
 
-                //Update tab for all players.
-                //This is done with the tab chat channel.
-                instance.chat.broadcastMessage(Component.text("remove " + uuid), "uknet:tab");
+                if (TAB) {
+                    //Update tab for all players.
+                    //This is done with the tab chat channel.
+                    instance.chat.broadcastMessage(Component.text("remove " + uuid), "uknet:tab");
+                }
 
                 //Log playercount in database
                 instance.globalSQL.update("INSERT INTO player_count(log_time,players) VALUES(" + Time.currentTime() + "," +

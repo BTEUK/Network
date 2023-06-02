@@ -14,8 +14,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.UUID;
 
-import static me.bteuk.network.utils.Constants.LOGGER;
-import static me.bteuk.network.utils.Constants.SERVER_NAME;
+import static me.bteuk.network.utils.Constants.*;
+import static me.bteuk.network.utils.Constants.DISCORD_CHAT;
 
 public class LeaveServer implements Listener {
 
@@ -44,8 +44,18 @@ public class LeaveServer implements Listener {
     @EventHandler
     public void leaveServerEvent(PlayerQuitEvent e) {
 
-        //Set default leave message to null.
-        e.quitMessage(null);
+        //Set default leave message to null if custom messages are enabled or disconnecting is blocked.
+        //Cancel default join message if custom messages are enabled.
+        if (CUSTOM_MESSAGES || blocked) {
+            e.quitMessage(null);
+        } else {
+
+            //If discord chat is enabled send the join message to discord also.
+            if (DISCORD_CHAT) {
+                instance.chat.broadcastMessage(e.quitMessage(),"uknet:discord_disconnect");
+            }
+
+        }
 
         if (blocked) {
             return;
@@ -100,10 +110,12 @@ public class LeaveServer implements Listener {
         }
 
         //If this is the last player on the server, remove all players from other servers from tab.
-        if (instance.getServer().getOnlinePlayers().size() == 1) {
-            //Add all players from other servers to the fake players list, so they will show in tab when players connect.
-            for (String uuid : globalSQL.getStringList("SELECT uuid FROM online_users;")) {
-                instance.tab.removeFakePlayer(uuid);
+        if (TAB) {
+            if (instance.getServer().getOnlinePlayers().size() == 1) {
+                //Add all players from other servers to the fake players list, so they will show in tab when players connect.
+                for (String uuid : globalSQL.getStringList("SELECT uuid FROM online_users;")) {
+                    instance.tab.removeFakePlayer(uuid);
+                }
             }
         }
 

@@ -15,7 +15,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
-import static me.bteuk.network.utils.Constants.SERVER_NAME;
+import static me.bteuk.network.utils.Constants.*;
 import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
 //This class deals with players joining and leaving the network.
@@ -60,10 +60,15 @@ public class Connect {
             //Add a slight delay so message can be seen by player joining.
             Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
 
-                instance.chat.broadcastMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(firstJoinMessage.replace("%player%", p.getName())), "uknet:connect");
+                if (CUSTOM_MESSAGES) {
 
-                instance.chat.broadcastMessage(Component.text(TextureUtils.getAvatarUrl(p.getPlayerProfile()) + " ")
-                        .append(LegacyComponentSerializer.legacyAmpersand().deserialize(firstJoinMessage.replace("%player%", p.getName()))), "uknet:discord_connect");
+                    instance.chat.broadcastMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(firstJoinMessage.replace("%player%", p.getName())), "uknet:connect");
+
+                    if (DISCORD_CHAT) {
+                        instance.chat.broadcastMessage(Component.text(TextureUtils.getAvatarUrl(p.getPlayerProfile()) + " ")
+                                .append(LegacyComponentSerializer.legacyAmpersand().deserialize(firstJoinMessage.replace("%player%", p.getName()))), "uknet:discord_connect");
+                    }
+                }
             }, 20L);
 
         } else {
@@ -75,11 +80,17 @@ public class Connect {
             //Add a slight delay so message can be seen by player joining.
             Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
 
-                instance.chat.broadcastMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(joinMessage.replace("%player%", p.getName())), "uknet:connect");
+                if (CUSTOM_MESSAGES) {
 
-                instance.chat.broadcastMessage(Component.text(TextureUtils.getAvatarUrl(p.getPlayerProfile()) + " ")
-                                .append(LegacyComponentSerializer.legacyAmpersand().deserialize(joinMessage.replace("%player%", p.getName())))
-                        , "uknet:discord_connect");
+                    instance.chat.broadcastMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(joinMessage.replace("%player%", p.getName())), "uknet:connect");
+
+                    if (DISCORD_CHAT) {
+                        instance.chat.broadcastMessage(Component.text(TextureUtils.getAvatarUrl(p.getPlayerProfile()) + " ")
+                                        .append(LegacyComponentSerializer.legacyAmpersand().deserialize(joinMessage.replace("%player%", p.getName())))
+                                , "uknet:discord_connect");
+                    }
+
+                }
             }, 1L);
 
         }
@@ -167,18 +178,24 @@ public class Connect {
         String player_skin = globalSQL.getString("SELECT player_skin FROM player_data WHERE uuid='" + uuid + "';");
 
         //Run disconnect message.
-        instance.chat.broadcastMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(leaveMessage.replace("%player%", name)), "uknet:disconnect");
+        if (CUSTOM_MESSAGES) {
+            instance.chat.broadcastMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(leaveMessage.replace("%player%", name)), "uknet:disconnect");
 
-        instance.chat.broadcastMessage(Component.text(TextureUtils.getAvatarUrl(name, p.getUniqueId(), player_skin) + " ")
-                        .append(LegacyComponentSerializer.legacyAmpersand().deserialize(leaveMessage.replace("%player%", name)))
-                , "uknet:discord_disconnect");
+            if (DISCORD_CHAT) {
+                instance.chat.broadcastMessage(Component.text(TextureUtils.getAvatarUrl(name, p.getUniqueId(), player_skin) + " ")
+                                .append(LegacyComponentSerializer.legacyAmpersand().deserialize(leaveMessage.replace("%player%", name)))
+                        , "uknet:discord_disconnect");
+            }
+        }
 
         //Remove player from online_users.
         globalSQL.update("DELETE FROM online_users WHERE uuid='" + uuid + "';");
 
-        //Update tab for all players.
-        //This is done with the tab chat channel.
-        instance.chat.broadcastMessage(Component.text("remove " + p.getUniqueId()), "uknet:tab");
+        if (TAB) {
+            //Update tab for all players.
+            //This is done with the tab chat channel.
+            instance.chat.broadcastMessage(Component.text("remove " + p.getUniqueId()), "uknet:tab");
+        }
 
         //Log playercount in database
         globalSQL.update("INSERT INTO player_count(log_time,players) VALUES(" + Time.currentTime() + "," +

@@ -14,8 +14,7 @@ import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import static me.bteuk.network.utils.Constants.LOGGER;
-import static me.bteuk.network.utils.Constants.STAFF_CHAT;
+import static me.bteuk.network.utils.Constants.*;
 
 public class Staff implements CommandExecutor {
 
@@ -73,7 +72,10 @@ public class Staff implements CommandExecutor {
             } else {
                 //Send message in staff chat.
                 Network.getInstance().chat.broadcastPlayerMessage(p, Component.text(String.join(" ", args), NamedTextColor.WHITE), "uknet:staff");
-                Network.getInstance().chat.broadcastPlayerMessage(p, Component.text(String.join(" ", args), NamedTextColor.WHITE), "uknet:discord_staff");
+
+                if (DISCORD_CHAT) {
+                    Network.getInstance().chat.broadcastPlayerMessage(p, Component.text(String.join(" ", args), NamedTextColor.WHITE), "uknet:discord_staff");
+                }
             }
             return true;
         }

@@ -13,7 +13,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import static me.bteuk.network.utils.Constants.SERVER_NAME;
+import static me.bteuk.network.utils.Constants.*;
 
 public class JoinServer implements Listener {
 
@@ -34,8 +34,17 @@ public class JoinServer implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void joinServerEvent(PlayerJoinEvent e) {
 
-        //Cancel default join message to null.
-        e.joinMessage(null);
+        //Cancel default join message if custom messages are enabled.
+        if (CUSTOM_MESSAGES) {
+            e.joinMessage(null);
+        } else {
+
+            //If discord chat is enabled send the join message to discord also.
+            if (DISCORD_CHAT) {
+                instance.chat.broadcastMessage(e.joinMessage(),"uknet:discord_connect");
+            }
+
+        }
 
         //If the player is not in the online_users table add them, and run a network connect.
         //If they are update the server.
@@ -60,21 +69,23 @@ public class JoinServer implements Listener {
         instance.addUser(u);
 
         //If this is the first player on the server, add all players from other servers to tab.
-        if (instance.getServer().getOnlinePlayers().size() == 1) {
+        if (instance.getServer().getOnlinePlayers().size() == 1 && TAB) {
             //Add all players from other servers to the fake players list, so they will show in tab when players connect.
             for (String uuid : globalSQL.getStringList("SELECT uuid FROM online_users;")) {
                 instance.tab.addFakePlayer(uuid);
             }
         }
 
-        //Add the player to the fake players list for other servers.
-        instance.chat.broadcastMessage(Component.text("add " + e.getPlayer().getUniqueId()), "uknet:tab");
+        if (TAB) {
+            //Add the player to the fake players list for other servers.
+            instance.chat.broadcastMessage(Component.text("add " + e.getPlayer().getUniqueId()), "uknet:tab");
 
-        //Remove the player from the fake players list, if they are currently in it.
-        instance.tab.removeFakePlayer(e.getPlayer().getUniqueId().toString());
+            //Remove the player from the fake players list, if they are currently in it.
+            instance.tab.removeFakePlayer(e.getPlayer().getUniqueId().toString());
 
-        //Load tab for the player, this will add the fake players.
-        Bukkit.getScheduler().runTask(instance, () -> instance.tab.loadTab(e.getPlayer()));
+            //Load tab for the player, this will add the fake players.
+            Bukkit.getScheduler().runTask(instance, () -> instance.tab.loadTab(e.getPlayer()));
+        }
 
         //Check if the player has any join events, if try run them.
         //Delay by 1 second for all plugins to run their join events.
