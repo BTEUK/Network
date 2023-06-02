@@ -63,8 +63,6 @@ public final class Network extends JavaPlugin {
 
     //Chat
     public CustomChat chat;
-    public String socketIP;
-    public int socketPort;
 
     //Timers
     @Getter
@@ -173,13 +171,9 @@ public final class Network extends JavaPlugin {
         //Create user list.
         networkUsers = new ArrayList<>();
 
-        //Setup custom chat.
-        socketIP = CONFIG.getString("socket.IP");
-        socketPort = CONFIG.getInt("socket.port");
-
         //Enabled global chat if enabled.
         if (GLOBAL_CHAT) {
-            chat = new CustomChat(this, socketIP, socketPort);
+            chat = new CustomChat(this);
         } else {
 
         }

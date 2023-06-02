@@ -21,23 +21,26 @@ import java.util.Map;
 import java.util.UUID;
 
 import static me.bteuk.network.utils.Constants.*;
+import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public class CustomChat extends Moderation implements Listener, PluginMessageListener {
 
     private final Network instance;
-    private final String IP;
-    private final int port;
+    private String IP;
+    private int port;
 
-    public CustomChat(Network instance, String IP, int port) {
+    public CustomChat(Network instance) {
 
         this.instance = instance;
-        this.IP = IP;
-        this.port = port;
 
         instance.getServer().getPluginManager().registerEvents(this, instance);
 
         //If global chat is enabled, register the listeners.
         if (GLOBAL_CHAT) {
+
+            this.IP = CONFIG.getString("chat.global_chat.socket.IP");
+            this.port = CONFIG.getInt("chat.global_chat.socket.port");
+
             //Register chat channels.
             instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:globalchat", this);
             instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:reviewer", this);
@@ -297,7 +300,7 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
         if (GLOBAL_CHAT) {
 
             Bukkit.getScheduler().runTaskAsynchronously(instance, () -> {
-                try (Socket socket = new Socket(instance.socketIP, instance.socketPort)) {
+                try (Socket socket = new Socket(IP, port)) {
 
                     //Convert component to json and write to output.
                     OutputStream output = socket.getOutputStream();

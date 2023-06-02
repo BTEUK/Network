@@ -71,8 +71,8 @@ chat:
   custom_messages:
     enabled: true
     join: '&e%player% has joined UKnet'
-      firstjoin: '&eWelcome to UKnet, %player%'
-      leave: '&e%player% has left UKnet'
+    firstjoin: '&eWelcome to UKnet, %player%'
+    leave: '&e%player% has left UKnet'
 
 #Tpll config.
 #The min and max y are for searching altitude for teleport, set it to the same value as the world height.

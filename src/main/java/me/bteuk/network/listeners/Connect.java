@@ -26,9 +26,9 @@ public class Connect {
     private final GlobalSQL globalSQL;
     private final PlotSQL plotSQL;
 
-    private final String joinMessage;
-    private final String firstJoinMessage;
-    private final String leaveMessage;
+    private String joinMessage;
+    private String firstJoinMessage;
+    private String leaveMessage;
 
     public Connect(Network instance, GlobalSQL globalSQL, PlotSQL plotSQL) {
 
@@ -38,9 +38,11 @@ public class Connect {
         this.plotSQL = plotSQL;
 
         //Get join and leave message from config.
-        joinMessage = CONFIG.getString("chat.join");
-        firstJoinMessage = CONFIG.getString("chat.firstjoin");
-        leaveMessage = CONFIG.getString("chat.leave");
+        if (CUSTOM_MESSAGES) {
+            joinMessage = CONFIG.getString("chat.custom_messages.join");
+            firstJoinMessage = CONFIG.getString("chat.custom_messages.firstjoin");
+            leaveMessage = CONFIG.getString("chat.custom_messages.leave");
+        }
 
     }
 
