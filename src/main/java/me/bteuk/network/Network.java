@@ -177,7 +177,14 @@ public final class Network extends JavaPlugin {
         socketIP = CONFIG.getString("socket.IP");
         socketPort = CONFIG.getInt("socket.port");
 
-        chat = new CustomChat(this, socketIP, socketPort);
+        //Enabled global chat if enabled.
+        if (GLOBAL_CHAT) {
+            chat = new CustomChat(this, socketIP, socketPort);
+        } else {
+
+        }
+
+        //Create listener to check for afk.
 
         //Setup connect.
         //Network connect
@@ -255,8 +262,6 @@ public final class Network extends JavaPlugin {
 
         getCommand("back").setExecutor(new Back());
 
-        //Modpack will no longer be used.
-        //getCommand("modpack").setExecutor(new Modpack());
         getCommand("discord").setExecutor(new Discord());
 
         getCommand("ll").setExecutor(new ll());
@@ -299,7 +304,7 @@ public final class Network extends JavaPlugin {
         new Staff(this);
 
         //Moderation commands.
-        if (CONFIG.getBoolean("moderation.enabled")) {
+        if (CONFIG.getBoolean("staff.moderation.enabled")) {
 
             new Ban(this);
             new Unban(this);

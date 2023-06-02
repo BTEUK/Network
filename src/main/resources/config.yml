@@ -29,25 +29,50 @@ spawn:
   yaw: -90
   pitch: 0
 
-#Moderation
-moderation:
-  enabled: true
+#Staff features
+staff:
+  staff_chat:
+    enabled: true
+  moderation:
+    enabled: true
 
 #Homes
 homes:
   enabled: true
 
-#Chat Socket
-socket:
-  IP: localhost
-  port: 30589
-
-#Network messages
-#%player% is a placeholder for the player name.
+#Chat Settings
 chat:
-  join: '&e%player% has joined UKnet'
-  firstjoin: '&eWelcome to UKnet, %player%'
-  leave: '&e%player% has left UKnet'
+  #Global allows for cross-server implementation of chat.
+  #This is required to enable discord compatibility.
+  #Requires the proxy-plugin which is built for Velocity.
+  global_chat:
+    enabled: true
+    socket:
+      IP: localhost
+      port: 30589
+    discord:
+      chat:
+        enabled: true
+      linking:
+        enabled: true
+        role_id:
+          reviewer: 815686457838272512
+          architect: 1050426152700878871
+          builder: 696773933256671373
+          jrbuilder: 837045714562973754
+          apprentice: 728017845652553799
+          applicant: 955520858577850458
+    #Custom tab menu
+    tab:
+      enabled: true
+
+  #Network messages
+  #%player% is a placeholder for the player name.
+  custom_messages:
+    enabled: true
+    join: '&e%player% has joined UKnet'
+      firstjoin: '&eWelcome to UKnet, %player%'
+      leave: '&e%player% has left UKnet'
 
 #Tpll config.
 #The min and max y are for searching altitude for teleport, set it to the same value as the world height.
@@ -91,12 +116,3 @@ database_uknet: minecraft_uknet
 
 #Discord link
 discord: 'https://discord.gg/5m56EgEVW6'
-
-#Discord role ids
-role_id:
-  reviewer: 815686457838272512
-  architect: 1050426152700878871
-  builder: 696773933256671373
-  jrbuilder: 837045714562973754
-  apprentice: 728017845652553799
-  applicant: 955520858577850458

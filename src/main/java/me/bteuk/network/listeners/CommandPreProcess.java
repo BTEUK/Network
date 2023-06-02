@@ -29,31 +29,8 @@ public class CommandPreProcess implements Listener {
 
     @EventHandler
     public void onCommandPreProcess(PlayerCommandPreprocessEvent e) {
-        //Replace /region with /network:region
-        if (isCommand(e.getMessage(), "/region")) {
-            if (REGIONS_ENABLED) {
-                e.setMessage(e.getMessage().replace("/region", "/network:region"));
-            } else {
-                return;
-            }
 
-        } else if (isCommand(e.getMessage(), "/tpll")) {
-            if (TPLL_ENABLED) {
-                e.setMessage(e.getMessage().replace("/tpll", "/network:tpll"));
-            } else {
-                return;
-            }
-
-        } else if (isCommand(e.getMessage(), "/server")) {
-            e.setMessage(e.getMessage().replace("/server", "/network:server"));
-
-        } else if (isCommand(e.getMessage(), "/hdb")) {
-            //If skulls plugin exists and is loaded.
-            if(Bukkit.getServer().getPluginManager().getPlugin("skulls") != null){
-                e.setMessage(e.getMessage().replace("/hdb", "/skulls"));
-            }
-        }
-
+        //Reset afk status.
         if (!e.getMessage().startsWith("/afk")) {
 
             //If player is afk, unset it.
@@ -75,6 +52,27 @@ public class CommandPreProcess implements Listener {
                 Network.getInstance().chat.broadcastAFK(u.player, false);
             }
 
+        }
+
+        //Replace /region with /network:region
+        if (isCommand(e.getMessage(), "/region")) {
+            if (REGIONS_ENABLED) {
+                e.setMessage(e.getMessage().replace("/region", "/network:region"));
+            }
+
+        } else if (isCommand(e.getMessage(), "/tpll")) {
+            if (TPLL_ENABLED) {
+                e.setMessage(e.getMessage().replace("/tpll", "/network:tpll"));
+            }
+
+        } else if (isCommand(e.getMessage(), "/server")) {
+            e.setMessage(e.getMessage().replace("/server", "/network:server"));
+
+        } else if (isCommand(e.getMessage(), "/hdb")) {
+            //If skulls plugin exists and is loaded.
+            if(Bukkit.getServer().getPluginManager().getPlugin("skulls") != null){
+                e.setMessage(e.getMessage().replace("/hdb", "/skulls"));
+            }
         }
     }
 

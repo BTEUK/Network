@@ -17,8 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import static me.bteuk.network.utils.Constants.REGIONS_ENABLED;
-import static me.bteuk.network.utils.Constants.SERVER_NAME;
+import static me.bteuk.network.utils.Constants.*;
 import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public class Timers {
@@ -87,14 +86,16 @@ public class Timers {
         //Minutes * 60 seconds * 1000 milliseconds
         afk = CONFIG.getInt("afk") * 60L * 1000L;
 
-        //Get roles from config.
+        //Get roles from config if discord linking is enabled.
         roles = new HashMap<>();
-        roles.put("reviewer", CONFIG.getLong("role_id.reviewer"));
-        roles.put("architect", CONFIG.getLong("role_id.architect"));
-        roles.put("builder", CONFIG.getLong("role_id.builder"));
-        roles.put("jrbuilder", CONFIG.getLong("role_id.jrbuilder"));
-        roles.put("apprentice", CONFIG.getLong("role_id.apprentice"));
-        roles.put("applicant", CONFIG.getLong("role_id.applicant"));
+        if (DISCORD_LINKING) {
+            roles.put("reviewer", CONFIG.getLong("chat.global_chat.discord.linking.role_id.reviewer"));
+            roles.put("architect", CONFIG.getLong("chat.global_chat.discord.linking.role_id.architect"));
+            roles.put("builder", CONFIG.getLong("chat.global_chat.discord.linking.role_id.builder"));
+            roles.put("jrbuilder", CONFIG.getLong("chat.global_chat.discord.linking.role_id.jrbuilder"));
+            roles.put("apprentice", CONFIG.getLong("chat.global_chat.discord.linking.role_id.apprentice"));
+            roles.put("applicant", CONFIG.getLong("chat.global_chat.discord.linking.role_id.applicant"));
+        }
 
     }
 
@@ -279,7 +280,7 @@ public class Timers {
             //For all online players sync the roles.
             for (NetworkUser u : instance.getUsers()) {
 
-                if (u.isLinked) {
+                if (u.isLinked && DISCORD_LINKING) {
                     //Get the highest role for syncing and sync it, except for guest.
                     String role = Roles.builderRole(u.player);
                     discordSync(u.discord_id, role);

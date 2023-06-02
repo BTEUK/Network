@@ -30,6 +30,24 @@ public class Constants {
     //Earth world name.
     public static final String EARTH_WORLD;
 
+    //Is global chat enabled
+    public static final boolean GLOBAL_CHAT;
+
+    //Custom join/leave messages.
+    public static final boolean CUSTOM_MESSAGES;
+
+    //Is staff chat enabled
+    public static final boolean STAFF_CHAT;
+
+    //Custom table
+    public static final boolean TAB;
+
+    //Discord chat compatibility
+    public static final boolean DISCORD_CHAT;
+
+    //Discord role linking
+    public static final boolean DISCORD_LINKING;
+
     static {
 
         LOGGER = Network.getInstance().getLogger();
@@ -46,6 +64,16 @@ public class Constants {
 
         MAX_Y = CONFIG.getInt("tpll.max_y");
         MIN_Y = CONFIG.getInt("tpll.min_y");
+
+        GLOBAL_CHAT = CONFIG.getBoolean("chat.global_chat.enabled");
+        CUSTOM_MESSAGES = CONFIG.getBoolean("chat.custom_messages.enabled");
+
+        STAFF_CHAT = CONFIG.getBoolean("staff.staff_chat.enabled");
+
+        TAB = CONFIG.getBoolean("chat.global_chat.tab.enabled");
+
+        DISCORD_CHAT = CONFIG.getBoolean("chat.global_chat.discord.chat.enabled");
+        DISCORD_LINKING = CONFIG.getBoolean("chat.global_chat.discord.linking.enabled");
 
         if (CONFIG.getString("earth_world") == null) {
             //Setting default value.

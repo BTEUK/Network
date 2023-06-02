@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import static me.bteuk.network.utils.Constants.LOGGER;
+import static me.bteuk.network.utils.Constants.STAFF_CHAT;
 
 public class Staff implements CommandExecutor {
 
@@ -58,8 +59,8 @@ public class Staff implements CommandExecutor {
 
         if (u == null) {return true;}
 
-        //If first arg is chat, switch the player to and from staff chat.
-        if (args.length > 0) {
+        //If first arg is chat, switch the player to and from staff chat if enabled.
+        if (args.length > 0 && STAFF_CHAT) {
             if (args[0].equalsIgnoreCase("chat")) {
                 if (u.staffChat) {
                     u.player.sendMessage(Utils.success("Disabled staff chat."));
