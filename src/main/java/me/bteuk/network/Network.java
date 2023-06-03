@@ -171,14 +171,8 @@ public final class Network extends JavaPlugin {
         //Create user list.
         networkUsers = new ArrayList<>();
 
-        //Enabled global chat if enabled.
-        if (GLOBAL_CHAT) {
-            chat = new CustomChat(this);
-        } else {
-
-        }
-
-        //Create listener to check for afk.
+        //Enabled chat, both global and normal chat are handled through this.
+        chat = new CustomChat(this);
 
         //Setup connect.
         //Network connect

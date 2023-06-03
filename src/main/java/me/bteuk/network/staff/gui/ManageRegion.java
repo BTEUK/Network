@@ -1,4 +1,4 @@
-package me.bteuk.network.staff;
+package me.bteuk.network.staff.gui;
 
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.utils.NetworkUser;

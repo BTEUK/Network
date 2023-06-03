@@ -3,7 +3,7 @@ package me.bteuk.network.gui.regions;
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.sql.RegionSQL;
-import me.bteuk.network.staff.StaffGui;
+import me.bteuk.network.staff.gui.StaffGui;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.regions.Request;
 import net.kyori.adventure.text.Component;

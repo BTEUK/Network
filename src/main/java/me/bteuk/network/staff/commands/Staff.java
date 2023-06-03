@@ -1,8 +1,7 @@
 package me.bteuk.network.staff.commands;
 
 import me.bteuk.network.Network;
-import me.bteuk.network.sql.GlobalSQL;
-import me.bteuk.network.staff.StaffGui;
+import me.bteuk.network.staff.gui.StaffGui;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;

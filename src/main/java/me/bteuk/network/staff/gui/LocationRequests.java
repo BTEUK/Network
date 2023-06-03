@@ -1,8 +1,9 @@
-package me.bteuk.network.staff;
+package me.bteuk.network.staff.gui;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.gui.navigation.AddLocation;
+import me.bteuk.network.staff.gui.StaffGui;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.AddLocationType;
 import me.bteuk.network.utils.enums.Categories;

@@ -1,0 +1,170 @@
+package me.bteuk.network.staff.gui;
+
+import me.bteuk.network.Network;
+import me.bteuk.network.gui.Gui;
+import me.bteuk.network.gui.regions.RegionInfo;
+import me.bteuk.network.utils.Time;
+import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.enums.ModerationType;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Material;
+
+import java.util.List;
+
+public class SelectUser extends Gui {
+
+    List<String> users;
+
+    ModerationType type;
+
+    int page;
+
+    public SelectUser(ModerationType type) {
+
+        super(45, Component.text("Select User for " + type.label, NamedTextColor.AQUA, TextDecoration.BOLD));
+
+        this.type = type;
+
+        //Select all the players to show in the menu depending on the ModerationType.
+        switch (type) {
+
+            case BAN, MUTE, KICK -> {
+
+                //Get online users.
+                users = Network.getInstance().globalSQL.getStringList("SELECT uuid FROM online_users;");
+
+            }
+
+            case UNBAN -> {
+
+                //Get banned users.
+                users = Network.getInstance().globalSQL.getStringList("SELECT uuid FROM moderation WHERE end_time>" + Time.currentTime() + " AND type='ban'");
+
+            }
+
+            case UNMUTE -> {
+
+                //Get muted users.
+                users = Network.getInstance().globalSQL.getStringList("SELECT uuid FROM moderation WHERE end_time>" + Time.currentTime() + " AND type='mute'");
+
+            }
+        }
+
+        createGui();
+
+    }
+
+    private void createGui() {
+
+        //Slot count.
+        int slot = 10;
+
+        //Skip count.
+        int skip = 21 * (page - 1);
+
+        //If page is greater than 1 add a previous page button.
+        if (page > 1) {
+            setItem(18, Utils.createItem(Material.ARROW, 1,
+                            Utils.title("Previous Page"),
+                            Utils.line("Open the previous page of regions.")),
+                    u ->
+
+                    {
+
+                        //Update the gui.
+                        page--;
+                        this.refresh();
+                        u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
+
+                    });
+        }
+
+        //Make a button for each user.
+        for (int i = 0; i < users.size(); i++) {
+
+            int finalI = i;
+
+            //If skip is greater than 0, skip this iteration.
+            if (skip > 0) {
+                skip--;
+                continue;
+            }
+
+            //If the slot is greater than the number that fit in a page, create a new page.
+            if (slot > 34) {
+
+                setItem(26, Utils.createItem(Material.ARROW, 1,
+                                Utils.title("Next Page"),
+                                Utils.line("Open the next page of users.")),
+                        u ->
+
+                        {
+
+                            //Update the gui.
+                            page++;
+                            this.refresh();
+                            u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
+
+                        });
+
+                //Stop iterating.
+                break;
+
+            }
+
+            //Create a menu for the moderation action for this specific player.
+            //Ban and muting has a submenu to select duration and reason.
+            //Kicking just prompts staff to type the reason in chat.
+            //Unban and unmute is just a simple click.
+            switch (type) {
+
+                case BAN, MUTE -> {
+
+                }
+
+                case KICK -> {
+
+                }
+
+                case UNBAN, UNMUTE -> {
+
+                }
+
+            }
+
+            //Increase slot accordingly.
+            if (slot % 9 == 7) {
+                //Increase row, basically add 3.
+                slot += 3;
+            } else {
+                //Increase value by 1.
+                slot++;
+            }
+        }
+
+        setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
+                        Utils.title("Previous Page"),
+                        Utils.line("Open the moderation menu.")),
+                u ->
+
+                {
+
+                    //Return to request menu.
+                    this.delete();
+                    u.staffGui = null;
+
+                    u.staffGui = new ModerationGui();
+                    u.staffGui.open(u);
+
+                });
+    }
+
+    public void refresh() {
+
+        this.clearGui();
+        createGui();
+
+    }
+}
