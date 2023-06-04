@@ -230,17 +230,6 @@ public class Timers {
                 }
             }
 
-            //Check for users with a last ping greater than 10 seconds ago, disconnect them from the network.
-            uuids = globalSQL.getStringList("SELECT uuid FROM online_users WHERE last_ping<" + (time - (1000 * 10)) + ";");
-
-            //Iterate through uuids and check time.
-            for (String uuid : uuids) {
-
-                //Run network disconnect and remove their entry.
-                connect.leaveEvent(Bukkit.getOfflinePlayer(uuid));
-
-            }
-
         }, 0L, 20L));
 
         //1 minute timer.
