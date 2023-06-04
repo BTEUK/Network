@@ -1,15 +1,21 @@
 package me.bteuk.network.utils;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.commands.Nightvision;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.utils.regions.Region;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import static me.bteuk.network.utils.Constants.EARTH_WORLD;
-import static me.bteuk.network.utils.Constants.SERVER_NAME;
+import static me.bteuk.network.utils.Constants.*;
+import static me.bteuk.network.utils.Constants.TAB;
 
 public class NetworkUser {
+
+    //Network instance.
+    private final Network instance;
 
     //Player instance.
     public final Player player;
@@ -59,6 +65,8 @@ public class NetworkUser {
 
     public NetworkUser(Player player) {
 
+        this.instance = Network.getInstance();
+
         this.player = player;
 
         switching = false;
@@ -67,64 +75,130 @@ public class NetworkUser {
         afk = false;
         last_movement = Time.currentTime();
 
+        //Update builder role in database.
+        instance.globalSQL.update("UPDATE player_data SET builder_role='" + Roles.builderRole(player) + "' WHERE uuid='" + player.getUniqueId() + "';");
+
+        //Load tab for the user.
+        loadTab();
+
         //Get discord linked status.
         //If they're linked get discord id.
-        isLinked = Network.getInstance().globalSQL.hasRow("SELECT uuid FROM discord WHERE uuid='" + player.getUniqueId() + "';");
+        isLinked = instance.globalSQL.hasRow("SELECT uuid FROM discord WHERE uuid='" + player.getUniqueId() + "';");
         if (isLinked) {
-            discord_id = Network.getInstance().globalSQL.getLong("SELECT discord_id FROM discord WHERE uuid='" + player.getUniqueId() + "';");
+            discord_id = instance.globalSQL.getLong("SELECT discord_id FROM discord WHERE uuid='" + player.getUniqueId() + "';");
         }
 
         //Set navigator enabled/disabled.
-        navigator = Network.getInstance().globalSQL.hasRow("SELECT navigator FROM player_data WHERE uuid='" + player.getUniqueId() + "' AND navigator=1;");
+        navigator = instance.globalSQL.hasRow("SELECT navigator FROM player_data WHERE uuid='" + player.getUniqueId() + "' AND navigator=1;");
         //If navigator is disabled, remove the navigator if in the inventory.
         if (!navigator) {
 
             ItemStack slot8 = player.getInventory().getItem(8);
 
             if (slot8 != null) {
-                if (slot8.equals(Network.getInstance().navigator)) {
+                if (slot8.equals(instance.navigator)) {
                     player.getInventory().setItem(8, null);
                 }
             }
         }
 
         //Set staff chat value, if user is no longer staff, auto-disable.
-        if (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM player_data WHERE uuid='" + player.getUniqueId() + "' AND staff_chat=1;")) {
+        if (instance.globalSQL.hasRow("SELECT uuid FROM player_data WHERE uuid='" + player.getUniqueId() + "' AND staff_chat=1;")) {
             if (player.hasPermission("uknet.staff")) {
                 staffChat = true;
             } else {
                 staffChat = false;
                 //And remove staff from database.
-                Network.getInstance().globalSQL.update("UPDATE player_data SET staff_chat=0 WHERE uuid='" + player.getUniqueId() + "';");
+                instance.globalSQL.update("UPDATE player_data SET staff_chat=0 WHERE uuid='" + player.getUniqueId() + "';");
             }
         } else {
             staffChat = false;
         }
 
-        //Update builder role in database.
-        Network.getInstance().globalSQL.update("UPDATE player_data SET builder_role='" + Roles.builderRole(player) + "' WHERE uuid='" + player.getUniqueId() + "';");
-
         //Check if the player is in a region.
-        if (SERVER_NAME.equals(Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH'"))) {
+        if (SERVER_NAME.equals(instance.globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH'"))) {
             //Check if they are in the earth world.
             if (player.getLocation().getWorld().getName().equals(EARTH_WORLD)) {
-                region = Network.getInstance().getRegionManager().getRegion(player.getLocation());
+                region = instance.getRegionManager().getRegion(player.getLocation());
                 //Add region to database if not exists.
                 region.addToDatabase();
                 inRegion = true;
             }
-        } else if (SERVER_NAME.equals(Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='PLOT';"))) {
+        } else if (SERVER_NAME.equals(instance.globalSQL.getString("SELECT name FROM server_data WHERE type='PLOT';"))) {
             //Check if the player is in a buildable plot world and apply coordinate transform if true.
-            if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';")) {
-                dx = -Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';");
-                dz = -Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';");
+            if (instance.plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';")) {
+                dx = -instance.plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';");
+                dz = -instance.plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';");
 
-                region = Network.getInstance().getRegionManager().getRegion(player.getLocation(), dx, dz);
+                region = instance.getRegionManager().getRegion(player.getLocation(), dx, dz);
                 inRegion = true;
             }
         }
 
+        runEvents();
+
         last_time_log = Time.currentTime();
         active_time = 0;
+
+        //Give the player nightvision if enabled or remove it if disabled.
+        if (instance.globalSQL.hasRow("SELECT nightvision_enabled FROM player_data WHERE nightvision_enabled=1 AND uuid='" + player.getUniqueId() + "';")) {
+
+            Nightvision.giveNightvision(player);
+
+        } else {
+
+            Nightvision.removeNightvision(player);
+
+        }
+    }
+
+    private void loadTab() {
+
+        //If this is the first player on the server, add all players from other servers to tab.
+        if (instance.getServer().getOnlinePlayers().size() == 1 && TAB) {
+            //Add all players from other servers to the fake players list, so they will show in tab when players connect.
+            for (String uuid : instance.globalSQL.getStringList("SELECT uuid FROM online_users;")) {
+                instance.tab.addFakePlayer(uuid);
+            }
+        }
+
+        if (TAB) {
+            //Add the player to the fake players list for other servers.
+            instance.chat.broadcastMessage(Component.text("add " + player.getUniqueId()), "uknet:tab");
+
+            //Remove the player from the fake players list, if they are currently in it.
+            instance.tab.removeFakePlayer(player.getUniqueId().toString());
+
+            //Load tab for the player, this will add the fake players.
+            Bukkit.getScheduler().runTask(instance, () -> instance.tab.loadTab(player));
+        }
+
+    }
+
+    private void runEvents() {
+
+        //Check if the player has any join events, if try run them.
+        //Delay by 1 second for all plugins to run their join events.
+        Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> {
+            if (instance.globalSQL.hasRow("SELECT uuid FROM join_events WHERE uuid='" + player.getUniqueId() + "' AND type='network';")) {
+
+                //Get the event from the database.
+                String event = instance.globalSQL.getString("SELECT event FROM join_events WHERE uuid='" + player.getUniqueId() + "' AND type='network'");
+
+                //Get message.
+                String message = instance.globalSQL.getString("SELECT message FROM join_events WHERE uuid='" + player.getUniqueId() + "' AND type='network'");
+
+                //Split the event by word.
+                String[] aEvent = event.split(" ");
+
+                //Clear the events.
+                instance.globalSQL.update("DELETE FROM join_events WHERE uuid='" + player.getUniqueId() + "' AND type='network';");
+
+                //Send the event to the event handler.
+                instance.getTimers().getEventManager().event(player.getUniqueId().toString(), aEvent, message);
+
+            }
+        }, 20L);
+
     }
 }

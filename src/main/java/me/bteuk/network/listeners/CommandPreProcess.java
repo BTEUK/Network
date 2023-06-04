@@ -114,8 +114,8 @@ public class CommandPreProcess implements Listener {
 
         //Block the LeaveServer listener so it doesn't trigger since it causes an error.
         //It needs to be active to prevent the leave message to show in chat.
-        if (instance.leaveServer != null) {
-            instance.leaveServer.block();
+        if (instance.getConnect() != null) {
+            instance.getConnect().setBlockLeaveEvent(true);
         }
 
         //Check if another server is online,

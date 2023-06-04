@@ -1,12 +1,11 @@
 package me.bteuk.network.listeners;
 
+import lombok.Setter;
 import me.bteuk.network.Network;
+import me.bteuk.network.gui.Gui;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
-import me.bteuk.network.utils.Roles;
-import me.bteuk.network.utils.TextureUtils;
-import me.bteuk.network.utils.Time;
-import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.*;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -14,12 +13,19 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+
+import java.util.UUID;
 
 import static me.bteuk.network.utils.Constants.*;
 import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
 //This class deals with players joining and leaving the network.
-public class Connect {
+public class Connect implements Listener {
 
     private final Network instance;
 
@@ -30,12 +36,17 @@ public class Connect {
     private String firstJoinMessage;
     private String leaveMessage;
 
+    @Setter
+    private boolean blockLeaveEvent;
+
     public Connect(Network instance, GlobalSQL globalSQL, PlotSQL plotSQL) {
 
         this.instance = instance;
 
         this.globalSQL = globalSQL;
         this.plotSQL = plotSQL;
+
+        this.blockLeaveEvent = false;
 
         //Get join and leave message from config.
         if (CUSTOM_MESSAGES) {
@@ -44,13 +55,126 @@ public class Connect {
             leaveMessage = CONFIG.getString("chat.custom_messages.leave");
         }
 
+        //Register join and leave events.
+        Bukkit.getServer().getPluginManager().registerEvents(this, instance);
+
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void joinServerEvent(PlayerJoinEvent e) {
+
+        //Cancel default join message if custom messages are enabled.
+        if (CUSTOM_MESSAGES) {
+            e.joinMessage(null);
+        } else {
+
+            //If discord chat is enabled send the join message to discord also.
+            if (DISCORD_CHAT) {
+                instance.chat.broadcastMessage(e.joinMessage(),"uknet:discord_connect");
+            }
+
+        }
+
+        //If the player is not in the online_users table add them, and run a network connect.
+        if (globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid='" + e.getPlayer().getUniqueId() + "';")) {
+
+            serverSwitchEvent(e.getPlayer());
+
+        } else {
+
+            networkJoinEvent(e.getPlayer());
+        }
+
+        //Add user to the list.
+        //This will also run the player-specific functions that need to be run for both network join and server switch.
+        NetworkUser u = new NetworkUser(e.getPlayer());
+        instance.addUser(u);
+
+    }
+
+    @EventHandler
+    public void leaveServerEvent(PlayerQuitEvent e) {
+
+        //Cancel default join message if custom messages are enabled.
+        if (CUSTOM_MESSAGES) {
+            e.quitMessage(null);
+        } else {
+
+            //If discord chat is enabled send the join message to discord also.
+            if (DISCORD_CHAT) {
+                instance.chat.broadcastMessage(e.quitMessage(),"uknet:discord_disconnect");
+            }
+        }
+
+        if (blockLeaveEvent) {
+            e.quitMessage(null);
+            return;
+        }
+
+        NetworkUser u = instance.getUser(e.getPlayer());
+
+        //If u is null, cancel.
+        if (u == null) {
+            LOGGER.severe("User " + e.getPlayer().getName() + " can not be found!");
+            e.getPlayer().sendMessage(Utils.error("User can not be found, please relog!"));
+            return;
+        }
+
+        //Reset last logged time.
+        if (u.afk) {
+            u.last_time_log = u.last_movement = Time.currentTime();
+            u.afk = false;
+        }
+
+        //Update statistics
+        long time = Time.currentTime();
+        Statistics.save(u, Time.getDate(time), time);
+
+        //Remove user from list.
+        instance.removeUser(u);
+
+        //Get player uuid.
+        UUID playerUUID = u.player.getUniqueId();
+
+        //If they are currently in an inventory, remove them from the list of open inventories.
+        Gui.openInventories.remove(playerUUID);
+
+        //Delete any guis that may exist.
+        if (u.mainGui != null) {
+            u.mainGui.delete();
+        }
+        if (u.staffGui != null) {
+            u.staffGui.delete();
+        }
+        if (u.lightsOut != null) {
+            u.lightsOut.delete();
+        }
+
+        //If the player is not in the server_switch table they have disconnected from the network.
+        if (!globalSQL.hasRow("SELECT uuid FROM server_switch WHERE uuid='" + e.getPlayer().getUniqueId()
+                + "' AND from_server='" + SERVER_NAME + "';")) {
+
+            //Run leave network sequence.
+            networkLeaveEvent(e.getPlayer());
+
+        }
+
+        //If this is the last player on the server, remove all players from other servers from tab.
+        if (TAB) {
+            if (instance.getServer().getOnlinePlayers().size() == 1) {
+                //Add all players from other servers to the fake players list, so they will show in tab when players connect.
+                for (String uuid : globalSQL.getStringList("SELECT uuid FROM online_users;")) {
+                    instance.tab.removeFakePlayer(uuid);
+                }
+            }
+        }
     }
 
     /*
     A player has officially connected to the network if they have
     join the server but are not in the online_users table in the database.
      */
-    public void joinEvent(Player p) {
+    public void networkJoinEvent(Player p) {
 
         //If the user is not yet in the player_data table add them.
         if (!globalSQL.hasRow("SELECT uuid FROM player_data WHERE uuid='" + p.getUniqueId() + "';")) {
@@ -94,7 +218,6 @@ public class Connect {
 
                 }
             }, 1L);
-
         }
 
         //Add user to table.
@@ -155,12 +278,25 @@ public class Connect {
 
     }
 
+    private void serverSwitchEvent(Player p) {
+
+        //Update server.
+        globalSQL.update("UPDATE online_users SET server='" + SERVER_NAME + "' WHERE uuid='" + p.getUniqueId() + "';");
+
+        //Remove their server_switch entry. Delayed by 1 second to make sure the previous server has run their PlayerQuitEvent.
+        Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> globalSQL.update("DELETE FROM server_switch WHERE uuid='" + p.getUniqueId() + "';"), 20L);
+
+        //Update the last_ping.
+        globalSQL.update("UPDATE online_users SET last_ping=" + Time.currentTime() + " WHERE uuid='" + p.getUniqueId() + "' AND server='" + SERVER_NAME + "';");
+
+    }
+
     /*
     A player has officially disconnected from the network after two
     unsuccessful pings by any network-connected server.
     A ping will occur on a one-second interval.
      */
-    public void leaveEvent(OfflinePlayer p) {
+    public void networkLeaveEvent(OfflinePlayer p) {
 
         String uuid = p.getUniqueId().toString();
 

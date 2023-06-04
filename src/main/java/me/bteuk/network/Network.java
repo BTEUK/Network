@@ -71,8 +71,9 @@ public final class Network extends JavaPlugin {
     //Lobby
     private Lobby lobby;
 
-    //Leave Server listener.
-    public LeaveServer leaveServer;
+    //Listener and manager of server connects.
+    @Getter
+    private Connect connect;
 
     //Movement listeners.
     public MoveListener moveListener;
@@ -174,18 +175,14 @@ public final class Network extends JavaPlugin {
         //Enabled chat, both global and normal chat are handled through this.
         chat = new CustomChat(this);
 
-        //Setup connect.
-        //Network connect
-        Connect connect = new Connect(this, globalSQL, plotSQL);
+        //Setup connect, this handles all connections to the server.
+        connect = new Connect(this, globalSQL, plotSQL);
 
         //Create navigator.
         navigatorGui = new NavigatorGui();
         navigator = Utils.createItem(Material.NETHER_STAR, 1, Utils.title("Navigator"), Utils.line("Click to open the navigator."));
 
         //Register events.
-        new JoinServer(this, globalSQL, connect);
-        leaveServer = new LeaveServer(this, globalSQL, connect);
-
         new PreJoinServer(this);
 
         new GuiListener(this);

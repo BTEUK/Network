@@ -225,7 +225,7 @@ public class Timers {
                     //Run network disconnect and remove their entry.
                     globalSQL.update("DELETE FROM server_switch WHERE uuid='" + uuid + "';");
 
-                    connect.leaveEvent(Bukkit.getOfflinePlayer(UUID.fromString(uuid)));
+                    connect.networkLeaveEvent(Bukkit.getOfflinePlayer(UUID.fromString(uuid)));
 
                 }
             }
