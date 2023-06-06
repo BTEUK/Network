@@ -189,6 +189,7 @@ public final class Network extends JavaPlugin {
         navigator = Utils.createItem(Material.NETHER_STAR, 1, Utils.title("Navigator"), Utils.line("Click to open the navigator."));
 
         //Register events.
+        PlayerDisplayName scoreboard = new PlayerDisplayName();
         new JoinServer(this, globalSQL, connect);
         leaveServer = new LeaveServer(this, globalSQL, connect);
 
