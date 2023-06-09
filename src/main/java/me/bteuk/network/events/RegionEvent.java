@@ -119,7 +119,7 @@ public class RegionEvent extends AbstractEvent {
 
                 //Send message to plot owner.
                 Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + region.getOwner() + "','&3" +
-                        Network.getInstance().globalSQL.getStringList("SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " &ahas joined region &3" + region.getTag(region.getOwner()) + "');");
+                        Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " &ahas joined region &3" + region.getTag(region.getOwner()) + "');");
                 break;
             }
         }

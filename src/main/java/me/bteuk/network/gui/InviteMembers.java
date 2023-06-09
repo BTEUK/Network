@@ -299,8 +299,10 @@ public class InviteMembers extends Gui {
             EventManager.createEvent(uuid, "network", globalSQL.getString("SELECT server FROM online_users WHERE uuid='" + uuid + "';"),
                     "invite region " + region.regionName());
 
-            u.player.sendMessage(Utils.success("Invited &3" + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "'") +
-                    " &ato region " + region.getTag(u.player.getUniqueId().toString()) + "."));
+            u.player.sendMessage(Utils.success("Invited ")
+                    .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "'"), NamedTextColor.DARK_AQUA))
+                    .append(Utils.success(" to region "))
+                    .append(Component.text(region.getTag(u.player.getUniqueId().toString()), NamedTextColor.DARK_AQUA)));
 
         } else if (regionType == RegionType.PLOT) {
 
@@ -315,7 +317,9 @@ public class InviteMembers extends Gui {
             EventManager.createEvent(uuid, "network", globalSQL.getString("SELECT server FROM online_users WHERE uuid='" + uuid + "';"),
                     "invite plot " + plotID);
 
-            u.player.sendMessage(Utils.success("Invited &3" + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "'") + " &ato your Plot."));
+            u.player.sendMessage(Utils.success("Invited ")
+                    .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "'"), NamedTextColor.DARK_AQUA))
+                    .append(Utils.success(" to your Plot.")));
 
         } else if (regionType == RegionType.ZONE) {
 
@@ -330,7 +334,9 @@ public class InviteMembers extends Gui {
             EventManager.createEvent(uuid, "network", globalSQL.getString("SELECT server FROM online_users WHERE uuid='" + uuid + "';"),
                     "invite zone " + zoneID);
 
-            u.player.sendMessage(Utils.success("Invited &3" + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "'") + " &ato your Zone."));
+            u.player.sendMessage(Utils.success("Invited ")
+                    .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "'"), NamedTextColor.DARK_AQUA))
+                    .append(Utils.success(" to your Zone.")));
 
         }
     }
