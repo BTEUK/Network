@@ -176,7 +176,7 @@ public final class Network extends JavaPlugin {
         chat = new CustomChat(this);
 
         //Setup connect, this handles all connections to the server.
-        connect = new Connect(this, globalSQL, plotSQL);
+        connect = new Connect(this, globalSQL, plotSQL, regionSQL);
 
         //Create navigator.
         navigatorGui = new NavigatorGui();

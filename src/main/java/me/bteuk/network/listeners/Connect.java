@@ -5,6 +5,7 @@ import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
+import me.bteuk.network.sql.RegionSQL;
 import me.bteuk.network.utils.*;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
@@ -31,6 +32,7 @@ public class Connect implements Listener {
 
     private final GlobalSQL globalSQL;
     private final PlotSQL plotSQL;
+    private final RegionSQL regionSQL;
 
     private String joinMessage;
     private String firstJoinMessage;
@@ -39,12 +41,13 @@ public class Connect implements Listener {
     @Setter
     private boolean blockLeaveEvent;
 
-    public Connect(Network instance, GlobalSQL globalSQL, PlotSQL plotSQL) {
+    public Connect(Network instance, GlobalSQL globalSQL, PlotSQL plotSQL, RegionSQL regionSQL) {
 
         this.instance = instance;
 
         this.globalSQL = globalSQL;
         this.plotSQL = plotSQL;
+        this.regionSQL = regionSQL;
 
         this.blockLeaveEvent = false;
 
@@ -303,10 +306,12 @@ public class Connect implements Listener {
         //Remove any outstanding invites that this player has sent.
         plotSQL.update("DELETE FROM plot_invites WHERE owner='" + uuid + "';");
         plotSQL.update("DELETE FROM zone_invites WHERE owner='" + uuid + "';");
+        regionSQL.update("DELETE FROM region_invites WHERE owner='" + uuid + "';");
 
         //Remove any outstanding invites that this player has received.
         plotSQL.update("DELETE FROM plot_invites WHERE uuid='" + uuid + "';");
         plotSQL.update("DELETE FROM zone_invites WHERE uuid='" + uuid + "';");
+        regionSQL.update("DELETE FROM region_invites WHERE uuid='" + uuid + "';");
 
         //Set last_online time in playerdata.
         globalSQL.update("UPDATE player_data SET last_online=" + Time.currentTime() + " WHERE UUID='" + uuid + "';");

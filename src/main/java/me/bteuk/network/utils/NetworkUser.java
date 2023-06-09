@@ -3,6 +3,7 @@ package me.bteuk.network.utils;
 import me.bteuk.network.Network;
 import me.bteuk.network.commands.Nightvision;
 import me.bteuk.network.gui.Gui;
+import me.bteuk.network.utils.enums.ServerType;
 import me.bteuk.network.utils.regions.Region;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -116,7 +117,7 @@ public class NetworkUser {
         }
 
         //Check if the player is in a region.
-        if (SERVER_NAME.equals(instance.globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH'"))) {
+        if (SERVER_TYPE == ServerType.EARTH) {
             //Check if they are in the earth world.
             if (player.getLocation().getWorld().getName().equals(EARTH_WORLD)) {
                 region = instance.getRegionManager().getRegion(player.getLocation());
@@ -124,7 +125,7 @@ public class NetworkUser {
                 region.addToDatabase();
                 inRegion = true;
             }
-        } else if (SERVER_NAME.equals(instance.globalSQL.getString("SELECT name FROM server_data WHERE type='PLOT';"))) {
+        } else if (SERVER_TYPE == ServerType.PLOT) {
             //Check if the player is in a buildable plot world and apply coordinate transform if true.
             if (instance.plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';")) {
                 dx = -instance.plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';");
