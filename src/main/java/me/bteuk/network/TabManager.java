@@ -8,6 +8,7 @@ import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.PlayerInfoData;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.comphenix.protocol.wrappers.WrappedGameProfile;
+import me.bteuk.network.utils.PlayerDisplayName;
 import me.bteuk.network.utils.Roles;
 import me.bteuk.network.utils.Utils;
 import org.bukkit.entity.Player;
@@ -22,6 +23,8 @@ public class TabManager {
     private final ProtocolManager pm;
     private PacketListener pl;
 
+    private final PlayerDisplayName playerDisplayName;
+
     //private List<TextComponent> headers = new ArrayList<>();
     //private List<TextComponent> footers = new ArrayList<>();
 
@@ -31,6 +34,8 @@ public class TabManager {
 
         this.instance = instance;
         pm = ProtocolLibrary.getProtocolManager();
+
+        playerDisplayName = new PlayerDisplayName();
 
         fakePlayers = new HashMap<>();
 
@@ -137,7 +142,6 @@ public class TabManager {
     //Add all players from other servers.
     public void loadTab(Player p) {
 
-
         //Add all players from the fake player list.
         for (PlayerInfoData playerInfoData : fakePlayers.values()) {
 
@@ -175,18 +179,23 @@ public class TabManager {
 
                     PlayerInfoData info = infoList.get(0);
 
-                    String displayName = instance.globalSQL.getString("SELECT display_name FROM online_users WHERE uuid='" + info.getProfile().getUUID() + "';");
-                    String name = instance.globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + info.getProfile().getUUID() + "';");
-
-                    //Add prefix char to the name so it gets sorted by role first.
-                    name = Roles.tabSorting(instance.globalSQL.getString("SELECT primary_role FROM online_users WHERE uuid='" + info.getProfile().getUUID() + "';")) + name;
-
-                    if (name.length() > 16) {
-                        name = name.substring(0, 16);
+                    //If player is not online, skip.
+                    if (!instance.globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid='" + info.getProfile().getUUID() + "';")) {
+                        event.setCancelled(true);
+                        return;
                     }
 
+                    String displayName = instance.globalSQL.getString("SELECT display_name FROM online_users WHERE uuid='" + info.getProfile().getUUID() + "';");
+
+                    //Get the name of the team which the player needs adding to, this is to sort tab.
+                    char teamName = Roles.tabSorting(instance.globalSQL.getString("SELECT primary_role FROM online_users WHERE uuid='" + info.getProfile().getUUID() + "';"));
+
+                    //Add player to the correct team.
+                    playerDisplayName.addEntry(info.getProfile().getName(), String.valueOf(teamName));
+
                     infoList.clear();
-                    infoList.add(new PlayerInfoData(new WrappedGameProfile(info.getProfile().getUUID(), name), 0, EnumWrappers.NativeGameMode.CREATIVE, WrappedChatComponent.fromJson(Utils.tabName(displayName))));
+
+                    infoList.add(new PlayerInfoData(info.getProfile(), 0, EnumWrappers.NativeGameMode.CREATIVE, WrappedChatComponent.fromJson(Utils.tabName(displayName))));
 
                     packet.getPlayerInfoDataLists().write(0, infoList);
 

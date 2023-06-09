@@ -63,7 +63,12 @@ public record Region(String regionName) {
 
     //Return the region status.
     public RegionStatus status() {
-        return (RegionStatus.valueOf(Network.getInstance().regionSQL.getString("SELECT status FROM regions WHERE region='" + regionName + "';").toUpperCase(Locale.ROOT)));
+        String status = Network.getInstance().regionSQL.getString("SELECT status FROM regions WHERE region='" + regionName + "';");
+        if (status == null) {
+            return RegionStatus.DEFAULT;
+        } else {
+            return (RegionStatus.valueOf(status.toUpperCase(Locale.ROOT)));
+        }
     }
 
     //Return whether the region is claimable.
