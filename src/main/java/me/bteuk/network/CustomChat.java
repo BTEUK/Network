@@ -245,7 +245,7 @@ public class CustomChat implements Listener, PluginMessageListener {
                 OutputStream output = socket.getOutputStream();
                 ObjectOutputStream objectOutput = new ObjectOutputStream(output);
 
-                objectOutput.writeObject(GsonComponentSerializer.gson().serialize(message));
+                objectOutput.writeObject(Utils.toJson(message));
                 objectOutput.writeObject(channel);
                 objectOutput.flush();
 
