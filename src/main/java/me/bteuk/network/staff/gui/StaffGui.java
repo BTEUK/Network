@@ -186,7 +186,8 @@ public class StaffGui extends Gui {
                     if (Network.getInstance().plotSQL.hasRow("SELECT id FROM plot_data WHERE status='submitted';")) {
 
                         //Get arraylist of submitted plots.
-                        ArrayList<Integer> nPlots = Network.getInstance().plotSQL.getIntList("SELECT id FROM plot_data WHERE status='submitted';");
+                        //Order them by submit time, so the oldest submissions are reviewed first.
+                        ArrayList<Integer> nPlots = Network.getInstance().plotSQL.getIntList("SELECT pd.id FROM plot_data AS pd INNER JOIN plot_submissions AS ps ON pd.id=ps.id WHERE pd.status='submitted' ORDER BY ps.submit_time ASC;");
 
                         int counter = 0;
 
