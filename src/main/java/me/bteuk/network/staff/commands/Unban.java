@@ -59,6 +59,23 @@ public class Unban extends Moderation implements CommandExecutor {
 
         String uuid = Network.getInstance().globalSQL.getString("SELECT uuid FROM player_data WHERE name='" + args[0] + "';");
 
+        sender.sendMessage(unbanPlayer(args[0], uuid));
+
+        return false;
+    }
+
+    /**
+     * Unban the player and return the feedback so the executor can be notified of success/failure.
+     *
+     * @param name
+     * Name of the banned player.
+     * @param uuid
+     * Uuid of the banned player.
+     * @return
+     * The Component to display to the executor.
+     */
+    public Component unbanPlayer(String name, String uuid) {
+
         //Check if the player is currently banned.
         if (isBanned(uuid)) {
 
@@ -66,14 +83,11 @@ public class Unban extends Moderation implements CommandExecutor {
             unban(uuid);
 
             //Send feedback.
-            sender.sendMessage(Utils.success("Unbanned ")
-                    .append(Component.text(args[0], NamedTextColor.DARK_AQUA)));
+            return (Utils.success("Unbanned ")
+                    .append(Component.text(name, NamedTextColor.DARK_AQUA)));
 
         } else {
-            sender.sendMessage(Utils.error(args[0] + " is not currently banned."));
-            return true;
+            return (Utils.error(name + " is not currently banned."));
         }
-
-        return false;
     }
 }

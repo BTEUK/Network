@@ -59,6 +59,23 @@ public class Unmute extends Moderation implements CommandExecutor {
 
         String uuid = Network.getInstance().globalSQL.getString("SELECT uuid FROM player_data WHERE name='" + args[0] + "';");
 
+        sender.sendMessage(unmutePlayer(args[0], uuid));
+
+        return true;
+    }
+
+    /**
+     * Unmute the player and return the feedback so the executor can be notified of success/failure.
+     *
+     * @param name
+     * Name of the muted player.
+     * @param uuid
+     * Uuid of the muted player.
+     * @return
+     * The Component to display to the executor.
+     */
+    public Component unmutePlayer(String name, String uuid) {
+
         //Check if the player is currently banned.
         if (isMuted(uuid)) {
 
@@ -66,14 +83,12 @@ public class Unmute extends Moderation implements CommandExecutor {
             unmute(uuid);
 
             //Send feedback.
-            sender.sendMessage(Utils.success("Unmuted ")
-                    .append(Component.text(args[0], NamedTextColor.DARK_AQUA)));
+            return (Utils.success("Unmuted ")
+                    .append(Component.text(name, NamedTextColor.DARK_AQUA)));
 
         } else {
-            sender.sendMessage(Utils.error(args[0] + " is not currently muted."));
-            return true;
-        }
+            return (Utils.error(name + " is not currently muted."));
 
-        return false;
+        }
     }
 }

@@ -2,9 +2,7 @@ package me.bteuk.network.staff.gui;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
-import me.bteuk.network.gui.regions.RegionInfo;
 import me.bteuk.network.sql.GlobalSQL;
-import me.bteuk.network.staff.listeners.ModerationReasonListener;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.ModerationType;
@@ -14,6 +12,9 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 
 import java.util.List;
+
+import static me.bteuk.network.utils.enums.ModerationType.UNBAN;
+import static me.bteuk.network.utils.enums.ModerationType.UNMUTE;
 
 public class SelectUser extends Gui {
 
@@ -132,29 +133,47 @@ public class SelectUser extends Gui {
 
                 }
 
-                case KICK -> {
+                case KICK -> //Kick the player from the server.
+                        setItem(i, Utils.createItem(Material.RED_CONCRETE, 1,
+                                        Utils.title("Kick " + name),
+                                        Utils.line("Opens the kick menu to set the parameters.")),
+                                u ->
 
-                    //Kick the player from the server.
+                                {
 
-                    setItem(i, Utils.createItem(Material.RED_CONCRETE, 1,
-                                    Utils.title("Kick " + name),
-                                    Utils.line("Opens the kick menu to set the parameters.")),
-                            u ->
+                                    //Open the kick menu.
+                                    this.delete();
+                                    u.staffGui = new ModerationActionGui(type, uuid);
+                                    u.staffGui.open(u);
 
-                            {
+                                });
 
-                                //Open the kick menu.
-                                this.delete();
-                                u.staffGui = new ModerationActionGui(type, uuid);
-                                u.staffGui.open(u);
+                case UNBAN, UNMUTE -> //Unban/unmute the player.
+                        setItem(i, Utils.createItem(Material.LIME_CONCRETE, 1,
+                                        Utils.title(type.label + " " + name),
+                                        Utils.line(type.label + " the player immediately.")),
 
-                            });
+                                u -> {
 
-                }
+                                    u.player.closeInventory();
 
-                case UNBAN, UNMUTE -> {
+                                    if (type == UNBAN) {
 
-                }
+                                        //Unban the player.
+                                        u.player.sendMessage(Network.getInstance().getUnban().unbanPlayer(name, uuid));
+
+                                    } else if (type == UNMUTE) {
+
+                                        //Unmute the player.
+                                        u.player.sendMessage(Network.getInstance().getUnmute().unmutePlayer(name, uuid));
+
+                                    }
+
+                                    //Delete the gui and remove it from the user.
+                                    this.delete();
+                                    u.staffGui = null;
+
+                                });
 
             }
 
