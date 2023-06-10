@@ -11,7 +11,9 @@ import me.bteuk.network.Network;
 import me.bteuk.network.events.EventManager;
 import me.bteuk.network.exceptions.DurationFormatException;
 import me.bteuk.network.exceptions.NotBannedException;
+import me.bteuk.network.exceptions.NotMutedException;
 import me.bteuk.network.utils.Time;
+import me.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -35,16 +37,13 @@ public abstract class Moderation {
         Network.getInstance().globalSQL.update("INSERT INTO moderation(uuid,start_time,end_time,reason,type) VALUES('" + uuid + "'," + time + "," + end_time + ",'" + reason + "','ban');");
 
         //If the player is currently online, ban them.
-        //Iterate through online users.
-        for (String s : Network.getInstance().globalSQL.getStringList("SELECT uuid FROM online_users;")) {
-            //If the uuid equals the uuid of the banned user.
-            //Then kick them with the ban message.
-            if (s.equals(uuid)) {
-                EventManager.createEvent(uuid, "network",
-                        Network.getInstance().globalSQL.getString("SELECT server FROM online_users WHERE uuid='" + uuid + "';"),
-                        "kick", LegacyComponentSerializer.legacyAmpersand().serialize(getBannedComponent(uuid))
-                );
-            }
+        if (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "';")) {
+
+            //Kick them with the ban message.
+            EventManager.createEvent(uuid, "network",
+                    Network.getInstance().globalSQL.getString("SELECT server FROM online_users WHERE uuid='" + uuid + "';"),
+                    "kick", LegacyComponentSerializer.legacyAmpersand().serialize(getBannedComponent(uuid))
+            );
         }
     }
 
@@ -73,6 +72,18 @@ public abstract class Moderation {
         //Get time.
         long time = Time.currentTime();
         Network.getInstance().globalSQL.update("UPDATE moderation SET end_time=" + time + " WHERE uuid='" + uuid + "' AND end_time>" + time + " AND type='mute';");
+    }
+
+    //Kick the player.
+    public void kick(String uuid, String reason) {
+
+        //Check if the player is currently online.
+        if (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "';")) {
+            //Kick them with the reason.
+            EventManager.createEvent(uuid, "network",
+                    Network.getInstance().globalSQL.getString("SELECT server FROM online_users WHERE uuid='" + uuid + "';"),
+                    "kick", "You have been kicked for " + reason);
+        }
     }
 
     /**
@@ -114,7 +125,7 @@ public abstract class Moderation {
 
     /**
      * Get Component for banned player to display.
-     * This assumes that the player is banned, else this will return null.
+     * This assumes that the player is banned, else this will throw an exception.
      *
      * @param uuid the uuid of the banned player
      * @return the component of the banned message with reason and duration
@@ -128,6 +139,25 @@ public abstract class Moderation {
                     .append(Component.text(getBanDuration(uuid), NamedTextColor.DARK_RED));
         } else {
             throw new NotBannedException("The user with uuid " + uuid + " is not banned.");
+        }
+    }
+
+    /**
+     * Get Component for muted player to display.
+     * This assumes that the player is muted, else this will throw an exception.
+     *
+     * @param uuid the uuid of the muted player
+     * @return the component of the muted message with reason and duration
+     * @throws NotMutedException if the player is not muted
+     */
+    public Component getMutedComponent(String uuid) throws NotMutedException {
+        if (isMuted(uuid)) {
+            return Utils.error("You have been muted for ")
+                    .append(Component.text(getMutedReason(uuid), NamedTextColor.DARK_RED))
+                    .append(Utils.error(" until "))
+                    .append(Component.text(getMuteDuration(uuid), NamedTextColor.DARK_RED));
+        } else {
+            throw new NotMutedException("The user with uuid " + uuid + " is not muted.");
         }
     }
 

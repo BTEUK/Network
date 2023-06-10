@@ -91,6 +91,6 @@ public class Mute extends Moderation implements CommandExecutor {
                 .append(Utils.success(" for reason: "))
                 .append(Component.text(reason, NamedTextColor.DARK_AQUA)));
 
-        return false;
+        return true;
     }
 }

@@ -3,6 +3,8 @@ package me.bteuk.network.staff.gui;
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.gui.regions.RegionInfo;
+import me.bteuk.network.sql.GlobalSQL;
+import me.bteuk.network.staff.listeners.ModerationReasonListener;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.ModerationType;
@@ -21,11 +23,15 @@ public class SelectUser extends Gui {
 
     int page;
 
+    GlobalSQL globalSQL;
+
     public SelectUser(ModerationType type) {
 
         super(45, Component.text("Select User for " + type.label, NamedTextColor.AQUA, TextDecoration.BOLD));
 
         this.type = type;
+
+        globalSQL = Network.getInstance().globalSQL;
 
         //Select all the players to show in the menu depending on the ModerationType.
         switch (type) {
@@ -33,21 +39,21 @@ public class SelectUser extends Gui {
             case BAN, MUTE, KICK -> {
 
                 //Get online users.
-                users = Network.getInstance().globalSQL.getStringList("SELECT uuid FROM online_users;");
+                users = globalSQL.getStringList("SELECT uuid FROM online_users;");
 
             }
 
             case UNBAN -> {
 
                 //Get banned users.
-                users = Network.getInstance().globalSQL.getStringList("SELECT uuid FROM moderation WHERE end_time>" + Time.currentTime() + " AND type='ban'");
+                users = globalSQL.getStringList("SELECT uuid FROM moderation WHERE end_time>" + Time.currentTime() + " AND type='ban'");
 
             }
 
             case UNMUTE -> {
 
                 //Get muted users.
-                users = Network.getInstance().globalSQL.getStringList("SELECT uuid FROM moderation WHERE end_time>" + Time.currentTime() + " AND type='mute'");
+                users = globalSQL.getStringList("SELECT uuid FROM moderation WHERE end_time>" + Time.currentTime() + " AND type='mute'");
 
             }
         }
@@ -84,7 +90,7 @@ public class SelectUser extends Gui {
         //Make a button for each user.
         for (int i = 0; i < users.size(); i++) {
 
-            int finalI = i;
+            String uuid = users.get(i);
 
             //If skip is greater than 0, skip this iteration.
             if (skip > 0) {
@@ -118,6 +124,8 @@ public class SelectUser extends Gui {
             //Ban and muting has a submenu to select duration and reason.
             //Kicking just prompts staff to type the reason in chat.
             //Unban and unmute is just a simple click.
+            String name = globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
+
             switch (type) {
 
                 case BAN, MUTE -> {
@@ -125,6 +133,22 @@ public class SelectUser extends Gui {
                 }
 
                 case KICK -> {
+
+                    //Kick the player from the server.
+
+                    setItem(i, Utils.createItem(Material.RED_CONCRETE, 1,
+                                    Utils.title("Kick " + name),
+                                    Utils.line("Opens the kick menu to set the parameters.")),
+                            u ->
+
+                            {
+
+                                //Open the kick menu.
+                                this.delete();
+                                u.staffGui = new ModerationActionGui(type, uuid);
+                                u.staffGui.open(u);
+
+                            });
 
                 }
 

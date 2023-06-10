@@ -1,6 +1,7 @@
 package me.bteuk.network;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
+import me.bteuk.network.exceptions.NotMutedException;
 import me.bteuk.network.staff.Moderation;
 import me.bteuk.network.utils.*;
 import net.kyori.adventure.text.Component;
@@ -107,10 +108,18 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
         //If player is muted cancel.
         if (isMuted(e.getPlayer().getUniqueId().toString())) {
             e.setCancelled(true);
-            e.getPlayer().sendMessage(Utils.error("You are muted for ")
-                    .append(Component.text(getMutedReason(e.getPlayer().getUniqueId().toString()), NamedTextColor.DARK_RED))
-                    .append(Utils.error(" until "))
-                    .append(Component.text(getMuteDuration(e.getPlayer().getUniqueId().toString()), NamedTextColor.DARK_RED)));
+            try {
+
+                //Send message and end event.
+                e.getPlayer().sendMessage(getMutedComponent(e.getPlayer().getUniqueId().toString()));
+                return;
+
+            } catch (NotMutedException ex) {
+
+                //Unset the muted status.
+                e.setCancelled(false);
+
+            }
         }
 
         if (!e.isCancelled()) {

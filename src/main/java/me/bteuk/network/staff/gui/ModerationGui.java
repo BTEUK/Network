@@ -61,8 +61,6 @@ public class ModerationGui extends Gui {
 
                     //Return to request menu.
                     this.delete();
-                    u.staffGui = null;
-
                     u.staffGui = new StaffGui(u);
                     u.staffGui.open(u);
 

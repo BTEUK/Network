@@ -25,10 +25,10 @@ public class RegionTagListener implements Listener {
 
     public RegionTagListener(Player p, Region region) {
 
-        Bukkit.getServer().getPluginManager().registerEvents(this, Network.getInstance());
-
         this.p = p;
         this.region = region;
+
+        Bukkit.getServer().getPluginManager().registerEvents(this, Network.getInstance());
 
         //Start timer to automatically close the listener.
         task = Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {

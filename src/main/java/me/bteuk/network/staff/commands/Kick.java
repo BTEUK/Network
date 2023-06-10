@@ -20,13 +20,13 @@ import java.util.Arrays;
 
 import static me.bteuk.network.utils.Constants.LOGGER;
 
-public class Ban extends Moderation implements CommandExecutor {
+public class Kick extends Moderation implements CommandExecutor {
 
     //Constructor to enable the command.
-    public Ban(Network instance) {
+    public Kick(Network instance) {
 
         //Register command.
-        PluginCommand command = instance.getCommand("ban");
+        PluginCommand command = instance.getCommand("kick");
 
         if (command == null) {
             LOGGER.warning("Home command not added to plugin.yml, it will therefore not be enabled.");
@@ -43,7 +43,7 @@ public class Ban extends Moderation implements CommandExecutor {
 
         //Check if sender is player, then check permissions
         if (sender instanceof Player p) {
-            if (!p.hasPermission("uknet.ban")) {
+            if (!p.hasPermission("uknet.kick")) {
                 p.sendMessage(Utils.error("You do not have permission to use this command."));
                 return true;
             }
@@ -51,7 +51,7 @@ public class Ban extends Moderation implements CommandExecutor {
 
         //Check args.
         if (args.length < 3) {
-            sender.sendMessage(Utils.error("/ban <player> <duration> <reason>"));
+            sender.sendMessage(Utils.error("/kick <player> <reason>"));
             return true;
         }
 
@@ -65,39 +65,30 @@ public class Ban extends Moderation implements CommandExecutor {
 
         String uuid = Network.getInstance().globalSQL.getString("SELECT uuid FROM player_data WHERE name='" + args[0] + "';");
 
-        //Get the duration of the ban.
-        long time;
-        try {
-
-            time = getDuration(args[1]);
-
-        } catch (DurationFormatException e) {
-            sender.sendMessage(Utils.error("Duration must be in ymdh format, for example 1y6m, which is 1 year and 6 months or 2d12h is 2 days and 12 hours."));
+        //Check if player is online.
+        if (!Network.getInstance().globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "';")) {
+            sender.sendMessage(Component.text(args[0], NamedTextColor.DARK_RED)
+                    .append(Utils.error(" is not online.")));
             return true;
         }
-
-        //Get end time of current time plus time.
-        long end_time = Time.currentTime() + time;
 
         //Combine all remaining args to create a reason.
-        String sArgs = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
-        String reason = StringUtils.substring(sArgs, 2);
+        String sArgs = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
+        String reason = StringUtils.substring(sArgs, 1);
 
-        try {
-            ban(uuid, end_time, reason);
-        } catch (NotBannedException e) {
-            sender.sendMessage(Utils.error("An error occurred while banning this player, please contact an admin for support."));
-            e.printStackTrace();
-            return true;
-        }
+        sender.sendMessage(kickPlayer(args[0], uuid, reason));
 
-        sender.sendMessage(Utils.success("Banned ")
-                .append(Component.text(args[0], NamedTextColor.DARK_AQUA))
-                .append(Utils.success(" until "))
-                .append(Component.text(Time.getDateTime(end_time), NamedTextColor.DARK_AQUA))
+        return true;
+    }
+
+    public Component kickPlayer(String name, String uuid, String reason) {
+
+        kick(uuid, reason);
+
+        return (Utils.success("Kicked ")
+                .append(Component.text(name, NamedTextColor.DARK_AQUA))
                 .append(Utils.success(" for reason: "))
                 .append(Component.text(reason, NamedTextColor.DARK_AQUA)));
 
-        return true;
     }
 }

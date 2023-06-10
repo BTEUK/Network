@@ -82,6 +82,10 @@ public final class Network extends JavaPlugin {
     //Tab
     public TabManager tab;
 
+    //Kick Command
+    @Getter
+    private Kick kick;
+
     @Override
     public void onEnable() {
 
@@ -296,6 +300,8 @@ public final class Network extends JavaPlugin {
 
             new Mute(this);
             new Unmute(this);
+
+            kick = new Kick(this);
 
         }
 
