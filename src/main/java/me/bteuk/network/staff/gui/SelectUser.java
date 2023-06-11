@@ -37,26 +37,20 @@ public class SelectUser extends Gui {
         //Select all the players to show in the menu depending on the ModerationType.
         switch (type) {
 
-            case BAN, MUTE, KICK -> {
+            case BAN, MUTE, KICK ->
 
-                //Get online users.
-                users = globalSQL.getStringList("SELECT uuid FROM online_users;");
+                    //Get online users.
+                    users = globalSQL.getStringList("SELECT uuid FROM online_users;");
 
-            }
+            case UNBAN ->
 
-            case UNBAN -> {
+                    //Get banned users.
+                    users = globalSQL.getStringList("SELECT uuid FROM moderation WHERE end_time>" + Time.currentTime() + " AND type='ban'");
 
-                //Get banned users.
-                users = globalSQL.getStringList("SELECT uuid FROM moderation WHERE end_time>" + Time.currentTime() + " AND type='ban'");
+            case UNMUTE ->
 
-            }
-
-            case UNMUTE -> {
-
-                //Get muted users.
-                users = globalSQL.getStringList("SELECT uuid FROM moderation WHERE end_time>" + Time.currentTime() + " AND type='mute'");
-
-            }
+                    //Get muted users.
+                    users = globalSQL.getStringList("SELECT uuid FROM moderation WHERE end_time>" + Time.currentTime() + " AND type='mute'");
         }
 
         createGui();

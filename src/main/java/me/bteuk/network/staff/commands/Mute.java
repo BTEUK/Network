@@ -2,6 +2,7 @@ package me.bteuk.network.staff.commands;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.exceptions.DurationFormatException;
+import me.bteuk.network.exceptions.NotMutedException;
 import me.bteuk.network.staff.Moderation;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
@@ -82,15 +83,39 @@ public class Mute extends Moderation implements CommandExecutor {
         String sArgs = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
         String reason = StringUtils.substring(sArgs, 2);
 
-        mute(uuid, end_time, reason);
+        sender.sendMessage(mutePlayer(args[0], uuid, end_time, reason));
+        return true;
 
-        sender.sendMessage(Utils.success("Muted ")
-                .append(Component.text(args[0], NamedTextColor.DARK_AQUA))
+    }
+
+    /**
+     * Mute the player and return the feedback so the executor can be notified of success/failure.
+     *
+     * @param name
+     * Name of the player to mute.
+     * @param uuid
+     * Uuid of the player to mute.
+     * @param end_time
+     * Time for the mute to end in milliseconds.
+     * @param reason
+     * Reason for muting the player.
+     * @return
+     * The Component to display to the executor.
+     */
+    public Component mutePlayer(String name, String uuid, long end_time, String reason) {
+
+        try {
+            mute(uuid, end_time, reason);
+        } catch (NotMutedException e) {
+            e.printStackTrace();
+            return Utils.error("An error occurred while banning this player, please contact an admin for support.");
+        }
+
+        return Utils.success("Muted ")
+                .append(Component.text(name, NamedTextColor.DARK_AQUA))
                 .append(Utils.success(" until "))
                 .append(Component.text(Time.getDateTime(end_time), NamedTextColor.DARK_AQUA))
                 .append(Utils.success(" for reason: "))
-                .append(Component.text(reason, NamedTextColor.DARK_AQUA)));
-
-        return true;
+                .append(Component.text(reason, NamedTextColor.DARK_AQUA));
     }
 }

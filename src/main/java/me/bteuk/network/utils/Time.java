@@ -29,6 +29,16 @@ public class Time {
         return formatter.format(date);
     }
 
+    //Converts hours/days/months and years to milliseconds.
+    public static long toMilliseconds(long hours, long days, long months, long years) {
+
+        days += months * 12 + years * 365;
+        hours += 24 * days;
+
+        return hours * 60 * 60 * 1000;
+
+    }
+
     //Converts milliseconds to minutes.
     public static long minutes(long time) {
         return ((time / 1000) / 60);

@@ -83,21 +83,39 @@ public class Ban extends Moderation implements CommandExecutor {
         String sArgs = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
         String reason = StringUtils.substring(sArgs, 2);
 
+        sender.sendMessage(banPlayer(args[0], uuid, end_time, reason));
+        return true;
+
+    }
+
+    /**
+     * Ban the player and return the feedback so the executor can be notified of success/failure.
+     *
+     * @param name
+     * Name of the player to ban.
+     * @param uuid
+     * Uuid of the player to ban.
+     * @param end_time
+     * Time for the ban to end in milliseconds.
+     * @param reason
+     * Reason for banning the player.
+     * @return
+     * The Component to display to the executor.
+     */
+    public Component banPlayer(String name, String uuid, long end_time, String reason) {
+
         try {
             ban(uuid, end_time, reason);
         } catch (NotBannedException e) {
-            sender.sendMessage(Utils.error("An error occurred while banning this player, please contact an admin for support."));
             e.printStackTrace();
-            return true;
+            return Utils.error("An error occurred while banning this player, please contact an admin for support.");
         }
 
-        sender.sendMessage(Utils.success("Banned ")
-                .append(Component.text(args[0], NamedTextColor.DARK_AQUA))
+        return Utils.success("Banned ")
+                .append(Component.text(name, NamedTextColor.DARK_AQUA))
                 .append(Utils.success(" until "))
                 .append(Component.text(Time.getDateTime(end_time), NamedTextColor.DARK_AQUA))
                 .append(Utils.success(" for reason: "))
-                .append(Component.text(reason, NamedTextColor.DARK_AQUA)));
-
-        return true;
+                .append(Component.text(reason, NamedTextColor.DARK_AQUA));
     }
 }

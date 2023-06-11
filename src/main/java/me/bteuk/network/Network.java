@@ -86,9 +86,17 @@ public final class Network extends JavaPlugin {
     @Getter
     private Kick kick;
 
+    //Mute Command
+    @Getter
+    private Mute mute;
+
     //Unmute Command
     @Getter
     private Unmute unmute;
+
+    //Ban Command
+    @Getter
+    private Ban ban;
 
     //Unban Command
     @Getter
@@ -303,10 +311,10 @@ public final class Network extends JavaPlugin {
         //Moderation commands.
         if (CONFIG.getBoolean("staff.moderation.enabled")) {
 
-            new Ban(this);
+            ban = new Ban(this);
             unban = new Unban(this);
 
-            new Mute(this);
+            mute = new Mute(this);
             unmute = new Unmute(this);
 
             kick = new Kick(this);
