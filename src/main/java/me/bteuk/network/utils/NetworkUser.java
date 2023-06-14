@@ -6,8 +6,9 @@ import me.bteuk.network.utils.regions.Region;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import static me.bteuk.network.utils.Constants.EARTH_WORLD;
-import static me.bteuk.network.utils.Constants.SERVER_NAME;
+import static me.bteuk.network.utils.Constants.*;
+import static me.bteuk.network.utils.enums.ServerType.EARTH;
+import static me.bteuk.network.utils.enums.ServerType.PLOT;
 
 public class NetworkUser {
 
@@ -105,22 +106,24 @@ public class NetworkUser {
         Network.getInstance().globalSQL.update("UPDATE player_data SET builder_role='" + Roles.builderRole(player) + "' WHERE uuid='" + player.getUniqueId() + "';");
 
         //Check if the player is in a region.
-        if (SERVER_NAME.equals(Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH'"))) {
+        if (SERVER_TYPE == EARTH) {
             //Check if they are in the earth world.
-            if (player.getLocation().getWorld().getName().equals(EARTH_WORLD)) {
+            if (player.getWorld().getName().equals(EARTH_WORLD)) {
                 region = Network.getInstance().getRegionManager().getRegion(player.getLocation());
                 //Add region to database if not exists.
                 region.addToDatabase();
                 inRegion = true;
+                LOGGER.info(player.getName() + " joined the server in region " + region.regionName());
             }
-        } else if (SERVER_NAME.equals(Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='PLOT';"))) {
+        } else if (SERVER_TYPE == PLOT) {
             //Check if the player is in a buildable plot world and apply coordinate transform if true.
-            if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';")) {
-                dx = -Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';");
-                dz = -Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';");
+            if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + player.getWorld().getName() + "';")) {
+                dx = -Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + player.getWorld().getName() + "';");
+                dz = -Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + player.getWorld().getName() + "';");
 
                 region = Network.getInstance().getRegionManager().getRegion(player.getLocation(), dx, dz);
                 inRegion = true;
+                LOGGER.info(player.getName() + " joined the server in region " + region.regionName());
             }
         }
 
