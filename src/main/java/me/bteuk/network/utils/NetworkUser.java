@@ -3,7 +3,6 @@ package me.bteuk.network.utils;
 import me.bteuk.network.Network;
 import me.bteuk.network.commands.Nightvision;
 import me.bteuk.network.gui.Gui;
-import me.bteuk.network.utils.enums.ServerType;
 import me.bteuk.network.utils.regions.Region;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -11,7 +10,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import static me.bteuk.network.utils.Constants.*;
-import static me.bteuk.network.utils.Constants.TAB;
+import static me.bteuk.network.utils.enums.ServerType.EARTH;
+import static me.bteuk.network.utils.enums.ServerType.PLOT;
 
 public class NetworkUser {
 
@@ -117,15 +117,15 @@ public class NetworkUser {
         }
 
         //Check if the player is in a region.
-        if (SERVER_TYPE == ServerType.EARTH) {
+        if (SERVER_TYPE == EARTH) {
             //Check if they are in the earth world.
-            if (player.getLocation().getWorld().getName().equals(EARTH_WORLD)) {
+            if (player.getWorld().getName().equals(EARTH_WORLD)) {
                 region = instance.getRegionManager().getRegion(player.getLocation());
                 //Add region to database if not exists.
                 region.addToDatabase();
                 inRegion = true;
             }
-        } else if (SERVER_TYPE == ServerType.PLOT) {
+        } else if (SERVER_TYPE == PLOT) {
             //Check if the player is in a buildable plot world and apply coordinate transform if true.
             if (instance.plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';")) {
                 dx = -instance.plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';");
