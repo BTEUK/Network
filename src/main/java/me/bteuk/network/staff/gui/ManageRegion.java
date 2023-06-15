@@ -17,7 +17,7 @@ public class ManageRegion extends Gui {
 
     public ManageRegion(NetworkUser user, Region region) {
 
-        super(27, Component.text("Manage Region", NamedTextColor.AQUA, TextDecoration.BOLD));
+        super(9, Component.text("Manage Region", NamedTextColor.AQUA, TextDecoration.BOLD));
 
         this.region = region;
         this.user = user;
@@ -28,7 +28,7 @@ public class ManageRegion extends Gui {
 
     private void createGui() {
 
-        setItem(4, Utils.createItem(Material.BOOK, 1,
+        setItem(0, Utils.createItem(Material.ENCHANTED_BOOK, 1,
                 Utils.title("Region " + region.regionName()),
                 Utils.line("Current owner: ")
                         .append(Component.text(region.ownerName(), NamedTextColor.GRAY)),
@@ -43,7 +43,7 @@ public class ManageRegion extends Gui {
         if (user.player.hasPermission("uknet.regions.manage.public")) {
             if (region.status() == RegionStatus.DEFAULT || region.status() == RegionStatus.INACTIVE) {
 
-                setItem(11, Utils.createItem(Material.OAK_DOOR, 1,
+                setItem(2, Utils.createItem(Material.OAK_DOOR, 1,
                                 Utils.title("Make region public"),
                                 Utils.line("A public region allows members"),
                                 Utils.line("to join without needing"),
@@ -52,13 +52,14 @@ public class ManageRegion extends Gui {
                         u -> {
 
                             region.setPublic();
+                            u.player.sendMessage("Set region " + region.regionName() + " to public.");
                             this.refresh();
 
                         });
 
             } else if (region.status() == RegionStatus.PUBLIC) {
 
-                setItem(11, Utils.createItem(Material.IRON_DOOR, 1,
+                setItem(2, Utils.createItem(Material.IRON_DOOR, 1,
                                 Utils.title("Make region private"),
                                 Utils.line("The default region setting,"),
                                 Utils.line("joining requires the owner"),
@@ -67,6 +68,7 @@ public class ManageRegion extends Gui {
                         u -> {
 
                             region.setDefault();
+                            u.player.sendMessage("Set region " + region.regionName() + " to default.");
                             this.refresh();
 
                         });
@@ -77,8 +79,8 @@ public class ManageRegion extends Gui {
         if (user.player.hasPermission("uknet.regions.manage.owner")) {
             if (region.hasMember()) {
 
-                //Slot 14
-                setItem(14, Utils.createItem(Material.MAGENTA_GLAZED_TERRACOTTA, 1,
+                //Slot 5
+                setItem(5, Utils.createItem(Material.MAGENTA_GLAZED_TERRACOTTA, 1,
                                 Utils.title("Transfer Ownership"),
                                 Utils.line("Open the transfer ownership menu."),
                                 Utils.line("Allows you to make a member"),
@@ -103,10 +105,10 @@ public class ManageRegion extends Gui {
         if (user.player.hasPermission("uknet.regions.manage.kick")) {
             if (region.hasOwner() || region.hasMember()) {
 
-                //Slot 15
-                setItem(15, Utils.createItem(Material.BARRIER, 1,
+                //Slot 6
+                setItem(6, Utils.createItem(Material.BARRIER, 1,
                                 Utils.title("Kick Members"),
-                                Utils.line("Remove any current members."),
+                                Utils.line("Remove any current members,"),
                                 Utils.line("or the owner from the region.")),
 
                         u -> {
@@ -129,7 +131,7 @@ public class ManageRegion extends Gui {
         if (user.player.hasPermission("uknet.regions.manage.lock")) {
             if (region.status() == RegionStatus.DEFAULT || region.status() == RegionStatus.PUBLIC || region.status() == RegionStatus.OPEN || region.status() == RegionStatus.INACTIVE) {
 
-                setItem(12, Utils.createItem(Material.IRON_TRAPDOOR, 1,
+                setItem(4, Utils.createItem(Material.IRON_TRAPDOOR, 1,
                                 Utils.title("Lock Region"),
                                 Utils.line("Locking a region stops anyone"),
                                 Utils.line("from joining or building in the"),
@@ -144,6 +146,7 @@ public class ManageRegion extends Gui {
                             }
 
                             region.setLocked();
+                            u.player.sendMessage("Set Region " + region.regionName() + " to locked.");
 
                             this.refresh();
 
@@ -151,15 +154,16 @@ public class ManageRegion extends Gui {
 
             } else if (region.status() == RegionStatus.LOCKED) {
 
-                setItem(12, Utils.createItem(Material.OAK_TRAPDOOR, 1,
+                setItem(4, Utils.createItem(Material.OAK_TRAPDOOR, 1,
                                 Utils.title("Unlock Region"),
                                 Utils.line("The default region setting,"),
                                 Utils.line("people will be able to join"),
-                                Utils.line("and building in the region again.")),
+                                Utils.line("and build in the region again.")),
 
                         u -> {
 
                             region.setDefault();
+                            u.player.sendMessage("Set region " + region.regionName() + " to default.");
                             this.refresh();
 
                         });
@@ -171,7 +175,7 @@ public class ManageRegion extends Gui {
         if (user.player.hasPermission("uknet.regions.manage.open")) {
             if (region.status() == RegionStatus.DEFAULT || region.status() == RegionStatus.PUBLIC || region.status() == RegionStatus.INACTIVE) {
 
-                setItem(13, Utils.createItem(Material.OAK_FENCE_GATE, 1,
+                setItem(3, Utils.createItem(Material.OAK_FENCE_GATE, 1,
                                 Utils.title("Make region open"),
                                 Utils.line("An open region allows all"),
                                 Utils.line("Jr.Builder+ to build without"),
@@ -180,12 +184,13 @@ public class ManageRegion extends Gui {
 
                         u -> {
                             region.setOpen();
+                            u.player.sendMessage("Set region " + region.regionName() + " to open.");
                             this.refresh();
                         });
 
             } else if (region.status() == RegionStatus.OPEN) {
 
-                setItem(13, Utils.createItem(Material.OAK_FENCE, 1,
+                setItem(3, Utils.createItem(Material.OAK_FENCE, 1,
                                 Utils.title("Make region closed"),
                                 Utils.line("The default region setting,"),
                                 Utils.line("people will again be required"),
@@ -193,13 +198,14 @@ public class ManageRegion extends Gui {
 
                         u -> {
                             region.setDefault("jrbuilder");
+                            u.player.sendMessage("Set region " + region.regionName() + " to default.");
                             this.refresh();
                         });
 
             }
         }
 
-        setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
+        setItem(8, Utils.createItem(Material.SPRUCE_DOOR, 1,
                         Utils.title("Previous Page"),
                         Utils.line("Open the staff menu.")),
                 u ->

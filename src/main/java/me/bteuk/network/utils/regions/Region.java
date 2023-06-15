@@ -216,7 +216,7 @@ public record Region(String regionName) {
     public void setOpen() {
 
         //Remove all members and the owner.
-        removeMembers("&aThe region &3%tag% &ais now open, you no longer need to claimed it to build here.");
+        removeMembers("&aThe region &3%tag% &ais now open, you no longer need to claim it to build here.");
 
         //Set open.
         WorldGuard.addGroup(regionName, "jrbuilder", Bukkit.getWorld(Objects.requireNonNull(EARTH_WORLD)));
