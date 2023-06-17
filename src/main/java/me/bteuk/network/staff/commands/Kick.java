@@ -29,7 +29,7 @@ public class Kick extends Moderation implements CommandExecutor {
         PluginCommand command = instance.getCommand("kick");
 
         if (command == null) {
-            LOGGER.warning("Home command not added to plugin.yml, it will therefore not be enabled.");
+            LOGGER.warning("Kick command not added to plugin.yml, it will therefore not be enabled.");
             return;
         }
 

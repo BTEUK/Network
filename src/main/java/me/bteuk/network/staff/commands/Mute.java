@@ -29,7 +29,7 @@ public class Mute extends Moderation implements CommandExecutor {
         PluginCommand command = instance.getCommand("mute");
 
         if (command == null) {
-            LOGGER.warning("Home command not added to plugin.yml, it will therefore not be enabled.");
+            LOGGER.warning("Mute command not added to plugin.yml, it will therefore not be enabled.");
             return;
         }
 

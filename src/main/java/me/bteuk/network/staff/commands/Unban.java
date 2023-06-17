@@ -23,7 +23,7 @@ public class Unban extends Moderation implements CommandExecutor {
         PluginCommand command = instance.getCommand("unban");
 
         if (command == null) {
-            LOGGER.warning("Home command not added to plugin.yml, it will therefore not be enabled.");
+            LOGGER.warning("Unban command not added to plugin.yml, it will therefore not be enabled.");
             return;
         }
 

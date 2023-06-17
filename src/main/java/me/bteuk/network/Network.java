@@ -321,6 +321,9 @@ public final class Network extends JavaPlugin {
 
         }
 
+        //Route /hdb to /skulls
+        new Hdb(this);
+
         //Register commandpreprocess to make sure /network:region runs and not that of another plugin.
         new CommandPreProcess(this);
         getCommand("region").setExecutor(new RegionCommand());

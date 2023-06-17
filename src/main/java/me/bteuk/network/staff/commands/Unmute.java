@@ -23,7 +23,7 @@ public class Unmute extends Moderation implements CommandExecutor {
         PluginCommand command = instance.getCommand("unmute");
 
         if (command == null) {
-            LOGGER.warning("Home command not added to plugin.yml, it will therefore not be enabled.");
+            LOGGER.warning("Unmute command not added to plugin.yml, it will therefore not be enabled.");
             return;
         }
 
