@@ -29,7 +29,7 @@ public class Ban extends Moderation implements CommandExecutor {
         PluginCommand command = instance.getCommand("ban");
 
         if (command == null) {
-            LOGGER.warning("Home command not added to plugin.yml, it will therefore not be enabled.");
+            LOGGER.warning("Ban command not added to plugin.yml, it will therefore not be enabled.");
             return;
         }
 
