@@ -253,6 +253,11 @@ public class StaffGui extends Gui {
 
                 {
 
+                    this.delete();
+
+                    u.staffGui = new ModerationGui();
+                    u.staffGui.open(u);
+
                 });
     }
 
