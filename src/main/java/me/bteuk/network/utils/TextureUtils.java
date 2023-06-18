@@ -49,24 +49,19 @@ public class TextureUtils {
     }
 
     public static String getAvatarUrl(PlayerProfile profile) {
-        return constructAvatarUrl(profile.getName(), Objects.requireNonNull(profile.getId()), getTexture(profile));
+        return constructAvatarUrl(Objects.requireNonNull(profile.getId()), getTexture(profile));
     }
 
-    public static String getAvatarUrl(String name, UUID uuid, String texture) {
-        return constructAvatarUrl(name, uuid, texture);
+    public static String getAvatarUrl(UUID uuid, String texture) {
+        return constructAvatarUrl(uuid, texture);
     }
 
-    private static String constructAvatarUrl(String username, UUID uuid, String texture) {
+    private static String constructAvatarUrl(UUID uuid, String texture) {
 
         String defaultUrl = "https://crafatar.com/avatars/{uuid-nodashes}.png?size={size}&overlay#{texture}";
-        //String offlineUrl = "https://cravatar.eu/helmavatar/{username}/{size}.png#{texture}";
-
-        username = URLEncoder.encode(username, StandardCharsets.UTF_8);
 
         defaultUrl = defaultUrl
                 .replace("{texture}", texture != null ? texture : "")
-                .replace("{username}", username)
-                .replace("{uuid}", uuid != null ? uuid.toString() : "")
                 .replace("{uuid-nodashes}", Objects.requireNonNull(uuid).toString().replace("-", ""))
                 .replace("{size}", "128");
 

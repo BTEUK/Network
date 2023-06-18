@@ -10,6 +10,10 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
@@ -85,10 +89,20 @@ public class ExploreGui extends Gui {
          */
 
         //England
-        setItem(2, Utils.createItem(Material.ORANGE_CONCRETE_POWDER, 1,
-                        Utils.title("England"),
-                        Utils.line("Click to pick from"),
-                        Utils.line("locations in England.")),
+        ItemStack england;
+        try {
+            england = Utils.createCustomSkull(new URL("http://textures.minecraft.net/texture/bee5c850afbb7d8843265a146211ac9c615f733dcc5a8e2190e5c247dea32"), 1,
+                    Utils.title("England"),
+                    Utils.line("Click to pick from"),
+                    Utils.line("locations in England."));
+        } catch (MalformedURLException e) {
+            //Fallback
+            england = Utils.createItem(Material.ORANGE_CONCRETE_POWDER, 1,
+                    Utils.title("England"),
+                    Utils.line("Click to pick from"),
+                    Utils.line("locations in England."));
+        }
+        setItem(2, england,
                 u -> {
 
                     //Switch to england menu to select region.
@@ -101,34 +115,74 @@ public class ExploreGui extends Gui {
         );
 
         //Scotland
-        setItem(3, Utils.createItem(Material.LIGHT_BLUE_CONCRETE_POWDER, 1,
-                        Utils.title("Scotland"),
-                        Utils.line("Click to pick from"),
-                        Utils.line("locations in Scotland.")),
+        ItemStack scotland;
+        try {
+            scotland = Utils.createCustomSkull(new URL("http://textures.minecraft.net/texture/dadc377816389c3c87c65dcacac1d8f880b54334d7c23ea22f099e2c4eab1ff9"), 1,
+                    Utils.title("Scotland"),
+                    Utils.line("Click to pick from"),
+                    Utils.line("locations in Scotland."));
+        } catch (MalformedURLException e) {
+            //Fallback
+            scotland = Utils.createItem(Material.LIGHT_BLUE_CONCRETE_POWDER, 1,
+                    Utils.title("Scotland"),
+                    Utils.line("Click to pick from"),
+                    Utils.line("locations in Scotland."));
+        }
+        setItem(3, scotland,
                 u -> openLocation("Scotland", u, "Scotland")
         );
 
         //Wales
-        setItem(4, Utils.createItem(Material.RED_CONCRETE_POWDER, 1,
-                        Utils.title("Wales"),
-                        Utils.line("Click to pick from"),
-                        Utils.line("locations in Wales.")),
+        ItemStack wales;
+        try {
+            wales = Utils.createCustomSkull(new URL("http://textures.minecraft.net/texture/8140ad08f7ee1c73bf75660614595c7392caba5529211a9adbe3b5639cb6ad41"), 1,
+                    Utils.title("Wales"),
+                    Utils.line("Click to pick from"),
+                    Utils.line("locations in Wales."));
+        } catch (MalformedURLException e) {
+            //Fallback
+            wales = Utils.createItem(Material.RED_CONCRETE_POWDER, 1,
+                    Utils.title("Wales"),
+                    Utils.line("Click to pick from"),
+                    Utils.line("locations in Wales."));
+        }
+        setItem(4, wales,
                 u -> openLocation("Wales", u, "Wales")
         );
 
         //Northern Ireland
-        setItem(5, Utils.createItem(Material.LIME_CONCRETE_POWDER, 1,
-                        Utils.title("Northern Ireland"),
-                        Utils.line("Click to pick from"),
-                        Utils.line("locations in Norther Ireland.")),
+        ItemStack northern_ireland;
+        try {
+            northern_ireland = Utils.createCustomSkull(new URL("http://textures.minecraft.net/texture/c00ae311a5c7082e76450ecafcbbbc07dcdc484600ac0bf8d91f27e0a65b7e32"), 1,
+                    Utils.title("Northern Ireland"),
+                    Utils.line("Click to pick from"),
+                    Utils.line("locations in Norther Ireland."));
+        } catch (MalformedURLException e) {
+            //Fallback
+            northern_ireland = Utils.createItem(Material.LIME_CONCRETE_POWDER, 1,
+                    Utils.title("Northern Ireland"),
+                    Utils.line("Click to pick from"),
+                    Utils.line("locations in Norther Ireland."));
+        }
+        setItem(5, northern_ireland,
                 u -> openLocation("Northern Ireland", u, "Northern Ireland")
         );
 
         //Other
-        setItem(6, Utils.createItem(Material.YELLOW_CONCRETE_POWDER, 1,
-                        Utils.title("Other"),
-                        Utils.line("Click to pick from locations"),
-                        Utils.line("not in the 4 countries of the UK.")),
+        ItemStack other;
+        try {
+            other = Utils.createCustomSkull(new URL("http://textures.minecraft.net/texture/c439d7f9c67f32dcbb86b7010b1e14b60de96776a35f61cee982660aacf5264b"), 1,
+                    Utils.title("Other"),
+                    Utils.line("Click to pick from locations"),
+                    Utils.line("not in the 4 countries of the UK."));
+        } catch (MalformedURLException e) {
+            //Fallback
+            other = Utils.createItem(Material.YELLOW_CONCRETE_POWDER, 1,
+                    Utils.title("Other"),
+                    Utils.line("Click to pick from locations"),
+                    Utils.line("not in the 4 countries of the UK."));
+        }
+        setItem(6, other,
                 u -> openLocation("Other", u, "Other")
         );
 

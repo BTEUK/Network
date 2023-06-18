@@ -325,7 +325,7 @@ public class Connect implements Listener {
             instance.chat.broadcastMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(leaveMessage.replace("%player%", name)), "uknet:disconnect");
 
             if (DISCORD_CHAT) {
-                instance.chat.broadcastMessage(Component.text(TextureUtils.getAvatarUrl(name, p.getUniqueId(), player_skin) + " ")
+                instance.chat.broadcastMessage(Component.text(TextureUtils.getAvatarUrl(p.getUniqueId(), player_skin) + " ")
                                 .append(LegacyComponentSerializer.legacyAmpersand().deserialize(leaveMessage.replace("%player%", name)))
                         , "uknet:discord_disconnect");
             }

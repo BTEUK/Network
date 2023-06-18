@@ -1,5 +1,7 @@
 package me.bteuk.network.utils;
 
+import com.destroystokyo.paper.profile.PlayerProfile;
+import com.destroystokyo.paper.profile.ProfileProperty;
 import me.bteuk.network.Network;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
@@ -8,6 +10,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.*;
+import org.bukkit.block.Skull;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -15,7 +18,9 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.profile.PlayerTextures;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -71,6 +76,33 @@ public class Utils {
         item.setAmount(amount);
 
         ItemMeta meta = item.getItemMeta();
+        meta.displayName(displayName);
+        List<Component> lore = new ArrayList<>(Arrays.asList(loreString));
+        meta.lore(lore);
+        item.setItemMeta(meta);
+
+        return item;
+
+    }
+
+    public static ItemStack createCustomSkull(URL url, int amount, Component displayName, Component... loreString) {
+
+        ItemStack item;
+
+        item = new ItemStack(Material.PLAYER_HEAD);
+        item.setAmount(amount);
+
+        SkullMeta meta = (SkullMeta) item.getItemMeta();
+
+        //Create playerprofile.
+        PlayerProfile profile = Network.getInstance().getServer().createProfile(UUID.randomUUID());
+
+        PlayerTextures textures = profile.getTextures();
+        textures.setSkin(url);
+
+        profile.setTextures(textures);
+
+        meta.setPlayerProfile(profile);
         meta.displayName(displayName);
         List<Component> lore = new ArrayList<>(Arrays.asList(loreString));
         meta.lore(lore);
