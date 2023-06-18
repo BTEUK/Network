@@ -213,7 +213,7 @@ public class ModerationActionGui extends Gui {
                     reasonListener = new ModerationReasonListener(u, this);
 
                     u.player.closeInventory();
-                    u.player.sendMessage("Please write the reason in chat, the first message counts.");
+                    u.player.sendMessage(Utils.success("Please write the reason in chat, the first message counts."));
 
                 });
 

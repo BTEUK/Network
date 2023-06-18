@@ -83,9 +83,7 @@ public class SelectUser extends Gui {
         }
 
         //Make a button for each user.
-        for (int i = 0; i < users.size(); i++) {
-
-            String uuid = users.get(i);
+        for (String uuid : users) {
 
             //If skip is greater than 0, skip this iteration.
             if (skip > 0) {

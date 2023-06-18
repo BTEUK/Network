@@ -20,6 +20,8 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.Locale;
 import java.util.Objects;
 
+import static net.kyori.adventure.text.format.NamedTextColor.DARK_AQUA;
+
 public class ModerationReasonListener implements Listener {
 
     private final NetworkUser u;
@@ -63,11 +65,14 @@ public class ModerationReasonListener implements Listener {
 
                 //Set the reason.
                 gui.setReason(PlainTextComponentSerializer.plainText().serialize(e.message()));
+                e.getPlayer().sendMessage(Utils.success("Set reason to: ")
+                        .append(e.message().color(DARK_AQUA)));
 
                 //Refresh and reopen the gui.
                 //This also cancels the task and unregisters the listener.
                 gui.refresh();
-                gui.open(u);
+
+                Bukkit.getScheduler().runTask(Network.getInstance(), () -> gui.open(u));
 
             }
         }
