@@ -156,7 +156,7 @@ public class ModerationActionGui extends Gui {
                             if (reason != null) {
 
                                 //Check if time is set.
-                                if (hours == 0 && days == 0 && months == 0 && years == 0) {
+                                if (hours > 0 || days > 0 || months > 0 || years > 0) {
 
                                     //Get time.
                                     long end_time = Time.toMilliseconds(hours, days, months, years);

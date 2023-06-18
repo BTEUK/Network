@@ -80,7 +80,7 @@ public abstract class Moderation {
             //Kick them with the reason.
             EventManager.createEvent(uuid, "network",
                     Network.getInstance().globalSQL.getString("SELECT server FROM online_users WHERE uuid='" + uuid + "';"),
-                    "kick", "You have been kicked for " + reason);
+                    "kick", reason);
         }
     }
 

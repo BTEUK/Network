@@ -12,6 +12,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 
 import java.util.List;
+import java.util.Locale;
 
 import static me.bteuk.network.utils.enums.ModerationType.UNBAN;
 import static me.bteuk.network.utils.enums.ModerationType.UNMUTE;
@@ -125,7 +126,7 @@ public class SelectUser extends Gui {
                 case BAN, MUTE, KICK -> //Ban/mute/kick the player.
                         setItem(slot, Utils.createCustomSkullWithFallback(player_skin, Material.RED_CONCRETE, 1,
                                         Utils.title(type.label + " " + name),
-                                        Utils.line("Opens the " + type.label + " menu to set the parameters.")),
+                                        Utils.line("Opens the " + type.label.toLowerCase(Locale.ROOT) + " menu to set the parameters.")),
                                 u ->
 
                                 {
