@@ -76,7 +76,7 @@ public class Unmute extends Moderation implements CommandExecutor {
      */
     public Component unmutePlayer(String name, String uuid) {
 
-        //Check if the player is currently banned.
+        //Check if the player is currently muted.
         if (isMuted(uuid)) {
 
             //Unban the player.

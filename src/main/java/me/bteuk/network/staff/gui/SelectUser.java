@@ -120,17 +120,14 @@ public class SelectUser extends Gui {
             //Kicking just prompts staff to type the reason in chat.
             //Unban and unmute is just a simple click.
             String name = globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
+            String player_skin = globalSQL.getString("SELECT player_skin FROM player_data WHERE uuid='" + uuid + "';");
 
             switch (type) {
 
-                case BAN, MUTE -> {
-
-                }
-
-                case KICK -> //Kick the player from the server.
-                        setItem(i, Utils.createItem(Material.RED_CONCRETE, 1,
-                                        Utils.title("Kick " + name),
-                                        Utils.line("Opens the kick menu to set the parameters.")),
+                case BAN, MUTE, KICK -> //Ban/mute/kick the player.
+                        setItem(i, Utils.createCustomSkullWithFallback(player_skin, Material.RED_CONCRETE, 1,
+                                        Utils.title(type.label + " " + name),
+                                        Utils.line("Opens the " + type.label + " menu to set the parameters.")),
                                 u ->
 
                                 {

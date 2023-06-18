@@ -1,7 +1,6 @@
 package me.bteuk.network.utils;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
-import com.destroystokyo.paper.profile.ProfileProperty;
 import me.bteuk.network.Network;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
@@ -9,8 +8,10 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import org.bukkit.*;
-import org.bukkit.block.Skull;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -85,24 +86,38 @@ public class Utils {
 
     }
 
-    public static ItemStack createCustomSkull(URL url, int amount, Component displayName, Component... loreString) {
+    public static ItemStack createCustomSkullWithFallback(String texture, Material fallback, int amount, Component displayName, Component... loreString) {
 
         ItemStack item;
 
-        item = new ItemStack(Material.PLAYER_HEAD);
+        try {
+
+            if (texture == null) {
+                throw new NullPointerException();
+            }
+
+            URL url = new URL("http://textures.minecraft.net/texture/" + texture);
+            item = new ItemStack(Material.PLAYER_HEAD);
+
+            SkullMeta meta = (SkullMeta) item.getItemMeta();
+
+            //Create playerprofile.
+            PlayerProfile profile = Network.getInstance().getServer().createProfile(UUID.randomUUID());
+
+            PlayerTextures textures = profile.getTextures();
+            textures.setSkin(url);
+
+            profile.setTextures(textures);
+
+            meta.setPlayerProfile(profile);
+
+        } catch (Exception e) {
+            item = new ItemStack(fallback);
+        }
+
         item.setAmount(amount);
 
-        SkullMeta meta = (SkullMeta) item.getItemMeta();
-
-        //Create playerprofile.
-        PlayerProfile profile = Network.getInstance().getServer().createProfile(UUID.randomUUID());
-
-        PlayerTextures textures = profile.getTextures();
-        textures.setSkin(url);
-
-        profile.setTextures(textures);
-
-        meta.setPlayerProfile(profile);
+        ItemMeta meta = item.getItemMeta();
         meta.displayName(displayName);
         List<Component> lore = new ArrayList<>(Arrays.asList(loreString));
         meta.lore(lore);
