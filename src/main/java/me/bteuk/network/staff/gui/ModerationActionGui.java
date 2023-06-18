@@ -159,7 +159,7 @@ public class ModerationActionGui extends Gui {
                                 if (hours > 0 || days > 0 || months > 0 || years > 0) {
 
                                     //Get time.
-                                    long end_time = Time.toMilliseconds(hours, days, months, years);
+                                    long end_time = Time.currentTime() + Time.toMilliseconds(hours, days, months, years);
 
                                     if (type == BAN) {
 

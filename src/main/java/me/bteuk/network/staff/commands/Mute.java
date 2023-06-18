@@ -108,7 +108,7 @@ public class Mute extends Moderation implements CommandExecutor {
             mute(uuid, end_time, reason);
         } catch (NotMutedException e) {
             e.printStackTrace();
-            return Utils.error("An error occurred while banning this player, please contact an admin for support.");
+            return Utils.error("An error occurred while muting this player, please contact an admin for support.");
         }
 
         return Utils.success("Muted ")
