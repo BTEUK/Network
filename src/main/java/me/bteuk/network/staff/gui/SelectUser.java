@@ -139,7 +139,7 @@ public class SelectUser extends Gui {
                                 });
 
                 case UNBAN, UNMUTE -> //Unban/unmute the player.
-                        setItem(slot, Utils.createItem(Material.LIME_CONCRETE, 1,
+                        setItem(slot, Utils.createCustomSkullWithFallback(player_skin, Material.LIME_CONCRETE, 1,
                                         Utils.title(type.label + " " + name),
                                         Utils.line(type.label + " the player immediately.")),
 
