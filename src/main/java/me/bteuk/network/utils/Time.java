@@ -23,7 +23,7 @@ public class Time {
 
     //Converts milliseconds to datetime.
     public static String getDateTime(long time) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mmZ");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm Z");
         formatter.setTimeZone(TimeZone.getTimeZone("Europe/London"));
         Date date = new Date(time);
         return formatter.format(date);
