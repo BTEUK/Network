@@ -109,7 +109,7 @@ public class ModerationActionGui extends Gui {
 
                             hours = (hours == 24) ? 0 : hours + 1;
                             this.refresh();
-                            u.player.getInventory().setContents(getInventory().getContents());
+                            u.player.getOpenInventory().getTopInventory().setContents(getInventory().getContents());
 
                         });
 
@@ -120,7 +120,7 @@ public class ModerationActionGui extends Gui {
 
                             days = (days == 30) ? 0 : days + 1;
                             this.refresh();
-                            u.player.getInventory().setContents(getInventory().getContents());
+                            u.player.getOpenInventory().getTopInventory().setContents(getInventory().getContents());
 
                         });
 
@@ -131,7 +131,7 @@ public class ModerationActionGui extends Gui {
 
                             months = (months == 12) ? 0 : months + 1;
                             this.refresh();
-                            u.player.getInventory().setContents(getInventory().getContents());
+                            u.player.getOpenInventory().getTopInventory().setContents(getInventory().getContents());
 
                         });
 
@@ -142,7 +142,7 @@ public class ModerationActionGui extends Gui {
 
                             years = (years == 5) ? 0 : years + 1;
                             this.refresh();
-                            u.player.getInventory().setContents(getInventory().getContents());
+                            u.player.getOpenInventory().getTopInventory().setContents(getInventory().getContents());
 
                         });
 

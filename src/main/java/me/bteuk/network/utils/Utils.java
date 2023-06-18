@@ -111,6 +111,8 @@ public class Utils {
 
             meta.setPlayerProfile(profile);
 
+            item.setItemMeta(meta);
+
         } catch (Exception e) {
             item = new ItemStack(fallback);
         }
