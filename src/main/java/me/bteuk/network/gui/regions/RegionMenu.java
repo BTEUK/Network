@@ -211,7 +211,7 @@ public class RegionMenu extends Gui {
 
                         //Delete this gui and switch to region requests.
                         this.delete();
-                        u.mainGui = new RegionRequests(false);
+                        u.mainGui = new ReviewRegionRequests(false);
                         u.mainGui.open(u);
 
                     });

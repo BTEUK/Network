@@ -1,7 +1,7 @@
 package me.bteuk.network.gui;
 
 import me.bteuk.network.Network;
-import me.bteuk.network.commands.Back;
+import me.bteuk.network.commands.navigation.Back;
 import me.bteuk.network.events.EventManager;
 import me.bteuk.network.gui.plotsystem.PlotMenu;
 import me.bteuk.network.gui.plotsystem.PlotServerLocations;

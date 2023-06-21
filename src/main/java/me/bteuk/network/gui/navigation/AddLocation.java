@@ -1,12 +1,12 @@
 package me.bteuk.network.gui.navigation;
 
 import me.bteuk.network.Network;
-import me.bteuk.network.commands.Back;
+import me.bteuk.network.commands.navigation.Back;
 import me.bteuk.network.events.EventManager;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.sql.GlobalSQL;
-import me.bteuk.network.staff.gui.LocationRequests;
-import me.bteuk.network.staff.gui.StaffGui;
+import me.bteuk.network.gui.staff.LocationRequests;
+import me.bteuk.network.gui.staff.StaffGui;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;

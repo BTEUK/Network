@@ -2,7 +2,8 @@ package me.bteuk.network;
 
 import lombok.Getter;
 import me.bteuk.network.commands.*;
-import me.bteuk.network.staff.commands.*;
+import me.bteuk.network.commands.navigation.*;
+import me.bteuk.network.commands.staff.*;
 import me.bteuk.network.tabcompleters.LocationSelector;
 import me.bteuk.network.tabcompleters.PlayerSelector;
 import me.bteuk.network.tabcompleters.ServerSelector;

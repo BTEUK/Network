@@ -1,6 +1,7 @@
 package me.bteuk.network.staff;
 
 import me.bteuk.network.exceptions.DurationFormatException;
+import me.bteuk.network.utils.staff.Moderation;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
