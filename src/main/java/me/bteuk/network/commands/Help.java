@@ -113,13 +113,14 @@ public class Help implements CommandExecutor {
                             "Complete 1 medium plot to be promoted to "))
                     .append(Component.text("Jr.Builder", NamedTextColor.GRAY)));
 
-            /*case "applicant" -> p.sendMessage(Utils.chat("Achieved by completed the required steps in the tutorial, you now have access to the plot system. " +
-                    "Complete 1 easy plot to be promoted to &7Apprentice&f."));*/
-
-            case "default" -> p.sendMessage(Utils.line("The role you start with when you first join the server. Complete 1 easy plot to be promoted to ")
+            case "applicant" -> p.sendMessage(Utils.line("Achieved by completed the required steps in the tutorial, you now have access to the plot system. " +
+                            "Complete 1 easy plot to be promoted to ")
                     .append(Component.text("Apprentice", NamedTextColor.GRAY)));
 
-            //case "guest" -> p.sendMessage(Utils.chat("The role you start with when you first join the server. To start your path towards becoming a builder just hop into the tutorial."));
+            //case "default" -> p.sendMessage(Utils.line("The role you start with when you first join the server. Complete 1 easy plot to be promoted to ")
+            //       .append(Component.text("Apprentice", NamedTextColor.GRAY)));
+
+            case "default" -> p.sendMessage(Utils.line("The role you start with when you first join the server. To start your path towards becoming a builder just hop into the tutorial."));
 
         }
 
