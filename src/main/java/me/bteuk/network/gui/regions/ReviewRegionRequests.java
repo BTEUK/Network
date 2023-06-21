@@ -23,7 +23,7 @@ public class ReviewRegionRequests extends Gui {
 
     public ReviewRegionRequests(boolean staff) {
 
-        super(45, Component.text("Region Requests", NamedTextColor.AQUA, TextDecoration.BOLD));
+        super(45, Component.text("Review Region Requests", NamedTextColor.AQUA, TextDecoration.BOLD));
 
         page = 1;
 

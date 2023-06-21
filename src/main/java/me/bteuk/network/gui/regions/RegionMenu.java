@@ -202,19 +202,39 @@ public class RegionMenu extends Gui {
         //Check if you have any requests for regions you own.
         if (regionSQL.hasRow("SELECT region FROM region_requests WHERE owner='" + user.player.getUniqueId() + "' AND owner_accept=0;")) {
 
-            setItem(40, Utils.createItem(Material.LIME_STAINED_GLASS_PANE, 1,
+            setItem(39, Utils.createItem(Material.LIME_STAINED_GLASS_PANE, 1,
                             Utils.title("Review Region Requests"),
                             Utils.line("View all region join requests for"),
                             Utils.line("regions that you are the owner of.")),
 
                     u -> {
 
-                        //Delete this gui and switch to region requests.
+                        //Delete this gui and switch to review region requests.
                         this.delete();
                         u.mainGui = new ReviewRegionRequests(false);
                         u.mainGui.open(u);
 
                     });
+        }
+
+        //Check if the player has any active region requests.
+        if (regionSQL.hasRow("SELECT region FROM region_requests WHERE uuid='" + user.player.getUniqueId() + "';")) {
+
+            setItem(41, Utils.createItem(Material.ORANGE_STAINED_GLASS, 1,
+                            Utils.title("Region Requests"),
+                            Utils.line("View active regions requests"),
+                            Utils.line("that you have made that have"),
+                            Utils.line("not yet been accepted.")),
+
+                    u -> {
+
+                        //Delete this gui and switch to region request menu.
+                        this.delete();
+                        u.mainGui = new RegionRequestMenu(u);
+                        u.mainGui.open(u);
+
+                    });
+
         }
 
 

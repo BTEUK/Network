@@ -27,7 +27,7 @@ public class ReviewRegionRequest extends Gui {
 
     public ReviewRegionRequest(Request request, boolean staff) {
 
-        super(27, Component.text("Region Request", NamedTextColor.AQUA, TextDecoration.BOLD));
+        super(27, Component.text("Review Region Request", NamedTextColor.AQUA, TextDecoration.BOLD));
 
         regionSQL = Network.getInstance().regionSQL;
 
