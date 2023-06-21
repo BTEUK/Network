@@ -283,8 +283,6 @@ public final class Network extends JavaPlugin {
 
         getCommand("navigation").setExecutor(new Navigation());
 
-        getCommand("database").setExecutor(new Database());
-
         getCommand("afk").setExecutor(new AFK());
 
         getCommand("clear").setExecutor(new Clear());

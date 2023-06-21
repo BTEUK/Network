@@ -11,7 +11,7 @@ import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.*;
-import me.bteuk.network.utils.navigation.LocationNameListener;
+import me.bteuk.network.listeners.navigation.LocationNameListener;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;

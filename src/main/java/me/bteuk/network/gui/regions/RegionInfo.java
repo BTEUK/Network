@@ -11,7 +11,7 @@ import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.RegionStatus;
 import me.bteuk.network.utils.enums.RegionType;
 import me.bteuk.network.utils.regions.Region;
-import me.bteuk.network.utils.regions.RegionTagListener;
+import me.bteuk.network.listeners.regions.RegionTagListener;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;

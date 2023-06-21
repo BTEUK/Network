@@ -1,4 +1,4 @@
-package me.bteuk.network.utils.navigation;
+package me.bteuk.network.listeners.navigation;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
 import me.bteuk.network.Network;

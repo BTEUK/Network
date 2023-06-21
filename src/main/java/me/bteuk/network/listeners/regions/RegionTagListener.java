@@ -1,10 +1,11 @@
-package me.bteuk.network.utils.regions;
+package me.bteuk.network.listeners.regions;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.regions.RegionInfo;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.regions.Region;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
