@@ -65,27 +65,34 @@ public class Help implements CommandExecutor {
     private void help(Player p) {
 
         //Navigator
-        p.sendMessage(Component.text("/navigator", NamedTextColor.GRAY).append(Utils.line(" - Opens the navigator, access most server features from here.")));
+        p.sendMessage(Component.text("/navigator", NamedTextColor.GRAY).append(Utils.line(" - Clock to open the navigator, access most server features from here."))
+                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/navigator")));
 
         //Exporing
-        p.sendMessage(Component.text("/help explore", NamedTextColor.GRAY).append(Utils.line(" - Lists commands used for exploring the server.")));
+        p.sendMessage(Component.text("/help explore", NamedTextColor.GRAY).append(Utils.line(" - Click to list commands used for exploring the server."))
+                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/help explore")));
 
         //Building
-        p.sendMessage(Component.text("/help building", NamedTextColor.GRAY).append(Utils.line(" - Information on how to rank-up and build.")));
+        p.sendMessage(Component.text("/help building", NamedTextColor.GRAY).append(Utils.line(" - Click for information on how to rank-up and build."))
+                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/help building")));
 
         //Plots
         //Information about plots.
-        p.sendMessage(Component.text("/help plots", NamedTextColor.GRAY).append(Utils.line(" - Details on plots and how to use them.")));
+        p.sendMessage(Component.text("/help plots", NamedTextColor.GRAY).append(Utils.line(" - Click for details on plots and how to use them."))
+                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/help plots")));
 
         //Regions
         //Information about regions.
-        p.sendMessage(Component.text("/help regions", NamedTextColor.GRAY).append(Utils.line(" - What are regions and why we have them.")));
+        p.sendMessage(Component.text("/help regions", NamedTextColor.GRAY).append(Utils.line(" - Click for information about regions and why we have them."))
+                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/help regions")));
 
         //Utilities
-        p.sendMessage(Component.text("/help utils", NamedTextColor.GRAY).append(Utils.line(" - Other commands that can be useful in general.")));
+        p.sendMessage(Component.text("/help utils", NamedTextColor.GRAY).append(Utils.line(" - Clock for other commands that can be useful in general."))
+                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/help utils")));
 
         //Worldedit
-        p.sendMessage(Component.text("/help worldedit", NamedTextColor.GRAY).append(Utils.line(" - Lists available WorldEdit commands.")));
+        p.sendMessage(Component.text("/help worldedit", NamedTextColor.GRAY).append(Utils.line(" - Click to list available WorldEdit commands."))
+                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/help worldedit")));
     }
 
     private void building(Player p) {
