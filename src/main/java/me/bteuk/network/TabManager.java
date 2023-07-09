@@ -11,8 +11,12 @@ import com.comphenix.protocol.wrappers.WrappedGameProfile;
 import me.bteuk.network.utils.PlayerDisplayName;
 import me.bteuk.network.utils.Roles;
 import me.bteuk.network.utils.Utils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
 
+import javax.naming.Name;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
@@ -154,6 +158,18 @@ public class TabManager {
                 e.printStackTrace();
             }
         }
+
+        //Add header/footer.
+        //This information is static and does not require constant updates.
+        p.sendPlayerListHeaderAndFooter(
+                Component.text("BTE ", NamedTextColor.AQUA, TextDecoration.BOLD)
+                        .append(Component.text("UK", NamedTextColor.DARK_AQUA, TextDecoration.BOLD))
+                        .append(Component.newline()),
+                Component.newline()
+                        .append(Component.text("Type /help for server info", NamedTextColor.GRAY)
+                                .append(Component.newline())
+                                .append(Component.text("For more information visit our /discord", NamedTextColor.GRAY)))
+        );
 
         instance.getLogger().info("Loaded tab for " + p.getName());
 
