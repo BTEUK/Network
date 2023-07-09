@@ -166,9 +166,11 @@ public class TabManager {
                         .append(Component.text("UK", NamedTextColor.DARK_AQUA, TextDecoration.BOLD))
                         .append(Component.newline()),
                 Component.newline()
-                        .append(Component.text("Type /help for server info", NamedTextColor.GRAY)
-                                .append(Component.newline())
-                                .append(Component.text("For more information visit our /discord", NamedTextColor.GRAY)))
+                        .append(Utils.line("Server Info: "))
+                        .append(Component.text("/help", NamedTextColor.GRAY))
+                        .append(Component.newline())
+                        .append(Utils.line("More Info: "))
+                        .append(Component.text("/discord", NamedTextColor.GRAY))
         );
 
         instance.getLogger().info("Loaded tab for " + p.getName());
