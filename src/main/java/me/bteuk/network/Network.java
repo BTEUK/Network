@@ -57,6 +57,7 @@ import me.bteuk.network.utils.NetworkConfig;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Statistics;
 import me.bteuk.network.utils.Time;
+import me.bteuk.network.utils.Tips;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.ServerType;
 import me.bteuk.network.utils.regions.RegionManager;
@@ -371,6 +372,11 @@ public final class Network extends JavaPlugin {
         //Enable tab.
         if (TAB) {
             tab = new TabManager(this);
+        }
+
+        //Enable tips.
+        if (TIPS) {
+            new Tips();
         }
 
         //Enable server in server table.

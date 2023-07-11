@@ -107,7 +107,7 @@ public class Navigation implements CommandExecutor {
                         Network.getInstance().globalSQL.update("DELETE FROM location_data WHERE location='" + location + "';");
                         p.sendMessage(Utils.success("Location ")
                                 .append(Component.text(location, NamedTextColor.DARK_AQUA))
-                                .append(Utils.error(" removed.")));
+                                .append(Utils.success(" removed.")));
                     } else {
                         p.sendMessage(Utils.error("The location ")
                                 .append(Component.text(location, NamedTextColor.DARK_RED))

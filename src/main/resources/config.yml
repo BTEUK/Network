@@ -74,6 +74,14 @@ chat:
     firstjoin: '&eWelcome to UKnet, %player%'
     leave: '&e%player% has left UKnet'
 
+  #Tips in chat
+  #Whether to enable tips in chat and at what frequency they should display.
+  #Adding messages can be done in files in the 'tips' folder. One file for each builder role you want to display it to.
+  #Frequency is in minutes.
+  tips:
+    enabled: true
+    frequency: 5
+
 #Tpll config.
 #The min and max y are for searching altitude for teleport, set it to the same value as the world height.
 tpll:

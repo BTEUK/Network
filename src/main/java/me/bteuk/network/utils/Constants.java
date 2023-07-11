@@ -47,6 +47,9 @@ public class Constants {
 
     //Discord role linking
     public static final boolean DISCORD_LINKING;
+    
+    //Are tips enabled
+    public static final boolean TIPS;
 
     static {
 
@@ -74,6 +77,8 @@ public class Constants {
 
         DISCORD_CHAT = CONFIG.getBoolean("chat.global_chat.discord.chat.enabled");
         DISCORD_LINKING = CONFIG.getBoolean("chat.global_chat.discord.linking.enabled");
+
+        TIPS = CONFIG.getBoolean("chat.tips.enabled");
 
         if (CONFIG.getString("earth_world") == null) {
             //Setting default value.
