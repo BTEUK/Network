@@ -66,7 +66,7 @@ public class Utils {
      * @return Component of the tip with the prefix
      */
     public static Component tip(String tip) {
-        return Component.text("[TIP]", TextColor.color(0x346beb))
+        return Component.text("[TIP] ", TextColor.color(0x346beb))
                 .append(Utils.line(tip));
     }
 

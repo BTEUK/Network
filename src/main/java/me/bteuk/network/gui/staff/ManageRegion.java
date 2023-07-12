@@ -52,7 +52,9 @@ public class ManageRegion extends Gui {
                         u -> {
 
                             region.setPublic();
-                            u.player.sendMessage("Set region " + region.regionName() + " to public.");
+                            u.player.sendMessage(Utils.success("Set region ")
+                                    .append(Component.text(region.regionName(), NamedTextColor.DARK_AQUA))
+                                    .append(Utils.success(" to public.")));
                             this.refresh();
 
                         });
@@ -68,7 +70,9 @@ public class ManageRegion extends Gui {
                         u -> {
 
                             region.setDefault();
-                            u.player.sendMessage("Set region " + region.regionName() + " to default.");
+                            u.player.sendMessage(Utils.success("Set region ")
+                                    .append(Component.text(region.regionName(), NamedTextColor.DARK_AQUA))
+                                    .append(Utils.success(" to default.")));
                             this.refresh();
 
                         });
@@ -146,7 +150,9 @@ public class ManageRegion extends Gui {
                             }
 
                             region.setLocked();
-                            u.player.sendMessage("Set Region " + region.regionName() + " to locked.");
+                            u.player.sendMessage(Utils.success("Set Region ")
+                                    .append(Component.text(region.regionName(), NamedTextColor.DARK_AQUA))
+                                    .append(Utils.success(" to locked.")));
 
                             this.refresh();
 
@@ -163,7 +169,9 @@ public class ManageRegion extends Gui {
                         u -> {
 
                             region.setDefault();
-                            u.player.sendMessage("Set region " + region.regionName() + " to default.");
+                            u.player.sendMessage(Utils.success("Set region ")
+                                    .append(Component.text(region.regionName(), NamedTextColor.DARK_AQUA))
+                                    .append(Utils.success(" to default.")));
                             this.refresh();
 
                         });
@@ -184,7 +192,9 @@ public class ManageRegion extends Gui {
 
                         u -> {
                             region.setOpen();
-                            u.player.sendMessage("Set region " + region.regionName() + " to open.");
+                            u.player.sendMessage(Utils.success("Set region ")
+                                    .append(Component.text(region.regionName(), NamedTextColor.DARK_AQUA))
+                                    .append(Utils.success(" to open.")));
                             this.refresh();
                         });
 
@@ -198,7 +208,9 @@ public class ManageRegion extends Gui {
 
                         u -> {
                             region.setDefault("jrbuilder");
-                            u.player.sendMessage("Set region " + region.regionName() + " to default.");
+                            u.player.sendMessage(Utils.success("Set region ")
+                                    .append(Component.text(region.regionName(), NamedTextColor.DARK_AQUA))
+                                    .append(Utils.success(" to default.")));
                             this.refresh();
                         });
 

@@ -44,7 +44,7 @@ public class Tips {
                 try {
 
                     FileUtils.copyToFile(Objects.requireNonNull(Network.getInstance().getResource("tips-example.txt")), new File(file + "/tips-example.txt"));
-                    LOGGER.info("Create tips directory and added example file.");
+                    LOGGER.info("Created tips directory and added example file.");
 
                 } catch (IOException | NullPointerException e) {
                     e.printStackTrace();
