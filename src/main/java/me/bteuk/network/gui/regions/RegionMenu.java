@@ -220,7 +220,7 @@ public class RegionMenu extends Gui {
         //Check if the player has any active region requests.
         if (regionSQL.hasRow("SELECT region FROM region_requests WHERE uuid='" + user.player.getUniqueId() + "';")) {
 
-            setItem(41, Utils.createItem(Material.ORANGE_STAINED_GLASS, 1,
+            setItem(40, Utils.createItem(Material.ORANGE_STAINED_GLASS, 1,
                             Utils.title("Region Requests"),
                             Utils.line("View active regions requests"),
                             Utils.line("that you have made that have"),

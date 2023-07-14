@@ -5,7 +5,6 @@ import me.bteuk.network.gui.Gui;
 import me.bteuk.network.sql.RegionSQL;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
-import me.bteuk.network.utils.regions.Request;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -51,7 +50,7 @@ public class RegionRequestMenu extends Gui {
     private void createGui() {
 
         //Get all regions with uuid.
-        ArrayList<Request> requests = regionSQL.getRequestList("SELECT region FROM region_requests WHERE uuid='" + u.player.getUniqueId() + "';");
+        ArrayList<String> requests = regionSQL.getStringList("SELECT region FROM region_requests WHERE uuid='" + u.player.getUniqueId() + "';");
 
         //Slot count.
         int slot = 10;
@@ -107,13 +106,13 @@ public class RegionRequestMenu extends Gui {
 
             int finalI = i;
             setItem(slot, Utils.createItem(Material.LIME_CONCRETE, 1,
-                            Utils.title("Region " + requests.get(i).region),
+                            Utils.title("Region " + requests.get(i)),
                             Utils.line("Awaiting review by ").append(Utils.line(
 
-                                    (regionSQL.hasRow("SELECT region FROM region_requests WHERE region='" + requests.get(i).region + "' AND uuid='" + u.player.getUniqueId() + "' AND staff_accept=0;"))
-                                            ? "staff"
+                                    (regionSQL.hasRow("SELECT region FROM region_requests WHERE region='" + requests.get(i) + "' AND uuid='" + u.player.getUniqueId() + "' AND staff_accept=0;"))
+                                            ? "a reviewer"
                                             : Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
-                                            regionSQL.getString("SELECT owner FROM region_requests WHERE region='" + requests.get(i).region + "' AND uuid='" + u.player.getUniqueId() + "';")
+                                            regionSQL.getString("SELECT owner FROM region_requests WHERE region='" + requests.get(i) + "' AND uuid='" + u.player.getUniqueId() + "';")
                                             + "';")
 
                             )),
@@ -122,12 +121,12 @@ public class RegionRequestMenu extends Gui {
                     u -> {
 
                         //Delete region request.
-                        regionSQL.update("DELETE FROM region_requests  WHERE region='" + requests.get(finalI).region + "' AND uuid='" + u.player.getUniqueId() + "';");
+                        regionSQL.update("DELETE FROM region_requests  WHERE region='" + requests.get(finalI) + "' AND uuid='" + u.player.getUniqueId() + "';");
 
                         //Close the gui and send feedback.
                         u.player.closeInventory();
                         u.player.sendMessage(Utils.success("Cancelled region request for ")
-                                .append(Component.text(requests.get(finalI).region, NamedTextColor.DARK_AQUA)));
+                                .append(Component.text(requests.get(finalI), NamedTextColor.DARK_AQUA)));
 
                     });
 
