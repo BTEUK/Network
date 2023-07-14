@@ -125,7 +125,7 @@ public class MoveListener implements Listener {
 
                                     //Set join event to teleport there.
                                     EventManager.createJoinEvent(u.player.getUniqueId().toString(), "network", "teleport " +
-                                            location + " " + (l.getX() + xTransform) + " " + (l.getZ() + zTransform) + " " + l.getYaw() + " " + l.getPitch() + " " + SERVER_NAME);
+                                            location + " " + (l.getX() + xTransform) + " " + (l.getZ() + zTransform) + " " + l.getYaw() + " " + l.getPitch());
 
                                 } else {
 
@@ -134,7 +134,7 @@ public class MoveListener implements Listener {
 
                                     //Set join event to teleport there.
                                     EventManager.createJoinEvent(u.player.getUniqueId().toString(), "network", "teleport " +
-                                            EARTH_WORLD + " " + l.getX() + " " + l.getZ() + " " + l.getYaw() + " " + l.getPitch() + " " + SERVER_NAME);
+                                            EARTH_WORLD + " " + l.getX() + " " + l.getZ() + " " + l.getYaw() + " " + l.getPitch());
 
                                 }
 
