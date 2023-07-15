@@ -62,7 +62,7 @@ public class ll implements CommandExecutor {
 
             } catch (OutOfProjectionBoundsException e) {
 
-                p.sendMessage(Utils.error("You must be standing in a region to get the coordinates."));
+                p.sendMessage(Utils.error("You are not standing in a location where coordinates can be retrieved."));
                 return true;
 
             }

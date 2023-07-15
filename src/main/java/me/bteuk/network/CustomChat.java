@@ -1,7 +1,8 @@
 package me.bteuk.network;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
-import me.bteuk.network.staff.Moderation;
+import me.bteuk.network.exceptions.NotMutedException;
+import me.bteuk.network.utils.staff.Moderation;
 import me.bteuk.network.utils.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -20,68 +21,84 @@ import java.net.Socket;
 import java.util.Map;
 import java.util.UUID;
 
-import static me.bteuk.network.utils.Constants.LOGGER;
+import static me.bteuk.network.utils.Constants.*;
+import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
-public class CustomChat implements Listener, PluginMessageListener {
+public class CustomChat extends Moderation implements Listener, PluginMessageListener {
 
     private final Network instance;
-    private final String IP;
-    private final int port;
+    private String IP;
+    private int port;
 
-    private final Moderation moderation;
-
-    public CustomChat(Network instance, String IP, int port) {
+    public CustomChat(Network instance) {
 
         this.instance = instance;
-        this.IP = IP;
-        this.port = port;
-
-        moderation = new Moderation();
 
         instance.getServer().getPluginManager().registerEvents(this, instance);
 
-        //Register chat channels.
-        instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:globalchat", this);
-        instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:reviewer", this);
-        instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:staff", this);
-        instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:connect", this);
-        instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:disconnect", this);
+        //If global chat is enabled, register the listeners.
+        if (GLOBAL_CHAT) {
 
-        instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:tab", this);
+            this.IP = CONFIG.getString("chat.global_chat.socket.IP");
+            this.port = CONFIG.getInt("chat.global_chat.socket.port");
 
-        //Discord specific channels.
-        instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord", this);
-        instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord_staff", this);
-        instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord_reviewer", this);
+            //Register chat channels.
+            instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:globalchat", this);
+            instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:reviewer", this);
+            instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:staff", this);
+            instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:connect", this);
+            instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:disconnect", this);
 
-        instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord_connect", this);
-        instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord_disconnect", this);
+            if (TAB) {
+                //Register custom tab.
+                instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:tab", this);
+            }
 
-        instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord_linking", this);
+            if (DISCORD_CHAT) {
+                //Discord specific channels.
+                instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord", this);
+                instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord_staff", this);
+                instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord_reviewer", this);
 
-        LOGGER.info("Successfully enabled Global Chat!");
+                instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord_connect", this);
+                instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord_disconnect", this);
+            }
 
+            if (DISCORD_LINKING) {
+                instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord_linking", this);
+            }
+
+            LOGGER.info("Successfully enabled Global Chat!");
+        }
     }
 
     public void onDisable() {
 
-        instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:globalchat");
-        instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:reviewer");
-        instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:staff");
-        instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:connect");
-        instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:disconnect");
+        if (GLOBAL_CHAT) {
+            instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:globalchat");
+            instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:reviewer");
+            instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:staff");
+            instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:connect");
+            instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:disconnect");
 
-        instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:tab");
+            if (TAB) {
+                instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:tab");
+            }
 
-        //Discord specific channels.
-        instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord", this);
-        instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord_staff", this);
-        instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord_reviewer", this);
+            if (DISCORD_CHAT) {
+                //Discord specific channels.
+                instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord", this);
+                instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord_staff", this);
+                instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord_reviewer", this);
 
-        instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord_connect", this);
-        instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord_disconnect", this);
+                instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord_connect", this);
+                instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord_disconnect", this);
+            }
 
-        instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord_linking", this);
+            if (DISCORD_LINKING) {
+                instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord_linking", this);
+            }
+        }
 
     }
 
@@ -89,12 +106,20 @@ public class CustomChat implements Listener, PluginMessageListener {
     public void onPlayerChatEvent(AsyncChatEvent e) {
 
         //If player is muted cancel.
-        if (moderation.isMuted(e.getPlayer().getUniqueId().toString())) {
+        if (isMuted(e.getPlayer().getUniqueId().toString())) {
             e.setCancelled(true);
-            e.getPlayer().sendMessage(Utils.error("You are muted for ")
-                    .append(Component.text(moderation.getMutedReason(e.getPlayer().getUniqueId().toString()), NamedTextColor.DARK_RED))
-                    .append(Utils.error(" until "))
-                    .append(Component.text(moderation.getMuteDuration(e.getPlayer().getUniqueId().toString()), NamedTextColor.DARK_RED)));
+            try {
+
+                //Send message and end event.
+                e.getPlayer().sendMessage(getMutedComponent(e.getPlayer().getUniqueId().toString()));
+                return;
+
+            } catch (NotMutedException ex) {
+
+                //Unset the muted status.
+                e.setCancelled(false);
+
+            }
         }
 
         if (!e.isCancelled()) {
@@ -118,13 +143,20 @@ public class CustomChat implements Listener, PluginMessageListener {
                 broadcastAFK(u.player, false);
             }
 
-            if (u.staffChat) {
+            Statistics.addMessage(e.getPlayer().getUniqueId().toString(), Time.getDate(Time.currentTime()));
+
+            if (STAFF_CHAT && u.staffChat) {
                 broadcastPlayerMessage(e.getPlayer(), e.message().color(NamedTextColor.WHITE), "uknet:staff");
-                broadcastPlayerMessage(e.getPlayer(), e.message().color(NamedTextColor.WHITE), "uknet:discord_staff");
+
+                if (DISCORD_CHAT) {
+                    broadcastPlayerMessage(e.getPlayer(), e.message().color(NamedTextColor.WHITE), "uknet:discord_staff");
+                }
             } else {
-                Statistics.addMessage(e.getPlayer().getUniqueId().toString(), Time.getDate(Time.currentTime()));
                 broadcastPlayerMessage(e.getPlayer(), e.message().color(NamedTextColor.WHITE), "uknet:globalchat");
-                broadcastPlayerMessage(e.getPlayer(), e.message().color(NamedTextColor.WHITE), "uknet:discord");
+
+                if (DISCORD_CHAT) {
+                    broadcastPlayerMessage(e.getPlayer(), e.message().color(NamedTextColor.WHITE), "uknet:discord");
+                }
             }
         }
     }
@@ -144,6 +176,11 @@ public class CustomChat implements Listener, PluginMessageListener {
 
         Component component = GsonComponentSerializer.gson().deserialize(sMessage);
 
+        sendReceivedMessage(component, channel);
+
+    }
+
+    private void sendReceivedMessage(Component component, String channel) {
         switch (channel) {
 
             case "uknet:globalchat":
@@ -204,7 +241,7 @@ public class CustomChat implements Listener, PluginMessageListener {
                             String role = Roles.builderRole(p);
 
                             //Remove all roles except current role.
-                            for (Map.Entry<String, Long> entry : Network.getInstance().timers.getRoles().entrySet()) {
+                            for (Map.Entry<String, Long> entry : Network.getInstance().getTimers().getRoles().entrySet()) {
 
                                 if (role.equals(entry.getKey())) {
                                     broadcastMessage(Component.text("addrole " + args[2] + " " + entry.getValue()), "uknet:discord_linking");
@@ -234,56 +271,90 @@ public class CustomChat implements Listener, PluginMessageListener {
     }
 
     public void broadcastPlayerMessage(Player player, Component component, String channel) {
-        Bukkit.getScheduler().runTaskAsynchronously(instance, () -> {
-            try (Socket socket = new Socket(IP, port)) {
 
-                //Add formatted player name to start of the message.
-                //Create a new component and append the component to that.
-                Component message = Utils.chatFormat(player, component);
+        //Add formatted player name to start of the message.
+        //Create a new component and append the component to that.
+        Component message = Utils.chatFormat(player, component);
 
-                //Convert component to json and write to output.
-                OutputStream output = socket.getOutputStream();
-                ObjectOutputStream objectOutput = new ObjectOutputStream(output);
+        //If global chat is enabled send the message to the proxy using the chat socket.
+        if (GLOBAL_CHAT) {
+            Bukkit.getScheduler().runTaskAsynchronously(instance, () -> {
+                try (Socket socket = new Socket(IP, port)) {
 
-                objectOutput.writeObject(Utils.toJson(message));
-                objectOutput.writeObject(channel);
-                objectOutput.flush();
+                    //Convert component to json and write to output.
+                    OutputStream output = socket.getOutputStream();
+                    ObjectOutputStream objectOutput = new ObjectOutputStream(output);
 
-                objectOutput.close();
-            } catch (IOException ex) {
-                LOGGER.severe("Could not broadcast message to server socket!");
-            }
-        });
+                    objectOutput.writeObject(GsonComponentSerializer.gson().serialize(message));
+                    objectOutput.writeObject(channel);
+                    objectOutput.flush();
+
+                    objectOutput.close();
+                } catch (IOException ex) {
+                    LOGGER.severe("Could not broadcast message to server socket!");
+                }
+            });
+        } else {
+
+            //Send locally.
+            //Check for valid channels.
+            sendReceivedMessage(message, channel);
+
+        }
     }
 
     public void broadcastMessage(Component message, String channel) {
-        Bukkit.getScheduler().runTaskAsynchronously(instance, () -> {
-            try (Socket socket = new Socket(instance.socketIP, instance.socketPort)) {
 
-                //Convert component to json and write to output.
-                OutputStream output = socket.getOutputStream();
-                ObjectOutputStream objectOutput = new ObjectOutputStream(output);
+        //If global chat is enabled send the message to the proxy using the chat socket.
+        if (GLOBAL_CHAT) {
 
-                // Send player message
-                objectOutput.writeObject(Utils.toJson(message));
-                objectOutput.writeObject(channel);
-                objectOutput.flush();
+            Bukkit.getScheduler().runTaskAsynchronously(instance, () -> {
+                try (Socket socket = new Socket(IP, port)) {
 
-                objectOutput.close();
-            } catch (IOException ex) {
-                LOGGER.severe("Could not broadcast message to server socket!");
-            }
-        });
+                    //Convert component to json and write to output.
+                    OutputStream output = socket.getOutputStream();
+                    ObjectOutputStream objectOutput = new ObjectOutputStream(output);
+
+                    // Send player message
+                    objectOutput.writeObject(Utils.toJson(message));
+                    objectOutput.writeObject(channel);
+                    objectOutput.flush();
+
+                    objectOutput.close();
+                } catch (IOException ex) {
+                    LOGGER.severe("Could not broadcast message to server socket!");
+                }
+            });
+        } else {
+
+            //Send locally.
+            //Check for valid channels.
+            sendReceivedMessage(message, channel);
+
+        }
     }
 
     //Send afk or no longer afk message to players ingame and discord.
     public void broadcastAFK(Player p, boolean afk) {
+
+        Component chat_message;
+        Component discord_message;
+
         if (afk) {
-            broadcastMessage(Component.text(p.getName() + " is now afk", NamedTextColor.GRAY), "uknet:globalchat");
-            broadcastMessage(Component.text("*" + p.getName() + " is now afk*"), "uknet:discord");
+            chat_message = Component.text(p.getName() + " is now afk", NamedTextColor.GRAY);
+            discord_message = Component.text("*" + p.getName() + " is now afk*");
         } else {
-            broadcastMessage(Component.text(p.getName() + " is no longer afk", NamedTextColor.GRAY), "uknet:globalchat");
-            broadcastMessage(Component.text("*" + p.getName() + " is no longer afk*"), "uknet:discord");
+            chat_message = Component.text(p.getName() + " is no longer afk", NamedTextColor.GRAY);
+            discord_message = Component.text("*" + p.getName() + " is no longer afk*");
+        }
+
+        //Send message
+        broadcastMessage(chat_message, "uknet:globalchat");
+
+        if (DISCORD_CHAT) {
+
+            broadcastMessage(discord_message, "uknet:discord");
+
         }
     }
 }

@@ -1,15 +1,51 @@
 package me.bteuk.network;
 
-import me.bteuk.network.commands.*;
+import lombok.Getter;
+import me.bteuk.network.commands.AFK;
+import me.bteuk.network.commands.Clear;
+import me.bteuk.network.commands.DebugStick;
+import me.bteuk.network.commands.Discord;
+import me.bteuk.network.commands.Gamemode;
+import me.bteuk.network.commands.Hdb;
+import me.bteuk.network.commands.Help;
+import me.bteuk.network.commands.Navigator;
+import me.bteuk.network.commands.Nightvision;
+import me.bteuk.network.commands.Phead;
+import me.bteuk.network.commands.Plot;
+import me.bteuk.network.commands.Portals;
+import me.bteuk.network.commands.RegionCommand;
+import me.bteuk.network.commands.Rules;
+import me.bteuk.network.commands.Speed;
+import me.bteuk.network.commands.Zone;
+import me.bteuk.network.commands.ll;
+import me.bteuk.network.commands.navigation.Back;
+import me.bteuk.network.commands.navigation.Delhome;
+import me.bteuk.network.commands.navigation.Home;
+import me.bteuk.network.commands.navigation.Homes;
+import me.bteuk.network.commands.navigation.Navigation;
+import me.bteuk.network.commands.navigation.Server;
+import me.bteuk.network.commands.navigation.Sethome;
+import me.bteuk.network.commands.navigation.Spawn;
+import me.bteuk.network.commands.navigation.Tp;
+import me.bteuk.network.commands.navigation.TpToggle;
+import me.bteuk.network.commands.navigation.Tpll;
+import me.bteuk.network.commands.navigation.Warp;
+import me.bteuk.network.commands.navigation.Warps;
 import me.bteuk.network.commands.staff.Ban;
-import me.bteuk.network.commands.staff.Database;
+import me.bteuk.network.commands.staff.Kick;
 import me.bteuk.network.commands.staff.Mute;
 import me.bteuk.network.commands.staff.Staff;
-import me.bteuk.network.commands.tabcompleter.LocationSelector;
-import me.bteuk.network.commands.tabcompleter.PlayerSelector;
-import me.bteuk.network.commands.tabcompleter.ServerSelector;
+import me.bteuk.network.commands.staff.Unban;
+import me.bteuk.network.commands.staff.Unmute;
+import me.bteuk.network.listeners.CommandPreProcess;
+import me.bteuk.network.listeners.Connect;
+import me.bteuk.network.listeners.GuiListener;
+import me.bteuk.network.listeners.PlayerInteract;
+import me.bteuk.network.listeners.PreJoinServer;
+import me.bteuk.network.tabcompleters.LocationSelector;
+import me.bteuk.network.tabcompleters.PlayerSelector;
+import me.bteuk.network.tabcompleters.ServerSelector;
 import me.bteuk.network.gui.NavigatorGui;
-import me.bteuk.network.listeners.*;
 import me.bteuk.network.listeners.global_teleport.MoveListener;
 import me.bteuk.network.listeners.global_teleport.TeleportListener;
 import me.bteuk.network.lobby.Lobby;
@@ -17,7 +53,12 @@ import me.bteuk.network.sql.DatabaseUpdates;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.sql.RegionSQL;
-import me.bteuk.network.utils.*;
+import me.bteuk.network.utils.NetworkConfig;
+import me.bteuk.network.utils.NetworkUser;
+import me.bteuk.network.utils.Statistics;
+import me.bteuk.network.utils.Time;
+import me.bteuk.network.utils.Tips;
+import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.ServerType;
 import me.bteuk.network.utils.regions.RegionManager;
 import net.kyori.adventure.text.Component;
@@ -65,17 +106,17 @@ public final class Network extends JavaPlugin {
 
     //Chat
     public CustomChat chat;
-    public String socketIP;
-    public int socketPort;
 
     //Timers
-    public Timers timers;
+    @Getter
+    private Timers timers;
 
     //Lobby
     private Lobby lobby;
 
-    //Leave Server listener.
-    public LeaveServer leaveServer;
+    //Listener and manager of server connects.
+    @Getter
+    private Connect connect;
 
     //Movement listeners.
     public MoveListener moveListener;
@@ -83,6 +124,30 @@ public final class Network extends JavaPlugin {
 
     //Tab
     public TabManager tab;
+
+    //Kick Command
+    @Getter
+    private Kick kick;
+
+    //Mute Command
+    @Getter
+    private Mute mute;
+
+    //Unmute Command
+    @Getter
+    private Unmute unmute;
+
+    //Ban Command
+    @Getter
+    private Ban ban;
+
+    //Unban Command
+    @Getter
+    private Unban unban;
+
+    //Tutorials
+    @Getter
+    private Tutorials tutorials;
 
     @Override
     public void onEnable() {
@@ -174,23 +239,22 @@ public final class Network extends JavaPlugin {
         //Create user list.
         networkUsers = new ArrayList<>();
 
-        //Setup custom chat.
-        socketIP = CONFIG.getString("socket.IP");
-        socketPort = CONFIG.getInt("socket.port");
+        //Enabled chat, both global and normal chat are handled through this.
+        chat = new CustomChat(this);
 
-        chat = new CustomChat(this, socketIP, socketPort);
+        //Setup connect, this handles all connections to the server.
+        connect = new Connect(this, globalSQL, plotSQL, regionSQL);
 
-        //Setup connect.
-        //Network connect
-        Connect connect = new Connect(this, globalSQL, plotSQL);
+        //Enable the tutorial if enabled.
+        if (TUTORIALS) {
+            tutorials = new Tutorials();
+        }
 
         //Create navigator.
         navigatorGui = new NavigatorGui();
         navigator = Utils.createItem(Material.NETHER_STAR, 1, Utils.title("Navigator"), Utils.line("Click to open the navigator."));
 
         //Register events.
-        new JoinServer(this, globalSQL, connect);
-        leaveServer = new LeaveServer(this, globalSQL, connect);
         new PreJoinServer(this);
 
         new GuiListener(this);
@@ -237,6 +301,7 @@ public final class Network extends JavaPlugin {
         if (TPLL_ENABLED) {
 
             getCommand("tpll").setExecutor(new Tpll(CONFIG.getBoolean("requires_permission")));
+
         }
 
         //Enable commands.
@@ -244,10 +309,6 @@ public final class Network extends JavaPlugin {
         getCommand("zone").setExecutor(new Zone());
 
         getCommand("navigator").setExecutor(new Navigator());
-
-        getCommand("staff").setExecutor(new Staff());
-        getCommand("ban").setExecutor(new Ban());
-        getCommand("mute").setExecutor(new Mute());
 
         getCommand("server").setExecutor(new Server());
         getCommand("server").setTabCompleter(new ServerSelector());
@@ -258,8 +319,6 @@ public final class Network extends JavaPlugin {
 
         getCommand("back").setExecutor(new Back());
 
-        //Modpack will no longer be used.
-        //getCommand("modpack").setExecutor(new Modpack());
         getCommand("discord").setExecutor(new Discord());
 
         getCommand("ll").setExecutor(new ll());
@@ -275,8 +334,6 @@ public final class Network extends JavaPlugin {
 
         getCommand("navigation").setExecutor(new Navigation());
 
-        getCommand("database").setExecutor(new Database());
-
         getCommand("afk").setExecutor(new AFK());
 
         getCommand("clear").setExecutor(new Clear());
@@ -291,17 +348,45 @@ public final class Network extends JavaPlugin {
         new Phead(this);
 
         //Homes commands.
-        new Sethome(this, globalSQL);
-        new Home(this, globalSQL);
-        new Delhome(this, globalSQL);
-        new Homes(this);
+        if (CONFIG.getBoolean("homes.enabled")) {
+            new Sethome(this, globalSQL);
+            new Home(this, globalSQL);
+            new Delhome(this, globalSQL);
+            new Homes(this);
+        }
+
+        //Staff command to open the staff gui and use staff chat.
+        new Staff(this);
+
+        //Moderation commands.
+        if (CONFIG.getBoolean("staff.moderation.enabled")) {
+
+            ban = new Ban(this);
+            unban = new Unban(this);
+
+            mute = new Mute(this);
+            unmute = new Unmute(this);
+
+            kick = new Kick(this);
+
+        }
+
+        //Route /hdb to /skulls
+        new Hdb(this);
 
         //Register commandpreprocess to make sure /network:region runs and not that of another plugin.
         new CommandPreProcess(this);
         getCommand("region").setExecutor(new RegionCommand());
 
         //Enable tab.
-        tab = new TabManager(this);
+        if (TAB) {
+            tab = new TabManager(this);
+        }
+
+        //Enable tips.
+        if (TIPS) {
+            new Tips();
+        }
 
         //Enable server in server table.
         globalSQL.update("UPDATE server_data SET online=1 WHERE name='" + SERVER_NAME + "';");
@@ -345,9 +430,11 @@ public final class Network extends JavaPlugin {
                 //Remove player from online_users.
                 instance.globalSQL.update("DELETE FROM online_users WHERE uuid='" + uuid + "';");
 
-                //Update tab for all players.
-                //This is done with the tab chat channel.
-                instance.chat.broadcastMessage(Component.text("remove " + uuid), "uknet:tab");
+                if (TAB) {
+                    //Update tab for all players.
+                    //This is done with the tab chat channel.
+                    instance.chat.broadcastMessage(Component.text("remove " + uuid), "uknet:tab");
+                }
 
                 //Log playercount in database
                 instance.globalSQL.update("INSERT INTO player_count(log_time,players) VALUES(" + Time.currentTime() + "," +

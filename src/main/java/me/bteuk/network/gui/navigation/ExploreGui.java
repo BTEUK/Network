@@ -5,7 +5,7 @@ import me.bteuk.network.gui.Gui;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.AddLocationType;
-import me.bteuk.network.utils.navigation.LocationSearch;
+import me.bteuk.network.listeners.navigation.LocationSearch;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -85,7 +85,7 @@ public class ExploreGui extends Gui {
          */
 
         //England
-        setItem(2, Utils.createItem(Material.ORANGE_CONCRETE_POWDER, 1,
+        setItem(2, Utils.createCustomSkullWithFallback("bee5c850afbb7d8843265a146211ac9c615f733dcc5a8e2190e5c247dea32", Material.ORANGE_CONCRETE_POWDER, 1,
                         Utils.title("England"),
                         Utils.line("Click to pick from"),
                         Utils.line("locations in England.")),
@@ -101,7 +101,7 @@ public class ExploreGui extends Gui {
         );
 
         //Scotland
-        setItem(3, Utils.createItem(Material.LIGHT_BLUE_CONCRETE_POWDER, 1,
+        setItem(3, Utils.createCustomSkullWithFallback("dadc377816389c3c87c65dcacac1d8f880b54334d7c23ea22f099e2c4eab1ff9", Material.LIGHT_BLUE_CONCRETE_POWDER, 1,
                         Utils.title("Scotland"),
                         Utils.line("Click to pick from"),
                         Utils.line("locations in Scotland.")),
@@ -109,7 +109,7 @@ public class ExploreGui extends Gui {
         );
 
         //Wales
-        setItem(4, Utils.createItem(Material.RED_CONCRETE_POWDER, 1,
+        setItem(4, Utils.createCustomSkullWithFallback("8140ad08f7ee1c73bf75660614595c7392caba5529211a9adbe3b5639cb6ad41", Material.RED_CONCRETE_POWDER, 1,
                         Utils.title("Wales"),
                         Utils.line("Click to pick from"),
                         Utils.line("locations in Wales.")),
@@ -117,7 +117,7 @@ public class ExploreGui extends Gui {
         );
 
         //Northern Ireland
-        setItem(5, Utils.createItem(Material.LIME_CONCRETE_POWDER, 1,
+        setItem(5, Utils.createCustomSkullWithFallback("c00ae311a5c7082e76450ecafcbbbc07dcdc484600ac0bf8d91f27e0a65b7e32", Material.LIME_CONCRETE_POWDER, 1,
                         Utils.title("Northern Ireland"),
                         Utils.line("Click to pick from"),
                         Utils.line("locations in Norther Ireland.")),
@@ -125,7 +125,7 @@ public class ExploreGui extends Gui {
         );
 
         //Other
-        setItem(6, Utils.createItem(Material.YELLOW_CONCRETE_POWDER, 1,
+        setItem(6, Utils.createCustomSkullWithFallback("c439d7f9c67f32dcbb86b7010b1e14b60de96776a35f61cee982660aacf5264b", Material.YELLOW_CONCRETE_POWDER, 1,
                         Utils.title("Other"),
                         Utils.line("Click to pick from locations"),
                         Utils.line("not in the 4 countries of the UK.")),

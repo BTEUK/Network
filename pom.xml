@@ -6,7 +6,7 @@
 
     <groupId>me.bteuk</groupId>
     <artifactId>Network</artifactId>
-    <version>1.1.1</version>
+    <version>1.2.0</version>
     <packaging>jar</packaging>
 
     <name>Network</name>
@@ -41,6 +41,18 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.1.0</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.junit.jupiter</groupId>
+                        <artifactId>junit-jupiter-engine</artifactId>
+                        <version>5.9.2</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
         <resources>
@@ -99,6 +111,11 @@
             <version>2.9.0</version>
         </dependency>
         <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.13.0</version>
+        </dependency>
+        <dependency>
             <groupId>me.clip</groupId>
             <artifactId>placeholderapi</artifactId>
             <version>2.11.1</version>
@@ -112,7 +129,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>31.1-jre</version>
+            <version>32.1.1-jre</version>
         </dependency>
         <dependency>
             <groupId>com.sk89q.worldguard</groupId>
@@ -125,6 +142,18 @@
             <artifactId>ProtocolLib</artifactId>
             <version>4.8.0</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.28</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.9.2</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

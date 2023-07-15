@@ -1,5 +1,6 @@
 package me.bteuk.network;
 
+import lombok.Getter;
 import me.bteuk.network.events.EventManager;
 import me.bteuk.network.listeners.Connect;
 import me.bteuk.network.sql.GlobalSQL;
@@ -60,6 +61,10 @@ public class Timers {
     //Discord roles
     private final HashMap<String, Long> roles;
 
+    //Event manager
+    @Getter
+    private final EventManager eventManager;
+
     public Timers(Network instance, GlobalSQL globalSQL, Connect connect) {
 
         this.instance = instance;
@@ -71,6 +76,7 @@ public class Timers {
 
         this.timers = new ArrayList<>();
 
+        eventManager = new EventManager();
         events = new ArrayList<>();
 
         //days * 24 hours * 60 minutes * 60 seconds * 1000 milliseconds
@@ -80,14 +86,16 @@ public class Timers {
         //Minutes * 60 seconds * 1000 milliseconds
         afk = CONFIG.getInt("afk") * 60L * 1000L;
 
-        //Get roles from config.
+        //Get roles from config if discord linking is enabled.
         roles = new HashMap<>();
-        roles.put("reviewer", CONFIG.getLong("role_id.reviewer"));
-        roles.put("architect", CONFIG.getLong("role_id.architect"));
-        roles.put("builder", CONFIG.getLong("role_id.builder"));
-        roles.put("jrbuilder", CONFIG.getLong("role_id.jrbuilder"));
-        roles.put("apprentice", CONFIG.getLong("role_id.apprentice"));
-        roles.put("applicant", CONFIG.getLong("role_id.applicant"));
+        if (DISCORD_LINKING) {
+            roles.put("reviewer", CONFIG.getLong("chat.global_chat.discord.linking.role_id.reviewer"));
+            roles.put("architect", CONFIG.getLong("chat.global_chat.discord.linking.role_id.architect"));
+            roles.put("builder", CONFIG.getLong("chat.global_chat.discord.linking.role_id.builder"));
+            roles.put("jrbuilder", CONFIG.getLong("chat.global_chat.discord.linking.role_id.jrbuilder"));
+            roles.put("apprentice", CONFIG.getLong("chat.global_chat.discord.linking.role_id.apprentice"));
+            roles.put("applicant", CONFIG.getLong("chat.global_chat.discord.linking.role_id.applicant"));
+        }
 
     }
 
@@ -111,13 +119,13 @@ public class Timers {
                     for (String[] event : events) {
 
                         //Deal with events here.
-                        Network.getInstance().getLogger().info("Event: " + event[1]);
+                        LOGGER.info("Event: " + event[1]);
 
                         //Split the event by word.
                         String[] aEvent = event[1].split(" ");
 
                         //Send the event to the event handler.
-                        EventManager.event(event[0], aEvent, event[2]);
+                        eventManager.event(event[0], aEvent, event[2]);
 
                     }
 
@@ -154,9 +162,11 @@ public class Timers {
                             PlaceholderAPI.setPlaceholders(user.player, "%luckperms_prefix%") + " " + user.player.getName() +
                             "',primary_role='" + Roles.getPrimaryRole(user.player) + "' WHERE uuid='" + user.player.getUniqueId() + "' AND server='" + SERVER_NAME + "';");
 
-                    //Update tab for all players to update display name.
-                    //This is done with the tab chat channel.
-                    instance.chat.broadcastMessage(Component.text("update " + user.player.getUniqueId()), "uknet:tab");
+                    if (TAB) {
+                        //Update tab for all players to update display name.
+                        //This is done with the tab chat channel.
+                        instance.chat.broadcastMessage(Component.text("update " + user.player.getUniqueId()), "uknet:tab");
+                    }
 
                 }
 
@@ -215,21 +225,9 @@ public class Timers {
                     //Run network disconnect and remove their entry.
                     globalSQL.update("DELETE FROM server_switch WHERE uuid='" + uuid + "';");
 
-                    connect.leaveEvent(Bukkit.getOfflinePlayer(UUID.fromString(uuid)));
+                    connect.networkLeaveEvent(Bukkit.getOfflinePlayer(UUID.fromString(uuid)));
 
                 }
-            }
-
-            //Check for users with a last ping greater than 10 seconds ago, disconnect them from the network.
-            //Only query players that should be on this server, else it could leave to premature disconnects if the server lags but another server thinks you're offline.
-            uuids = globalSQL.getStringList("SELECT uuid FROM online_users WHERE last_ping<" + (time - (1000 * 10)) + " AND server='" + SERVER_NAME + "';");
-
-            //Iterate through uuids and check time.
-            for (String uuid : uuids) {
-
-                //Run network disconnect and remove their entry.
-                connect.leaveEvent(Bukkit.getOfflinePlayer(UUID.fromString(uuid)));
-
             }
 
         }, 0L, 20L));
@@ -273,7 +271,7 @@ public class Timers {
             //For all online players sync the roles.
             for (NetworkUser u : instance.getUsers()) {
 
-                if (u.isLinked) {
+                if (u.isLinked && DISCORD_LINKING) {
                     //Get the highest role for syncing and sync it, except for guest.
                     String role = Roles.builderRole(u.player);
                     discordSync(u.discord_id, role);
@@ -305,7 +303,7 @@ public class Timers {
     //TODO: Only run this on role add/remove as well as discord link/unlink.
     public void discordSync(long discord_id, String role) {
         //Remove all roles except current role.
-        for (Map.Entry<String, Long> entry : Network.getInstance().timers.getRoles().entrySet()) {
+        for (Map.Entry<String, Long> entry : Network.getInstance().getTimers().getRoles().entrySet()) {
 
             if (role.equals(entry.getKey())) {
                 instance.chat.broadcastMessage(Component.text("addrole " + discord_id + " " + entry.getValue()), "uknet:discord_linking");

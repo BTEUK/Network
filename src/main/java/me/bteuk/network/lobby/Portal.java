@@ -1,5 +1,6 @@
 package me.bteuk.network.lobby;
 
+import me.bteuk.network.Network;
 import me.bteuk.network.events.EventManager;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -58,7 +59,7 @@ public class Portal {
                 p.chat(event);
 
             } else {
-                EventManager.event(p.getUniqueId().toString(), event.split(" "), null);
+                Network.getInstance().getTimers().getEventManager().event(p.getUniqueId().toString(), event.split(" "), null);
             }
         }
     }

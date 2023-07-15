@@ -5,6 +5,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
+import static me.bteuk.network.utils.Constants.DISCORD_LINKING;
+
 public final class Roles {
 
     /*
@@ -101,13 +103,13 @@ public final class Roles {
         //Update database.
         Network.getInstance().globalSQL.update("UPDATE player_data SET builder_role='" + nRole + "' WHERE uuid='" + uuid + "';");
 
-        //Sync with discord if linked.
-        if (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM discord WHERE uuid='" + uuid + "';")) {
+        //Sync with discord if linked and enabled.
+        if (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM discord WHERE uuid='" + uuid + "';") && DISCORD_LINKING) {
             //Get discord id.
             long discord_id = Network.getInstance().globalSQL.getLong("SELECT discord_id FROM discord WHERE uuid='" + uuid + "';");
 
             //Sync roles.
-            Network.getInstance().timers.discordSync(discord_id, nRole);
+            Network.getInstance().getTimers().discordSync(discord_id, nRole);
 
         }
     }

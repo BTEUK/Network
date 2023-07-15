@@ -1,13 +1,18 @@
 package me.bteuk.network.utils;
 
+import com.destroystokyo.paper.profile.PlayerProfile;
 import me.bteuk.network.Network;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -15,7 +20,9 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.profile.PlayerTextures;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -51,6 +58,18 @@ public class Utils {
         return Component.text(message, NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false);
     }
 
+    /**
+     * Adds the prefix to a tip message.
+     *
+     * @param tip the tip to add a prefix to
+     *
+     * @return Component of the tip with the prefix
+     */
+    public static Component tip(String tip) {
+        return Component.text("[TIP] ", TextColor.color(0x346beb))
+                .append(Utils.line(tip));
+    }
+
     public static String toJson(Component component) {
         return GsonComponentSerializer.gson().serialize(component);
     }
@@ -58,7 +77,7 @@ public class Utils {
     //Adds the chat formatting to the message.
     public static Component chatFormat(Player player, Component message) {
         //Get prefix placeholder and convert from legacy format.
-        //Legacy format for RGB is like §#a25981
+        //Legacy format for RGB is like &#a25981
         Component newMessage = LegacyComponentSerializer.legacyAmpersand().deserialize(PlaceholderAPI.setPlaceholders(player, "%luckperms_prefix% &f%player_name% &7&l> &r&f"));
         return newMessage.append(message);
     }
@@ -68,6 +87,49 @@ public class Utils {
         ItemStack item;
 
         item = new ItemStack(material);
+        item.setAmount(amount);
+
+        ItemMeta meta = item.getItemMeta();
+        meta.displayName(displayName);
+        List<Component> lore = new ArrayList<>(Arrays.asList(loreString));
+        meta.lore(lore);
+        item.setItemMeta(meta);
+
+        return item;
+
+    }
+
+    public static ItemStack createCustomSkullWithFallback(String texture, Material fallback, int amount, Component displayName, Component... loreString) {
+
+        ItemStack item;
+
+        try {
+
+            if (texture == null) {
+                throw new NullPointerException();
+            }
+
+            URL url = new URL("http://textures.minecraft.net/texture/" + texture);
+            item = new ItemStack(Material.PLAYER_HEAD);
+
+            SkullMeta meta = (SkullMeta) item.getItemMeta();
+
+            //Create playerprofile.
+            PlayerProfile profile = Network.getInstance().getServer().createProfile(UUID.randomUUID());
+
+            PlayerTextures textures = profile.getTextures();
+            textures.setSkin(url);
+
+            profile.setTextures(textures);
+
+            meta.setPlayerProfile(profile);
+
+            item.setItemMeta(meta);
+
+        } catch (Exception e) {
+            item = new ItemStack(fallback);
+        }
+
         item.setAmount(amount);
 
         ItemMeta meta = item.getItemMeta();

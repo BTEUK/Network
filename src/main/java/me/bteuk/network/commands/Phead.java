@@ -1,7 +1,7 @@
 package me.bteuk.network.commands;
 
 import me.bteuk.network.Network;
-import me.bteuk.network.commands.tabcompleter.PlayerSelector;
+import me.bteuk.network.tabcompleters.PlayerSelector;
 import me.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

@@ -23,10 +23,20 @@ public class Time {
 
     //Converts milliseconds to datetime.
     public static String getDateTime(long time) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm Z");
         formatter.setTimeZone(TimeZone.getTimeZone("Europe/London"));
         Date date = new Date(time);
         return formatter.format(date);
+    }
+
+    //Converts hours/days/months and years to milliseconds.
+    public static long toMilliseconds(long hours, long days, long months, long years) {
+
+        days += months * 12 + years * 365;
+        hours += 24 * days;
+
+        return hours * 60 * 60 * 1000;
+
     }
 
     //Converts milliseconds to minutes.

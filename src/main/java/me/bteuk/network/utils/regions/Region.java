@@ -120,7 +120,7 @@ public record Region(String regionName) {
 
     //Return whether the region has an owner.
     public boolean hasActiveOwner() {
-        return (Network.getInstance().regionSQL.hasRow("SELECT region FROM region_members WHERE region='" + regionName + "' AND is_owner=1 AND last_enter>=" + (Time.currentTime()-Network.getInstance().timers.inactivity) + ";"));
+        return (Network.getInstance().regionSQL.hasRow("SELECT region FROM region_members WHERE region='" + regionName + "' AND is_owner=1 AND last_enter>=" + (Time.currentTime()-Network.getInstance().getTimers().inactivity) + ";"));
     }
 
     //Return whether the region has a member.
@@ -216,7 +216,7 @@ public record Region(String regionName) {
     public void setOpen() {
 
         //Remove all members and the owner.
-        removeMembers("&aThe region &3%tag% &ais now open, you no longer need to claimed it to build here.");
+        removeMembers("&aThe region &3%tag% &ais now open, you no longer need to claim it to build here.");
 
         //Set open.
         WorldGuard.addGroup(regionName, "jrbuilder", Bukkit.getWorld(Objects.requireNonNull(EARTH_WORLD)));

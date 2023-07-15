@@ -1,5 +1,5 @@
 # Config version, do not update this manually as it could break the config.
-version: 1.1.1
+version: 1.2.0
 
 #MySQL is mandatory for this plugin.
 #Login information
@@ -29,17 +29,70 @@ spawn:
   yaw: -90
   pitch: 0
 
-#Chat Socket
-socket:
-  IP: localhost
-  port: 30589
+#Staff features
+staff:
+  staff_chat:
+    enabled: true
+  moderation:
+    enabled: true
 
-#Network messages
-#%player% is a placeholder for the player name.
+#Tutorials
+#Enable if your network contains a server with TeachingTutorials setup.
+tutorials:
+  enabled: false
+  compulsory_tutorial: true
+  database:
+    host: localhost
+    port: 3306
+    username: root
+    password: password
+    name: TeachingTutorials
+
+#Homes
+homes:
+  enabled: true
+
+#Chat Settings
 chat:
-  join: '&e%player% has joined UKnet'
-  firstjoin: '&eWelcome to UKnet, %player%'
-  leave: '&e%player% has left UKnet'
+  #Global allows for cross-server implementation of chat.
+  #This is required to enable discord compatibility.
+  #Requires the proxy-plugin which is built for Velocity.
+  global_chat:
+    enabled: true
+    socket:
+      IP: localhost
+      port: 30589
+    discord:
+      chat:
+        enabled: true
+      linking:
+        enabled: true
+        role_id:
+          reviewer: 815686457838272512
+          architect: 1050426152700878871
+          builder: 696773933256671373
+          jrbuilder: 837045714562973754
+          apprentice: 728017845652553799
+          applicant: 955520858577850458
+    #Custom tab menu
+    tab:
+      enabled: true
+
+  #Network messages
+  #%player% is a placeholder for the player name.
+  custom_messages:
+    enabled: true
+    join: '&e%player% has joined UKnet'
+    firstjoin: '&eWelcome to UKnet, %player%'
+    leave: '&e%player% has left UKnet'
+
+  #Tips in chat
+  #Whether to enable tips in chat and at what frequency they should display.
+  #Adding messages can be done in files in the 'tips' folder. One file for each builder role you want to display it to.
+  #Frequency is in minutes.
+  tips:
+    enabled: true
+    frequency: 5
 
 #Tpll config.
 #The min and max y are for searching altitude for teleport, set it to the same value as the world height.
@@ -77,18 +130,5 @@ staff_request:
 #If the region has no other members then the owner does not get demoted by the region becomes 'inactive'.
 region_inactivity: 30
 
-#Old database details
-#These are only necessary for UKnet1.0 to UKnet2.0 conversions.
-database_uknet: minecraft_uknet
-
 #Discord link
 discord: 'https://discord.gg/5m56EgEVW6'
-
-#Discord role ids
-role_id:
-  reviewer: 815686457838272512
-  architect: 1050426152700878871
-  builder: 696773933256671373
-  jrbuilder: 837045714562973754
-  apprentice: 728017845652553799
-  applicant: 955520858577850458

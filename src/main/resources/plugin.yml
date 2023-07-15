@@ -59,18 +59,9 @@ commands:
   navigation:
     usage: /<command>
     description: Adds commands to do with navigation.
-  database:
-    usage: /<command>
-    description: Adds all database conversions.
   afk:
     usage: /<command>
     description: Toggles afk status.
-  ban:
-    usage: /<command>
-    description: Bans a player for a specific duration and reason.
-  mute:
-    usage: /<command>
-    description: Mutes a player for a specific duration and reason.
   portals:
     usage: /<command>
     description: Command to reload portals.
@@ -112,3 +103,21 @@ commands:
   homes:
     usage: /<command>
     description: Like warps, but for homes, shows all homes the player has set.
+  ban:
+    usage: /<command>
+    description: Bans a player for a specific duration and reason.
+  mute:
+    usage: /<command>
+    description: Mutes a player for a specific duration and reason.
+  kick:
+    usage: /<command>
+    description: Kick a player for the server.
+  unban:
+    usage: /<command>
+    description: Unban a previously banned player.
+  unmute:
+    usage: /<command>
+    description: Unmute a previously muted player.
+  hdb:
+    usage: /<command>
+    description: Added so it can be routed to /skulls

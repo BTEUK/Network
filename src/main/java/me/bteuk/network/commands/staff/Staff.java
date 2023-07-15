@@ -1,7 +1,7 @@
 package me.bteuk.network.commands.staff;
 
 import me.bteuk.network.Network;
-import me.bteuk.network.staff.StaffGui;
+import me.bteuk.network.gui.staff.StaffGui;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
@@ -9,10 +9,29 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import static me.bteuk.network.utils.Constants.*;
+
 public class Staff implements CommandExecutor {
+
+    //Constructor to enable the command.
+    public Staff(Network instance) {
+
+        //Register command.
+        PluginCommand command = instance.getCommand("staff");
+
+        if (command == null) {
+            LOGGER.warning("Home command not added to plugin.yml, it will therefore not be enabled.");
+            return;
+        }
+
+        //Set executor.
+        command.setExecutor(this);
+
+    }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args) {
@@ -38,8 +57,8 @@ public class Staff implements CommandExecutor {
 
         if (u == null) {return true;}
 
-        //If first arg is chat, switch the player to and from staff chat.
-        if (args.length > 0) {
+        //If first arg is chat, switch the player to and from staff chat if enabled.
+        if (args.length > 0 && STAFF_CHAT) {
             if (args[0].equalsIgnoreCase("chat")) {
                 if (u.staffChat) {
                     u.player.sendMessage(Utils.success("Disabled staff chat."));
@@ -52,7 +71,10 @@ public class Staff implements CommandExecutor {
             } else {
                 //Send message in staff chat.
                 Network.getInstance().chat.broadcastPlayerMessage(p, Component.text(String.join(" ", args), NamedTextColor.WHITE), "uknet:staff");
-                Network.getInstance().chat.broadcastPlayerMessage(p, Component.text(String.join(" ", args), NamedTextColor.WHITE), "uknet:discord_staff");
+
+                if (DISCORD_CHAT) {
+                    Network.getInstance().chat.broadcastPlayerMessage(p, Component.text(String.join(" ", args), NamedTextColor.WHITE), "uknet:discord_staff");
+                }
             }
             return true;
         }

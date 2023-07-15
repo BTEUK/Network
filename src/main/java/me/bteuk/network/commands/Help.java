@@ -65,27 +65,34 @@ public class Help implements CommandExecutor {
     private void help(Player p) {
 
         //Navigator
-        p.sendMessage(Component.text("/navigator", NamedTextColor.GRAY).append(Utils.line(" - Opens the navigator, access most server features from here.")));
+        p.sendMessage(Component.text("/navigator", NamedTextColor.GRAY).append(Utils.line(" - Click to open the navigator, access most server features from here."))
+                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/navigator")));
 
         //Exporing
-        p.sendMessage(Component.text("/help explore", NamedTextColor.GRAY).append(Utils.line(" - Lists commands used for exploring the server.")));
+        p.sendMessage(Component.text("/help explore", NamedTextColor.GRAY).append(Utils.line(" - Click to list commands used for exploring the server."))
+                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/help explore")));
 
         //Building
-        p.sendMessage(Component.text("/help building", NamedTextColor.GRAY).append(Utils.line(" - Information on how to rank-up and build.")));
+        p.sendMessage(Component.text("/help building", NamedTextColor.GRAY).append(Utils.line(" - Click for information on how to rank-up and build."))
+                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/help building")));
 
         //Plots
         //Information about plots.
-        p.sendMessage(Component.text("/help plots", NamedTextColor.GRAY).append(Utils.line(" - Details on plots and how to use them.")));
+        p.sendMessage(Component.text("/help plots", NamedTextColor.GRAY).append(Utils.line(" - Click for details on plots and how to use them."))
+                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/help plots")));
 
         //Regions
         //Information about regions.
-        p.sendMessage(Component.text("/help regions", NamedTextColor.GRAY).append(Utils.line(" - What are regions and why we have them.")));
+        p.sendMessage(Component.text("/help regions", NamedTextColor.GRAY).append(Utils.line(" - Click for information about regions and why we have them."))
+                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/help regions")));
 
         //Utilities
-        p.sendMessage(Component.text("/help utils", NamedTextColor.GRAY).append(Utils.line(" - Other commands that can be useful in general.")));
+        p.sendMessage(Component.text("/help utils", NamedTextColor.GRAY).append(Utils.line(" - Click for other commands that can be useful in general."))
+                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/help utils")));
 
         //Worldedit
-        p.sendMessage(Component.text("/help worldedit", NamedTextColor.GRAY).append(Utils.line(" - Lists available WorldEdit commands.")));
+        p.sendMessage(Component.text("/help worldedit", NamedTextColor.GRAY).append(Utils.line(" - Click to list available WorldEdit commands."))
+                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/help worldedit")));
     }
 
     private void building(Player p) {
@@ -113,13 +120,14 @@ public class Help implements CommandExecutor {
                             "Complete 1 medium plot to be promoted to "))
                     .append(Component.text("Jr.Builder", NamedTextColor.GRAY)));
 
-            /*case "applicant" -> p.sendMessage(Utils.chat("Achieved by completed the required steps in the tutorial, you now have access to the plot system. " +
-                    "Complete 1 easy plot to be promoted to &7Apprentice&f."));*/
-
-            case "default" -> p.sendMessage(Utils.line("The role you start with when you first join the server. Complete 1 easy plot to be promoted to ")
+            case "applicant" -> p.sendMessage(Utils.line("Achieved by completed the required steps in the tutorial, you now have access to the plot system. " +
+                            "Complete 1 easy plot to be promoted to ")
                     .append(Component.text("Apprentice", NamedTextColor.GRAY)));
 
-            //case "guest" -> p.sendMessage(Utils.chat("The role you start with when you first join the server. To start your path towards becoming a builder just hop into the tutorial."));
+            //case "default" -> p.sendMessage(Utils.line("The role you start with when you first join the server. Complete 1 easy plot to be promoted to ")
+            //       .append(Component.text("Apprentice", NamedTextColor.GRAY)));
+
+            case "default" -> p.sendMessage(Utils.line("The role you start with when you first join the server. To start your path towards becoming a builder just hop into the tutorial."));
 
         }
 
@@ -130,7 +138,8 @@ public class Help implements CommandExecutor {
                 .append(Utils.line(" - Get the real life coordinates of your current location, with a link to Google Maps.")));
 
         p.sendMessage(Component.text("/skulls", NamedTextColor.GRAY)
-                .append(Utils.line(" - Opens the head menu. To search for a specific head use &7/skulls search")));
+                .append(Utils.line(" - Opens the head menu. To search for a specific head use "))
+                .append(Component.text("/skulls search")));
         p.sendMessage(Component.text("/bannermaker", NamedTextColor.GRAY)
                 .append(Utils.line(" - Opens the bannermaker menu, allows you to create and save banners easily.")));
 

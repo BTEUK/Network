@@ -5,9 +5,10 @@ import me.bteuk.network.utils.enums.RegionStatus;
 import me.bteuk.network.utils.regions.Region;
 import org.bukkit.Location;
 
-public class RegionEvent {
+public class RegionEvent extends AbstractEvent {
 
-    public static void event(String uuid, String[] event, String eMessage) {
+    @Override
+    public void event(String uuid, String[] event, String eMessage) {
 
         Region region;
 
@@ -118,7 +119,7 @@ public class RegionEvent {
 
                 //Send message to plot owner.
                 Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + region.getOwner() + "','&3" +
-                        Network.getInstance().globalSQL.getStringList("SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " &ahas joined region &3" + region.getTag(region.getOwner()) + "');");
+                        Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " &ahas joined region &3" + region.getTag(region.getOwner()) + "');");
                 break;
             }
         }

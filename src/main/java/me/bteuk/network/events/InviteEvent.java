@@ -13,9 +13,10 @@ import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
-public class InviteEvent {
+public class InviteEvent extends AbstractEvent {
 
-    public static void event(String uuid, String[] event) {
+    @Override
+    public void event(String uuid, String[] event, String sMessage) {
 
         switch (event[1]) {
             case "plot" -> {
@@ -56,7 +57,7 @@ public class InviteEvent {
 
                     int id = Integer.parseInt(event[2]);
 
-                    p.sendMessage(Utils.success("You have been invited to zpone ")
+                    p.sendMessage(Utils.success("You have been invited to zone ")
                             .append(Component.text(event[2], NamedTextColor.DARK_AQUA))
                             .append(Utils.success(" by "))
                             .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
