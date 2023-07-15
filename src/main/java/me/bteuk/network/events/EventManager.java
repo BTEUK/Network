@@ -1,7 +1,7 @@
 package me.bteuk.network.events;
 
 import me.bteuk.network.Network;
-import me.bteuk.network.commands.Back;
+import me.bteuk.network.commands.navigation.Back;
 import org.bukkit.Location;
 
 import static me.bteuk.network.utils.Constants.SERVER_NAME;

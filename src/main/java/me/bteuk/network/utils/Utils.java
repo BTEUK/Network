@@ -5,6 +5,7 @@ import me.bteuk.network.Network;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -57,6 +58,18 @@ public class Utils {
         return Component.text(message, NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false);
     }
 
+    /**
+     * Adds the prefix to a tip message.
+     *
+     * @param tip the tip to add a prefix to
+     *
+     * @return Component of the tip with the prefix
+     */
+    public static Component tip(String tip) {
+        return Component.text("[TIP] ", TextColor.color(0x346beb))
+                .append(Utils.line(tip));
+    }
+
     public static String toJson(Component component) {
         return GsonComponentSerializer.gson().serialize(component);
     }
@@ -64,7 +77,7 @@ public class Utils {
     //Adds the chat formatting to the message.
     public static Component chatFormat(Player player, Component message) {
         //Get prefix placeholder and convert from legacy format.
-        //Legacy format for RGB is like §#a25981
+        //Legacy format for RGB is like &#a25981
         Component newMessage = LegacyComponentSerializer.legacyAmpersand().deserialize(PlaceholderAPI.setPlaceholders(player, "%luckperms_prefix% &f%player_name% &7&l> &r&f"));
         return newMessage.append(message);
     }

@@ -2,7 +2,7 @@ package me.bteuk.network;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
 import me.bteuk.network.exceptions.NotMutedException;
-import me.bteuk.network.staff.Moderation;
+import me.bteuk.network.utils.staff.Moderation;
 import me.bteuk.network.utils.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

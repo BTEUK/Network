@@ -2,7 +2,7 @@ package me.bteuk.network.listeners;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.exceptions.NotBannedException;
-import me.bteuk.network.staff.Moderation;
+import me.bteuk.network.utils.staff.Moderation;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;

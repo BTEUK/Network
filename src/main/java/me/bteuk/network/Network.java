@@ -1,13 +1,51 @@
 package me.bteuk.network;
 
 import lombok.Getter;
-import me.bteuk.network.commands.*;
-import me.bteuk.network.staff.commands.*;
+import me.bteuk.network.commands.AFK;
+import me.bteuk.network.commands.Clear;
+import me.bteuk.network.commands.DebugStick;
+import me.bteuk.network.commands.Discord;
+import me.bteuk.network.commands.Gamemode;
+import me.bteuk.network.commands.Hdb;
+import me.bteuk.network.commands.Help;
+import me.bteuk.network.commands.Navigator;
+import me.bteuk.network.commands.Nightvision;
+import me.bteuk.network.commands.Phead;
+import me.bteuk.network.commands.Plot;
+import me.bteuk.network.commands.Portals;
+import me.bteuk.network.commands.RegionCommand;
+import me.bteuk.network.commands.Rules;
+import me.bteuk.network.commands.Speed;
+import me.bteuk.network.commands.Zone;
+import me.bteuk.network.commands.ll;
+import me.bteuk.network.commands.navigation.Back;
+import me.bteuk.network.commands.navigation.Delhome;
+import me.bteuk.network.commands.navigation.Home;
+import me.bteuk.network.commands.navigation.Homes;
+import me.bteuk.network.commands.navigation.Navigation;
+import me.bteuk.network.commands.navigation.Server;
+import me.bteuk.network.commands.navigation.Sethome;
+import me.bteuk.network.commands.navigation.Spawn;
+import me.bteuk.network.commands.navigation.Tp;
+import me.bteuk.network.commands.navigation.TpToggle;
+import me.bteuk.network.commands.navigation.Tpll;
+import me.bteuk.network.commands.navigation.Warp;
+import me.bteuk.network.commands.navigation.Warps;
+import me.bteuk.network.commands.staff.Ban;
+import me.bteuk.network.commands.staff.Kick;
+import me.bteuk.network.commands.staff.Mute;
+import me.bteuk.network.commands.staff.Staff;
+import me.bteuk.network.commands.staff.Unban;
+import me.bteuk.network.commands.staff.Unmute;
+import me.bteuk.network.listeners.CommandPreProcess;
+import me.bteuk.network.listeners.Connect;
+import me.bteuk.network.listeners.GuiListener;
+import me.bteuk.network.listeners.PlayerInteract;
+import me.bteuk.network.listeners.PreJoinServer;
 import me.bteuk.network.tabcompleters.LocationSelector;
 import me.bteuk.network.tabcompleters.PlayerSelector;
 import me.bteuk.network.tabcompleters.ServerSelector;
 import me.bteuk.network.gui.NavigatorGui;
-import me.bteuk.network.listeners.*;
 import me.bteuk.network.listeners.global_teleport.MoveListener;
 import me.bteuk.network.listeners.global_teleport.TeleportListener;
 import me.bteuk.network.lobby.Lobby;
@@ -15,7 +53,12 @@ import me.bteuk.network.sql.DatabaseUpdates;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.sql.RegionSQL;
-import me.bteuk.network.utils.*;
+import me.bteuk.network.utils.NetworkConfig;
+import me.bteuk.network.utils.NetworkUser;
+import me.bteuk.network.utils.Statistics;
+import me.bteuk.network.utils.Time;
+import me.bteuk.network.utils.Tips;
+import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.ServerType;
 import me.bteuk.network.utils.regions.RegionManager;
 import net.kyori.adventure.text.Component;
@@ -282,8 +325,6 @@ public final class Network extends JavaPlugin {
 
         getCommand("navigation").setExecutor(new Navigation());
 
-        getCommand("database").setExecutor(new Database());
-
         getCommand("afk").setExecutor(new AFK());
 
         getCommand("clear").setExecutor(new Clear());
@@ -331,6 +372,11 @@ public final class Network extends JavaPlugin {
         //Enable tab.
         if (TAB) {
             tab = new TabManager(this);
+        }
+
+        //Enable tips.
+        if (TIPS) {
+            new Tips();
         }
 
         //Enable server in server table.

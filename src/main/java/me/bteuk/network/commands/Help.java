@@ -138,7 +138,8 @@ public class Help implements CommandExecutor {
                 .append(Utils.line(" - Get the real life coordinates of your current location, with a link to Google Maps.")));
 
         p.sendMessage(Component.text("/skulls", NamedTextColor.GRAY)
-                .append(Utils.line(" - Opens the head menu. To search for a specific head use &7/skulls search")));
+                .append(Utils.line(" - Opens the head menu. To search for a specific head use "))
+                .append(Component.text("/skulls search")));
         p.sendMessage(Component.text("/bannermaker", NamedTextColor.GRAY)
                 .append(Utils.line(" - Opens the bannermaker menu, allows you to create and save banners easily.")));
 

@@ -59,9 +59,6 @@ commands:
   navigation:
     usage: /<command>
     description: Adds commands to do with navigation.
-  database:
-    usage: /<command>
-    description: Adds all database conversions.
   afk:
     usage: /<command>
     description: Toggles afk status.

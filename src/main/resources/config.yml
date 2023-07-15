@@ -74,6 +74,14 @@ chat:
     firstjoin: '&eWelcome to UKnet, %player%'
     leave: '&e%player% has left UKnet'
 
+  #Tips in chat
+  #Whether to enable tips in chat and at what frequency they should display.
+  #Adding messages can be done in files in the 'tips' folder. One file for each builder role you want to display it to.
+  #Frequency is in minutes.
+  tips:
+    enabled: true
+    frequency: 5
+
 #Tpll config.
 #The min and max y are for searching altitude for teleport, set it to the same value as the world height.
 tpll:
@@ -109,10 +117,6 @@ staff_request:
 #Number of days a region owner can be inactive before they are demoted to member.
 #If the region has no other members then the owner does not get demoted by the region becomes 'inactive'.
 region_inactivity: 30
-
-#Old database details
-#These are only necessary for UKnet1.0 to UKnet2.0 conversions.
-database_uknet: minecraft_uknet
 
 #Discord link
 discord: 'https://discord.gg/5m56EgEVW6'

@@ -119,7 +119,7 @@ public class Timers {
                     for (String[] event : events) {
 
                         //Deal with events here.
-                        Network.getInstance().getLogger().info("Event: " + event[1]);
+                        LOGGER.info("Event: " + event[1]);
 
                         //Split the event by word.
                         String[] aEvent = event[1].split(" ");
