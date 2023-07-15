@@ -2,6 +2,7 @@ package me.bteuk.network.commands;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.BuildGui;
+import me.bteuk.network.gui.TutorialsGui;
 import me.bteuk.network.gui.navigation.ExploreGui;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
@@ -35,6 +36,7 @@ public class Navigator implements CommandExecutor {
 
                 case "explore" -> openExplore(u);
                 case "building" -> openBuilding(u);
+                case "tutorials" -> openTutorials(u);
                 default -> openNavigator(u);
 
             }
@@ -86,6 +88,18 @@ public class Navigator implements CommandExecutor {
         }
 
         u.mainGui = new BuildGui(u);
+        u.mainGui.open(u);
+
+    }
+
+    private void openTutorials(NetworkUser u) {
+
+        if (u.mainGui != null) {
+            u.mainGui.delete();
+            u.mainGui = null;
+        }
+
+        u.mainGui = new TutorialsGui(u);
         u.mainGui.open(u);
 
     }

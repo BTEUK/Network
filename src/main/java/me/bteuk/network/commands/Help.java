@@ -120,7 +120,7 @@ public class Help implements CommandExecutor {
                             "Complete 1 medium plot to be promoted to "))
                     .append(Component.text("Jr.Builder", NamedTextColor.GRAY)));
 
-            case "applicant" -> p.sendMessage(Utils.line("Achieved by completed the required steps in the tutorial, you now have access to the plot system. " +
+            case "applicant" -> p.sendMessage(Utils.line("Achieved by completing the required steps in the tutorial, you now have access to the plot system. " +
                             "Complete 1 easy plot to be promoted to ")
                     .append(Component.text("Apprentice", NamedTextColor.GRAY)));
 
