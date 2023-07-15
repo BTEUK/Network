@@ -52,19 +52,27 @@ public class NavigatorGui extends Gui {
                 u -> {
 
                     //Switch to tutorials menu if it's online and enabled.
-                    if (TUTORIALS) {
-                        if (Network.getInstance().globalSQL.hasRow("SELECT name FROM server_data WHERE type='TUTORIAL' AND online=1;")) {
+                    //If the current server is already tutorials, don't open the gui.
+                    if (SERVER_TYPE == ServerType.TUTORIAL) {
 
-                            u.mainGui = new TutorialsGui(u);
-                            u.mainGui.open(u);
+                        u.player.closeInventory();
+                        u.player.sendMessage(Utils.error("You are already in the tutorial server, please use the menu in slot 8."));
 
+                    } else {
+                        if (TUTORIALS) {
+                            if (Network.getInstance().globalSQL.hasRow("SELECT name FROM server_data WHERE type='TUTORIAL' AND online=1;")) {
+
+                                u.mainGui = new TutorialsGui(u);
+                                u.mainGui.open(u);
+
+                            } else {
+                                u.player.closeInventory();
+                                u.player.sendMessage(Utils.error("The tutorials server is offline!"));
+                            }
                         } else {
                             u.player.closeInventory();
-                            u.player.sendMessage(Utils.error("The tutorials server is offline!"));
+                            u.player.sendMessage(Utils.error("Tutorials are currently not enabled!"));
                         }
-                    } else {
-                        u.player.closeInventory();
-                        u.player.sendMessage(Utils.error("Tutorials are currently not enabled!"));
                     }
 
                 });

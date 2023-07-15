@@ -60,7 +60,7 @@ public class TutorialsGui extends Gui {
             } else {
 
                 setItem(13, Utils.createItem(Material.BOOK, 1,
-                                Utils.line(inLesson ? "Continue Compulsory Tutorial" : "Start Compulsory Tutorial"),
+                                Utils.title(inLesson ? "Continue Compulsory Tutorial" : "Start Compulsory Tutorial"),
                                 Utils.line("Gain the applicant rank!")),
                         u -> {
 
