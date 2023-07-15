@@ -16,6 +16,7 @@ import org.bukkit.Material;
 import org.bukkit.potion.PotionEffectType;
 
 import static me.bteuk.network.utils.Constants.SERVER_TYPE;
+import static me.bteuk.network.utils.Constants.TUTORIALS;
 
 public class NavigatorGui extends Gui {
 
@@ -23,7 +24,7 @@ public class NavigatorGui extends Gui {
 
         super(27, Component.text("Navigator", NamedTextColor.AQUA, TextDecoration.BOLD));
 
-        setItem(3, Utils.createItem(Material.DIAMOND_PICKAXE, 1,
+        setItem(2, Utils.createItem(Material.DIAMOND_PICKAXE, 1,
                         Utils.title("Build"),
                         Utils.line("Click to open the build menu.")),
                 u -> {
@@ -34,7 +35,7 @@ public class NavigatorGui extends Gui {
 
                 });
 
-        setItem(5, Utils.createItem(Material.SPRUCE_BOAT, 1,
+        setItem(4, Utils.createItem(Material.SPRUCE_BOAT, 1,
                         Utils.title("Explore"),
                         Utils.line("Click to open the explore menu.")),
                 u -> {
@@ -42,6 +43,29 @@ public class NavigatorGui extends Gui {
                     //Click Action
                     u.mainGui = new ExploreGui(u);
                     u.mainGui.open(u);
+
+                });
+
+        setItem(6, Utils.createItem(Material.KNOWLEDGE_BOOK, 1,
+                        Utils.title("Tutorials"),
+                        Utils.line("Click to open the tutorials menu.")),
+                u -> {
+
+                    //Switch to tutorials menu if it's online and enabled.
+                    if (TUTORIALS) {
+                        if (Network.getInstance().globalSQL.hasRow("SELECT name FROM server_data WHERE type='TUTORIAL' AND online=1;")) {
+
+                            u.mainGui = new TutorialsGui(u);
+                            u.mainGui.open(u);
+
+                        } else {
+                            u.player.closeInventory();
+                            u.player.sendMessage(Utils.error("The tutorials server is offline!"));
+                        }
+                    } else {
+                        u.player.closeInventory();
+                        u.player.sendMessage(Utils.error("Tutorials are currently not enabled!"));
+                    }
 
                 });
 

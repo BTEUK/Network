@@ -145,6 +145,10 @@ public final class Network extends JavaPlugin {
     @Getter
     private Unban unban;
 
+    //Tutorials
+    @Getter
+    private Tutorials tutorials;
+
     @Override
     public void onEnable() {
 
@@ -240,6 +244,11 @@ public final class Network extends JavaPlugin {
 
         //Setup connect, this handles all connections to the server.
         connect = new Connect(this, globalSQL, plotSQL, regionSQL);
+
+        //Enable the tutorial if enabled.
+        if (TUTORIALS) {
+            tutorials = new Tutorials();
+        }
 
         //Create navigator.
         navigatorGui = new NavigatorGui();

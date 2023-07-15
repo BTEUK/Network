@@ -51,6 +51,9 @@ public class Constants {
     //Are tips enabled
     public static final boolean TIPS;
 
+    //Is the tutorial enabled
+    public static final boolean TUTORIALS;
+
     static {
 
         LOGGER = Network.getInstance().getLogger();
@@ -79,6 +82,8 @@ public class Constants {
         DISCORD_LINKING = CONFIG.getBoolean("chat.global_chat.discord.linking.enabled");
 
         TIPS = CONFIG.getBoolean("chat.tips.enabled");
+
+        TUTORIALS = CONFIG.getBoolean("tutorials.enabled");
 
         if (CONFIG.getString("earth_world") == null) {
             //Setting default value.
