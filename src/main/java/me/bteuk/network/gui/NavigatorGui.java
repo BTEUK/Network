@@ -56,7 +56,7 @@ public class NavigatorGui extends Gui {
                     if (SERVER_TYPE == ServerType.TUTORIAL) {
 
                         u.player.closeInventory();
-                        u.player.sendMessage(Utils.error("You are already in the tutorial server, please use the menu in slot 8."));
+                        u.player.sendMessage(Utils.error("You are already in the tutorials server, please use the menu in slot 8."));
 
                     } else {
                         if (TUTORIALS) {
