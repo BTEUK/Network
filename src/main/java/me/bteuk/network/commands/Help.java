@@ -65,7 +65,7 @@ public class Help implements CommandExecutor {
     private void help(Player p) {
 
         //Navigator
-        p.sendMessage(Component.text("/navigator", NamedTextColor.GRAY).append(Utils.line(" - Clock to open the navigator, access most server features from here."))
+        p.sendMessage(Component.text("/navigator", NamedTextColor.GRAY).append(Utils.line(" - Click to open the navigator, access most server features from here."))
                 .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/navigator")));
 
         //Exporing
@@ -87,7 +87,7 @@ public class Help implements CommandExecutor {
                 .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/help regions")));
 
         //Utilities
-        p.sendMessage(Component.text("/help utils", NamedTextColor.GRAY).append(Utils.line(" - Clock for other commands that can be useful in general."))
+        p.sendMessage(Component.text("/help utils", NamedTextColor.GRAY).append(Utils.line(" - Click for other commands that can be useful in general."))
                 .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/help utils")));
 
         //Worldedit
