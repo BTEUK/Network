@@ -16,8 +16,7 @@ CREATE TABLE IF NOT EXISTS plot_members
     uuid        CHAR(36)    NOT NULL,
     is_owner    TINYINT(1)  NULL DEFAULT 0,
     last_enter  BIGINT      NOT NULL,
-    PRIMARY KEY(id, uuid),
-    FOREIGN KEY (id) REFERENCES plot_data(id)
+    PRIMARY KEY(id, uuid)
 );
 
 CREATE TABLE IF NOT EXISTS plot_corners
@@ -26,8 +25,7 @@ CREATE TABLE IF NOT EXISTS plot_corners
     corner      INT         NOT NULL,
     x           INT         NOT NULL,
     z           INT         NOT NULL,
-    PRIMARY KEY(id,corner),
-    FOREIGN KEY (id) REFERENCES plot_data(id)
+    PRIMARY KEY(id,corner)
 );
 
 CREATE TABLE IF NOT EXISTS plot_invites
@@ -35,8 +33,7 @@ CREATE TABLE IF NOT EXISTS plot_invites
     id          INT         NOT NULL,
     owner       CHAR(36)    NOT NULL,
     uuid        CHAR(36)    NOT NULL,
-    PRIMARY KEY(id,uuid),
-    FOREIGN KEY (id) REFERENCES plot_data(id)
+    PRIMARY KEY(id,uuid)
 );
 
 CREATE TABLE IF NOT EXISTS plot_submissions
@@ -44,8 +41,7 @@ CREATE TABLE IF NOT EXISTS plot_submissions
     id          INT         NOT NULL,
     submit_time BIGINT      NOT NULL,
     last_query  BIGINT      NULL DEFAULT 0,
-    PRIMARY KEY (id),
-    FOREIGN KEY (id) REFERENCES plot_data(id)
+    PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS accept_data
@@ -57,8 +53,7 @@ CREATE TABLE IF NOT EXISTS accept_data
     accuracy    INT         NOT NULL,
     quality     INT         NOT NULL,
     accept_time BIGINT      NOT NULL,
-    PRIMARY KEY(id),
-    FOREIGN KEY (id) REFERENCES plot_data(id)
+    PRIMARY KEY(id)
 );
 
 CREATE TABLE IF NOT EXISTS deny_data
@@ -69,8 +64,7 @@ CREATE TABLE IF NOT EXISTS deny_data
     book_id     INT         NOT NULL,
     attempt     INT         NOT NULL,
     deny_time   BIGINT      NOT NULL,
-    PRIMARY KEY(id, uuid, attempt),
-    FOREIGN KEY (id) REFERENCES plot_data(id)
+    PRIMARY KEY(id, uuid, attempt)
 );
 
 CREATE TABLE IF NOT EXISTS book_data
@@ -116,8 +110,7 @@ CREATE TABLE IF NOT EXISTS zone_members
     id          INT         NOT NULL,
     uuid        CHAR(36)    NOT NULL,
     is_owner    TINYINT(1)  NULL DEFAULT 0,
-    PRIMARY KEY(id, uuid),
-    FOREIGN KEY(id) REFERENCES zones(id)
+    PRIMARY KEY(id, uuid)
 );
 
 CREATE TABLE IF NOT EXISTS zone_invites
@@ -125,8 +118,7 @@ CREATE TABLE IF NOT EXISTS zone_invites
     id          INT         NOT NULL,
     owner       CHAR(36)    NOT NULL,
     uuid        CHAR(36)    NOT NULL,
-    PRIMARY KEY(id,uuid),
-    FOREIGN KEY(id) REFERENCES zones(id)
+    PRIMARY KEY(id,uuid)
 );
 
 CREATE TABLE IF NOT EXISTS zone_corners
@@ -135,6 +127,5 @@ CREATE TABLE IF NOT EXISTS zone_corners
     corner      INT         NOT NULL,
     x           INT         NOT NULL,
     z           INT         NOT NULL,
-    PRIMARY KEY(id,corner),
-    FOREIGN KEY(id) REFERENCES zones(id)
+    PRIMARY KEY(id,corner)
 );

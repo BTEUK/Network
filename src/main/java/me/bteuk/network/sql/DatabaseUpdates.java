@@ -14,8 +14,8 @@ public class DatabaseUpdates {
         if (Network.getInstance().globalSQL.hasRow("SELECT data_value FROM unique_data WHERE data_key='version';")) {
             version = Network.getInstance().globalSQL.getString("SELECT data_value FROM unique_data WHERE data_key='version';");
         } else {
-            //Insert the latest database version as version.
-            Network.getInstance().globalSQL.update("INSERT INTO unique_data(data_key, data_value) VALUES('version','1.1.0')");
+            //Insert the default database version as version.
+            Network.getInstance().globalSQL.update("INSERT INTO unique_data(data_key, data_value) VALUES('version','1.0.0')");
         }
 
         //Check for specific table columns that could be missing,
@@ -31,11 +31,21 @@ public class DatabaseUpdates {
         if (oldVersionInt <= 1) {
             update1_2();
         }
+
+        //1.1.0 -> 1.2.0
+        if (oldVersionInt <= 2) {
+            update2_3();
+        }
     }
 
     private int getVersionInt(String version) {
 
         switch(version) {
+
+            //1.2.0 = 3
+            case "1.2.0" -> {
+                return 3;
+            }
 
             //1.1.0 = 2
             case "1.1.0" -> {
@@ -51,11 +61,25 @@ public class DatabaseUpdates {
 
     }
 
+    private void update2_3() {
+
+        LOGGER.info("Updating database from 1.1.0 to 1.2.0");
+
+        //Version 1.2.0.
+        Network.getInstance().globalSQL.getString("UPDATE unique_data SET data_value='1.2.0' WHERE data_key='version';");
+
+        //Add applicant to list of builder roles.
+        Network.getInstance().globalSQL.update("ALTER TABLE player_data MODIFY builder_role ENUM('default','applicant','apprentice','jrbuilder','builder','architect','reviewer') DEFAULT 'default'");
+
+    }
+
     private void update1_2() {
 
         LOGGER.info("Updating database from 1.0.0 to 1.1.0");
 
         //Version 1.1.0.
+        Network.getInstance().globalSQL.getString("UPDATE unique_data SET data_value='1.1.0' WHERE data_key='version';");
+
         //Add skin texture id column.
         Network.getInstance().globalSQL.update("ALTER TABLE player_data ADD COLUMN player_skin TEXT NULL DEFAULT NULL;");
 
@@ -86,7 +110,6 @@ public class DatabaseUpdates {
         Network.getInstance().globalSQL.update("ALTER TABLE server_switch ADD fk_server_switch_2 FOREIGN KEY (from_server) REFERENCES server_data(name);");
         Network.getInstance().globalSQL.update("ALTER TABLE server_switch ADD fk_server_switch_3 FOREIGN KEY (to_server) REFERENCES server_data(name);");
         Network.getInstance().globalSQL.update("ALTER TABLE coordinates ADD fk_coordinates_1 FOREIGN KEY (server) REFERENCES server_data(name);");
-
 
     }
 }

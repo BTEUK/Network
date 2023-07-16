@@ -12,6 +12,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import static me.bteuk.network.utils.Constants.SERVER_TYPE;
+import static me.bteuk.network.utils.Constants.TUTORIALS;
+import static me.bteuk.network.utils.enums.ServerType.TUTORIAL;
+
 public class Navigator implements CommandExecutor {
 
     @Override
@@ -92,15 +96,23 @@ public class Navigator implements CommandExecutor {
 
     }
 
+    //Only if tutorials is enabled and the server is not already tutorials.
     private void openTutorials(NetworkUser u) {
 
-        if (u.mainGui != null) {
-            u.mainGui.delete();
-            u.mainGui = null;
+        if (SERVER_TYPE != TUTORIAL && TUTORIALS) {
+
+            if (u.mainGui != null) {
+                u.mainGui.delete();
+                u.mainGui = null;
+            }
+
+            u.mainGui = new TutorialsGui(u);
+            u.mainGui.open(u);
+
+        } else {
+
+            openNavigator(u);
+
         }
-
-        u.mainGui = new TutorialsGui(u);
-        u.mainGui.open(u);
-
     }
 }

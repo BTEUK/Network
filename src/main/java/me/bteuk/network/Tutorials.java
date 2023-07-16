@@ -1,5 +1,8 @@
 package me.bteuk.network;
 
+import me.bteuk.network.utils.Utils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 import java.sql.Connection;
@@ -13,6 +16,11 @@ import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 public class Tutorials {
 
     private BasicDataSource dataSource;
+
+    public static final Component TUTORIAL_REQUIRED_MESSAGE =
+            Utils.error("You need applicant to claim a plot, you can get this by completing a tutorial.")
+                    .append(Utils.error(" Click here to open the tutorial menu!"))
+                    .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/navigator tutorials"));
 
     public Tutorials() {
         try {
