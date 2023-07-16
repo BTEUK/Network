@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS player_data
     name      VARCHAR(16)       NOT NULL,
     last_online    BIGINT       NOT NULL,
     last_submit    BIGINT       NOT NULL,
-    builder_role    ENUM('default','apprentice',
+    builder_role    ENUM('default','applicant','apprentice',
     'jrbuilder','builder','architect',
     'reviewer') NULL DEFAULT 'default',
     navigator   TINYINT(1)      NOT NULL DEFAULT 1,
