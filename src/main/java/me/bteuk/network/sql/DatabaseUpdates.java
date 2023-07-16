@@ -66,7 +66,7 @@ public class DatabaseUpdates {
         LOGGER.info("Updating database from 1.1.0 to 1.2.0");
 
         //Version 1.2.0.
-        Network.getInstance().globalSQL.getString("UPDATE unique_data SET data_value='1.2.0' WHERE data_key='version';");
+        Network.getInstance().globalSQL.update("UPDATE unique_data SET data_value='1.2.0' WHERE data_key='version';");
 
         //Add applicant to list of builder roles.
         Network.getInstance().globalSQL.update("ALTER TABLE player_data MODIFY builder_role ENUM('default','applicant','apprentice','jrbuilder','builder','architect','reviewer') DEFAULT 'default'");
