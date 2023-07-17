@@ -15,11 +15,11 @@ public class DatabaseUpdates {
             version = Network.getInstance().globalSQL.getString("SELECT data_value FROM unique_data WHERE data_key='version';");
         } else {
             //Insert the default database version as version.
-            Network.getInstance().globalSQL.update("INSERT INTO unique_data(data_key, data_value) VALUES('version','1.0.0')");
+            Network.getInstance().globalSQL.update("INSERT INTO unique_data(data_key, data_value) VALUES('version','1.2.0')");
         }
 
         //Check for specific table columns that could be missing,
-        //All changes have to be tested from 1.0.0.
+        //All changes have to be tested from 1.0.0.er
         //We update 1 version at a time.
 
         //Convert config version to integer, so we can easily use them.
