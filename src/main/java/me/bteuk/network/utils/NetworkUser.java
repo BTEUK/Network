@@ -202,4 +202,32 @@ public class NetworkUser {
         }, 20L);
 
     }
+
+    /**
+     * Check if the {@link NetworkUser} has the permission node.
+     *
+     * @param permission_node permission node.
+     * @return whether the {@link NetworkUser} has the permission node.
+     */
+    public boolean hasPermission(String permission_node) {
+        return player.hasPermission(permission_node);
+    }
+
+    /**
+     * Check if the {@link NetworkUser} has any permission node in the array.
+     *
+     * @param permission_nodes array of permission nodes.
+     * @return whether the {@link NetworkUser} has any of the permission nodes.
+     */
+    public boolean hasAnyPermission(String[] permission_nodes) {
+
+        for (String permission_node : permission_nodes) {
+            if (hasPermission(permission_node)) {
+                return true;
+            }
+        }
+
+        return false;
+
+    }
 }
