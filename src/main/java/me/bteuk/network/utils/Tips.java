@@ -88,13 +88,18 @@ public class Tips {
                     Bukkit.getScheduler().scheduleSyncRepeatingTask(Network.getInstance(), () -> {
 
                         //For all online players see if their builder role has tips, if true send them the current tip.
-                        for (Player p : Bukkit.getOnlinePlayers()) {
+                        for (NetworkUser user : Network.getInstance().getUsers()) {
 
-                            //Get builder role from database.
-                            String role = Network.getInstance().globalSQL.getString("SELECT builder_role FROM player_data WHERE uuid='" + p.getUniqueId() + "';");
+                            //Check if the user has tips enabled.
+                            if (user.isTips_enabled()) {
 
-                            if (tipsMap.containsKey(role)) {
-                                p.sendMessage(Utils.tip(tipsMap.get(role).getTip()));
+                                //Get builder role from database.
+                                String role = Network.getInstance().globalSQL.getString("SELECT builder_role FROM player_data WHERE uuid='" + user.player.getUniqueId() + "';");
+
+                                if (tipsMap.containsKey(role)) {
+                                    user.player.sendMessage(Utils.tip(tipsMap.get(role).getTip()));
+                                }
+
                             }
                         }
 
