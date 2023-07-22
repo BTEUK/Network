@@ -15,7 +15,7 @@ public class DatabaseUpdates {
             version = Network.getInstance().globalSQL.getString("SELECT data_value FROM unique_data WHERE data_key='version';");
         } else {
             //Insert the default database version as version.
-            Network.getInstance().globalSQL.update("INSERT INTO unique_data(data_key, data_value) VALUES('version','1.2.0')");
+            Network.getInstance().globalSQL.update("INSERT INTO unique_data(data_key, data_value) VALUES('version','1.3.0')");
         }
 
         //Check for specific table columns that could be missing,
@@ -36,11 +36,21 @@ public class DatabaseUpdates {
         if (oldVersionInt <= 2) {
             update2_3();
         }
+
+        //1.2.0 -> 1.3.0
+        if (oldVersionInt <= 3) {
+            update3_4();
+        }
     }
 
     private int getVersionInt(String version) {
 
         switch(version) {
+
+            //1.3.0 = 4
+            case "1.3.0" -> {
+                return 4;
+            }
 
             //1.2.0 = 3
             case "1.2.0" -> {
@@ -58,6 +68,18 @@ public class DatabaseUpdates {
             }
 
         }
+
+    }
+
+    private void update3_4() {
+
+        LOGGER.info("Updating database from 1.2.0 to 1.3.0");
+
+        //Version 1.3.0.
+        Network.getInstance().globalSQL.update("UPDATE unique_data SET data_value='1.3.0' WHERE data_key='version';");
+
+        //Add tips_enabled to the player_data table.
+        Network.getInstance().globalSQL.update("ALTER TABLE player_data ADD COLUMN tips_enabled TINYINT(1) NOT NULL DEFAULT 1;");
 
     }
 

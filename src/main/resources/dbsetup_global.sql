@@ -42,6 +42,8 @@ CREATE TABLE IF NOT EXISTS player_data
     nightvision_enabled TINYINT(1)  NOT NULL DEFAULT 0,
     staff_chat          TINYINT(1)  NOT NULL DEFAULT 0,
     previous_coordinate INT     NOT NULL DEFAULT 0,
+    player_skin     TEXT    NULL DEFAULT NULL,
+    tips_enabled    TINYINT(1)  NOT NULL DEFAULT 1,
     PRIMARY KEY (uuid)
 );
 
