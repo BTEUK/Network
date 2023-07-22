@@ -80,8 +80,7 @@ public class Ban extends Moderation implements CommandExecutor {
         long end_time = Time.currentTime() + time;
 
         //Combine all remaining args to create a reason.
-        String sArgs = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
-        String reason = StringUtils.substring(sArgs, 2);
+        String reason = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
 
         sender.sendMessage(banPlayer(args[0], uuid, end_time, reason));
         return true;

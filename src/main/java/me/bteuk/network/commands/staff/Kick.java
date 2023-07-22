@@ -70,8 +70,7 @@ public class Kick extends Moderation implements CommandExecutor {
         }
 
         //Combine all remaining args to create a reason.
-        String sArgs = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
-        String reason = StringUtils.substring(sArgs, 1);
+        String reason = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
 
         sender.sendMessage(kickPlayer(args[0], uuid, reason));
 
