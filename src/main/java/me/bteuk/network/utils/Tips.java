@@ -3,7 +3,6 @@ package me.bteuk.network.utils;
 import me.bteuk.network.Network;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
