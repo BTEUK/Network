@@ -108,39 +108,43 @@ public class MoveListener implements Listener {
                             //Check if the player can enter the region.
                             if (region.inDatabase() || p.hasPermission("group.jrbuilder")) {
 
-                                //Add region to database if not exists.
-                                region.addToDatabase();
+                                //If the server is offline, notify the player.
+                                if (Network.getInstance().globalSQL.getBoolean("SELECT online FROM server_data WHERE name='" + region.getServer() + "';")) {
 
-                                //Region is on another server, teleport them accordingly.
-                                //If the new region is on a plot server, check for coordinate transform.
-                                String server;
-                                if (region.status() == RegionStatus.PLOT) {
+                                    //Add region to database if not exists.
+                                    region.addToDatabase();
 
-                                    //Get server and world of region.
-                                    server = Network.getInstance().plotSQL.getString("SELECT server FROM regions WHERE region='" + region.regionName() + "';");
-                                    String location = Network.getInstance().plotSQL.getString("SELECT location FROM regions WHERE region='" + region.regionName() + "';");
+                                    //Region is on another server, teleport them accordingly.
+                                    //If the new region is on a plot server, check for coordinate transform.
+                                    if (region.status() == RegionStatus.PLOT) {
 
-                                    int xTransform = Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + location + "';");
-                                    int zTransform = Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
+                                        //Get server and world of region.
+                                        String location = Network.getInstance().plotSQL.getString("SELECT location FROM regions WHERE region='" + region.regionName() + "';");
 
-                                    //Set join event to teleport there.
-                                    EventManager.createJoinEvent(u.player.getUniqueId().toString(), "network", "teleport " +
-                                            location + " " + (l.getX() + xTransform) + " " + (l.getZ() + zTransform) + " " + l.getYaw() + " " + l.getPitch());
+                                        int xTransform = Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + location + "';");
+                                        int zTransform = Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
+
+                                        //Set join event to teleport there.
+                                        EventManager.createJoinEvent(u.player.getUniqueId().toString(), "network", "teleport " +
+                                                location + " " + (l.getX() + xTransform) + " " + (l.getZ() + zTransform) + " " + l.getYaw() + " " + l.getPitch());
+
+                                    } else {
+
+                                        //Set join event to teleport there.
+                                        EventManager.createJoinEvent(u.player.getUniqueId().toString(), "network", "teleport " +
+                                                EARTH_WORLD + " " + l.getX() + " " + l.getZ() + " " + l.getYaw() + " " + l.getPitch());
+
+                                    }
+
+                                    //Switch server.
+                                    u.switching = true;
+                                    SwitchServer.switchServer(u.player, region.getServer());
 
                                 } else {
 
-                                    //Location is on the earth server.
-                                    server = Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';");
-
-                                    //Set join event to teleport there.
-                                    EventManager.createJoinEvent(u.player.getUniqueId().toString(), "network", "teleport " +
-                                            EARTH_WORLD + " " + l.getX() + " " + l.getZ() + " " + l.getYaw() + " " + l.getPitch());
+                                    p.sendMessage(Utils.error("This region is on another server, however the server is currently offline."));
 
                                 }
-
-                                //Switch server.
-                                u.switching = true;
-                                SwitchServer.switchServer(u.player, server);
 
                             } else {
 
