@@ -155,7 +155,7 @@ public class Home implements CommandExecutor, TabCompleter {
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command
             command, @NotNull String label, @NotNull String[] args) {
 
-        List<String> homes = Network.getInstance().globalSQL.getStringList("SELECT name FROM home WHERE uuid='" + ((Player) sender).getUniqueId() + " AND name IS NOT NULL;");
+        List<String> homes = Network.getInstance().globalSQL.getStringList("SELECT name FROM home WHERE uuid='" + ((Player) sender).getUniqueId() + "' AND name IS NOT NULL;");
         List<String> returns = new ArrayList<>();
 
         if (args.length == 0) {
