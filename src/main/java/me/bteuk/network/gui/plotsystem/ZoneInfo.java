@@ -166,6 +166,7 @@ public class ZoneInfo extends Gui {
 
                             //Set zone to private and refresh this gui.
                             plotSQL.update("UPDATE zones SET is_public=0 WHERE id=" + zoneID + ";");
+                            u.player.sendMessage(Utils.success("Set zone to private."));
 
                             this.refresh();
                             u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
@@ -182,6 +183,7 @@ public class ZoneInfo extends Gui {
 
                             //Set zone to private and refresh this gui.
                             plotSQL.update("UPDATE zones SET is_public=1 WHERE id=" + zoneID + ";");
+                            u.player.sendMessage(Utils.success("Set zone to public."));
 
                             this.refresh();
                             u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
