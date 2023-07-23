@@ -47,7 +47,7 @@ public class Kick extends Moderation implements CommandExecutor {
         }
 
         //Check args.
-        if (args.length < 3) {
+        if (args.length < 2) {
             sender.sendMessage(Utils.error("/kick <player> <reason>"));
             return true;
         }
