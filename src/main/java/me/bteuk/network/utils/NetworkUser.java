@@ -1,5 +1,7 @@
 package me.bteuk.network.utils;
 
+import lombok.Getter;
+import lombok.Setter;
 import me.bteuk.network.Network;
 import me.bteuk.network.commands.Nightvision;
 import me.bteuk.network.gui.Gui;
@@ -64,6 +66,11 @@ public class NetworkUser {
     public boolean inPortal;
     public boolean wasInPortal;
 
+    //Should tips be displayed for the player.
+    @Getter
+    @Setter
+    private boolean tips_enabled;
+
     public NetworkUser(Player player) {
 
         this.instance = Network.getInstance();
@@ -75,6 +82,9 @@ public class NetworkUser {
         wasInPortal = false;
         afk = false;
         last_movement = Time.currentTime();
+
+        //Set tips based on database value.
+        tips_enabled = instance.globalSQL.hasRow("SELECT tips_enabled FROM player_data WHERE uuid='" + player.getUniqueId() + "' AND tips_enabled=1;");
 
         //Update builder role in database.
         instance.globalSQL.update("UPDATE player_data SET builder_role='" + Roles.builderRole(player) + "' WHERE uuid='" + player.getUniqueId() + "';");
