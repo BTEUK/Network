@@ -109,8 +109,9 @@ tpll:
 regions_enabled: true
 global_teleport: true
 earth_world: earth
-#Whether the /ll command should only work in valid regions.
-ll_requires_region: true
+
+#Should /ll be enabled.
+ll_enabled: true
 
 #Time before player is set to AFK (minutes).
 afk: 5
