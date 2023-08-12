@@ -54,7 +54,7 @@ public class TeleportListener implements Listener {
         //If u is null, cancel.
         if (u == null) {
             LOGGER.severe("User " + p.getName() + " can not be found!");
-            p.sendMessage("User can not be found, please relog!");
+            p.sendMessage(Utils.error("User can not be found, please relog!"));
             e.setCancelled(true);
             return;
         }

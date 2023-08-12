@@ -170,7 +170,7 @@ public class NetworkUser {
         //If this is the first player on the server, add all players from other servers to tab.
         if (instance.getServer().getOnlinePlayers().size() == 1 && TAB) {
             //Add all players from other servers to the fake players list, so they will show in tab when players connect.
-            for (String uuid : instance.globalSQL.getStringList("SELECT uuid FROM online_users;")) {
+            for (String uuid : instance.globalSQL.getStringList("SELECT uuid FROM online_users WHERE server<>'" + SERVER_NAME + "';")) {
                 instance.tab.addFakePlayer(uuid);
             }
         }

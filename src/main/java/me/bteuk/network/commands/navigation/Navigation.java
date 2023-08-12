@@ -40,7 +40,7 @@ public class Navigation implements CommandExecutor {
         NetworkUser u = Network.getInstance().getUser(p);
         if (u == null) {
             LOGGER.severe("User " + p.getName() + " can not be found!");
-            p.sendMessage("User can not be found, please relog!");
+            p.sendMessage(Utils.error("User can not be found, please relog!"));
             return true;
         }
 

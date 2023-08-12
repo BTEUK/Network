@@ -16,9 +16,15 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
 
-import javax.naming.Name;
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.UUID;
+
+import static me.bteuk.network.utils.Constants.LOGGER;
+import static com.comphenix.protocol.wrappers.EnumWrappers.PlayerInfoAction.UPDATE_DISPLAY_NAME;
+import static com.comphenix.protocol.wrappers.EnumWrappers.PlayerInfoAction.ADD_PLAYER;
 
 public class TabManager {
 
@@ -29,10 +35,9 @@ public class TabManager {
 
     private final PlayerDisplayName playerDisplayName;
 
-    //private List<TextComponent> headers = new ArrayList<>();
-    //private List<TextComponent> footers = new ArrayList<>();
-
     private final HashMap<String, PlayerInfoData> fakePlayers;
+
+    private final HashSet<EnumWrappers.PlayerInfoAction> actions;
 
     public TabManager(Network instance) {
 
@@ -42,6 +47,10 @@ public class TabManager {
         playerDisplayName = new PlayerDisplayName();
 
         fakePlayers = new HashMap<>();
+
+        actions = new HashSet<>();
+        actions.add(ADD_PLAYER);
+        actions.add(UPDATE_DISPLAY_NAME);
 
         startTab();
         instance.getLogger().info("Enabled Tab");
@@ -55,25 +64,27 @@ public class TabManager {
 
     }
 
-    public void addFakePlayer(String uuid) {
+    public void addFakePlayer(String sUuid) {
 
         //Check if the player is not connected to this server, and is not already contained in the list.
-        if (!instance.hasPlayer(uuid) && !fakePlayers.containsKey(uuid)) {
+        if (!instance.hasPlayer(sUuid) && !fakePlayers.containsKey(sUuid)) {
 
             //Get name from database
-            String name = instance.globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
+            String name = instance.globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + sUuid + "';");
 
-            WrappedGameProfile profile = new WrappedGameProfile(UUID.fromString(uuid), name);
+            UUID uuid = UUID.fromString(sUuid);
+            WrappedGameProfile profile = new WrappedGameProfile(uuid, name);
 
-            PlayerInfoData playerInfoData = new PlayerInfoData(profile, 0, EnumWrappers.NativeGameMode.CREATIVE, null);
+            PlayerInfoData playerInfoData = new PlayerInfoData(uuid, 0, true, EnumWrappers.NativeGameMode.CREATIVE, profile, null);
 
             //instance.getLogger().info("Added " + name + " to fake players list.");
-            fakePlayers.put(uuid, playerInfoData);
+            fakePlayers.put(sUuid, playerInfoData);
 
             //Also add them to tab.
             PacketContainer packetIn = pm.createPacket(PacketType.Play.Server.PLAYER_INFO);
-            packetIn.getPlayerInfoAction().write(0, EnumWrappers.PlayerInfoAction.ADD_PLAYER);
-            packetIn.getPlayerInfoDataLists().write(0, Collections.singletonList(playerInfoData));
+
+            packetIn.getPlayerInfoActions().write(0, actions);
+            packetIn.getPlayerInfoDataLists().write(1, Collections.singletonList(playerInfoData));
             pm.broadcastServerPacket(packetIn);
 
         }
@@ -90,9 +101,8 @@ public class TabManager {
 
             //instance.getLogger().info("Removed " + playerInfoData.getProfile().getName() + " from fake players list.");
 
-            PacketContainer packetOut = pm.createPacket(PacketType.Play.Server.PLAYER_INFO);
-            packetOut.getPlayerInfoAction().write(0, EnumWrappers.PlayerInfoAction.REMOVE_PLAYER);
-            packetOut.getPlayerInfoDataLists().write(0, Collections.singletonList(playerInfoData));
+            PacketContainer packetOut = pm.createPacket(PacketType.Play.Server.PLAYER_INFO_REMOVE);
+            packetOut.getUUIDLists().write(0, Collections.singletonList(UUID.fromString(uuid)));
             pm.broadcastServerPacket(packetOut);
 
         }
@@ -119,26 +129,29 @@ public class TabManager {
 
     }
 
-    public void updatePlayer(String uuid) {
+    public void updatePlayer(String sUuid) {
 
-        //First remove the player from tab and then readd them again.
-        //This allows the packet to be intercepted and the new displayname to be added.
+        UUID uuid = UUID.fromString(sUuid);
 
         //Get name from database
-        String name = instance.globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
+        String name = instance.globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + sUuid + "';");
 
-        WrappedGameProfile profile = new WrappedGameProfile(UUID.fromString(uuid), name);
+        String displayName = instance.globalSQL.getString("SELECT display_name FROM online_users WHERE uuid='" + sUuid + "';");
 
-        PlayerInfoData playerInfoData = new PlayerInfoData(profile, 0, EnumWrappers.NativeGameMode.CREATIVE, null);
+        //Get the name of the team which the player needs adding to, this is to sort tab.
+        char teamName = Roles.tabSorting(instance.globalSQL.getString("SELECT primary_role FROM online_users WHERE uuid='" + sUuid + "';"));
 
-        PacketContainer packetOut = pm.createPacket(PacketType.Play.Server.PLAYER_INFO);
-        packetOut.getPlayerInfoAction().write(0, EnumWrappers.PlayerInfoAction.REMOVE_PLAYER);
-        packetOut.getPlayerInfoDataLists().write(0, Collections.singletonList(playerInfoData));
-        pm.broadcastServerPacket(packetOut);
+        //Add player to the correct team.
+        playerDisplayName.addEntry(name, String.valueOf(teamName));
+
+        WrappedGameProfile profile = new WrappedGameProfile(uuid, name);
+
+        PlayerInfoData playerInfoData = new PlayerInfoData(uuid, 0, true, EnumWrappers.NativeGameMode.CREATIVE, profile, WrappedChatComponent.fromJson(Utils.tabName(displayName)));
 
         PacketContainer packetIn = pm.createPacket(PacketType.Play.Server.PLAYER_INFO);
-        packetIn.getPlayerInfoAction().write(0, EnumWrappers.PlayerInfoAction.ADD_PLAYER);
-        packetIn.getPlayerInfoDataLists().write(0, Collections.singletonList(playerInfoData));
+
+        packetIn.getPlayerInfoActions().write(0, Collections.singleton(UPDATE_DISPLAY_NAME));
+        packetIn.getPlayerInfoDataLists().write(1, Collections.singletonList(playerInfoData));
         pm.broadcastServerPacket(packetIn);
 
     }
@@ -150,13 +163,9 @@ public class TabManager {
         for (PlayerInfoData playerInfoData : fakePlayers.values()) {
 
             PacketContainer packetIn = pm.createPacket(PacketType.Play.Server.PLAYER_INFO);
-            packetIn.getPlayerInfoAction().write(0, EnumWrappers.PlayerInfoAction.ADD_PLAYER);
-            packetIn.getPlayerInfoDataLists().write(0, Collections.singletonList(playerInfoData));
-            try {
-                pm.sendServerPacket(p, packetIn);
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            }
+            packetIn.getPlayerInfoActions().write(0, actions);
+            packetIn.getPlayerInfoDataLists().write(1, Collections.singletonList(playerInfoData));
+            pm.sendServerPacket(p, packetIn);
         }
 
         //Add header/footer.
@@ -188,14 +197,18 @@ public class TabManager {
             @Override
             public void onPacketSending(PacketEvent event) {
 
+                PacketContainer packet = event.getPacket();
+
                 //If packet is for adding a player, intercept it and add the custom display name.
-                if (event.getPacket().getPlayerInfoAction().getValues().get(0).equals(EnumWrappers.PlayerInfoAction.ADD_PLAYER)) {
+                if (packet.getPlayerInfoActions().getValues().get(0).contains(ADD_PLAYER)) {
 
-                    PacketContainer packet = event.getPacket();
-
-                    List<PlayerInfoData> infoList = event.getPacket().getPlayerInfoDataLists().getValues().get(0);
+                    List<PlayerInfoData> infoList = packet.getPlayerInfoDataLists().getValues().get(1);
 
                     PlayerInfoData info = infoList.get(0);
+
+                    if (info == null) {
+                        return;
+                    }
 
                     //If player is not online, skip.
                     if (!instance.globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid='" + info.getProfile().getUUID() + "';")) {
@@ -213,11 +226,11 @@ public class TabManager {
 
                     infoList.clear();
 
-                    infoList.add(new PlayerInfoData(info.getProfile(), 0, EnumWrappers.NativeGameMode.CREATIVE, WrappedChatComponent.fromJson(Utils.tabName(displayName))));
+                    infoList.add(new PlayerInfoData(info.getProfileId(), 0, true, EnumWrappers.NativeGameMode.CREATIVE, info.getProfile(), WrappedChatComponent.fromJson(Utils.tabName(displayName))));
 
-                    packet.getPlayerInfoDataLists().write(0, infoList);
+                    packet.getPlayerInfoDataLists().write(1, infoList);
 
-                    //instance.getLogger().info("Intercepting ADD_PLAYER packet, setting display name for " + displayName);
+                    instance.getLogger().info("Intercepting ADD_PLAYER packet, setting display name for " + displayName);
 
                     event.setPacket(packet);
 
