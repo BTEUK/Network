@@ -130,7 +130,7 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
             //If u is null, cancel.
             if (u == null) {
                 LOGGER.severe("User " + e.getPlayer().getName() + " can not be found!");
-                e.getPlayer().sendMessage("User can not be found, please relog!");
+                e.getPlayer().sendMessage(Utils.error("User can not be found, please relog!"));
                 return;
             }
 
@@ -230,7 +230,7 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
                             //If u is null, cancel.
                             if (u == null) {
                                 LOGGER.severe("User " + p.getName() + " can not be found!");
-                                p.sendMessage("User can not be found, please relog!");
+                                p.sendMessage(Utils.error("User can not be found, please relog!"));
                                 return;
                             }
 
