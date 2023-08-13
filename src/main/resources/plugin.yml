@@ -121,3 +121,7 @@ commands:
   hdb:
     usage: /<command>
     description: Added so it can be routed to /skulls
+  tips:
+    aliases: [toggletips, tipstoggle]
+    usage: /<command>
+    description: Toggles tips in chat.

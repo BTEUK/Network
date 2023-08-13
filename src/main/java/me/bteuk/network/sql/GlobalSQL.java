@@ -53,6 +53,28 @@ public class GlobalSQL {
         }
     }
 
+    public boolean getBoolean(String sql) {
+
+        try (Connection conn = conn();
+             PreparedStatement statement = conn.prepareStatement(sql);
+             ResultSet results = statement.executeQuery()) {
+
+            if (results.next()) {
+
+                return results.getBoolean(1);
+
+            } else {
+
+                return false;
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public int getInt(String sql) {
 
         try (Connection conn = conn();
