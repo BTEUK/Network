@@ -22,7 +22,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
-import static me.bteuk.network.utils.Constants.LOGGER;
 import static com.comphenix.protocol.wrappers.EnumWrappers.PlayerInfoAction.UPDATE_DISPLAY_NAME;
 import static com.comphenix.protocol.wrappers.EnumWrappers.PlayerInfoAction.ADD_PLAYER;
 
