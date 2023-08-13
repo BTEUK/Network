@@ -16,6 +16,7 @@ import me.bteuk.network.commands.Portals;
 import me.bteuk.network.commands.RegionCommand;
 import me.bteuk.network.commands.Rules;
 import me.bteuk.network.commands.Speed;
+import me.bteuk.network.commands.TipsToggle;
 import me.bteuk.network.commands.Zone;
 import me.bteuk.network.commands.ll;
 import me.bteuk.network.commands.navigation.Back;
@@ -385,6 +386,11 @@ public final class Network extends JavaPlugin {
 
         //Enable tips.
         if (TIPS) {
+
+            //Enable the tips command.
+            new TipsToggle(this);
+
+            //Enable tips in chat.
             new Tips();
         }
 

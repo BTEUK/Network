@@ -253,10 +253,21 @@ public class StaffGui extends Gui {
 
                 {
 
-                    this.delete();
+                    //Check if the NetworkUser has any of the following permissions.
+                    if (u.hasAnyPermission(new String[]{"uknet.ban", "uknet.mute", "uknet.kick"})) {
 
-                    u.staffGui = new ModerationGui();
-                    u.staffGui.open(u);
+                        this.delete();
+
+                        u.staffGui = new ModerationGui();
+                        u.staffGui.open(u);
+
+                    } else {
+
+                        u.player.sendMessage(Utils.error("You do not have permission to access the Moderation Menu."));
+                        //Don't close the inventory as the player could have just miss-clicked, the chat should still be visible either way.
+                        //Staff users should also be aware if they have this permission beforehand.
+
+                    }
 
                 });
     }
