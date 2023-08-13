@@ -80,7 +80,13 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-import static me.bteuk.network.utils.Constants.*;
+import static me.bteuk.network.utils.Constants.REGIONS_ENABLED;
+import static me.bteuk.network.utils.Constants.SERVER_NAME;
+import static me.bteuk.network.utils.Constants.SERVER_TYPE;
+import static me.bteuk.network.utils.Constants.TAB;
+import static me.bteuk.network.utils.Constants.TIPS;
+import static me.bteuk.network.utils.Constants.TPLL_ENABLED;
+import static me.bteuk.network.utils.Constants.TUTORIALS;
 import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public final class Network extends JavaPlugin {
