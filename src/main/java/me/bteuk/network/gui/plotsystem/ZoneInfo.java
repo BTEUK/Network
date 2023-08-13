@@ -158,7 +158,7 @@ public class ZoneInfo extends Gui {
             //Set public/private
             if (plotSQL.hasRow("SELECT id FROM zones WHERE id=" + zoneID + " AND is_public=1;")) {
 
-                setItem(18, Utils.createItem(Material.IRON_DOOR, 1,
+                setItem(18, Utils.createItem(Material.OAK_DOOR, 1,
                                 Utils.title("Set Private"),
                                 Utils.line("Private zones require you to"),
                                 Utils.line("invite people if they want to build.")),
@@ -166,6 +166,7 @@ public class ZoneInfo extends Gui {
 
                             //Set zone to private and refresh this gui.
                             plotSQL.update("UPDATE zones SET is_public=0 WHERE id=" + zoneID + ";");
+                            u.player.sendMessage(Utils.success("Set zone to private."));
 
                             this.refresh();
                             u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
@@ -174,7 +175,7 @@ public class ZoneInfo extends Gui {
 
             } else {
 
-                setItem(18, Utils.createItem(Material.OAK_DOOR, 1,
+                setItem(18, Utils.createItem(Material.IRON_DOOR, 1,
                                 Utils.title("Set Public"),
                                 Utils.line("Public zones allow Jr.Builder+"),
                                 Utils.line("to join the zone without invitation.")),
@@ -182,6 +183,7 @@ public class ZoneInfo extends Gui {
 
                             //Set zone to private and refresh this gui.
                             plotSQL.update("UPDATE zones SET is_public=1 WHERE id=" + zoneID + ";");
+                            u.player.sendMessage(Utils.success("Set zone to public."));
 
                             this.refresh();
                             u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
