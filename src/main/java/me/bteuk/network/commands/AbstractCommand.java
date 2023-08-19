@@ -11,10 +11,10 @@ import static me.bteuk.network.utils.Constants.LOGGER;
  * Abstract class for registering a command.
  * The implementation of the commandExecutor happens in the extending class.
  */
-public abstract class Command implements CommandExecutor {
+public abstract class AbstractCommand implements CommandExecutor {
 
     //Constructor to enable the command.
-    public Command(Network instance, String commandName) {
+    public AbstractCommand(Network instance, String commandName) {
 
         //Register command.
         PluginCommand command = instance.getCommand(commandName);

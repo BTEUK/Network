@@ -13,7 +13,7 @@ import static me.bteuk.network.utils.Constants.LOGGER;
  * Abstract class for giving an item to a player.
  * Is used for all commands that give items to a player.
  */
-public abstract class GiveItem extends Command {
+public abstract class GiveItem extends AbstractCommand {
     public GiveItem(Network instance, String commandName) {
         super(instance, commandName);
     }
