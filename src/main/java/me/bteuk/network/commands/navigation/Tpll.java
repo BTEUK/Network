@@ -1,5 +1,6 @@
 package me.bteuk.network.commands.navigation;
 
+import io.papermc.lib.PaperLib;
 import me.bteuk.network.Network;
 import me.bteuk.network.commands.navigation.Back;
 import me.bteuk.network.events.EventManager;
@@ -201,7 +202,13 @@ public class Tpll implements CommandExecutor {
 
             } else {
 
-                alt = Utils.getHighestYAt(p.getWorld(), (int) proj[0], (int) proj[1]);
+                //Check if the chunk is generated already, else skip this.
+                if (PaperLib.isChunkGenerated(l)) {
+                    alt = Utils.getHighestYAt(p.getWorld(), (int) proj[0], (int) proj[1]);
+                } else {
+                    //This means the altitude will get fetched by T--.
+                    alt = Integer.MIN_VALUE;
+                }
 
             }
 
@@ -249,12 +256,19 @@ public class Tpll implements CommandExecutor {
                         //Add tpll to statistics.
                         Statistics.addTpll(p.getUniqueId().toString(), Time.getDate(Time.currentTime()));
 
+                        //If the terrain has not been generated, let the player know it could take a while.
+                        if (!PaperLib.isChunkGenerated(l)) {
+                            Utils.success("Location is generating, please wait a moment...");
+                        }
+
+                        //Teleport player.
+                        PaperLib.teleportAsync(p, loc);
+
                         p.sendMessage(
-                                Utils.success("Teleporting to ")
+                                Utils.success("Teleported to ")
                                         .append(Component.text(DECIMAL_FORMATTER.format(finalDefaultCoords.getLat()), NamedTextColor.DARK_AQUA))
                                         .append(Utils.success(", "))
                                         .append(Component.text(DECIMAL_FORMATTER.format(finalDefaultCoords.getLng()), NamedTextColor.DARK_AQUA)));
-                        p.teleport(loc);
 
                     } else {
 
