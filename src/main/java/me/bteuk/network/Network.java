@@ -5,7 +5,9 @@ import me.bteuk.network.commands.AFK;
 import me.bteuk.network.commands.Clear;
 import me.bteuk.network.commands.Discord;
 import me.bteuk.network.commands.Gamemode;
+import me.bteuk.network.commands.GiveBarrier;
 import me.bteuk.network.commands.GiveDebugStick;
+import me.bteuk.network.commands.GiveLight;
 import me.bteuk.network.commands.Hdb;
 import me.bteuk.network.commands.Help;
 import me.bteuk.network.commands.Navigator;
@@ -340,6 +342,8 @@ public final class Network extends JavaPlugin {
         getCommand("clear").setExecutor(new Clear());
 
         new GiveDebugStick(this);
+        new GiveLight(this);
+        new GiveBarrier(this);
 
         getCommand("spawn").setExecutor(new Spawn());
 
