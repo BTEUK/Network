@@ -30,16 +30,8 @@ public class UtilsGui extends Gui {
                     //Delete this gui.
                     u.player.closeInventory();
 
-                    //Check if the user has permission.
-                    if (!u.player.hasPermission("uknet.debugstick")) {
-
-                        u.player.sendMessage(Utils.error("You do not have permission to use this command."));
-                        return;
-
-                    }
-
-                    //Add debug stick to inventory.
-                    Utils.giveItem(u.player, new ItemStack(Material.DEBUG_STICK), "Debug Stick");
+                    //Run the command to get the item.
+                    u.player.performCommand("/debugstick");
 
                 });
 
@@ -54,16 +46,8 @@ public class UtilsGui extends Gui {
                     //Delete this gui.
                     u.player.closeInventory();
 
-                    //Check if the user has permission.
-                    if (!u.player.hasPermission("uknet.light")) {
-
-                        u.player.sendMessage(Utils.error("You do not have permission to use this command."));
-                        return;
-
-                    }
-
-                    //Add debug stick to inventory.
-                    Utils.giveItem(u.player, new ItemStack(Material.LIGHT), "Light");
+                    //Run the command to get the item.
+                    u.player.performCommand("/light");
 
                 });
 
@@ -78,16 +62,8 @@ public class UtilsGui extends Gui {
                     //Delete this gui.
                     u.player.closeInventory();
 
-                    //Check if the user has permission.
-                    if (!u.player.hasPermission("uknet.barrier")) {
-
-                        u.player.sendMessage(Utils.error("You do not have permission to use this command."));
-                        return;
-
-                    }
-
-                    //Add debug stick to inventory.
-                    Utils.giveItem(u.player, new ItemStack(Material.BARRIER), "Barrier");
+                    //Run the command to get the item.
+                    u.player.performCommand("/barrier");
 
                 });
 
