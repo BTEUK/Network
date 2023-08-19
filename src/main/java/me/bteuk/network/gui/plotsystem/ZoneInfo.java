@@ -208,12 +208,12 @@ public class ZoneInfo extends Gui {
                         if (expiration > max_time) {
 
                             plotSQL.update("UPDATE zones SET expiration=" + max_time + " WHERE id=" + zoneID);
-                            u.player.sendMessage(Utils.success("Set Zone expiration time to &3" + Time.getDateTime(max_time)));
+                            u.player.sendMessage(Utils.success("Set Zone expiration time to ").append(Component.text(Time.getDateTime(max_time), NamedTextColor.DARK_AQUA)));
 
                         } else {
 
                             plotSQL.update("UPDATE zones SET expiration=" + expiration + " WHERE id=" + zoneID);
-                            u.player.sendMessage(Utils.success("Set Zone expiration time to &3" + Time.getDateTime(expiration)));
+                            u.player.sendMessage(Utils.success("Set Zone expiration time to ").append(Component.text(Time.getDateTime(expiration), NamedTextColor.DARK_AQUA)));
 
                         }
 
