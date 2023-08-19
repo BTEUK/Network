@@ -31,7 +31,7 @@ public class UtilsGui extends Gui {
                     u.player.closeInventory();
 
                     //Run the command to get the item.
-                    u.player.performCommand("/debugstick");
+                    u.player.performCommand("debugstick");
 
                 });
 
@@ -47,7 +47,7 @@ public class UtilsGui extends Gui {
                     u.player.closeInventory();
 
                     //Run the command to get the item.
-                    u.player.performCommand("/light");
+                    u.player.performCommand("light");
 
                 });
 
@@ -63,7 +63,7 @@ public class UtilsGui extends Gui {
                     u.player.closeInventory();
 
                     //Run the command to get the item.
-                    u.player.performCommand("/barrier");
+                    u.player.performCommand("barrier");
 
                 });
 
