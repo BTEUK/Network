@@ -127,22 +127,24 @@ public class NetworkUser {
         }
 
         //Check if the player is in a region.
-        if (SERVER_TYPE == EARTH) {
-            //Check if they are in the earth world.
-            if (player.getWorld().getName().equals(EARTH_WORLD)) {
-                region = instance.getRegionManager().getRegion(player.getLocation());
-                //Add region to database if not exists.
-                region.addToDatabase();
-                inRegion = true;
-            }
-        } else if (SERVER_TYPE == PLOT) {
-            //Check if the player is in a buildable plot world and apply coordinate transform if true.
-            if (instance.plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';")) {
-                dx = -instance.plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';");
-                dz = -instance.plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';");
+        if (REGIONS_ENABLED) {
+            if (SERVER_TYPE == EARTH) {
+                //Check if they are in the earth world.
+                if (player.getWorld().getName().equals(EARTH_WORLD)) {
+                    region = instance.getRegionManager().getRegion(player.getLocation());
+                    //Add region to database if not exists.
+                    region.addToDatabase();
+                    inRegion = true;
+                }
+            } else if (SERVER_TYPE == PLOT) {
+                //Check if the player is in a buildable plot world and apply coordinate transform if true.
+                if (instance.plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';")) {
+                    dx = -instance.plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';");
+                    dz = -instance.plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';");
 
-                region = instance.getRegionManager().getRegion(player.getLocation(), dx, dz);
-                inRegion = true;
+                    region = instance.getRegionManager().getRegion(player.getLocation(), dx, dz);
+                    inRegion = true;
+                }
             }
         }
 
