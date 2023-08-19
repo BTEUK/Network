@@ -3,9 +3,9 @@ package me.bteuk.network;
 import lombok.Getter;
 import me.bteuk.network.commands.AFK;
 import me.bteuk.network.commands.Clear;
-import me.bteuk.network.commands.DebugStick;
 import me.bteuk.network.commands.Discord;
 import me.bteuk.network.commands.Gamemode;
+import me.bteuk.network.commands.GiveDebugStick;
 import me.bteuk.network.commands.Hdb;
 import me.bteuk.network.commands.Help;
 import me.bteuk.network.commands.Navigator;
@@ -338,7 +338,8 @@ public final class Network extends JavaPlugin {
         getCommand("afk").setExecutor(new AFK());
 
         getCommand("clear").setExecutor(new Clear());
-        new DebugStick(this);
+
+        new GiveDebugStick(this);
 
         getCommand("spawn").setExecutor(new Spawn());
 

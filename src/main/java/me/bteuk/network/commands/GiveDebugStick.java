@@ -13,9 +13,13 @@ import org.jetbrains.annotations.NotNull;
 
 import static me.bteuk.network.utils.Constants.LOGGER;
 
-public class DebugStick extends GiveItem {
+/**
+ * Gives a debug stick to the player.
+ * Extends GiveItem, which handles the actual giving of the item.
+ */
+public class GiveDebugStick extends GiveItem {
 
-    public DebugStick(Network instance) {
+    public GiveDebugStick(Network instance) {
         super(instance, "debugstick");
     }
 

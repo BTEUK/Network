@@ -7,6 +7,10 @@ import org.bukkit.command.PluginCommand;
 
 import static me.bteuk.network.utils.Constants.LOGGER;
 
+/**
+ * Abstract class for registering a command.
+ * The implementation of the commandExecutor happens in the extending class.
+ */
 public abstract class Command implements CommandExecutor {
 
     //Constructor to enable the command.
