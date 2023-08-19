@@ -338,7 +338,7 @@ public final class Network extends JavaPlugin {
         getCommand("afk").setExecutor(new AFK());
 
         getCommand("clear").setExecutor(new Clear());
-        getCommand("debugstick").setExecutor(new DebugStick());
+        new DebugStick(this);
 
         getCommand("spawn").setExecutor(new Spawn());
 

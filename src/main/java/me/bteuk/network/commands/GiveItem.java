@@ -1,0 +1,50 @@
+package me.bteuk.network.commands;
+
+import me.bteuk.network.Network;
+import me.bteuk.network.utils.NetworkUser;
+import me.bteuk.network.utils.Utils;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
+import static me.bteuk.network.utils.Constants.LOGGER;
+
+public abstract class GiveItem extends Command {
+    public GiveItem(Network instance, String commandName) {
+        super(instance, commandName);
+    }
+
+    public boolean onCommand(CommandSender sender, String permission, ItemStack item, String itemName) {
+
+        //Check if the sender is a player.
+        if (!(sender instanceof Player p)) {
+
+            sender.sendMessage(Utils.error("You must be a player to use this command."));
+            return true;
+
+        }
+
+        //Check if the user has permission.
+        if (!p.hasPermission(permission)) {
+
+            p.sendMessage(Utils.error("You do not have permission to use this command."));
+            return true;
+
+        }
+
+        //Get user.
+        NetworkUser u = Network.getInstance().getUser(p);
+
+        //If u is null, cancel.
+        if (u == null) {
+            LOGGER.severe("User " + p.getName() + " can not be found!");
+            p.sendMessage("User can not be found, please relog!");
+            return true;
+        }
+
+        //Add debug stick to inventory.
+        Utils.giveItem(p, item, itemName);
+
+        return true;
+    }
+}

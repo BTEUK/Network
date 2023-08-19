@@ -45,8 +45,8 @@ public class UtilsGui extends Gui {
 
         //Get light block.
         setItem(11, Utils.createItem(Material.LIGHT, 1,
-                        Utils.title("Light Block"),
-                        Utils.line("Click to get a light block.")),
+                        Utils.title("Light"),
+                        Utils.line("Click to get a light.")),
                 u ->
 
                 {
@@ -55,7 +55,7 @@ public class UtilsGui extends Gui {
                     u.player.closeInventory();
 
                     //Check if the user has permission.
-                    if (!u.player.hasPermission("uknet.lightblock")) {
+                    if (!u.player.hasPermission("uknet.light")) {
 
                         u.player.sendMessage(Utils.error("You do not have permission to use this command."));
                         return;

@@ -13,40 +13,16 @@ import org.jetbrains.annotations.NotNull;
 
 import static me.bteuk.network.utils.Constants.LOGGER;
 
-public class DebugStick implements CommandExecutor {
+public class DebugStick extends GiveItem {
+
+    public DebugStick(Network instance) {
+        super(instance, "debugstick");
+    }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
 
-        //Check if the sender is a player.
-        if (!(sender instanceof Player p)) {
+        return (onCommand(sender, "uknet.debugstick", new ItemStack(Material.DEBUG_STICK), "Debug Stick"));
 
-            sender.sendMessage(Utils.error("You must be a player to use this command."));
-            return true;
-
-        }
-
-        //Check if the user has permission.
-        if (!p.hasPermission("uknet.debugstick")) {
-
-            p.sendMessage(Utils.error("You do not have permission to use this command."));
-            return true;
-
-        }
-
-        //Get user.
-        NetworkUser u = Network.getInstance().getUser(p);
-
-        //If u is null, cancel.
-        if (u == null) {
-            LOGGER.severe("User " + p.getName() + " can not be found!");
-            p.sendMessage("User can not be found, please relog!");
-            return true;
-        }
-
-        //Add debug stick to inventory.
-        Utils.giveItem(p, new ItemStack(Material.DEBUG_STICK), "Debug Stick");
-
-        return true;
     }
 }
