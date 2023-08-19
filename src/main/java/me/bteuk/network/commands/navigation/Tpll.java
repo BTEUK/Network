@@ -302,12 +302,14 @@ public class Tpll implements CommandExecutor {
                             //Add tpll to statistics.
                             Statistics.addTpll(p.getUniqueId().toString(), Time.getDate(Time.currentTime()));
 
+                            //Teleport player.
+                            PaperLib.teleportAsync(p, loc);
+
                             p.sendMessage(
-                                    Utils.success("Teleporting to ")
+                                    Utils.success("Teleported to ")
                                             .append(Component.text(DECIMAL_FORMATTER.format(finalDefaultCoords.getLat()), NamedTextColor.DARK_AQUA))
                                             .append(Utils.success(", "))
                                             .append(Component.text(DECIMAL_FORMATTER.format(finalDefaultCoords.getLng()), NamedTextColor.DARK_AQUA)));
-                            p.teleport(loc);
 
 
                         } else {
