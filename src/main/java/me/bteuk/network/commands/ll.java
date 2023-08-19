@@ -16,7 +16,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.text.DecimalFormat;
 
+import static me.bteuk.network.utils.Constants.LL;
 import static me.bteuk.network.utils.Constants.LOGGER;
+import static me.bteuk.network.utils.Constants.REGIONS_ENABLED;
 
 public class ll implements CommandExecutor {
 
@@ -45,7 +47,19 @@ public class ll implements CommandExecutor {
             return true;
         }
 
-        if (u.inRegion) {
+        //Check is regions are enabled
+        if (REGIONS_ENABLED) {
+            //Check if in a valid region.
+            if (!u.inRegion) {
+
+                p.sendMessage(Utils.error("You must be standing in a region to get the coordinates."));
+                return true;
+
+            }
+        }
+
+        //Send coordinates with a link to Google Maps to the player if /ll is enabled.
+        if (LL) {
 
             try {
 
@@ -69,7 +83,7 @@ public class ll implements CommandExecutor {
 
         } else {
 
-            p.sendMessage(Utils.error("You must be standing in a region to get the coordinates."));
+            p.sendMessage(Utils.error("This command can not be used here."));
             return true;
 
         }

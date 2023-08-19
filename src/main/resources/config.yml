@@ -1,5 +1,5 @@
 # Config version, do not update this manually as it could break the config.
-version: 1.2.0
+version: 1.3.0
 
 #MySQL is mandatory for this plugin.
 #Login information
@@ -109,6 +109,9 @@ tpll:
 regions_enabled: true
 global_teleport: true
 earth_world: earth
+
+#Should /ll be enabled.
+ll_enabled: true
 
 #Time before player is set to AFK (minutes).
 afk: 5

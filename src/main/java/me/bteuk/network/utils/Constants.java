@@ -54,6 +54,9 @@ public class Constants {
     //Is the tutorial enabled
     public static final boolean TUTORIALS;
 
+    //Is /ll enabled
+    public static final boolean LL;
+
     static {
 
         LOGGER = Network.getInstance().getLogger();
@@ -84,6 +87,8 @@ public class Constants {
         TIPS = CONFIG.getBoolean("chat.tips.enabled");
 
         TUTORIALS = CONFIG.getBoolean("tutorials.enabled");
+
+        LL = CONFIG.getBoolean("ll_enabled");
 
         if (CONFIG.getString("earth_world") == null) {
             //Setting default value.
