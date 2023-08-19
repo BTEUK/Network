@@ -1,17 +1,11 @@
-package me.bteuk.network.commands;
+package me.bteuk.network.commands.give;
 
 import me.bteuk.network.Network;
-import me.bteuk.network.utils.NetworkUser;
-import me.bteuk.network.utils.Utils;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-
-import static me.bteuk.network.utils.Constants.LOGGER;
 
 /**
  * Gives a debug stick to the player.

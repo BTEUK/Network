@@ -1,6 +1,7 @@
-package me.bteuk.network.commands;
+package me.bteuk.network.commands.give;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.commands.AbstractCommand;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
 import org.bukkit.command.CommandSender;
