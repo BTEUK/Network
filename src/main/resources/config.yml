@@ -48,6 +48,15 @@ tutorials:
     password: password
     name: TeachingTutorials
 
+#Progress Map
+#Enable if you have a MapHub progress map
+ProgressMap:
+  enabled: false
+  MapHubAPIKey:
+  ProgressMapID:
+  #A web link to the progress map
+  Link:
+
 #Homes
 homes:
   enabled: true

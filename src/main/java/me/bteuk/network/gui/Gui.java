@@ -32,6 +32,14 @@ public abstract class Gui implements GuiInterface {
 
     }
 
+    public Gui(Inventory inv)
+    {
+        this.inv = inv;
+        uuid = UUID.randomUUID();
+        actions = new HashMap<>();
+        inventoriesByUUID.put(getUuid(), this);
+    }
+
     public Inventory getInventory() {
         return inv;
     }
@@ -52,6 +60,14 @@ public abstract class Gui implements GuiInterface {
     public void setItem(int slot, ItemStack stack) {
 
         setItem(slot, stack, null);
+
+    }
+
+    public void setAction(int slot, guiAction action){
+
+        if (action != null) {
+            actions.put(slot, action);
+        }
 
     }
 

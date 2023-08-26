@@ -140,6 +140,11 @@
             <version>master-SNAPSHOT</version>
         </dependency>
         <dependency>
+            <groupId>com.github.BTEUK</groupId>
+            <artifactId>ProgressMapper</artifactId>
+            <version>2f3fc96c3f</version>
+        </dependency>
+        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>32.1.1-jre</version>

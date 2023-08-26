@@ -7,6 +7,7 @@ import me.bteuk.network.gui.plotsystem.PlotMenu;
 import me.bteuk.network.gui.plotsystem.PlotServerLocations;
 import me.bteuk.network.gui.plotsystem.PlotsystemLocations;
 import me.bteuk.network.gui.plotsystem.ZoneMenu;
+import me.bteuk.network.gui.progressmap.LocalFeatureListGUI;
 import me.bteuk.network.gui.regions.RegionInfo;
 import me.bteuk.network.gui.regions.RegionMenu;
 import me.bteuk.network.utils.NetworkUser;
@@ -16,6 +17,7 @@ import me.bteuk.network.utils.enums.ServerType;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.regions.Region;
 import me.bteuk.network.utils.regions.RegionManager;
+import me.bteuk.progressmapper.guis.LocalFeaturesMenu;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -23,6 +25,7 @@ import org.bukkit.Material;
 
 import static me.bteuk.network.utils.Constants.SERVER_NAME;
 import static me.bteuk.network.utils.Constants.SERVER_TYPE;
+import static me.bteuk.network.utils.Constants.PROGRESS_MAP;
 import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public class BuildGui extends Gui {
@@ -484,6 +487,39 @@ public class BuildGui extends Gui {
                     u.mainGui.open(u);
 
                 });
+
+        if (PROGRESS_MAP && user.player.hasPermission("uknet.progressmap.edit"))
+        {
+            //Progress map edit menu
+            setItem(0, Utils.createItem(Material.MAP, 1,
+                            Utils.title("Progress Map"),
+                            Utils.line("Edit or add areas to the progress map")),
+                    u -> {
+
+                        //Deletes this GUI
+                        this.delete();
+                        u.mainGui = null;
+
+                        LocalFeaturesMenu localFeatures = new LocalFeaturesMenu(
+                                Network.getInstance().getConfig().getInt("ProgressMap.ProgressMapID"),
+                                Network.getInstance().getConfig().getString("ProgressMap.MapHubAPIKey"),
+                                u.player);
+
+                        //Check to see if the location could be established
+                        if (localFeatures.getPlayerCoordinates() == null)
+                        {
+                            u.mainGui = this;
+                            u.mainGui.open(u);
+                            u.player.sendMessage(Utils.error("Could not locate you"));
+                        }
+                        else
+                        {
+                            //Switch to local features menu
+                            u.mainGui = new LocalFeatureListGUI(localFeatures, Network.getInstance());
+                            u.mainGui.open(u);
+                        }
+                    });
+        }
 
         //Return
         setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,

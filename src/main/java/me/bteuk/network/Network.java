@@ -21,6 +21,7 @@ import me.bteuk.network.commands.Speed;
 import me.bteuk.network.commands.TipsToggle;
 import me.bteuk.network.commands.Zone;
 import me.bteuk.network.commands.ll;
+import me.bteuk.network.commands.ProgressMap;
 import me.bteuk.network.commands.navigation.Back;
 import me.bteuk.network.commands.navigation.Delhome;
 import me.bteuk.network.commands.navigation.Home;
@@ -89,6 +90,7 @@ import static me.bteuk.network.utils.Constants.TAB;
 import static me.bteuk.network.utils.Constants.TIPS;
 import static me.bteuk.network.utils.Constants.TPLL_ENABLED;
 import static me.bteuk.network.utils.Constants.TUTORIALS;
+import static me.bteuk.network.utils.Constants.PROGRESS_MAP;
 import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public final class Network extends JavaPlugin {
@@ -352,6 +354,13 @@ public final class Network extends JavaPlugin {
         new GiveBarrier(this);
 
         getCommand("spawn").setExecutor(new Spawn());
+
+        //Enabled the progress map command if enabled
+        if (PROGRESS_MAP)
+        {
+            getCommand("progressmap").setExecutor(new ProgressMap());
+            getLogger().info("Enabled Progress map support");
+        }
 
         //Gamemode command.
         new Gamemode(this);
