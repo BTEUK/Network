@@ -1,7 +1,7 @@
 package me.bteuk.network.commands;
 
 import me.bteuk.network.Network;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.PluginCommand;
 
