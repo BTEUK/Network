@@ -16,7 +16,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.text.DecimalFormat;
 
+import static me.bteuk.network.utils.Constants.LL;
 import static me.bteuk.network.utils.Constants.LOGGER;
+import static me.bteuk.network.utils.Constants.REGIONS_ENABLED;
+import static me.bteuk.network.utils.Constants.SERVER_TYPE;
+import static me.bteuk.network.utils.enums.ServerType.PLOT;
 
 public class ll implements CommandExecutor {
 
@@ -45,9 +49,31 @@ public class ll implements CommandExecutor {
             return true;
         }
 
-        if (u.inRegion) {
+        //Check is regions are enabled
+        if (REGIONS_ENABLED) {
+            //Check if in a valid region.
+            if (!u.inRegion) {
+
+                p.sendMessage(Utils.error("You must be standing in a region to get the coordinates."));
+                return true;
+
+            }
+        }
+
+        //Send coordinates with a link to Google Maps to the player if /ll is enabled.
+        if (LL) {
 
             try {
+
+                //TEMP: The following if statement is only necessary because the server does not update the dx,dz
+                // on teleport when regions are disabled, this will be fixed in BTEUK-315!
+                // If the player is in the plotsystem update their dx,dz.
+                if (SERVER_TYPE == PLOT && Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + p.getWorld().getName() + "';")) {
+
+                        //Get negative coordinate transform of new location.
+                        u.dx = -Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + p.getWorld().getName() + "';");
+                        u.dz = -Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + p.getWorld().getName() + "';");
+                }
 
                 double[] coords = bteGeneratorSettings.projection().toGeo(p.getLocation().getX() + u.dx, p.getLocation().getZ() + u.dz);
 
@@ -69,7 +95,7 @@ public class ll implements CommandExecutor {
 
         } else {
 
-            p.sendMessage(Utils.error("You must be standing in a region to get the coordinates."));
+            p.sendMessage(Utils.error("This command can not be used here."));
             return true;
 
         }

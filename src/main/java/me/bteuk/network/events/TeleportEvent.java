@@ -1,5 +1,6 @@
 package me.bteuk.network.events;
 
+import io.papermc.lib.PaperLib;
 import me.bteuk.network.Network;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
@@ -183,8 +184,14 @@ public class TeleportEvent extends AbstractEvent {
                 //Create location.
                 Location l = new Location(world, x, y, z, yaw, pitch);
 
+
+                //If the terrain has not been generated, let the player know it could take a while.
+                if (!PaperLib.isChunkGenerated(l)) {
+                    Utils.success("Location is generating, please wait a moment...");
+                }
+
                 //Teleport player.
-                p.teleport(l);
+                PaperLib.teleportAsync(p, l);
 
                 //If custom message is set, send that to player, else send default message.
                 if (message == null) {

@@ -124,9 +124,6 @@ public class Help implements CommandExecutor {
                             "Complete 1 easy plot to be promoted to ")
                     .append(Component.text("Apprentice", NamedTextColor.GRAY)));
 
-            //case "default" -> p.sendMessage(Utils.line("The role you start with when you first join the server. Complete 1 easy plot to be promoted to ")
-            //       .append(Component.text("Apprentice", NamedTextColor.GRAY)));
-
             case "default" -> p.sendMessage(Utils.line("The role you start with when you first join the server. To start your path towards becoming a builder just hop into the tutorial."));
 
         }
@@ -189,13 +186,13 @@ public class Help implements CommandExecutor {
 
         p.sendMessage(Utils.line("\nYou can claim a plot in the building menu or using ")
                 .append(Component.text("/claim", NamedTextColor.GRAY))
-                .append(Utils.line("while standing in a plot.")));
+                .append(Utils.line(" while standing in a plot.")));
 
         p.sendMessage(Utils.line("\nPlots can be managed in the plot menu which is accessed from the build menu, from here you can also invite others to your plot."));
 
         p.sendMessage(Utils.line("\nBy completing plots of various difficulties you are able to rank up."));
         p.sendMessage(
-                Component.text("Guest", NamedTextColor.GRAY)
+                Component.text("Applicant", NamedTextColor.GRAY)
                         .append(Utils.line(" -> "))
                         .append(Component.text("Apprentice", NamedTextColor.GRAY))
                         .append(Utils.line(" by completing an easy plot.")));

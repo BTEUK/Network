@@ -83,6 +83,12 @@ commands:
   debugstick:
     usage: /<command>
     description: Get the debug stick.
+  light:
+    usage: /<command>
+    description: Get a light block.
+  barrier:
+    usage: /<command>
+    description: Get a barrier block.
   spawn:
     aliases: [lobby]
     usage: /<command>

@@ -1,22 +1,25 @@
-package me.bteuk.network.commands;
+package me.bteuk.network.commands.give;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.commands.AbstractCommand;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
-import org.bukkit.Material;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 import static me.bteuk.network.utils.Constants.LOGGER;
 
-public class DebugStick implements CommandExecutor {
+/**
+ * Abstract class for giving an item to a player.
+ * Is used for all commands that give items to a player.
+ */
+public abstract class GiveItem extends AbstractCommand {
+    public GiveItem(Network instance, String commandName) {
+        super(instance, commandName);
+    }
 
-    @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
+    public boolean onCommand(CommandSender sender, String permission, ItemStack item, String itemName) {
 
         //Check if the sender is a player.
         if (!(sender instanceof Player p)) {
@@ -27,7 +30,7 @@ public class DebugStick implements CommandExecutor {
         }
 
         //Check if the user has permission.
-        if (!p.hasPermission("uknet.debugstick")) {
+        if (!p.hasPermission(permission)) {
 
             p.sendMessage(Utils.error("You do not have permission to use this command."));
             return true;
@@ -45,7 +48,7 @@ public class DebugStick implements CommandExecutor {
         }
 
         //Add debug stick to inventory.
-        Utils.giveItem(p, new ItemStack(Material.DEBUG_STICK), "Debug Stick");
+        Utils.giveItem(p, item, itemName);
 
         return true;
     }

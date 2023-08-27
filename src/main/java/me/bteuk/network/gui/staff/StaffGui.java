@@ -131,7 +131,7 @@ public class StaffGui extends Gui {
                     .append(Utils.line(" region join request by Jr.Builders."));
         } else {
             rRequestString = Utils.line("There are currently ")
-                    .append(Component.text(lRequestCount, NamedTextColor.GRAY))
+                    .append(Component.text(rRequestCount, NamedTextColor.GRAY))
                     .append(Utils.line(" region join requests by Jr.Builders."));
         }
 
