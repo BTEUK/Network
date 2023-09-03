@@ -1,4 +1,4 @@
-package me.bteuk.network.staff;
+package me.bteuk.network.utils.staff;
 
 import me.bteuk.network.utils.staff.Moderation;
 
