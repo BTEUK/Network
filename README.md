@@ -3,8 +3,7 @@ Developed by: [@LM-Wolfert](https://www.github.com/LM-Wolfert)
 ___
 A general purpose Minecraft plugin for BTE-related server features.
 ## Tested Versions
-[![385](https://img.shields.io/badge/Paper-1.18.2%20%23385-green)](https://api.papermc.io/v2/projects/paper/versions/1.18.2/builds/385/downloads/paper-1.18.2-385.jar)
-[![388](https://img.shields.io/badge/Paper-1.18.2%20%23388-green)](https://api.papermc.io/v2/projects/paper/versions/1.18.2/builds/388/downloads/paper-1.18.2-388.jar)
+[![169](https://img.shields.io/badge/Paper-1.20.1%20%23169-green)](https://api.papermc.io/v2/projects/paper/versions/1.20.1/builds/169/downloads/paper-1.20.1-169.jar)
 ## Features
 - Regions-based claiming
 - Custom `/tpll` and `/ll`
