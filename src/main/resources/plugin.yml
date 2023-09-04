@@ -127,6 +127,12 @@ commands:
   hdb:
     usage: /<command>
     description: Added so it can be routed to /skulls
+  progressmap:
+    usage: /<command>
+    description: Sends a link of the progress map
+    aliases:
+      - map
+      - progress
   tips:
     aliases: [toggletips, tipstoggle]
     usage: /<command>
