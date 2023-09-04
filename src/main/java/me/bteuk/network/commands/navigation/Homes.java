@@ -18,7 +18,7 @@ import java.util.List;
 
 import static me.bteuk.network.utils.Constants.LOGGER;
 
-public class Homes implements CommandExecutor, TabCompleter {
+public class Homes implements CommandExecutor {
 
     //Constructor to enable the command.
     public Homes(Network instance) {
@@ -33,9 +33,6 @@ public class Homes implements CommandExecutor, TabCompleter {
 
         //Set executor.
         command.setExecutor(this);
-
-        //Set tab completer.
-        command.setTabCompleter(this);
 
     }
 
@@ -168,29 +165,6 @@ public class Homes implements CommandExecutor, TabCompleter {
         p.sendMessage(message);
 
         return true;
-    }
-
-    @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command
-            command, @NotNull String label, @NotNull String[] args) {
-
-        List<String> homes = Network.getInstance().globalSQL.getStringList("SELECT name FROM home WHERE uuid='" + ((Player) sender).getUniqueId() + " AND name IS NOT NULL;");
-        List<String> returns = new ArrayList<>();
-
-        if (args.length == 0) {
-
-            return homes;
-
-        } else if (args.length == 1) {
-
-            StringUtil.copyPartialMatches(args[0], homes, returns);
-            return returns;
-
-        } else {
-
-            return null;
-
-        }
     }
 
     private Component createHome(String name) {

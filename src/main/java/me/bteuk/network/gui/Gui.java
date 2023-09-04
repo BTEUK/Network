@@ -1,5 +1,6 @@
 package me.bteuk.network.gui;
 
+import lombok.Getter;
 import me.bteuk.network.utils.NetworkUser;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -11,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+@Getter
 public abstract class Gui implements GuiInterface {
 
     public static final Map<UUID, Gui> inventoriesByUUID = new HashMap<>();
@@ -28,6 +30,14 @@ public abstract class Gui implements GuiInterface {
         actions = new HashMap<>();
         inventoriesByUUID.put(getUuid(), this);
 
+    }
+
+    public Gui(Inventory inv)
+    {
+        this.inv = inv;
+        uuid = UUID.randomUUID();
+        actions = new HashMap<>();
+        inventoriesByUUID.put(getUuid(), this);
     }
 
     public Inventory getInventory() {
@@ -53,6 +63,14 @@ public abstract class Gui implements GuiInterface {
 
     }
 
+    public void setAction(int slot, guiAction action){
+
+        if (action != null) {
+            actions.put(slot, action);
+        }
+
+    }
+
     public void clearGui() {
         inv.clear();
         actions.clear();
@@ -67,22 +85,9 @@ public abstract class Gui implements GuiInterface {
 
     public void delete() {
         for (Player p : Bukkit.getOnlinePlayers()) {
-            UUID u = openInventories.get(p.getUniqueId());
-            if (u != null) {
-                if (u.equals(getUuid())) {
-                    p.closeInventory();
-                }
-            }
+            openInventories.remove(p.getUniqueId());
         }
         inventoriesByUUID.remove(getUuid());
-    }
-
-    public UUID getUuid() {
-        return uuid;
-    }
-
-    public Map<Integer, guiAction> getActions() {
-        return actions;
     }
 
 }

@@ -5,7 +5,6 @@ import me.bteuk.network.utils.staff.Moderation;
 import me.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -47,7 +46,7 @@ public class Kick extends Moderation implements CommandExecutor {
         }
 
         //Check args.
-        if (args.length < 3) {
+        if (args.length < 2) {
             sender.sendMessage(Utils.error("/kick <player> <reason>"));
             return true;
         }
@@ -70,8 +69,7 @@ public class Kick extends Moderation implements CommandExecutor {
         }
 
         //Combine all remaining args to create a reason.
-        String sArgs = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
-        String reason = StringUtils.substring(sArgs, 1);
+        String reason = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
 
         sender.sendMessage(kickPlayer(args[0], uuid, reason));
 

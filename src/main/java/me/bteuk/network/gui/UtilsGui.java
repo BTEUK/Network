@@ -30,16 +30,40 @@ public class UtilsGui extends Gui {
                     //Delete this gui.
                     u.player.closeInventory();
 
-                    //Check if the user has permission.
-                    if (!u.player.hasPermission("uknet.debugstick")) {
+                    //Run the command to get the item.
+                    u.player.performCommand("debugstick");
 
-                        u.player.sendMessage(Utils.error("You do not have permission to use this command."));
-                        return;
+                });
 
-                    }
+        //Get light block.
+        setItem(11, Utils.createItem(Material.LIGHT, 1,
+                        Utils.title("Light"),
+                        Utils.line("Click to get a light.")),
+                u ->
 
-                    //Add debug stick to inventory.
-                    Utils.giveItem(u.player, new ItemStack(Material.DEBUG_STICK), "Debug Stick");
+                {
+
+                    //Delete this gui.
+                    u.player.closeInventory();
+
+                    //Run the command to get the item.
+                    u.player.performCommand("light");
+
+                });
+
+        //Get barrier block.
+        setItem(15, Utils.createItem(Material.BARRIER, 1,
+                        Utils.title("Barrier"),
+                        Utils.line("Click to get a barrier.")),
+                u ->
+
+                {
+
+                    //Delete this gui.
+                    u.player.closeInventory();
+
+                    //Run the command to get the item.
+                    u.player.performCommand("barrier");
 
                 });
 

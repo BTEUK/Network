@@ -113,4 +113,43 @@ public final class Roles {
 
         }
     }
+
+    /**
+     * Maps a technical role name to a display role name.
+     * @param role the role to map
+     * @return the display name of that role
+     */
+    public static String roleMapping(String role) {
+
+        switch (role) {
+
+            case "applicant" -> {
+                return("Applicant");
+            }
+
+            case "apprentice" -> {
+                return("Apprentice");
+            }
+
+            case "jrbuilder" -> {
+                return("Jr.Builder");
+            }
+
+            case "builder" -> {
+                return("Builder");
+            }
+
+            case "architect" -> {
+                return("Architect");
+            }
+
+            case "reviewer" -> {
+                return("Reviewer");
+            }
+
+            default -> {
+                return("Default");
+            }
+        }
+    }
 }

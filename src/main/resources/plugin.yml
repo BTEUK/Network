@@ -1,7 +1,7 @@
 name: Network
 version: '${project.version}'
 main: me.bteuk.network.Network
-api-version: 1.18
+api-version: 1.20
 depend: [ PlaceholderAPI, WorldGuard, ProtocolLib]
 
 commands:
@@ -83,6 +83,12 @@ commands:
   debugstick:
     usage: /<command>
     description: Get the debug stick.
+  light:
+    usage: /<command>
+    description: Get a light block.
+  barrier:
+    usage: /<command>
+    description: Get a barrier block.
   spawn:
     aliases: [lobby]
     usage: /<command>
@@ -121,3 +127,13 @@ commands:
   hdb:
     usage: /<command>
     description: Added so it can be routed to /skulls
+  progressmap:
+    usage: /<command>
+    description: Sends a link of the progress map
+    aliases:
+      - map
+      - progress
+  tips:
+    aliases: [toggletips, tipstoggle]
+    usage: /<command>
+    description: Toggles tips in chat.

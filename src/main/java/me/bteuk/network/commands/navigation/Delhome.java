@@ -2,22 +2,22 @@ package me.bteuk.network.commands.navigation;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.sql.GlobalSQL;
+import me.bteuk.network.tabcompleters.HomeSelector;
 import me.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.command.*;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
-import org.bukkit.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import static me.bteuk.network.utils.Constants.LOGGER;
 
-public class Delhome implements CommandExecutor, TabCompleter {
+public class Delhome extends HomeSelector implements CommandExecutor {
 
     private final GlobalSQL globalSQL;
 
@@ -107,28 +107,5 @@ public class Delhome implements CommandExecutor, TabCompleter {
 
         return true;
 
-    }
-
-    @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command
-            command, @NotNull String label, @NotNull String[] args) {
-
-        List<String> homes = Network.getInstance().globalSQL.getStringList("SELECT name FROM home WHERE uuid='" + ((Player) sender).getUniqueId() + " AND name IS NOT NULL;");
-        List<String> returns = new ArrayList<>();
-
-        if (args.length == 0) {
-
-            return homes;
-
-        } else if (args.length == 1) {
-
-            StringUtil.copyPartialMatches(args[0], homes, returns);
-            return returns;
-
-        } else {
-
-            return null;
-
-        }
     }
 }

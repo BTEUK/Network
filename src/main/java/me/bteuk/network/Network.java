@@ -3,9 +3,11 @@ package me.bteuk.network;
 import lombok.Getter;
 import me.bteuk.network.commands.AFK;
 import me.bteuk.network.commands.Clear;
-import me.bteuk.network.commands.DebugStick;
 import me.bteuk.network.commands.Discord;
 import me.bteuk.network.commands.Gamemode;
+import me.bteuk.network.commands.give.GiveBarrier;
+import me.bteuk.network.commands.give.GiveDebugStick;
+import me.bteuk.network.commands.give.GiveLight;
 import me.bteuk.network.commands.Hdb;
 import me.bteuk.network.commands.Help;
 import me.bteuk.network.commands.Navigator;
@@ -16,8 +18,10 @@ import me.bteuk.network.commands.Portals;
 import me.bteuk.network.commands.RegionCommand;
 import me.bteuk.network.commands.Rules;
 import me.bteuk.network.commands.Speed;
+import me.bteuk.network.commands.TipsToggle;
 import me.bteuk.network.commands.Zone;
 import me.bteuk.network.commands.ll;
+import me.bteuk.network.commands.ProgressMap;
 import me.bteuk.network.commands.navigation.Back;
 import me.bteuk.network.commands.navigation.Delhome;
 import me.bteuk.network.commands.navigation.Home;
@@ -79,7 +83,14 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-import static me.bteuk.network.utils.Constants.*;
+import static me.bteuk.network.utils.Constants.REGIONS_ENABLED;
+import static me.bteuk.network.utils.Constants.SERVER_NAME;
+import static me.bteuk.network.utils.Constants.SERVER_TYPE;
+import static me.bteuk.network.utils.Constants.TAB;
+import static me.bteuk.network.utils.Constants.TIPS;
+import static me.bteuk.network.utils.Constants.TPLL_ENABLED;
+import static me.bteuk.network.utils.Constants.TUTORIALS;
+import static me.bteuk.network.utils.Constants.PROGRESS_MAP;
 import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public final class Network extends JavaPlugin {
@@ -337,9 +348,19 @@ public final class Network extends JavaPlugin {
         getCommand("afk").setExecutor(new AFK());
 
         getCommand("clear").setExecutor(new Clear());
-        getCommand("debugstick").setExecutor(new DebugStick());
+
+        new GiveDebugStick(this);
+        new GiveLight(this);
+        new GiveBarrier(this);
 
         getCommand("spawn").setExecutor(new Spawn());
+
+        //Enabled the progress map command if enabled
+        if (PROGRESS_MAP)
+        {
+            getCommand("progressmap").setExecutor(new ProgressMap());
+            getLogger().info("Enabled Progress map support");
+        }
 
         //Gamemode command.
         new Gamemode(this);
@@ -385,6 +406,11 @@ public final class Network extends JavaPlugin {
 
         //Enable tips.
         if (TIPS) {
+
+            //Enable the tips command.
+            new TipsToggle(this);
+
+            //Enable tips in chat.
             new Tips();
         }
 

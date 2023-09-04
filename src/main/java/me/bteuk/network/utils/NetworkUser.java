@@ -1,5 +1,7 @@
 package me.bteuk.network.utils;
 
+import lombok.Getter;
+import lombok.Setter;
 import me.bteuk.network.Network;
 import me.bteuk.network.commands.Nightvision;
 import me.bteuk.network.gui.Gui;
@@ -64,6 +66,11 @@ public class NetworkUser {
     public boolean inPortal;
     public boolean wasInPortal;
 
+    //Should tips be displayed for the player.
+    @Getter
+    @Setter
+    private boolean tips_enabled;
+
     public NetworkUser(Player player) {
 
         this.instance = Network.getInstance();
@@ -75,6 +82,9 @@ public class NetworkUser {
         wasInPortal = false;
         afk = false;
         last_movement = Time.currentTime();
+
+        //Set tips based on database value.
+        tips_enabled = instance.globalSQL.hasRow("SELECT tips_enabled FROM player_data WHERE uuid='" + player.getUniqueId() + "' AND tips_enabled=1;");
 
         //Update builder role in database.
         instance.globalSQL.update("UPDATE player_data SET builder_role='" + Roles.builderRole(player) + "' WHERE uuid='" + player.getUniqueId() + "';");
@@ -117,22 +127,24 @@ public class NetworkUser {
         }
 
         //Check if the player is in a region.
-        if (SERVER_TYPE == EARTH) {
-            //Check if they are in the earth world.
-            if (player.getWorld().getName().equals(EARTH_WORLD)) {
-                region = instance.getRegionManager().getRegion(player.getLocation());
-                //Add region to database if not exists.
-                region.addToDatabase();
-                inRegion = true;
-            }
-        } else if (SERVER_TYPE == PLOT) {
-            //Check if the player is in a buildable plot world and apply coordinate transform if true.
-            if (instance.plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';")) {
-                dx = -instance.plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';");
-                dz = -instance.plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';");
+        if (REGIONS_ENABLED) {
+            if (SERVER_TYPE == EARTH) {
+                //Check if they are in the earth world.
+                if (player.getWorld().getName().equals(EARTH_WORLD)) {
+                    region = instance.getRegionManager().getRegion(player.getLocation());
+                    //Add region to database if not exists.
+                    region.addToDatabase();
+                    inRegion = true;
+                }
+            } else if (SERVER_TYPE == PLOT) {
+                //Check if the player is in a buildable plot world and apply coordinate transform if true.
+                if (instance.plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';")) {
+                    dx = -instance.plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';");
+                    dz = -instance.plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';");
 
-                region = instance.getRegionManager().getRegion(player.getLocation(), dx, dz);
-                inRegion = true;
+                    region = instance.getRegionManager().getRegion(player.getLocation(), dx, dz);
+                    inRegion = true;
+                }
             }
         }
 
@@ -158,7 +170,7 @@ public class NetworkUser {
         //If this is the first player on the server, add all players from other servers to tab.
         if (instance.getServer().getOnlinePlayers().size() == 1 && TAB) {
             //Add all players from other servers to the fake players list, so they will show in tab when players connect.
-            for (String uuid : instance.globalSQL.getStringList("SELECT uuid FROM online_users;")) {
+            for (String uuid : instance.globalSQL.getStringList("SELECT uuid FROM online_users WHERE server<>'" + SERVER_NAME + "';")) {
                 instance.tab.addFakePlayer(uuid);
             }
         }
@@ -200,6 +212,34 @@ public class NetworkUser {
 
             }
         }, 20L);
+
+    }
+
+    /**
+     * Check if the {@link NetworkUser} has the permission node.
+     *
+     * @param permission_node permission node.
+     * @return whether the {@link NetworkUser} has the permission node.
+     */
+    public boolean hasPermission(String permission_node) {
+        return player.hasPermission(permission_node);
+    }
+
+    /**
+     * Check if the {@link NetworkUser} has any permission node in the array.
+     *
+     * @param permission_nodes array of permission nodes.
+     * @return whether the {@link NetworkUser} has any of the permission nodes.
+     */
+    public boolean hasAnyPermission(String[] permission_nodes) {
+
+        for (String permission_node : permission_nodes) {
+            if (hasPermission(permission_node)) {
+                return true;
+            }
+        }
+
+        return false;
 
     }
 }

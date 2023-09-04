@@ -4,6 +4,7 @@ import me.bteuk.network.Network;
 import me.bteuk.network.utils.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,8 +15,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import static me.bteuk.network.utils.Constants.*;
+import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public class CommandPreProcess implements Listener {
 
@@ -70,7 +73,7 @@ public class CommandPreProcess implements Listener {
 
         } else if (isCommand(e.getMessage(), "/hdb")) {
             //If skulls plugin exists and is loaded.
-            if(Bukkit.getServer().getPluginManager().getPlugin("skulls") != null){
+            if (Bukkit.getServer().getPluginManager().getPlugin("skulls") != null) {
                 e.setMessage(e.getMessage().replace("/hdb", "/skulls"));
             }
         }
@@ -79,12 +82,8 @@ public class CommandPreProcess implements Listener {
     /**
      * Checks whether a command sent is equal to another command.
      *
-     * @param message
-     * Command message by the sender
-     *
-     * @param command
-     * Command to check for
-     *
+     * @param message Command message by the sender
+     * @param command Command to check for
      * @return true is equals, false otherwise
      */
     private boolean isCommand(String message, String command) {
@@ -193,6 +192,17 @@ public class CommandPreProcess implements Listener {
 
                 //Kick the player.
                 u.player.kick(Component.text("The server is restarting!", NamedTextColor.RED));
+
+                //Send the disconnect messagein discord, since the standard leaveserver event has been blocked.
+                String name = Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
+                String player_skin = Network.getInstance().globalSQL.getString("SELECT player_skin FROM player_data WHERE uuid='" + uuid + "';");
+
+                //Run disconnect message.
+                if (DISCORD_CHAT) {
+                    instance.chat.broadcastMessage(Component.text(TextureUtils.getAvatarUrl(u.player.getUniqueId(), player_skin) + " ")
+                                    .append(LegacyComponentSerializer.legacyAmpersand().deserialize(Objects.requireNonNull(CONFIG.getString("chat.custom_messages.leave")).replace("%player%", name)))
+                            , "uknet:discord_disconnect");
+                }
 
             }
 

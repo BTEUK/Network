@@ -54,6 +54,12 @@ public class Constants {
     //Is the tutorial enabled
     public static final boolean TUTORIALS;
 
+    //Is /ll enabled
+    public static final boolean LL;
+
+    //Is the progress map enabled
+    public static final boolean PROGRESS_MAP;
+
     static {
 
         LOGGER = Network.getInstance().getLogger();
@@ -84,6 +90,10 @@ public class Constants {
         TIPS = CONFIG.getBoolean("chat.tips.enabled");
 
         TUTORIALS = CONFIG.getBoolean("tutorials.enabled");
+
+        LL = CONFIG.getBoolean("ll_enabled");
+
+        PROGRESS_MAP = CONFIG.getBoolean("ProgressMap.enabled");
 
         if (CONFIG.getString("earth_world") == null) {
             //Setting default value.
