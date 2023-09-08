@@ -26,7 +26,6 @@ import java.util.UUID;
 import static com.comphenix.protocol.wrappers.EnumWrappers.PlayerInfoAction.UPDATE_DISPLAY_NAME;
 import static com.comphenix.protocol.wrappers.EnumWrappers.PlayerInfoAction.ADD_PLAYER;
 import static com.comphenix.protocol.wrappers.EnumWrappers.PlayerInfoAction.UPDATE_LISTED;
-import static me.bteuk.network.utils.Constants.LOGGER;
 
 public class TabManager {
 
@@ -218,7 +217,7 @@ public class TabManager {
                         //Add player to the correct team.
                         playerDisplayName.addEntry(info.getProfile().getName(), String.valueOf(teamName));
 
-                        newInfoList.add(new PlayerInfoData(info.getProfileId(), 0, true, EnumWrappers.NativeGameMode.CREATIVE, info.getProfile(), WrappedChatComponent.fromJson(Utils.tabName(displayName))));
+                        newInfoList.add(new PlayerInfoData(info.getProfileId(), 0, true, EnumWrappers.NativeGameMode.CREATIVE, info.getProfile(), WrappedChatComponent.fromJson(Utils.tabName(displayName)), info.getRemoteChatSessionData() == null ? null : info.getRemoteChatSessionData()));
 
                         instance.getLogger().info("Intercepting ADD_PLAYER packet, setting display name for " + displayName);
 
