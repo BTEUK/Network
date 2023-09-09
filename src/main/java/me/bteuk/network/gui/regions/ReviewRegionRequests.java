@@ -21,7 +21,14 @@ public class ReviewRegionRequests extends Gui {
 
     private final boolean staff;
 
-    public ReviewRegionRequests(boolean staff) {
+    private final String uuid;
+
+    /**
+     * Creates a region review menu for the player
+     * @param staff if it should be for staff requests
+     * @param uuid the player to create the menu for
+     */
+    public ReviewRegionRequests(boolean staff, String uuid) {
 
         super(45, Component.text("Review Region Requests", NamedTextColor.AQUA, TextDecoration.BOLD));
 
@@ -30,6 +37,7 @@ public class ReviewRegionRequests extends Gui {
         regionSQL = Network.getInstance().regionSQL;
 
         this.staff = staff;
+        this.uuid = uuid;
 
         createGui();
 
@@ -42,7 +50,7 @@ public class ReviewRegionRequests extends Gui {
         if (staff) {
             requests = regionSQL.getRequestList("SELECT region,uuid FROM region_requests WHERE staff_accept=0;");
         } else {
-            requests = regionSQL.getRequestList("SELECT region,uuid FROM region_requests WHERE owner_accept=0;");
+            requests = regionSQL.getRequestList("SELECT region,uuid FROM region_requests WHERE owner_accept=0 AND owner='" + uuid + "';");
         }
 
         //Slot count.

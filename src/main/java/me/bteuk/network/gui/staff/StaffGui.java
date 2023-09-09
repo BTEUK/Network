@@ -148,7 +148,7 @@ public class StaffGui extends Gui {
                             this.delete();
                             u.staffGui = null;
 
-                            u.staffGui = new ReviewRegionRequests(true);
+                            u.staffGui = new ReviewRegionRequests(true, u.player.getUniqueId().toString());
                             u.staffGui.open(u);
 
                         } else {
