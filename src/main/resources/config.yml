@@ -1,5 +1,5 @@
 # Config version, do not update this manually as it could break the config.
-version: 1.3.0
+version: 1.4.0
 
 #MySQL is mandatory for this plugin.
 #Login information
@@ -144,3 +144,8 @@ region_inactivity: 30
 
 #Discord link
 discord: 'https://discord.gg/5m56EgEVW6'
+
+#Progression
+progression:
+  enabled: false
+  seasons_enabled: true
