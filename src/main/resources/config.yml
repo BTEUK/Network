@@ -148,4 +148,6 @@ discord: 'https://discord.gg/5m56EgEVW6'
 #Progression
 progression:
   enabled: false
-  seasons_enabled: true
+  announce_level-ups:
+    overall: false
+    seasonal: true
