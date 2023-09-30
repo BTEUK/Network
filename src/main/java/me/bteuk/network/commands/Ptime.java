@@ -14,6 +14,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
+import static java.lang.Math.floorMod;
+
 public class Ptime extends AbstractCommand {
 
     private static final Component RESET_PLAYER_TIME = Utils.success("Reset player time, using server time.");
@@ -119,7 +121,7 @@ public class Ptime extends AbstractCommand {
 
     private int convertHourToTicks(int hour) {
         hour -= 6;
-        hour = hour % 24;
+        hour = floorMod(hour, 24);
         return hour * 1000;
     }
 
