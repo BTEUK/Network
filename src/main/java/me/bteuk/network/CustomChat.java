@@ -264,7 +264,8 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
                 //Run a tab update, the structure is the following.
                 //'update/add/remove <uuid>'
                 //This allows us to only update what is necessary.
-                Network.getInstance().tab.updateAll(PlainTextComponentSerializer.plainText().serialize(component));
+                //Make sure it runs after all other scheduled tasks, so it does not front-run the disconnect event if the player just left this server.
+                Bukkit.getScheduler().runTask(instance, () -> Network.getInstance().tab.updateAll(PlainTextComponentSerializer.plainText().serialize(component)));
 
 
         }
