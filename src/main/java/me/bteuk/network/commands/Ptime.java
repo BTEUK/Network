@@ -6,6 +6,7 @@ import me.bteuk.network.tabcompleters.Arg1Selector;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.TimesOfDay;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -54,7 +55,7 @@ public class Ptime extends AbstractCommand {
         try {
             if (Arrays.stream(TimesOfDay.values()).map(t -> t.label).anyMatch(t -> args[0].equalsIgnoreCase(t))) {
 
-                ticks = TimesOfDay.valueOf(args[0].toLowerCase()).ticks;
+                ticks = TimesOfDay.valueOf(args[0].toUpperCase()).ticks;
 
                 //Check if the argument contains AM or PM get the number before that and convert it to Minecraft time.
             } else if (args[0].toLowerCase().contains("pm")) {
@@ -92,14 +93,14 @@ public class Ptime extends AbstractCommand {
                 ticks = convertHourToTicks(hours) + convertMinutesToTicks(minutes);
 
             } else {
-            //If the argument contains just 1 or 2 number, use the full house with 24-hour format.
-            //If the arguments is between 3-5 numbers then use Minecraft time directly.
+                //If the argument contains just 1 or 2 number, use the full house with 24-hour format.
+                //If the arguments is between 3-5 numbers then use Minecraft time directly.
                 int hoursOrTicks = Integer.parseInt(args[0]);
 
                 if (hoursOrTicks >= 0 && hoursOrTicks < 24) {
                     ticks = convertHourToTicks(hoursOrTicks);
                 } else if (hoursOrTicks > 0) {
-                    ticks = hoursOrTicks;
+                    ticks = hoursOrTicks % 24000;
                 } else {
                     throw new InvalidFormatException("Invalid time format");
                 }
@@ -111,12 +112,14 @@ public class Ptime extends AbstractCommand {
 
         //Set time and send feedback.
         p.setPlayerTime(ticks, false);
-        p.sendMessage(SET_PLAYER_TIME.append(Component.text(args[0] + " (" + ticks + ")")));
+        p.sendMessage(SET_PLAYER_TIME.append(Component.text(args[0] + " (" + ticks + ")", NamedTextColor.DARK_AQUA)));
 
-        return false;
+        return true;
     }
 
     private int convertHourToTicks(int hour) {
+        hour += 6;
+        hour = hour >= 24 ? hour - 24 : hour;
         return hour * 1000;
     }
 
