@@ -118,12 +118,12 @@ public class Ptime extends AbstractCommand {
     }
 
     private int convertHourToTicks(int hour) {
-        hour += 6;
-        hour = hour >= 24 ? hour - 24 : hour;
+        hour -= 6;
+        hour = hour < 0 ? hour + 24 : hour;
         return hour * 1000;
     }
 
     private int convertMinutesToTicks(int minutes) {
-        return convertHourToTicks(minutes) / 60;
+        return minutes * 1000 / 60;
     }
 }
