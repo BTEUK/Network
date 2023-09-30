@@ -89,8 +89,12 @@ public class Ptime extends AbstractCommand {
 
                 String[] firstArg = args[0].split(":");
 
-                int hours = Integer.parseInt(firstArg[0]) % 24;
-                int minutes = Integer.parseInt(firstArg[1]) % 60;
+                int hours = Integer.parseInt(firstArg[0]);
+                int minutes = Integer.parseInt(firstArg[1]);
+
+                if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
+                    throw new InvalidFormatException("Invalid time format");
+                }
 
                 ticks = convertHourToTicks(hours) + convertMinutesToTicks(minutes);
 
