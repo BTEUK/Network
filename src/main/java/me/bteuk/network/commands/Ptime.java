@@ -87,8 +87,8 @@ public class Ptime extends AbstractCommand {
 
                 String[] firstArg = args[0].split(":");
 
-                int hours = Integer.parseInt(firstArg[0]);
-                int minutes = Integer.parseInt(firstArg[1]);
+                int hours = Integer.parseInt(firstArg[0]) % 24;
+                int minutes = Integer.parseInt(firstArg[1]) % 60;
 
                 ticks = convertHourToTicks(hours) + convertMinutesToTicks(minutes);
 
