@@ -66,7 +66,7 @@ public class Ptime extends AbstractCommand {
                 int time = Integer.parseInt(firstArg[0]);
 
                 if (time > 0 && time <= 12) {
-                    ticks = 12000 + convertHourToTicks(time);
+                    ticks = 12000 + convertHourToTicks(time % 12);
                 } else {
                     throw new InvalidFormatException("Invalid time format");
                 }
@@ -78,7 +78,7 @@ public class Ptime extends AbstractCommand {
                 int time = Integer.parseInt(firstArg[0]);
 
                 if (time > 0 && time <= 12) {
-                    ticks = convertHourToTicks(time);
+                    ticks = convertHourToTicks(time % 12);
                 } else {
                     throw new InvalidFormatException("Invalid time format");
                 }
