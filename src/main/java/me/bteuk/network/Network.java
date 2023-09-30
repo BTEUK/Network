@@ -5,6 +5,7 @@ import me.bteuk.network.commands.AFK;
 import me.bteuk.network.commands.Clear;
 import me.bteuk.network.commands.Discord;
 import me.bteuk.network.commands.Gamemode;
+import me.bteuk.network.commands.Ptime;
 import me.bteuk.network.commands.give.GiveBarrier;
 import me.bteuk.network.commands.give.GiveDebugStick;
 import me.bteuk.network.commands.give.GiveLight;
@@ -391,6 +392,9 @@ public final class Network extends JavaPlugin {
             kick = new Kick(this);
 
         }
+
+        //Enable ptime.
+        new Ptime(this);
 
         //Route /hdb to /skulls
         new Hdb(this);

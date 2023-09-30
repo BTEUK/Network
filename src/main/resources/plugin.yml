@@ -137,3 +137,6 @@ commands:
     aliases: [toggletips, tipstoggle]
     usage: /<command>
     description: Toggles tips in chat.
+  ptime:
+    usage: /<command>
+    description: Sets the time of day for the player
