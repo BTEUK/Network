@@ -57,6 +57,7 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
             if (DISCORD_CHAT) {
                 //Discord specific channels.
                 instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord", this);
+                instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord_formatted", this);
                 instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord_staff", this);
                 instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord_reviewer", this);
 
@@ -88,6 +89,7 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
             if (DISCORD_CHAT) {
                 //Discord specific channels.
                 instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord", this);
+                instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord_formatted", this);
                 instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord_staff", this);
                 instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord_reviewer", this);
 
@@ -354,7 +356,7 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
 
         if (DISCORD_CHAT) {
 
-            broadcastMessage(discord_message, "uknet:discord");
+            broadcastMessage(discord_message, "uknet:discord_formatted");
 
         }
     }

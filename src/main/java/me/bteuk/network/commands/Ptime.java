@@ -99,7 +99,6 @@ public class Ptime extends AbstractCommand {
                 ticks = convertHourToTicks(hours) + convertMinutesToTicks(minutes);
 
             } else {
-                //If the argument contains just 1 or 2 number, use the full house with 24-hour format.
                 //If the arguments is between 3-5 numbers then use Minecraft time directly.
                 int minecraftTicks = Integer.parseInt(args[0]);
 
