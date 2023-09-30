@@ -20,7 +20,7 @@ public class Ptime extends AbstractCommand {
 
     private static final Component RESET_PLAYER_TIME = Utils.success("Reset player time, using server time.");
     private static final Component SET_PLAYER_TIME = Utils.success("Set player time to ");
-    private static final Component INVALID_FORMAT = Utils.error("Invalid time format, try using HH:mm, HH or Minecraft ticks.");
+    private static final Component INVALID_FORMAT = Utils.error("Invalid time format, try using HH:mm or Minecraft ticks.");
 
     public Ptime(Network instance) {
         super(instance, "ptime");
@@ -101,12 +101,10 @@ public class Ptime extends AbstractCommand {
             } else {
                 //If the argument contains just 1 or 2 number, use the full house with 24-hour format.
                 //If the arguments is between 3-5 numbers then use Minecraft time directly.
-                int hoursOrTicks = Integer.parseInt(args[0]);
+                int minecraftTicks = Integer.parseInt(args[0]);
 
-                if (hoursOrTicks >= 0 && hoursOrTicks < 24) {
-                    ticks = convertHourToTicks(hoursOrTicks);
-                } else if (hoursOrTicks > 0) {
-                    ticks = hoursOrTicks % 24000;
+                if (minecraftTicks > 0) {
+                    ticks = minecraftTicks % 24000;
                 } else {
                     throw new InvalidFormatException("Invalid time format");
                 }
