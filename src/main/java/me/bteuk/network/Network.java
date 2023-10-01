@@ -5,6 +5,7 @@ import me.bteuk.network.commands.AFK;
 import me.bteuk.network.commands.Clear;
 import me.bteuk.network.commands.Discord;
 import me.bteuk.network.commands.Gamemode;
+import me.bteuk.network.commands.Ptime;
 import me.bteuk.network.commands.give.GiveBarrier;
 import me.bteuk.network.commands.give.GiveDebugStick;
 import me.bteuk.network.commands.give.GiveLight;
@@ -95,12 +96,16 @@ import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public final class Network extends JavaPlugin {
 
+    //Returns an instance of the plugin.
+    @Getter
     private static Network instance;
 
     //If the server can shutdown.
     public boolean allow_shutdown;
 
+    //Return an instance of the regionManager.
     //RegionManager
+    @Getter
     private RegionManager regionManager;
 
     //User List
@@ -122,7 +127,9 @@ public final class Network extends JavaPlugin {
     @Getter
     private Timers timers;
 
+    //Get lobby.
     //Lobby
+    @Getter
     private Lobby lobby;
 
     //Listener and manager of server connects.
@@ -356,8 +363,7 @@ public final class Network extends JavaPlugin {
         getCommand("spawn").setExecutor(new Spawn());
 
         //Enabled the progress map command if enabled
-        if (PROGRESS_MAP)
-        {
+        if (PROGRESS_MAP) {
             getCommand("progressmap").setExecutor(new ProgressMap());
             getLogger().info("Enabled Progress map support");
         }
@@ -391,6 +397,9 @@ public final class Network extends JavaPlugin {
             kick = new Kick(this);
 
         }
+
+        //Enable ptime.
+        new Ptime(this);
 
         //Route /hdb to /skulls
         new Hdb(this);
@@ -538,16 +547,6 @@ public final class Network extends JavaPlugin {
         }
     }
 
-    //Returns an instance of the plugin.
-    public static Network getInstance() {
-        return instance;
-    }
-
-    //Return an instance of the regionManager.
-    public RegionManager getRegionManager() {
-        return regionManager;
-    }
-
     //Get user from player.
     public NetworkUser getUser(Player p) {
 
@@ -589,10 +588,5 @@ public final class Network extends JavaPlugin {
             }
         }
         return false;
-    }
-
-    //Get lobby.
-    public Lobby getLobby() {
-        return lobby;
     }
 }

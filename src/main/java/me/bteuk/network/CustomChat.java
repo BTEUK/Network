@@ -57,6 +57,7 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
             if (DISCORD_CHAT) {
                 //Discord specific channels.
                 instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord", this);
+                instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord_formatted", this);
                 instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord_staff", this);
                 instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord_reviewer", this);
 
@@ -88,6 +89,7 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
             if (DISCORD_CHAT) {
                 //Discord specific channels.
                 instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord", this);
+                instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord_formatted", this);
                 instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord_staff", this);
                 instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord_reviewer", this);
 
@@ -264,7 +266,8 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
                 //Run a tab update, the structure is the following.
                 //'update/add/remove <uuid>'
                 //This allows us to only update what is necessary.
-                Network.getInstance().tab.updateAll(PlainTextComponentSerializer.plainText().serialize(component));
+                //Make sure it runs after all other scheduled tasks, so it does not front-run the disconnect event if the player just left this server.
+                Bukkit.getScheduler().runTask(instance, () -> Network.getInstance().tab.updateAll(PlainTextComponentSerializer.plainText().serialize(component)));
 
 
         }
@@ -353,7 +356,7 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
 
         if (DISCORD_CHAT) {
 
-            broadcastMessage(discord_message, "uknet:discord");
+            broadcastMessage(discord_message, "uknet:discord_formatted");
 
         }
     }

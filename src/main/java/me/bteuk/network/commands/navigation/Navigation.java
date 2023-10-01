@@ -136,13 +136,13 @@ public class Navigation implements CommandExecutor {
                             Network.getInstance().globalSQL.update("UPDATE location_data SET suggested=0 WHERE location='" + location + "';");
                             p.sendMessage(Utils.success("The location ")
                                     .append(Component.text(location, NamedTextColor.DARK_AQUA))
-                                    .append(Utils.error(" will no longer be suggested.")));
+                                    .append(Utils.success(" will no longer be suggested.")));
                         } else {
                             //Set location as suggested.
                             Network.getInstance().globalSQL.update("UPDATE location_data SET suggested=1 WHERE location='" + location + "';");
                             p.sendMessage(Utils.success("The location ")
                                     .append(Component.text(location, NamedTextColor.DARK_AQUA))
-                                    .append(Utils.error(" will now be suggested.")));
+                                    .append(Utils.success(" will now be suggested.")));
                         }
                     } else {
                         p.sendMessage(Utils.error("The location ")

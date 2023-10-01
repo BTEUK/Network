@@ -51,7 +51,7 @@ public class BuildGui extends Gui {
                         Utils.line("Available plots of each difficulty:"),
                         Utils.line("Easy: ")
                                 .append(Component.text(Network.getInstance().plotSQL.getInt("SELECT count(id) FROM plot_data WHERE status='unclaimed' AND difficulty=1;"), NamedTextColor.GRAY)),
-                        Utils.line("Medium: ")
+                        Utils.line("Normal: ")
                                 .append(Component.text(Network.getInstance().plotSQL.getInt("SELECT count(id) FROM plot_data WHERE status='unclaimed' AND difficulty=2;"), NamedTextColor.GRAY)),
                         Utils.line("Hard: ")
                                 .append(Component.text(Network.getInstance().plotSQL.getInt("SELECT count(id) FROM plot_data WHERE status='unclaimed' AND difficulty=3;"), NamedTextColor.GRAY))),
