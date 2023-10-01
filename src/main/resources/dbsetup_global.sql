@@ -183,7 +183,7 @@ CREATE TABLE IF NOT EXISTS home
 CREATE TABLE IF NOT EXISTS seasons
 (
     id          VARCHAR(64)     NOT NULL,
-    active      TINYINT(1)      NOT NULL DEFAULT 1,
+    active      TINYINT(1)      NOT NULL DEFAULT 0,
     PRIMARY KEY(id)
 )
 
