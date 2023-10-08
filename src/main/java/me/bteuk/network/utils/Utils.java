@@ -190,7 +190,8 @@ public class Utils {
                 return i + 1;
             }
         }
-        return Integer.MIN_VALUE;
+        //Return 65 as the default y.
+        return 65;
     }
 
     //Gives a player an item, it will be set in their main hand, if it does not already exist there.
