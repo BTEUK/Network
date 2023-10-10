@@ -78,7 +78,6 @@ public class Tpll extends AbstractCommand {
 
         tpll(p, args, false);
         return true;
-
     }
 
     public void tpll(Player p, String[] args, boolean fromEvent) {
@@ -263,7 +262,6 @@ public class Tpll extends AbstractCommand {
             } else {
                 l.setWorld(Bukkit.getWorld(EARTH_WORLD));
             }
-
         }
     }
 
@@ -278,7 +276,7 @@ public class Tpll extends AbstractCommand {
     private CompletableFuture<Double> getAltitude(Player p, TpllFormat format, Location l) {
         CompletableFuture<Double> altFuture;
         if (!PaperLib.isChunkGenerated(l)) {
-            Utils.success("Location is generating, please wait a moment...");
+            p.sendMessage(Utils.success("Location is generating, please wait a moment..."));
 
             //If the altitude was not specified, get it from the data.
             if (Double.isNaN(format.altitude)) {
@@ -367,7 +365,6 @@ public class Tpll extends AbstractCommand {
         }
 
         return array.toArray(array.toArray(new String[0]));
-
     }
 
     private String getRawArguments(String[] args) {
