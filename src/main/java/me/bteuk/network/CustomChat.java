@@ -360,4 +360,21 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
 
         }
     }
+
+    /**
+     * Broadcasts a message to chat and discord (if enabled).
+     *
+     * @param message the message to broadcast
+     */
+    public void broadcastToChatAndDiscord(Component message) {
+
+        //Send message
+        broadcastMessage(message, "uknet:globalchat");
+
+        if (DISCORD_CHAT) {
+
+            broadcastMessage(message, "uknet:discord_formatted");
+
+        }
+    }
 }

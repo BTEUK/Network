@@ -11,11 +11,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
-public class season extends AbstractCommand {
+public class Season extends AbstractCommand {
 
     private static final Component INVALID_COMMAND_ARGUMENTS = Utils.error("/season create|start|end [season_name]");
 
-    public season(Network instance) {
+    public Season(Network instance) {
         super(instance, "season");
     }
 

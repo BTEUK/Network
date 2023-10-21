@@ -242,4 +242,34 @@ public class NetworkUser {
         return false;
 
     }
+
+    /**
+     * Check if a user is online.
+     *
+     * @param uuid uuid of the user
+     * @return true if the user is online
+     */
+    public static boolean isOnline(String uuid) {
+        return Network.getInstance().globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "';");
+    }
+
+    /**
+     * Get the name of a user.
+     *
+     * @param uuid uuid of the user
+     * @return {@link String} name of the user
+     */
+    public static String getName(String uuid) {
+        return Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid'" + uuid + "';");
+    }
+
+    /**
+     * Send the user an offline message. This also works for online players.
+     *
+     * @param uuid uuid of the user
+     * @param message the message to send using legacy ampersand format
+     */
+    public static void sendOfflineMessage(String uuid, String message) {
+        Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','" + message + "');");
+    }
 }
