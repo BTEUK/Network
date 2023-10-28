@@ -14,6 +14,7 @@ import me.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -26,6 +27,8 @@ import java.util.UUID;
 import static com.comphenix.protocol.wrappers.EnumWrappers.PlayerInfoAction.UPDATE_DISPLAY_NAME;
 import static com.comphenix.protocol.wrappers.EnumWrappers.PlayerInfoAction.ADD_PLAYER;
 import static com.comphenix.protocol.wrappers.EnumWrappers.PlayerInfoAction.UPDATE_LISTED;
+import static me.bteuk.network.utils.Constants.LOGGER;
+import static me.bteuk.network.utils.Constants.SERVER_NAME;
 
 public class TabManager {
 
@@ -33,6 +36,7 @@ public class TabManager {
 
     private final ProtocolManager pm;
     private PacketListener pl;
+    private PacketListener player_info_remove;
 
     private final PlayerDisplayName playerDisplayName;
 
@@ -56,8 +60,9 @@ public class TabManager {
 
     private void startTab() {
 
-        createPacketListener();
+        createPacketListeners();
         pm.addPacketListener(pl);
+        pm.addPacketListener(player_info_remove);
 
     }
 
@@ -185,10 +190,11 @@ public class TabManager {
 
     public void closeTab() {
         pm.removePacketListener(pl);
+        pm.removePacketListener(player_info_remove);
         instance.getLogger().info("Disabled Tab");
     }
 
-    private void createPacketListener() {
+    private void createPacketListeners() {
         pl = new PacketAdapter(instance, ListenerPriority.NORMAL, PacketType.Play.Server.PLAYER_INFO) {
 
             @Override
@@ -228,6 +234,29 @@ public class TabManager {
                     event.setPacket(packet);
 
                 }
+            }
+        };
+
+        player_info_remove = new PacketAdapter(instance, ListenerPriority.NORMAL, PacketType.Play.Server.PLAYER_INFO_REMOVE) {
+
+            @Override
+            public void onPacketSending(PacketEvent event) {
+
+                PacketContainer packet = event.getPacket();
+
+                //Get all uuids to be removed, if they are still on the network, but on another server, try adding them as fake player.
+                packet.getUUIDLists().read(0).forEach(uuid -> {
+
+                    //If the player is on a different server.
+                    if (instance.globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "' AND server<>'" + SERVER_NAME + "';")) {
+
+                        LOGGER.info("Removed player with uuid " + uuid + " from TAB, but they are on another server");
+                        LOGGER.info("Adding them back as a fake player.");
+                        Bukkit.getScheduler().runTask(instance, () -> addFakePlayer(uuid.toString()));
+
+                    }
+                });
+
             }
         };
     }
