@@ -37,6 +37,7 @@ import me.bteuk.network.commands.navigation.Tpll;
 import me.bteuk.network.commands.navigation.Warp;
 import me.bteuk.network.commands.navigation.Warps;
 import me.bteuk.network.commands.staff.Ban;
+import me.bteuk.network.commands.staff.Exp;
 import me.bteuk.network.commands.staff.Kick;
 import me.bteuk.network.commands.staff.Mute;
 import me.bteuk.network.commands.staff.Staff;
@@ -422,6 +423,8 @@ public final class Network extends JavaPlugin {
             //Enable tips in chat.
             new Tips();
         }
+
+        new Exp(this);
 
         //Enable server in server table.
         globalSQL.update("UPDATE server_data SET online=1 WHERE name='" + SERVER_NAME + "';");

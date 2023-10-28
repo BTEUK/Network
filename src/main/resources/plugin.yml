@@ -144,3 +144,6 @@ commands:
     usage: /<command>
     description: Command for creating, starting and ending seasons.
     aliases: [seasons]
+  exp:
+    usage: /<command>
+    description: Test command for adding exp.
