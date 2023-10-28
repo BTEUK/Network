@@ -7,6 +7,7 @@ import me.bteuk.network.events.EventManager;
 import me.bteuk.network.utils.Statistics;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Time;
+import me.bteuk.network.utils.TpllFormat;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.regions.Region;
 import me.bteuk.network.utils.regions.RegionManager;
@@ -40,10 +41,10 @@ public class Tpll extends AbstractCommand {
     private final boolean requires_permission;
     private static final DecimalFormat DECIMAL_FORMATTER = new DecimalFormat("##.#####");
 
-    private final EarthGeneratorSettings bteGeneratorSettings = EarthGeneratorSettings.parse(EarthGeneratorSettings.BTE_DEFAULT_SETTINGS);
+    public static final EarthGeneratorSettings bteGeneratorSettings = EarthGeneratorSettings.parse(EarthGeneratorSettings.BTE_DEFAULT_SETTINGS);
 
     private final RegionManager regionManager;
-    private final boolean regionsEnabled;
+    private static final boolean regionsEnabled = CONFIG.getBoolean("regions_enabled");
 
     private static final Component USAGE = Utils.error("/tpll <latitude> <longitude> [altitude]");
 
@@ -53,8 +54,6 @@ public class Tpll extends AbstractCommand {
         this.requires_permission = requires_permission;
 
         regionManager = Network.getInstance().getRegionManager();
-
-        regionsEnabled = CONFIG.getBoolean("regions_enabled");
 
     }
 
@@ -91,7 +90,7 @@ public class Tpll extends AbstractCommand {
         //Convert the input to a usable format.
         TpllFormat format = getUsableTpllFormat(args);
 
-        if (format.coordinates == null) {
+        if (format.getCoordinates() == null) {
             p.sendMessage(USAGE);
             return;
         }
@@ -99,7 +98,7 @@ public class Tpll extends AbstractCommand {
         double[] proj;
 
         try {
-            proj = bteGeneratorSettings.projection().fromGeo(format.coordinates.getLng(), format.coordinates.getLat());
+            proj = bteGeneratorSettings.projection().fromGeo(format.getCoordinates().getLng(), format.getCoordinates().getLat());
         } catch (Exception e) {
             p.sendMessage(USAGE);
             return;
@@ -146,32 +145,32 @@ public class Tpll extends AbstractCommand {
      * @param args the command arguments
      * @return {@link TpllFormat} that includes the coordinate information that could be read from the command
      */
-    private TpllFormat getUsableTpllFormat(String[] args) {
+    public static TpllFormat getUsableTpllFormat(String[] args) {
         TpllFormat format = new TpllFormat();
 
-        format.coordinates = CoordinateParseUtils.parseVerbatimCoordinates(this.getRawArguments(args).trim());
+        format.setCoordinates(CoordinateParseUtils.parseVerbatimCoordinates(getRawArguments(args).trim()));
 
-        if (format.coordinates == null) {
-            LatLng possiblePlayerCoords = CoordinateParseUtils.parseVerbatimCoordinates(this.getRawArguments(this.selectArray(args)));
+        if (format.getCoordinates() == null) {
+            LatLng possiblePlayerCoords = CoordinateParseUtils.parseVerbatimCoordinates(getRawArguments(selectArray(args)));
             if (possiblePlayerCoords != null) {
-                format.coordinates = possiblePlayerCoords;
+                format.setCoordinates(possiblePlayerCoords);
             }
         }
 
-        LatLng possibleHeightCoords = CoordinateParseUtils.parseVerbatimCoordinates(this.getRawArguments(this.inverseSelectArray(args, args.length - 1)));
+        LatLng possibleHeightCoords = CoordinateParseUtils.parseVerbatimCoordinates(getRawArguments(inverseSelectArray(args, args.length - 1)));
         if (possibleHeightCoords != null) {
-            format.coordinates = possibleHeightCoords;
+            format.setCoordinates(possibleHeightCoords);
             try {
-                format.altitude = Double.parseDouble(args[args.length - 1]);
+                format.setAltitude(Double.parseDouble(args[args.length - 1]));
             } catch (Exception ignored) {
             }
         }
 
-        LatLng possibleHeightNameCoords = CoordinateParseUtils.parseVerbatimCoordinates(this.getRawArguments(this.inverseSelectArray(this.selectArray(args), this.selectArray(args).length - 1)));
+        LatLng possibleHeightNameCoords = CoordinateParseUtils.parseVerbatimCoordinates(getRawArguments(inverseSelectArray(selectArray(args), selectArray(args).length - 1)));
         if (possibleHeightNameCoords != null) {
-            format.coordinates = possibleHeightNameCoords;
+            format.setCoordinates(possibleHeightNameCoords);
             try {
-                format.altitude = Double.parseDouble(this.selectArray(args)[this.selectArray(args).length - 1]);
+                format.setAltitude(Double.parseDouble(selectArray(args)[selectArray(args).length - 1]));
             } catch (Exception ignored) {
             }
         }
@@ -222,7 +221,7 @@ public class Tpll extends AbstractCommand {
      * @param l      the location of the tpll
      * @return {@link Location} the location with potential coordinate transform
      */
-    private Location applyCoordinateTransformIfPlotSystem(Region region, Location l) {
+    public static Location applyCoordinateTransformIfPlotSystem(Region region, Location l) {
 
         //Regions must be enabled to use the plot system.
         if (regionsEnabled) {
@@ -279,26 +278,26 @@ public class Tpll extends AbstractCommand {
             p.sendMessage(Utils.success("Location is generating, please wait a moment..."));
 
             //If the altitude was not specified, get it from the data.
-            if (Double.isNaN(format.altitude)) {
+            if (Double.isNaN(format.getAltitude())) {
                 try {
                     altFuture = bteGeneratorSettings.datasets()
                             .<IScalarDataset>getCustom(EarthGeneratorPipelines.KEY_DATASET_HEIGHTS)
-                            .getAsync(format.coordinates.getLng(), format.coordinates.getLat())
+                            .getAsync(format.getCoordinates().getLng(), format.getCoordinates().getLat())
                             .thenApply(a -> a + 1.0d);
                 } catch (OutOfProjectionBoundsException e) { //out of bounds, notify user
                     p.sendMessage(Utils.error("These coordinates are out of the projection bounds."));
                     return null;
                 }
             } else {
-                altFuture = CompletableFuture.completedFuture(format.altitude);
+                altFuture = CompletableFuture.completedFuture(format.getAltitude());
             }
         } else {
 
             //If the altitude was not specified, get it from the data.
-            if (Double.isNaN(format.altitude)) {
+            if (Double.isNaN(format.getAltitude())) {
                 altFuture = CompletableFuture.completedFuture((double) Utils.getHighestYAt(l.getWorld(), l.getBlockX(), l.getBlockZ()));
             } else {
-                altFuture = CompletableFuture.completedFuture(format.altitude);
+                altFuture = CompletableFuture.completedFuture(format.getAltitude());
             }
         }
         return altFuture;
@@ -334,9 +333,9 @@ public class Tpll extends AbstractCommand {
 
             p.sendMessage(
                     Utils.success("Teleported to ")
-                            .append(Component.text(DECIMAL_FORMATTER.format(format.coordinates.getLat()), NamedTextColor.DARK_AQUA))
+                            .append(Component.text(DECIMAL_FORMATTER.format(format.getCoordinates().getLat()), NamedTextColor.DARK_AQUA))
                             .append(Utils.success(", "))
-                            .append(Component.text(DECIMAL_FORMATTER.format(format.coordinates.getLng()), NamedTextColor.DARK_AQUA)));
+                            .append(Component.text(DECIMAL_FORMATTER.format(format.getCoordinates().getLng()), NamedTextColor.DARK_AQUA)));
 
         }));
     }
@@ -347,7 +346,7 @@ public class Tpll extends AbstractCommand {
      * @param args Initial array
      * @return Selected array
      */
-    private String[] selectArray(String[] args) {
+    private static String[] selectArray(String[] args) {
         List<String> array = new ArrayList<>();
 
         if (args.length > 1) {
@@ -357,7 +356,7 @@ public class Tpll extends AbstractCommand {
         return array.toArray(array.toArray(new String[0]));
     }
 
-    private String[] inverseSelectArray(String[] args, int index) {
+    private static String[] inverseSelectArray(String[] args, int index) {
         List<String> array = new ArrayList<>();
 
         if (index > 0) {
@@ -367,7 +366,7 @@ public class Tpll extends AbstractCommand {
         return array.toArray(array.toArray(new String[0]));
     }
 
-    private String getRawArguments(String[] args) {
+    private static String getRawArguments(String[] args) {
         if (args.length == 0) {
             return "";
         }
@@ -382,15 +381,5 @@ public class Tpll extends AbstractCommand {
         }
 
         return arguments.toString();
-    }
-
-    /**
-     * Tpll format class, stores the altitude and coordinates gathered from the command arguments.
-     */
-    private static class TpllFormat {
-
-        private double altitude = Double.NaN;
-        private LatLng coordinates;
-
     }
 }
