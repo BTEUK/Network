@@ -86,6 +86,11 @@ public record Region(String regionName) {
         Network.getInstance().regionSQL.update("UPDATE regions SET status='inactive' WHERE region='" + regionName + "';");
     }
 
+    //Check if the region is in the plot system.
+    public boolean isPlot() {
+        return Network.getInstance().regionSQL.hasRow("SELECT region FROM regions WHERE region='" + regionName + "' AND status='plot';");
+    }
+
     //Set the region to be for plots.
     public void setPlot() {
 

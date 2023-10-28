@@ -8,6 +8,40 @@ port: 3306
 username: root
 password: password
 
+#Promotion track for roles.
+#Assign custom names and colours.
+#Colours must be of &#000000 format, where the #000000 is the hex colour.
+#Prefix is for tab and chat before the player name.
+roles:
+  default:
+    name: 'Guest'
+    prefix: '[Guest]'
+    colour: '&#fffdf9'
+  applicant:
+    name: 'Applicant'
+    prefix: '[Applicant]'
+    colour: '&#ffe599'
+  apprentice:
+    name: 'Apprentice'
+    prefix: '[Apprentice]'
+    colour: '&#efb70c'
+  jrbuilder:
+    name: 'Jr\.Builder'
+    prefix: '[Jr\.Builder]'
+    colour: '&#d78426'
+  builder:
+    name: 'Builder'
+    prefix: '[Builder]'
+    colour: '&#f26868'
+  architect:
+    name: 'Architect'
+    prefix: '[Architect]'
+    colour: '&#ec2a2a'
+  reviewer:
+    name: 'Reviewer'
+    prefix: '[Reviewer]'
+    colour: '&#8be565'
+
 #Database names (doesn't require adjusting)
 database:
   global: uknet_global
@@ -86,6 +120,8 @@ chat:
     #Custom tab menu
     tab:
       enabled: true
+  #Whether to announce role promotions in chat.
+  announce_promotions: true
 
   #Network messages
   #%player% is a placeholder for the player name.

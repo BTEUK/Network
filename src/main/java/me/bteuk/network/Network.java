@@ -164,6 +164,10 @@ public final class Network extends JavaPlugin {
     @Getter
     private Unban unban;
 
+    //Tpll Command
+    @Getter
+    private Tpll tpll;
+
     //Tutorials
     @Getter
     private Tutorials tutorials;
@@ -319,7 +323,7 @@ public final class Network extends JavaPlugin {
         //Setup tpll if enabled in config.
         if (TPLL_ENABLED) {
 
-            getCommand("tpll").setExecutor(new Tpll(CONFIG.getBoolean("requires_permission")));
+            tpll = new Tpll(this, CONFIG.getBoolean("requires_permission"));
 
         }
 

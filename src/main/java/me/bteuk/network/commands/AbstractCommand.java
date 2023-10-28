@@ -50,7 +50,7 @@ public abstract class AbstractCommand implements CommandExecutor {
         //Check if the sender is a player.
         if (!(sender instanceof Player p)) {
 
-            sender.sendMessage(Utils.error("This command can only be run by a player."));
+            sender.sendMessage(COMMAND_ONLY_BY_PLAYER);
             return null;
 
         }
