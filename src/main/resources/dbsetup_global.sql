@@ -185,7 +185,7 @@ CREATE TABLE IF NOT EXISTS seasons
     id          VARCHAR(64)     NOT NULL,
     active      TINYINT(1)      NOT NULL DEFAULT 0,
     PRIMARY KEY(id)
-)
+);
 
 CREATE TABLE IF NOT EXISTS progression
 (

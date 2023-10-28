@@ -4,6 +4,13 @@ import me.bteuk.network.Network;
 
 public class Level {
 
+    protected static void addPlayerIfNotExists(String season, String uuid) {
+
+        if (!Network.getInstance().globalSQL.hasRow("SELECT uuid FROM progression WHERE uuid='" + uuid + "' AND season='" + season + "';")) {
+            Network.getInstance().globalSQL.update("INSERT INTO progression(season,uuid) VALUES('" + season + "','" + uuid + "');");
+        }
+    }
+
     /**
      * Get the next exp threshold to reach the given level.
      *

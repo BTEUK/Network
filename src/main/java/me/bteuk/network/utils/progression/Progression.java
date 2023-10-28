@@ -30,8 +30,9 @@ public class Progression {
         addExp("default", uuid, exp, ANNOUNCE_OVERALL_LEVELUPS);
 
         //Add exp for the active season, if it exists. There can only be 1 active season at a time.
-        if (Network.getInstance().globalSQL.hasRow("SELECT id FROM seasons WHERE active=1")) {
-            addExp(Network.getInstance().globalSQL.getString("SELECT id FROM seasons WHERE active=1"), uuid, exp, ANNOUNCE_SEASONAL_LEVELUPS);
+        //Don't use the default season, this is always active.
+        if (Network.getInstance().globalSQL.hasRow("SELECT id FROM seasons WHERE active=1 and id<>'default'")) {
+            addExp(Network.getInstance().globalSQL.getString("SELECT id FROM seasons WHERE active=1 and id<>'default'"), uuid, exp, ANNOUNCE_SEASONAL_LEVELUPS);
         }
 
     }
@@ -45,6 +46,8 @@ public class Progression {
      * @param announce_levelups whether level-ups should be announced
      */
     private static void addExp(String season, String uuid, int exp, boolean announce_levelups) {
+
+        Level.addPlayerIfNotExists(season, uuid);
 
         int currentExp = exp + Level.getExp(season, uuid);
         int currentLevel = Level.getLevel(season, uuid);

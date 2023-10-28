@@ -24,9 +24,7 @@ public class Season extends AbstractCommand {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
 
         //Get the player, this is only to check the permission, it is not necessary to use the command.
-        Player p = getPlayer(sender);
-
-        if (p != null) {
+        if (sender instanceof Player p) {
             if (!p.hasPermission("uknet.season")) {
                 p.sendMessage(NO_PERMISSION);
                 return true;
@@ -34,23 +32,32 @@ public class Season extends AbstractCommand {
         }
 
         //Check args.
-        if (args.length > 2) {
+        if (args.length >= 2) {
+
+            //Don't allow season command to alter the default season.
+            if (args[1].equalsIgnoreCase("default")) {
+                sender.sendMessage(Utils.error("The default season can not be modified!"));
+                return true;
+            }
 
             //Check first arg.
             if (args[0].equalsIgnoreCase("create")) {
 
                 //Create season with all remaining args as name.
                 sender.sendMessage(createSeason(args));
+                return true;
 
             } else if (args[0].equalsIgnoreCase("start")) {
 
                 //Start season with all remaining args as name.
                 sender.sendMessage(startSeason(args));
+                return true;
 
             } else if (args[0].equalsIgnoreCase("end")) {
 
                 //End season with all remaining args as name.
                 sender.sendMessage(endSeason(args));
+                return true;
 
             }
         }
@@ -74,7 +81,7 @@ public class Season extends AbstractCommand {
         }
 
         if (Network.getInstance().globalSQL.update("INSERT INTO seasons(id) VALUES('" + name + "');")) {
-            return Utils.success("Season create with name ")
+            return Utils.success("Season created with name ")
                     .append(Component.text(name, NamedTextColor.DARK_AQUA));
         } else {
             return Utils.success("An error occurred while creating the season, please contact a server admin.");
@@ -95,6 +102,10 @@ public class Season extends AbstractCommand {
             return Utils.error("The season ")
                     .append(Component.text(name, NamedTextColor.DARK_RED)
                             .append(Utils.error(" has already started.")));
+        } else if (Network.getInstance().globalSQL.getInt("SELECT id FROM seasons WHERE id='" + name + "' AND active=1;") > 1) {
+            return Utils.error("There is already an active season, cancel season ")
+                    .append(Component.text(Network.getInstance().globalSQL.getString("SELECT id FROM seasons WHERE active=1 and id<>'default';"), NamedTextColor.DARK_RED))
+                    .append(Utils.error(" first."));
         }
 
         if (Network.getInstance().globalSQL.update("UPDATE seasons SET active=1 WHERE id='" + name + "';")) {

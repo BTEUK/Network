@@ -260,7 +260,7 @@ public class NetworkUser {
      * @return {@link String} name of the user
      */
     public static String getName(String uuid) {
-        return Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid'" + uuid + "';");
+        return Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
     }
 
     /**

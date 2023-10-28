@@ -6,6 +6,7 @@ import me.bteuk.network.commands.Clear;
 import me.bteuk.network.commands.Discord;
 import me.bteuk.network.commands.Gamemode;
 import me.bteuk.network.commands.Ptime;
+import me.bteuk.network.commands.Season;
 import me.bteuk.network.commands.give.GiveBarrier;
 import me.bteuk.network.commands.give.GiveDebugStick;
 import me.bteuk.network.commands.give.GiveLight;
@@ -426,6 +427,12 @@ public final class Network extends JavaPlugin {
 
             //Enable tips in chat.
             new Tips();
+        }
+
+        new Season(this);
+        //Create default season if not exists.
+        if (!globalSQL.hasRow("SELECT id FROM seasons WHERE id='default';")) {
+            globalSQL.update("INSERT INTO seasons(id,active) VALUES('default',1);");
         }
 
         new Exp(this);
