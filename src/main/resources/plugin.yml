@@ -62,9 +62,9 @@ commands:
   afk:
     usage: /<command>
     description: Toggles afk status.
-  portals:
+  lobby:
     usage: /<command>
-    description: Command to reload portals.
+    description: Command for all lobby management.
   sethome:
     usage: /<command>
     description: Set a home to your current location.

@@ -5,6 +5,7 @@ import me.bteuk.network.commands.AFK;
 import me.bteuk.network.commands.Clear;
 import me.bteuk.network.commands.Discord;
 import me.bteuk.network.commands.Gamemode;
+import me.bteuk.network.commands.LobbyCommand;
 import me.bteuk.network.commands.Ptime;
 import me.bteuk.network.commands.Season;
 import me.bteuk.network.commands.give.GiveBarrier;
@@ -16,7 +17,6 @@ import me.bteuk.network.commands.Navigator;
 import me.bteuk.network.commands.Nightvision;
 import me.bteuk.network.commands.Phead;
 import me.bteuk.network.commands.Plot;
-import me.bteuk.network.commands.Portals;
 import me.bteuk.network.commands.RegionCommand;
 import me.bteuk.network.commands.Rules;
 import me.bteuk.network.commands.Speed;
@@ -313,8 +313,8 @@ public final class Network extends JavaPlugin {
 
             lobby.reloadPortals();
 
-            //Create portals reload command.
-            getCommand("portals").setExecutor(new Portals(lobby));
+            //Create lobby command.
+            new LobbyCommand(this, lobby);
 
             //Set the rules lectern.
             lobby.setLectern();
