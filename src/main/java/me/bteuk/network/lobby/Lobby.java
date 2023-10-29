@@ -43,6 +43,8 @@ public class Lobby {
 
     public Location spawn;
 
+    private Map map;
+
     public Lobby(Network instance) {
 
         this.instance = instance;
@@ -235,7 +237,15 @@ public class Lobby {
 
     }
 
-    private void runMap() {
+
+    /**
+     * Reloads the map, this will be run when the plugin is enabled.
+     * As well as when the map is manually reloaded using /lobby reload map
+     * Map config is stored in map.yml as it is only necessary for a lobby server.
+     */
+    public void reloadMap() {
+
+        map.reload();
 
     }
 

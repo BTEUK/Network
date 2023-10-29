@@ -1,0 +1,38 @@
+# Lobby map configuration.
+# Must be enabled for the map to be active.
+enabled: false
+
+# Bounds of the map in both Minecraft and IRL coordinates.
+# Minecraft coordinates must be block coordinates (no decimals).
+# Irl coordinates must be in decimal format.
+# The map must be rectangular.
+# The coordinates will be used to indicate the outer corner of the block for the specific corner.
+# The y-coordinate will not be relevant, the map will work at any elevation.
+# If any of the bounds are not filled in the map will be disabled.
+# Latitude has a range of 90 (north) to -90 (south)
+# Longitude has a range of -180 (west) to 180 (east)
+# The cardinal directions used for the bounds names are Minecraft cardinal directions.
+bounds:
+  north_west:
+    x:
+    z:
+    latitude:
+    longitude:
+  north_east:
+    x:
+    z:
+    latitude:
+    longitude:
+  south_west:
+    x:
+    z:
+    latitude:
+    longitude:
+  south_east:
+    x:
+    z:
+    latitude:
+    longitude:
+
+# The range is the distance in KM from the location of the player in which locations will be shown in the menu.
+range: 50

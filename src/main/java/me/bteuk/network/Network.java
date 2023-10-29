@@ -313,6 +313,9 @@ public final class Network extends JavaPlugin {
 
             lobby.reloadPortals();
 
+            //Setup the map.
+            lobby.reloadMap();
+
             //Create lobby command.
             new LobbyCommand(this, lobby);
 
