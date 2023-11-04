@@ -122,11 +122,14 @@ public final class Roles {
 
         //Announce the promotion in chat and discord.
         //Send a message to the user if not online, so they'll be notified of their promotion next time they join the server.
-        if (CONFIG.getBoolean("announce_promotions")) {
+        String colouredRole = CONFIG.getString("roles." + nRole + ".colour") + CONFIG.getString("roles." + nRole + ".name");
+        if (CONFIG.getBoolean("chat.announce_promotions")) {
             String name = Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
+
+
             Component promotation_message = Component.text(name)
                     .append(PROMOTION_TEMPLATE)
-                    .append(LegacyComponentSerializer.legacyAmpersand().deserialize(CONFIG.getString("roles." + nRole + ".colour") + CONFIG.getString("roles." + nRole + ".name")));
+                    .append(LegacyComponentSerializer.legacyAmpersand().deserialize(colouredRole));
 
             Network.getInstance().chat.broadcastMessage(promotation_message, "uknet:globalchat");
             //Add discord formatting to make the message bold.
@@ -140,7 +143,7 @@ public final class Roles {
 
             //Send a message that will show when they next log in.
             Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','" +
-                    PROMOTION_SELF + CONFIG.getString("roles." + nRole + ".colour") + CONFIG.getString("roles." + nRole + ".name")
+                    PROMOTION_SELF + colouredRole
                     + "');");
 
         }
