@@ -147,3 +147,7 @@ commands:
   exp:
     usage: /<command>
     description: Test command for adding exp.
+  regionmanager:
+    aliases: [rm]
+    usage: /<command>
+    description: Region management command, can only be run from the console.
