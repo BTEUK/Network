@@ -117,7 +117,7 @@ public class Help implements CommandExecutor {
 
             case "apprentice" -> p.sendMessage(Component.text("Apprentice", NamedTextColor.GRAY)
                     .append(Utils.line(" is the first role achieved by building, however you must rankup once more to have access to region claiming. " +
-                            "Complete 1 medium plot to be promoted to "))
+                            "Complete 1 normal plot to be promoted to "))
                     .append(Component.text("Jr.Builder", NamedTextColor.GRAY)));
 
             case "applicant" -> p.sendMessage(Utils.line("Achieved by completing the required steps in the tutorial, you now have access to the plot system. " +
@@ -201,7 +201,7 @@ public class Help implements CommandExecutor {
                 Component.text("Apprentice", NamedTextColor.GRAY)
                         .append(Utils.line(" -> "))
                         .append(Component.text("Jr.Builder", NamedTextColor.GRAY))
-                        .append(Utils.line(" by completing a medium plot.")));
+                        .append(Utils.line(" by completing a normal plot.")));
 
         p.sendMessage(
                 Component.text("Jr.Builder", NamedTextColor.GRAY)

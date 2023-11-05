@@ -1,13 +1,20 @@
 package me.bteuk.network.utils;
 
 import me.bteuk.network.Network;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
+import static me.bteuk.network.utils.Constants.DISCORD_CHAT;
 import static me.bteuk.network.utils.Constants.DISCORD_LINKING;
+import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public final class Roles {
+
+    private static final Component PROMOTION_TEMPLATE = Component.text(" has been promoted to ");
+    private  static final String PROMOTION_SELF = "You have been promoted to ";
 
     /*
 
@@ -110,6 +117,34 @@ public final class Roles {
 
             //Sync roles.
             Network.getInstance().getTimers().discordSync(discord_id, nRole);
+
+        }
+
+        //Announce the promotion in chat and discord.
+        //Send a message to the user if not online, so they'll be notified of their promotion next time they join the server.
+        String colouredRole = CONFIG.getString("roles." + nRole + ".colour") + CONFIG.getString("roles." + nRole + ".name");
+        if (CONFIG.getBoolean("chat.announce_promotions")) {
+            String name = Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
+
+
+            Component promotation_message = Component.text(name)
+                    .append(PROMOTION_TEMPLATE)
+                    .append(LegacyComponentSerializer.legacyAmpersand().deserialize(colouredRole));
+
+            Network.getInstance().chat.broadcastMessage(promotation_message, "uknet:globalchat");
+            //Add discord formatting to make the message bold.
+            if (DISCORD_CHAT) {
+                Network.getInstance().chat.broadcastMessage(Component.text("**").append(promotation_message).append(Component.text("**")), "uknet:discord_formatted");
+            }
+        }
+
+        //Check if the player is online.
+        if (!Network.getInstance().globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "';")) {
+
+            //Send a message that will show when they next log in.
+            Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','" +
+                    PROMOTION_SELF + colouredRole
+                    + "');");
 
         }
     }

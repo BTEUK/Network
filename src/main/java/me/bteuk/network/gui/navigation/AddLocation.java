@@ -1,5 +1,6 @@
 package me.bteuk.network.gui.navigation;
 
+import lombok.Getter;
 import me.bteuk.network.Network;
 import me.bteuk.network.commands.navigation.Back;
 import me.bteuk.network.events.EventManager;
@@ -35,6 +36,7 @@ public class AddLocation extends Gui {
 
     private LocationNameListener locationNameListener;
 
+    @Getter
     private final AddLocationType type;
 
     private GlobalSQL globalSQL;
@@ -91,10 +93,6 @@ public class AddLocation extends Gui {
     public void setCounty(Counties county) {
         this.county = county;
         this.subcategory = county.region;
-    }
-
-    public AddLocationType getType() {
-        return type;
     }
 
     private void createGui() {

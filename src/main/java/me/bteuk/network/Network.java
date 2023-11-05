@@ -5,6 +5,8 @@ import me.bteuk.network.commands.AFK;
 import me.bteuk.network.commands.Clear;
 import me.bteuk.network.commands.Discord;
 import me.bteuk.network.commands.Gamemode;
+import me.bteuk.network.commands.Ptime;
+import me.bteuk.network.commands.Season;
 import me.bteuk.network.commands.give.GiveBarrier;
 import me.bteuk.network.commands.give.GiveDebugStick;
 import me.bteuk.network.commands.give.GiveLight;
@@ -36,6 +38,7 @@ import me.bteuk.network.commands.navigation.Tpll;
 import me.bteuk.network.commands.navigation.Warp;
 import me.bteuk.network.commands.navigation.Warps;
 import me.bteuk.network.commands.staff.Ban;
+import me.bteuk.network.commands.staff.Exp;
 import me.bteuk.network.commands.staff.Kick;
 import me.bteuk.network.commands.staff.Mute;
 import me.bteuk.network.commands.staff.Staff;
@@ -95,12 +98,16 @@ import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public final class Network extends JavaPlugin {
 
+    //Returns an instance of the plugin.
+    @Getter
     private static Network instance;
 
     //If the server can shutdown.
     public boolean allow_shutdown;
 
+    //Return an instance of the regionManager.
     //RegionManager
+    @Getter
     private RegionManager regionManager;
 
     //User List
@@ -122,7 +129,9 @@ public final class Network extends JavaPlugin {
     @Getter
     private Timers timers;
 
+    //Get lobby.
     //Lobby
+    @Getter
     private Lobby lobby;
 
     //Listener and manager of server connects.
@@ -155,6 +164,10 @@ public final class Network extends JavaPlugin {
     //Unban Command
     @Getter
     private Unban unban;
+
+    //Tpll Command
+    @Getter
+    private Tpll tpll;
 
     //Tutorials
     @Getter
@@ -311,7 +324,7 @@ public final class Network extends JavaPlugin {
         //Setup tpll if enabled in config.
         if (TPLL_ENABLED) {
 
-            getCommand("tpll").setExecutor(new Tpll(CONFIG.getBoolean("requires_permission")));
+            tpll = new Tpll(this, CONFIG.getBoolean("requires_permission"));
 
         }
 
@@ -356,8 +369,7 @@ public final class Network extends JavaPlugin {
         getCommand("spawn").setExecutor(new Spawn());
 
         //Enabled the progress map command if enabled
-        if (PROGRESS_MAP)
-        {
+        if (PROGRESS_MAP) {
             getCommand("progressmap").setExecutor(new ProgressMap());
             getLogger().info("Enabled Progress map support");
         }
@@ -392,6 +404,9 @@ public final class Network extends JavaPlugin {
 
         }
 
+        //Enable ptime.
+        new Ptime(this);
+
         //Route /hdb to /skulls
         new Hdb(this);
 
@@ -413,6 +428,14 @@ public final class Network extends JavaPlugin {
             //Enable tips in chat.
             new Tips();
         }
+
+        new Season(this);
+        //Create default season if not exists.
+        if (!globalSQL.hasRow("SELECT id FROM seasons WHERE id='default';")) {
+            globalSQL.update("INSERT INTO seasons(id,active) VALUES('default',1);");
+        }
+
+        new Exp(this);
 
         //Enable server in server table.
         globalSQL.update("UPDATE server_data SET online=1 WHERE name='" + SERVER_NAME + "';");
@@ -538,16 +561,6 @@ public final class Network extends JavaPlugin {
         }
     }
 
-    //Returns an instance of the plugin.
-    public static Network getInstance() {
-        return instance;
-    }
-
-    //Return an instance of the regionManager.
-    public RegionManager getRegionManager() {
-        return regionManager;
-    }
-
     //Get user from player.
     public NetworkUser getUser(Player p) {
 
@@ -589,10 +602,5 @@ public final class Network extends JavaPlugin {
             }
         }
         return false;
-    }
-
-    //Get lobby.
-    public Lobby getLobby() {
-        return lobby;
     }
 }

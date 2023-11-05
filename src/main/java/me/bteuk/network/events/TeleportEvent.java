@@ -138,6 +138,9 @@ public class TeleportEvent extends AbstractEvent {
                 }
             }
 
+            //Tpll command format.
+            case "tpll" -> Network.getInstance().getTpll().tpll(p, Arrays.copyOfRange(event, 2, event.length), true);
+
             default -> {
 
                 //Get world.

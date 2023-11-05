@@ -156,7 +156,7 @@ public class PlotServerLocations extends Gui {
                             Utils.line("Available plots of each difficulty:"),
                             Utils.line("Easy: ")
                                     .append(Component.text(plotSQL.getInt("SELECT count(id) FROM plot_data WHERE location='" + location + "' AND status='unclaimed' AND difficulty=1;"), NamedTextColor.GRAY)),
-                            Utils.line("Medium: ")
+                            Utils.line("Normal: ")
                                     .append(Component.text(plotSQL.getInt("SELECT count(id) FROM plot_data WHERE location='" + location + "' AND status='unclaimed' AND difficulty=2;"), NamedTextColor.GRAY)),
                             Utils.line("Hard: ")
                                     .append(Component.text(plotSQL.getInt("SELECT count(id) FROM plot_data WHERE location='" + location + "' AND status='unclaimed' AND difficulty=3;"), NamedTextColor.GRAY))),

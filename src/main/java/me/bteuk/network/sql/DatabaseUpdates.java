@@ -19,7 +19,7 @@ public class DatabaseUpdates {
         }
 
         //Check for specific table columns that could be missing,
-        //All changes have to be tested from 1.0.0.er
+        //All changes have to be tested from 1.0.0.
         //We update 1 version at a time.
 
         //Convert config version to integer, so we can easily use them.

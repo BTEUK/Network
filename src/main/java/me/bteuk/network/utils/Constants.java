@@ -60,6 +60,11 @@ public class Constants {
     //Is the progress map enabled
     public static final boolean PROGRESS_MAP;
 
+    //Is progression enabled
+    public static final boolean PROGRESSION;
+    public static final boolean ANNOUNCE_OVERALL_LEVELUPS;
+    public static final boolean ANNOUNCE_SEASONAL_LEVELUPS;
+
     static {
 
         LOGGER = Network.getInstance().getLogger();
@@ -94,6 +99,10 @@ public class Constants {
         LL = CONFIG.getBoolean("ll_enabled");
 
         PROGRESS_MAP = CONFIG.getBoolean("ProgressMap.enabled");
+
+        PROGRESSION = CONFIG.getBoolean("progression.enabled");
+        ANNOUNCE_OVERALL_LEVELUPS = CONFIG.getBoolean("progression.announce_level-ups.overall");
+        ANNOUNCE_SEASONAL_LEVELUPS = CONFIG.getBoolean("progression.announce_level-ups.seasonal");
 
         if (CONFIG.getString("earth_world") == null) {
             //Setting default value.
