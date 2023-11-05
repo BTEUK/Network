@@ -1,18 +1,17 @@
 package me.bteuk.network.utils;
 
 import me.bteuk.network.Network;
-import org.apache.commons.io.IOCase;
-import org.apache.commons.io.filefilter.WildcardFileFilter;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static me.bteuk.network.utils.Constants.EARTH_WORLD;
@@ -43,11 +42,12 @@ public class WorldScanner {
             return;
         }
 
-        FileFilter fileFilter = WildcardFileFilter.builder().setWildcards("*.mca").setIoCase(IOCase.INSENSITIVE).get();
-        File[] listOfFiles = folder.listFiles(fileFilter);
+        File[] listOfFiles = folder.listFiles();
 
         for (File file : listOfFiles) {
-            regions.add(new RegionFile(file));
+            if (file.isFile() && file.getName().endsWith(".mca")) {
+                regions.add(new RegionFile(file));
+            }
         }
 
         LOGGER.info("Loaded regions");
@@ -74,6 +74,9 @@ public class WorldScanner {
         int width = maxX[0] - minX[0];
         int height = maxZ[0] - minZ[0];
 
+        int widthSize = (int) ceil(width / 250d);
+        int heightSize = (int) ceil(height / 250d);
+
         BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D g2d = bufferedImage.createGraphics();
         g2d.setColor(Color.white);
@@ -81,7 +84,8 @@ public class WorldScanner {
         g2d.setColor(Color.BLACK);
 
         regions.forEach(region -> {
-            g2d.fillRect(region.x - minX[0], region.z - minZ[0], 1, 1);
+            g2d.fillRect(region.x - minX[0], region.z - minZ[0], widthSize, heightSize);
+            LOGGER.info("Drawn region at " + (region.x - minX[0]) + ", " + (region.z - minZ[0]));
         });
 
         File file = new File("regionDrawing.png");
