@@ -1,4 +1,4 @@
-# Network V1.3.1
+# Network V1.4.0
 Developed by: [@LM-Wolfert](https://www.github.com/LM-Wolfert)
 ___
 A general purpose Minecraft plugin for BTE-related server features.
