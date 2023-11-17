@@ -66,26 +66,27 @@ public class Connect implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void joinServerEvent(PlayerJoinEvent e) {
 
-        //Cancel default join message if custom messages are enabled.
-        if (CUSTOM_MESSAGES) {
-            e.joinMessage(null);
-        } else {
-
-            //If discord chat is enabled send the join message to discord also.
-            if (DISCORD_CHAT) {
-                instance.chat.broadcastMessage(e.joinMessage(),"uknet:discord_connect");
-            }
-
-        }
-
         //If the player is not in the online_users table add them, and run a network connect.
         if (globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid='" + e.getPlayer().getUniqueId() + "';")) {
 
             serverSwitchEvent(e.getPlayer());
+            e.joinMessage(null);
 
         } else {
 
+            //Cancel default join message if custom messages are enabled.
+            if (CUSTOM_MESSAGES) {
+                e.joinMessage(null);
+            } else {
+
+                //If discord chat is enabled send the join message to discord also.
+                if (DISCORD_CHAT) {
+                    instance.chat.broadcastDiscordAnnouncement(e.joinMessage(), "connect");
+                }
+            }
+
             networkJoinEvent(e.getPlayer());
+
         }
 
         //Add user to the list.
@@ -97,17 +98,6 @@ public class Connect implements Listener {
 
     @EventHandler
     public void leaveServerEvent(PlayerQuitEvent e) {
-
-        //Cancel default join message if custom messages are enabled.
-        if (CUSTOM_MESSAGES) {
-            e.quitMessage(null);
-        } else {
-
-            //If discord chat is enabled send the join message to discord also.
-            if (DISCORD_CHAT) {
-                instance.chat.broadcastMessage(e.quitMessage(),"uknet:discord_disconnect");
-            }
-        }
 
         if (blockLeaveEvent) {
             e.quitMessage(null);
@@ -159,16 +149,29 @@ public class Connect implements Listener {
 
             //Run leave network sequence.
             networkLeaveEvent(e.getPlayer());
+            //Cancel default join message if custom messages are enabled.
+            if (CUSTOM_MESSAGES) {
+                e.quitMessage(null);
+            } else {
 
+                //If discord chat is enabled send the join message to discord also.
+                if (DISCORD_CHAT) {
+                    instance.chat.broadcastDiscordAnnouncement(e.quitMessage(), "disconnect");
+                }
+            }
+
+        } else {
+            //Player is not leaving the network, so no disconnect message is appropriate.
+            e.quitMessage(null);
         }
 
         //If this is the last player on the server, remove all players from other servers from tab.
-            if (instance.getServer().getOnlinePlayers().size() == 1 && TAB) {
-                //Remove all fake players from tab since nobody is on this server.
-                for (String uuid : globalSQL.getStringList("SELECT uuid FROM online_users;")) {
-                    instance.tab.removeFakePlayer(uuid);
-                }
+        if (instance.getServer().getOnlinePlayers().size() == 1 && TAB) {
+            //Remove all fake players from tab since nobody is on this server.
+            for (String uuid : globalSQL.getStringList("SELECT uuid FROM online_users;")) {
+                instance.tab.removeFakePlayer(uuid);
             }
+        }
     }
 
     /*
@@ -178,48 +181,41 @@ public class Connect implements Listener {
     public void networkJoinEvent(Player p) {
 
         //If the user is not yet in the player_data table add them.
+        Component[] join_messages = new Component[1];
+
         if (!globalSQL.hasRow("SELECT uuid FROM player_data WHERE uuid='" + p.getUniqueId() + "';")) {
 
             globalSQL.update("INSERT INTO player_data(uuid,name,last_online,last_submit,player_skin) VALUES('" +
                     p.getUniqueId() + "','" + p.getName() + "'," + Time.currentTime() + "," + 0 + ",'" + TextureUtils.getTexture(p.getPlayerProfile()) + "');");
 
-            //Send global welcome message.
-            //Add a slight delay so message can be seen by player joining.
-            Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
-
-                if (CUSTOM_MESSAGES) {
-
-                    instance.chat.broadcastMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(firstJoinMessage.replace("%player%", p.getName())), "uknet:connect");
-
-                    if (DISCORD_CHAT) {
-                        instance.chat.broadcastMessage(Component.text(TextureUtils.getAvatarUrl(p.getPlayerProfile()) + " ")
-                                .append(LegacyComponentSerializer.legacyAmpersand().deserialize(firstJoinMessage.replace("%player%", p.getName()))), "uknet:discord_connect");
-                    }
-                }
-            }, 20L);
-
+            //Create the custom welcome messages if enabled.
+            if (CUSTOM_MESSAGES) {
+                join_messages[0] = LegacyComponentSerializer.legacyAmpersand().deserialize(firstJoinMessage.replace("%player%", p.getName()));
+            }
         } else {
 
             //Update the online time, name and player skin.
             globalSQL.update("UPDATE player_data SET name='" + p.getName() + "',last_online=" + Time.currentTime() + ",player_skin='" + TextureUtils.getTexture(p.getPlayerProfile()) + "' WHERE uuid='" + p.getUniqueId() + "';");
 
-            //Send global connect message.
-            //Add a slight delay so message can be seen by player joining.
-            Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
-
-                if (CUSTOM_MESSAGES) {
-
-                    instance.chat.broadcastMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(joinMessage.replace("%player%", p.getName())), "uknet:connect");
-
-                    if (DISCORD_CHAT) {
-                        instance.chat.broadcastMessage(Component.text(TextureUtils.getAvatarUrl(p.getPlayerProfile()) + " ")
-                                        .append(LegacyComponentSerializer.legacyAmpersand().deserialize(joinMessage.replace("%player%", p.getName())))
-                                , "uknet:discord_connect");
-                    }
-
-                }
-            }, 1L);
+            //Create the custom join messages if enabled.
+            if (CUSTOM_MESSAGES) {
+                join_messages[0] = LegacyComponentSerializer.legacyAmpersand().deserialize(joinMessage.replace("%player%", p.getName()));
+            }
         }
+
+        //Send global connect message.
+        //Add a slight delay so message can be seen by player joining.
+        Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
+            if (CUSTOM_MESSAGES) {
+
+                instance.chat.broadcastMessage(join_messages[0], "uknet:connect");
+
+                if (DISCORD_CHAT) {
+                    Component message = Component.text(TextureUtils.getAvatarUrl(p.getPlayerProfile()) + " ").append(join_messages[0]);
+                    instance.chat.broadcastDiscordAnnouncement(message, "connect");
+                }
+            }
+        }, 20L);
 
         //Add user to table.
         globalSQL.update("INSERT INTO online_users(uuid,join_time,last_ping,server,primary_role,display_name) VALUES('" + p.getUniqueId() +
@@ -320,12 +316,13 @@ public class Connect implements Listener {
 
         //Run disconnect message.
         if (CUSTOM_MESSAGES) {
-            instance.chat.broadcastMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(leaveMessage.replace("%player%", name)), "uknet:disconnect");
+
+            Component leave_message = LegacyComponentSerializer.legacyAmpersand().deserialize(leaveMessage.replace("%player%", name));
+            instance.chat.broadcastMessage(leave_message, "uknet:disconnect");
 
             if (DISCORD_CHAT) {
-                instance.chat.broadcastMessage(Component.text(TextureUtils.getAvatarUrl(p.getUniqueId(), player_skin) + " ")
-                                .append(LegacyComponentSerializer.legacyAmpersand().deserialize(leaveMessage.replace("%player%", name)))
-                        , "uknet:discord_disconnect");
+                Component message = Component.text(TextureUtils.getAvatarUrl(p.getUniqueId(), player_skin) + " ").append(leave_message);
+                instance.chat.broadcastDiscordAnnouncement(message, "disconnect");
             }
         }
 

@@ -56,13 +56,10 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
 
             if (DISCORD_CHAT) {
                 //Discord specific channels.
-                instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord", this);
-                instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord_formatted", this);
+                instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord_chat", this);
+                instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord_announcements", this);
                 instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord_staff", this);
                 instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord_reviewer", this);
-
-                instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord_connect", this);
-                instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:discord_disconnect", this);
             }
 
             if (DISCORD_LINKING) {
@@ -88,13 +85,10 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
 
             if (DISCORD_CHAT) {
                 //Discord specific channels.
-                instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord", this);
-                instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord_formatted", this);
+                instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord_chat", this);
+                instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord_announcements", this);
                 instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord_staff", this);
                 instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord_reviewer", this);
-
-                instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord_connect", this);
-                instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:discord_disconnect", this);
             }
 
             if (DISCORD_LINKING) {
@@ -184,15 +178,8 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
 
     private void sendReceivedMessage(Component component, String channel) {
         switch (channel) {
-
-            case "uknet:globalchat":
-            case "uknet:connect":
-            case "uknet:disconnect":
-
-                Bukkit.getServer().broadcast(component);
-                break;
-
-            case "uknet:reviewer":
+            case "uknet:globalchat", "uknet:connect", "uknet:disconnect" -> Bukkit.getServer().broadcast(component);
+            case "uknet:reviewer" -> {
 
                 //Send only to reviewers.
                 for (Player p : instance.getServer().getOnlinePlayers()) {
@@ -200,9 +187,8 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
                         p.sendMessage(component);
                     }
                 }
-                break;
-
-            case "uknet:staff":
+            }
+            case "uknet:staff" -> {
 
                 //Send only to staff.
                 for (Player p : instance.getServer().getOnlinePlayers()) {
@@ -210,14 +196,12 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
                         p.sendMessage(Component.text("[Staff]", NamedTextColor.RED).append(component));
                     }
                 }
-                break;
-
-            case "uknet:discord":
+            }
+            case "uknet:discord_linking" -> {
 
                 //This is for account linking.
                 String plainMessage = PlainTextComponentSerializer.plainText().serialize(component);
                 String[] args = plainMessage.split(" ");
-
                 if (args[0].equalsIgnoreCase("link")) {
 
                     //Check if player is online.
@@ -258,18 +242,14 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
                         }
                     }
                 }
-
-                break;
-
-            case "uknet:tab":
+            }
+            case "uknet:tab" ->
 
                 //Run a tab update, the structure is the following.
                 //'update/add/remove <uuid>'
                 //This allows us to only update what is necessary.
                 //Make sure it runs after all other scheduled tasks, so it does not front-run the disconnect event if the player just left this server.
-                Bukkit.getScheduler().runTask(instance, () -> Network.getInstance().tab.updateAll(PlainTextComponentSerializer.plainText().serialize(component)));
-
-
+                    Bukkit.getScheduler().runTask(instance, () -> Network.getInstance().tab.updateAll(PlainTextComponentSerializer.plainText().serialize(component)));
         }
     }
 
@@ -340,23 +320,20 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
     //Send afk or no longer afk message to players ingame and discord.
     public void broadcastAFK(Player p, boolean afk) {
 
-        Component chat_message;
-        Component discord_message;
+        Component message;
 
         if (afk) {
-            chat_message = Component.text(p.getName() + " is now afk", NamedTextColor.GRAY);
-            discord_message = Component.text("*" + p.getName() + " is now afk*");
+            message = Component.text(p.getName() + " is now afk", NamedTextColor.GRAY);
         } else {
-            chat_message = Component.text(p.getName() + " is no longer afk", NamedTextColor.GRAY);
-            discord_message = Component.text("*" + p.getName() + " is no longer afk*");
+            message = Component.text(p.getName() + " is no longer afk", NamedTextColor.GRAY);
         }
 
         //Send message
-        broadcastMessage(chat_message, "uknet:globalchat");
+        broadcastMessage(message, "uknet:globalchat");
 
         if (DISCORD_CHAT) {
 
-            broadcastMessage(discord_message, "uknet:discord_formatted");
+            broadcastDiscordAnnouncement(message, "afk");
 
         }
     }
@@ -373,8 +350,18 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
 
         if (DISCORD_CHAT) {
 
-            broadcastMessage(message, "uknet:discord_formatted");
+            broadcastMessage(message, "uknet:discord_chat");
 
         }
+    }
+
+    /**
+     * Broadcasts a discord announcement. The announcement type is used to decide how to use/format the message.
+     *
+     * @param message the message to announce
+     * @param announcement_type the type of announcement
+     */
+    public void broadcastDiscordAnnouncement(Component message, String announcement_type) {
+        broadcastMessage(Component.text(announcement_type).append(Component.text(" ").append(message)), "uknet:discord_announcements");
     }
 }

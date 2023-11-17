@@ -134,7 +134,7 @@ public final class Roles {
             Network.getInstance().chat.broadcastMessage(promotation_message, "uknet:globalchat");
             //Add discord formatting to make the message bold.
             if (DISCORD_CHAT) {
-                Network.getInstance().chat.broadcastMessage(Component.text("**").append(promotation_message).append(Component.text("**")), "uknet:discord_formatted");
+                Network.getInstance().chat.broadcastDiscordAnnouncement(promotation_message, "promotion");
             }
         }
 

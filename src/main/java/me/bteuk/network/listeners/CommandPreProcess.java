@@ -226,9 +226,9 @@ public class CommandPreProcess extends Moderation implements Listener {
 
                 //Run disconnect message.
                 if (DISCORD_CHAT) {
-                    instance.chat.broadcastMessage(Component.text(TextureUtils.getAvatarUrl(u.player.getUniqueId(), player_skin) + " ")
-                                    .append(LegacyComponentSerializer.legacyAmpersand().deserialize(Objects.requireNonNull(CONFIG.getString("chat.custom_messages.leave")).replace("%player%", name)))
-                            , "uknet:discord_disconnect");
+                    Component message = Component.text(TextureUtils.getAvatarUrl(u.player.getUniqueId(), player_skin) + " ")
+                            .append(LegacyComponentSerializer.legacyAmpersand().deserialize(Objects.requireNonNull(CONFIG.getString("chat.custom_messages.leave")).replace("%player%", name)));
+                    instance.chat.broadcastDiscordAnnouncement(message, "disconnect");
                 }
 
             }
