@@ -151,7 +151,7 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
                 broadcastPlayerMessage(e.getPlayer(), e.message().color(NamedTextColor.WHITE), "uknet:globalchat");
 
                 if (DISCORD_CHAT) {
-                    broadcastPlayerMessage(e.getPlayer(), e.message().color(NamedTextColor.WHITE), "uknet:discord");
+                    broadcastPlayerMessage(e.getPlayer(), e.message().color(NamedTextColor.WHITE), "uknet:discord_chat");
                 }
             }
         }
