@@ -101,11 +101,11 @@ public final class Roles {
         //Get console sender.
         ConsoleCommandSender console = Network.getInstance().getServer().getConsoleSender();
 
-        //Remove current builder role.
-        Bukkit.getServer().dispatchCommand(console, "lp user " + uuid + " parent remove " + pRole);
-
         //Add new builder role.
         Bukkit.getServer().dispatchCommand(console, "lp user " + uuid + " parent add " + nRole);
+
+        //Remove current builder role. Remove after adding to make sure the player always has a role.
+        Bukkit.getServer().dispatchCommand(console, "lp user " + uuid + " parent remove " + pRole);
 
         //Update database.
         Network.getInstance().globalSQL.update("UPDATE player_data SET builder_role='" + nRole + "' WHERE uuid='" + uuid + "';");
