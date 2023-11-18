@@ -150,7 +150,7 @@ public class PlotsystemMembers extends Gui {
 
                                     //Kick the member from the plot.
                                     EventManager.createEvent(uuid, "plotsystem", plotSQL.getString("SELECT server FROM location_data WHERE name='" +
-                                            plotSQL.getString("SELECT location FROM zone_data WHERE id=" + id + ";") + "';"), "kick zone " + id);
+                                            plotSQL.getString("SELECT location FROM zones WHERE id=" + id + ";") + "';"), "kick zone " + id);
 
                                     //Return to the previous menu, since otherwise the gui won't have updated.
                                     this.delete();
