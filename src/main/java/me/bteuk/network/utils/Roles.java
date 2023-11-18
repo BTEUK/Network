@@ -14,7 +14,7 @@ import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 public final class Roles {
 
     private static final Component PROMOTION_TEMPLATE = Component.text(" has been promoted to ");
-    private  static final String PROMOTION_SELF = "You have been promoted to ";
+    private static final String PROMOTION_SELF = "You have been promoted to ";
 
     /*
 
@@ -151,6 +151,7 @@ public final class Roles {
 
     /**
      * Maps a technical role name to a display role name.
+     *
      * @param role the role to map
      * @return the display name of that role
      */
@@ -159,31 +160,31 @@ public final class Roles {
         switch (role) {
 
             case "applicant" -> {
-                return("Applicant");
+                return ("Applicant");
             }
 
             case "apprentice" -> {
-                return("Apprentice");
+                return ("Apprentice");
             }
 
             case "jrbuilder" -> {
-                return("Jr.Builder");
+                return ("Jr.Builder");
             }
 
             case "builder" -> {
-                return("Builder");
+                return ("Builder");
             }
 
             case "architect" -> {
-                return("Architect");
+                return ("Architect");
             }
 
             case "reviewer" -> {
-                return("Reviewer");
+                return ("Reviewer");
             }
 
             default -> {
-                return("Default");
+                return ("Default");
             }
         }
     }

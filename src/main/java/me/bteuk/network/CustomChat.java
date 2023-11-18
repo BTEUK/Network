@@ -241,6 +241,19 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
 
                         }
                     }
+                } else if (args[0].equalsIgnoreCase("unlink")) {
+                    //The user may still be in the linked here, while they are no longer in the discord, try removing the link.
+                    try {
+                        long discord_id = Long.parseLong(args[1]);
+                        for (NetworkUser u : instance.getUsers()) {
+                            if (u.isLinked && u.discord_id == discord_id) {
+                                // Unlink
+                                u.isLinked = false;
+                            }
+                        }
+                    } catch (NumberFormatException e) {
+                        LOGGER.severe("An unlink event was sent with a non-long discord id: " + plainMessage);
+                    }
                 }
             }
             case "uknet:tab" ->
