@@ -248,10 +248,8 @@ public class ZoneInfo extends Gui {
     }
 
     public void refresh() {
-
         this.clearGui();
         createGui();
-
     }
 
     private void setExtendZoneDurationItem(int slot, ZoneExtensionTime extension) {

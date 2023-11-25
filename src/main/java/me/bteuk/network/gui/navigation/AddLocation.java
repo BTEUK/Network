@@ -396,7 +396,8 @@ public class AddLocation extends Gui {
                         globalSQL.update("DELETE FROM location_requests WHERE location='" + name + "';");
 
                         //Notify player.
-                        u.player.sendMessage(Utils.error("Denied location request &4" + name + "&c."));
+                        u.player.sendMessage(Utils.error("Denied location request ")
+                                        .append(Component.text(name, NamedTextColor.DARK_RED)));
 
                         //Delete gui and return to previous menu.
                         this.delete();
