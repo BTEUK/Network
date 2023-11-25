@@ -6,6 +6,7 @@ import me.bteuk.network.gui.Gui;
 import me.bteuk.network.gui.InviteMembers;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
+import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Time;
 import me.bteuk.network.utils.Utils;
@@ -23,6 +24,8 @@ public class ZoneInfo extends Gui {
     private final int zoneID;
     private final String uuid;
 
+    private final PlotSQL plotSQL;
+
     public ZoneInfo(int zoneID, String uuid) {
 
         super(27, Component.text("Zone " + zoneID, NamedTextColor.AQUA, TextDecoration.BOLD));
@@ -30,14 +33,15 @@ public class ZoneInfo extends Gui {
         this.zoneID = zoneID;
         this.uuid = uuid;
 
+        //Get plot sql.
+        plotSQL = Network.getInstance().plotSQL;
+
         createGui();
 
     }
 
     public void createGui() {
 
-        //Get plot sql.
-        PlotSQL plotSQL = Network.getInstance().plotSQL;
 
         //Get global sql.
         GlobalSQL globalSQL = Network.getInstance().globalSQL;
@@ -192,92 +196,9 @@ public class ZoneInfo extends Gui {
             }
 
             //Extend zone duration (can't exceed maximum of 48 hours).
-            setItem(21, Utils.createItem(Material.CLOCK, 2,
-                            Utils.title("Extend Zone Duration by 2 Hours"),
-                            Utils.line("Increases the expiration time"),
-                            Utils.line("of the zone by 2 hours,"),
-                            Utils.line("can't exceed the maximum of 48 hours.")),
-                    u -> {
-
-                        //Get expiration time.
-                        long expiration = plotSQL.getLong("SELECT expiration FROM zones WHERE id=" + zoneID + ";") + (1000L * 60L * 60L * 2L);
-
-                        //Get maximum expiration time.
-                        long max_time = Time.currentTime() + 1000L * 60L * 60L * 48L;
-
-                        if (expiration > max_time) {
-
-                            plotSQL.update("UPDATE zones SET expiration=" + max_time + " WHERE id=" + zoneID);
-                            u.player.sendMessage(Utils.success("Set Zone expiration time to ").append(Component.text(Time.getDateTime(max_time), NamedTextColor.DARK_AQUA)));
-
-                        } else {
-
-                            plotSQL.update("UPDATE zones SET expiration=" + expiration + " WHERE id=" + zoneID);
-                            u.player.sendMessage(Utils.success("Set Zone expiration time to ").append(Component.text(Time.getDateTime(expiration), NamedTextColor.DARK_AQUA)));
-
-                        }
-
-                        u.player.closeInventory();
-
-                    });
-
-            setItem(22, Utils.createItem(Material.CLOCK, 6,
-                            Utils.title("Extend Zone Duration by 6 Hours"),
-                            Utils.line("Increases the expiration time"),
-                            Utils.line("of the zone by 6 hours,"),
-                            Utils.line("can't exceed the maximum of 48 hours.")),
-                    u -> {
-
-                        //Get expiration time.
-                        long expiration = plotSQL.getLong("SELECT expiration FROM zones WHERE id=" + zoneID + ";") + (1000L * 60L * 60L * 6L);
-
-                        //Get maximum expiration time.
-                        long max_time = Time.currentTime() + 1000L * 60L * 60L * 48L;
-
-                        if (expiration > max_time) {
-
-                            plotSQL.update("UPDATE zones SET expiration=" + max_time + " WHERE id=" + zoneID);
-                            u.player.sendMessage(Utils.success("Set Zone expiration time to &3" + Time.getDateTime(max_time)));
-
-                        } else {
-
-                            plotSQL.update("UPDATE zones SET expiration=" + expiration + " WHERE id=" + zoneID);
-                            u.player.sendMessage(Utils.success("Set Zone expiration time to &3" + Time.getDateTime(expiration)));
-
-                        }
-
-                        u.player.closeInventory();
-
-                    });
-
-            setItem(23, Utils.createItem(Material.CLOCK, 24,
-                            Utils.title("Extend Zone Duration by 24 Hours"),
-                            Utils.line("Increases the expiration time"),
-                            Utils.line("of the zone by 24 hours,"),
-                            Utils.line("can't exceed the maximum of 48 hours.")),
-                    u -> {
-
-                        //Get expiration time.
-                        long expiration = plotSQL.getLong("SELECT expiration FROM zones WHERE id=" + zoneID + ";") + (1000L * 60L * 60L * 24L);
-
-                        //Get maximum expiration time.
-                        long max_time = Time.currentTime() + 1000L * 60L * 60L * 48L;
-
-                        if (expiration > max_time) {
-
-                            plotSQL.update("UPDATE zones SET expiration=" + max_time + " WHERE id=" + zoneID);
-                            u.player.sendMessage(Utils.success("Set Zone expiration time to &3" + Time.getDateTime(max_time)));
-
-                        } else {
-
-                            plotSQL.update("UPDATE zones SET expiration=" + expiration + " WHERE id=" + zoneID);
-                            u.player.sendMessage(Utils.success("Set Zone expiration time to &3" + Time.getDateTime(expiration)));
-
-                        }
-
-                        u.player.closeInventory();
-
-                    });
+            setExtendZoneDurationItem(21, ZoneExtensionTime.HOUR_2);
+            setExtendZoneDurationItem(22, ZoneExtensionTime.HOUR_6);
+            setExtendZoneDurationItem(23, ZoneExtensionTime.HOUR_24);
 
         } else {
 
@@ -331,5 +252,41 @@ public class ZoneInfo extends Gui {
         this.clearGui();
         createGui();
 
+    }
+
+    private void setExtendZoneDurationItem(int slot, ZoneExtensionTime extension) {
+        setItem(slot, Utils.createItem(Material.CLOCK, extension.hours,
+                        Utils.title("Extend Zone Duration by " + extension.hours + " Hours"),
+                        Utils.line("Increases the expiration time"),
+                        Utils.line("of the zone by " + extension.hours + " hours,"),
+                        Utils.line("can't exceed the maximum of " + ZoneExtensionTime.HOUR_48.hours + " hours.")),
+                u -> {
+                    //Get expiration time.
+                    long expiration = plotSQL.getLong("SELECT expiration FROM zones WHERE id=" + zoneID + ";") + extension.time;
+
+                    //Get maximum expiration time.
+                    long max_time = Time.currentTime() + ZoneExtensionTime.HOUR_48.time;
+
+                    plotSQL.update("UPDATE zones SET expiration=" + Math.min(expiration, max_time) + " WHERE id=" + zoneID);
+                    u.player.sendMessage(Utils.success("Set Zone expiration time to ")
+                            .append(Component.text(Time.getDateTime(Math.min(expiration, max_time)), NamedTextColor.DARK_AQUA)));
+
+                    u.player.closeInventory();
+                });
+    }
+
+    private enum ZoneExtensionTime {
+        HOUR_2(2, 1000L * 60L * 60L * 2L),
+        HOUR_6(6, 1000L * 60L * 60L * 6L),
+        HOUR_24(24, 1000L * 60L * 60L * 24L),
+        HOUR_48(48, 1000L * 60L * 60L * 48L);
+
+        private final int hours;
+        private final long time;
+
+        ZoneExtensionTime(int hours, long time) {
+            this.hours = hours;
+            this.time = time;
+        }
     }
 }
