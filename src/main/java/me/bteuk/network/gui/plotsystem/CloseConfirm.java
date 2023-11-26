@@ -61,7 +61,7 @@ public class CloseConfirm extends Gui {
                     u.mainGui = null;
 
                     //Switch back to zone info.
-                    u.mainGui = new ZoneInfo(id, u.player.getUniqueId().toString());
+                    u.mainGui = new ZoneInfo(u, id, u.player.getUniqueId().toString());
                     u.mainGui.open(u);
 
                 });

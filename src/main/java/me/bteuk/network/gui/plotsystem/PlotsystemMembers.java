@@ -137,7 +137,7 @@ public class PlotsystemMembers extends Gui {
                                     u.mainGui = null;
 
                                     //Switch back to plot info.
-                                    u.mainGui = new PlotInfo(id, u.player.getUniqueId().toString());
+                                    u.mainGui = new PlotInfo(u, id, u.player.getUniqueId().toString());
                                     u.mainGui.open(u);
 
                                 } else {
@@ -157,7 +157,7 @@ public class PlotsystemMembers extends Gui {
                                     u.mainGui = null;
 
                                     //Switch back to plot info.
-                                    u.mainGui = new ZoneInfo(id, u.player.getUniqueId().toString());
+                                    u.mainGui = new ZoneInfo(u, id, u.player.getUniqueId().toString());
                                     u.mainGui.open(u);
 
                                 } else {
@@ -191,11 +191,11 @@ public class PlotsystemMembers extends Gui {
                     //Switch back to plot info.
                     if (regionType == RegionType.PLOT) {
 
-                        u.mainGui = new PlotInfo(id, u.player.getUniqueId().toString());
+                        u.mainGui = new PlotInfo(u, id, u.player.getUniqueId().toString());
 
                     } else {
 
-                        u.mainGui = new ZoneInfo(id, u.player.getUniqueId().toString());
+                        u.mainGui = new ZoneInfo(u, id, u.player.getUniqueId().toString());
 
                     }
 

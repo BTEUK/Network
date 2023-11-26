@@ -26,10 +26,13 @@ public class ZoneInfo extends Gui {
 
     private final PlotSQL plotSQL;
 
-    public ZoneInfo(int zoneID, String uuid) {
+    private final NetworkUser user;
+
+    public ZoneInfo(NetworkUser user, int zoneID, String uuid) {
 
         super(27, Component.text("Zone " + zoneID, NamedTextColor.AQUA, TextDecoration.BOLD));
 
+        this.user = user;
         this.zoneID = zoneID;
         this.uuid = uuid;
 
@@ -248,8 +251,21 @@ public class ZoneInfo extends Gui {
     }
 
     public void refresh() {
+
         this.clearGui();
-        createGui();
+
+        // If the plot no longer exists, return to the plot menu.
+        if (Network.getInstance().plotSQL.hasRow("SELECT id FROM zones WHERE id=" + zoneID + ";")) {
+            createGui();
+        } else {
+            //Delete this gui.
+            this.delete();
+            user.mainGui = null;
+
+            //Switch back to plot menu.
+            user.mainGui = new ZoneMenu(user);
+            user.mainGui.open(user);
+        }
     }
 
     private void setExtendZoneDurationItem(int slot, ZoneExtensionTime extension) {
