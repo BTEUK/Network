@@ -14,7 +14,7 @@ import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 public final class Roles {
 
     private static final Component PROMOTION_TEMPLATE = Component.text(" has been promoted to ");
-    private  static final String PROMOTION_SELF = "You have been promoted to ";
+    private static final String PROMOTION_SELF = "You have been promoted to ";
 
     /*
 
@@ -101,11 +101,11 @@ public final class Roles {
         //Get console sender.
         ConsoleCommandSender console = Network.getInstance().getServer().getConsoleSender();
 
-        //Remove current builder role.
-        Bukkit.getServer().dispatchCommand(console, "lp user " + uuid + " parent remove " + pRole);
-
         //Add new builder role.
         Bukkit.getServer().dispatchCommand(console, "lp user " + uuid + " parent add " + nRole);
+
+        //Remove current builder role. Remove after adding to make sure the player always has a role.
+        Bukkit.getServer().dispatchCommand(console, "lp user " + uuid + " parent remove " + pRole);
 
         //Update database.
         Network.getInstance().globalSQL.update("UPDATE player_data SET builder_role='" + nRole + "' WHERE uuid='" + uuid + "';");
@@ -134,7 +134,7 @@ public final class Roles {
             Network.getInstance().chat.broadcastMessage(promotation_message, "uknet:globalchat");
             //Add discord formatting to make the message bold.
             if (DISCORD_CHAT) {
-                Network.getInstance().chat.broadcastMessage(Component.text("**").append(promotation_message).append(Component.text("**")), "uknet:discord_formatted");
+                Network.getInstance().chat.broadcastDiscordAnnouncement(promotation_message, "promotion");
             }
         }
 
@@ -151,6 +151,7 @@ public final class Roles {
 
     /**
      * Maps a technical role name to a display role name.
+     *
      * @param role the role to map
      * @return the display name of that role
      */
@@ -159,31 +160,31 @@ public final class Roles {
         switch (role) {
 
             case "applicant" -> {
-                return("Applicant");
+                return ("Applicant");
             }
 
             case "apprentice" -> {
-                return("Apprentice");
+                return ("Apprentice");
             }
 
             case "jrbuilder" -> {
-                return("Jr.Builder");
+                return ("Jr.Builder");
             }
 
             case "builder" -> {
-                return("Builder");
+                return ("Builder");
             }
 
             case "architect" -> {
-                return("Architect");
+                return ("Architect");
             }
 
             case "reviewer" -> {
-                return("Reviewer");
+                return ("Reviewer");
             }
 
             default -> {
-                return("Default");
+                return ("Default");
             }
         }
     }

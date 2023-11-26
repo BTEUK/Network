@@ -196,7 +196,7 @@ public class InviteMembers extends Gui {
                         u.mainGui = null;
 
                         //Switch back to plot info.
-                        u.mainGui = new PlotInfo(plotID, u.player.getUniqueId().toString());
+                        u.mainGui = new PlotInfo(u, plotID, u.player.getUniqueId().toString());
                         u.mainGui.open(u);
 
                     });
@@ -217,7 +217,7 @@ public class InviteMembers extends Gui {
                         u.mainGui = null;
 
                         //Switch back to plot info.
-                        u.mainGui = new ZoneInfo(zoneID, u.player.getUniqueId().toString());
+                        u.mainGui = new ZoneInfo(u, zoneID, u.player.getUniqueId().toString());
                         u.mainGui.open(u);
 
                     });

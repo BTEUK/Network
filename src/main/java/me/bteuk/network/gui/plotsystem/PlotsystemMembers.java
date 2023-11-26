@@ -137,7 +137,7 @@ public class PlotsystemMembers extends Gui {
                                     u.mainGui = null;
 
                                     //Switch back to plot info.
-                                    u.mainGui = new PlotInfo(id, u.player.getUniqueId().toString());
+                                    u.mainGui = new PlotInfo(u, id, u.player.getUniqueId().toString());
                                     u.mainGui.open(u);
 
                                 } else {
@@ -150,14 +150,14 @@ public class PlotsystemMembers extends Gui {
 
                                     //Kick the member from the plot.
                                     EventManager.createEvent(uuid, "plotsystem", plotSQL.getString("SELECT server FROM location_data WHERE name='" +
-                                            plotSQL.getString("SELECT location FROM zone_data WHERE id=" + id + ";") + "';"), "kick zone " + id);
+                                            plotSQL.getString("SELECT location FROM zones WHERE id=" + id + ";") + "';"), "kick zone " + id);
 
                                     //Return to the previous menu, since otherwise the gui won't have updated.
                                     this.delete();
                                     u.mainGui = null;
 
                                     //Switch back to plot info.
-                                    u.mainGui = new ZoneInfo(id, u.player.getUniqueId().toString());
+                                    u.mainGui = new ZoneInfo(u, id, u.player.getUniqueId().toString());
                                     u.mainGui.open(u);
 
                                 } else {
@@ -191,11 +191,11 @@ public class PlotsystemMembers extends Gui {
                     //Switch back to plot info.
                     if (regionType == RegionType.PLOT) {
 
-                        u.mainGui = new PlotInfo(id, u.player.getUniqueId().toString());
+                        u.mainGui = new PlotInfo(u, id, u.player.getUniqueId().toString());
 
                     } else {
 
-                        u.mainGui = new ZoneInfo(id, u.player.getUniqueId().toString());
+                        u.mainGui = new ZoneInfo(u, id, u.player.getUniqueId().toString());
 
                     }
 
