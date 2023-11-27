@@ -303,7 +303,7 @@ public final class Network extends JavaPlugin {
         //Create the rules book.
         lobby.loadRules();
         //Command to view the rules.
-        getCommand("rules").setExecutor(new Rules());
+        new Rules(this);
         if (SERVER_TYPE == ServerType.LOBBY) {
 
             //Set spawn location and enable auto-spawn teleport when falling in the void.
@@ -313,7 +313,7 @@ public final class Network extends JavaPlugin {
             lobby.reloadPortals();
 
             //Create portals reload command.
-            getCommand("portals").setExecutor(new Portals(lobby));
+            new Portals(this, lobby);
 
             //Set the rules lectern.
             lobby.setLectern();
@@ -328,7 +328,7 @@ public final class Network extends JavaPlugin {
         }
 
         //Enable commands.
-        getCommand("plot").setExecutor(new Plot());
+        new Plot(this);
         getCommand("zone").setExecutor(new Zone());
 
         getCommand("navigator").setExecutor(new Navigator());

@@ -2,29 +2,33 @@ package me.bteuk.network.commands;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.events.EventManager;
-import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.Utils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class Plot implements CommandExecutor {
+public class Plot extends AbstractCommand {
+
+    private static final Component ERROR = Utils.error("/plot join <plotID>");
+
+    public Plot(Network instance) {
+        super(instance, "plot");
+    }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
 
-        if (!(sender instanceof Player p)) {
+        Player p = getPlayer(sender);
 
-            sender.sendMessage(Utils.error("You must be a player to run this command."));
+        if (p == null) {
             return true;
-
         }
 
         if (args.length < 2) {
-            p.sendMessage(Utils.error("/plot join <plotID>"));
+            p.sendMessage(ERROR);
             return true;
         }
 
@@ -36,17 +40,16 @@ public class Plot implements CommandExecutor {
             plotID = Integer.parseInt(args[1]);
 
         } catch (NumberFormatException e) {
-            p.sendMessage(Utils.error("/plot join <plotID>"));
+            p.sendMessage(ERROR);
             return true;
         }
 
         //Check if the first arg is 'join'
         if (!args[0].equals("join")) {
-            p.sendMessage(Utils.error("/plot join <plotID>"));
+            p.sendMessage(ERROR);
             return true;
         }
 
-        GlobalSQL globalSQL = Network.getInstance().globalSQL;
         PlotSQL plotSQL = Network.getInstance().plotSQL;
 
         //Check if they have an invite for this plot.

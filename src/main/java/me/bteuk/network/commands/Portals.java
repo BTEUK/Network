@@ -1,18 +1,19 @@
 package me.bteuk.network.commands;
 
+import me.bteuk.network.Network;
 import me.bteuk.network.lobby.Lobby;
 import me.bteuk.network.utils.Utils;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class Portals implements CommandExecutor {
+public class Portals extends AbstractCommand {
 
     private final Lobby lobby;
 
-    public Portals(Lobby lobby) {
+    public Portals(Network instance, Lobby lobby) {
+        super(instance, "portals");
         this.lobby = lobby;
     }
 
@@ -22,13 +23,12 @@ public class Portals implements CommandExecutor {
         //Check permission if player.
         if (sender instanceof Player p) {
             if (!p.hasPermission("uknet.lobby.portals.reload")) {
-                sender.sendMessage(Utils.error("You do not have permission to use this command."));
+                sender.sendMessage(NO_PERMISSION);
                 return true;
             }
         }
 
         if (args.length > 0) {
-
             if (args[0].equals("reload")) {
                 lobby.reloadPortals();
                 sender.sendMessage(Utils.success("Reloaded portals"));
@@ -38,9 +38,7 @@ public class Portals implements CommandExecutor {
         } else {
             error(sender);
         }
-
         return true;
-
     }
 
     private void error(CommandSender sender) {
