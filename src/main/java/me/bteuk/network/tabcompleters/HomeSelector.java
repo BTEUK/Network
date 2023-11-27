@@ -18,22 +18,11 @@ public class HomeSelector implements TabCompleter {
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command
             command, @NotNull String label, @NotNull String[] args) {
 
-        List<String> homes = Network.getInstance().globalSQL.getStringList("SELECT name FROM home WHERE uuid='" + ((Player) sender).getUniqueId() + "' AND name IS NOT NULL;");
-        List<String> returns = new ArrayList<>();
-
-        if (args.length == 0) {
-
-            return homes;
-
-        } else if (args.length == 1) {
-
-            StringUtil.copyPartialMatches(args[0], homes, returns);
-            return returns;
-
+        if (sender instanceof Player p) {
+            List<String> homes = Network.getInstance().globalSQL.getStringList("SELECT name FROM home WHERE uuid='" + p.getUniqueId() + "' AND name IS NOT NULL;");
+            return TabCompleterForArg.onTabCompleteForArg(args, 0, homes);
         } else {
-
             return null;
-
         }
     }
 }

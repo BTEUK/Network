@@ -221,7 +221,6 @@ public final class Network extends JavaPlugin {
             initDb("dbsetup_plots.sql", plot_dataSource);
 
         } catch (SQLException | IOException e) {
-            e.printStackTrace();
             getLogger().severe("Failed to connect to the database, please check that you have set the config values correctly.");
             return;
         }
