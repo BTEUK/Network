@@ -26,8 +26,8 @@ roles:
     prefix: '[Apprentice]'
     colour: '&#efb70c'
   jrbuilder:
-    name: 'Jr\.Builder'
-    prefix: '[Jr\.Builder]'
+    name: 'Jr.Builder'
+    prefix: '[Jr.Builder]'
     colour: '&#d78426'
   builder:
     name: 'Builder'
@@ -180,3 +180,10 @@ region_inactivity: 30
 
 #Discord link
 discord: 'https://discord.gg/5m56EgEVW6'
+
+#Progression
+progression:
+  enabled: false
+  announce_level-ups:
+    overall: false
+    seasonal: true

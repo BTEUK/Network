@@ -179,3 +179,21 @@ CREATE TABLE IF NOT EXISTS home
     CONSTRAINT fk_home_1 FOREIGN KEY(coordinate_id) REFERENCES coordinates(id),
     CONSTRAINT fk_home_2 FOREIGN KEY(uuid) REFERENCES player_data(uuid)
 );
+
+CREATE TABLE IF NOT EXISTS seasons
+(
+    id          VARCHAR(64)     NOT NULL,
+    active      TINYINT(1)      NOT NULL DEFAULT 0,
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE IF NOT EXISTS progression
+(
+    season      VARCHAR(64)     NOT NULL,
+    uuid        CHAR(36)        NOT NULL,
+    lvl         INT             NOT NULL DEFAULT 1,
+    exp         INT             NOT NULL DEFAULT 0,
+    PRIMARY KEY(season, uuid),
+    CONSTRAINT fk_progression_1 FOREIGN KEY(season) REFERENCES seasons(id),
+    CONSTRAINT fk_progression_2 FOREIGN KEY(uuid) REFERENCES player_data(uuid)
+);

@@ -1,7 +1,9 @@
 package me.bteuk.network.listeners;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.exceptions.NotMutedException;
 import me.bteuk.network.utils.*;
+import me.bteuk.network.utils.staff.Moderation;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -20,7 +22,7 @@ import java.util.Objects;
 import static me.bteuk.network.utils.Constants.*;
 import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
-public class CommandPreProcess implements Listener {
+public class CommandPreProcess extends Moderation implements Listener {
 
     private final Network instance;
 
@@ -76,6 +78,22 @@ public class CommandPreProcess implements Listener {
             if (Bukkit.getServer().getPluginManager().getPlugin("skulls") != null) {
                 e.setMessage(e.getMessage().replace("/hdb", "/skulls"));
             }
+        } else if (isCommand(e.getMessage(), "/tell", "/msg", "/w", "/me")) {
+            //If player is muted cancel.
+            if (isMuted(e.getPlayer().getUniqueId().toString())) {
+                e.setCancelled(true);
+                try {
+
+                    //Send message and end event.
+                    e.getPlayer().sendMessage(getMutedComponent(e.getPlayer().getUniqueId().toString()));
+
+                } catch (NotMutedException ex) {
+
+                    //Unset the muted status.
+                    e.setCancelled(false);
+
+                }
+            }
         }
     }
 
@@ -88,6 +106,15 @@ public class CommandPreProcess implements Listener {
      */
     private boolean isCommand(String message, String command) {
         return (message.startsWith(command + " ") || message.equalsIgnoreCase(command));
+    }
+
+    private boolean isCommand(String message, String... commands) {
+        for (String command : commands) {
+            if (isCommand(message, command)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @EventHandler
@@ -199,9 +226,9 @@ public class CommandPreProcess implements Listener {
 
                 //Run disconnect message.
                 if (DISCORD_CHAT) {
-                    instance.chat.broadcastMessage(Component.text(TextureUtils.getAvatarUrl(u.player.getUniqueId(), player_skin) + " ")
-                                    .append(LegacyComponentSerializer.legacyAmpersand().deserialize(Objects.requireNonNull(CONFIG.getString("chat.custom_messages.leave")).replace("%player%", name)))
-                            , "uknet:discord_disconnect");
+                    Component message = Component.text(TextureUtils.getAvatarUrl(u.player.getUniqueId(), player_skin) + " ")
+                            .append(LegacyComponentSerializer.legacyAmpersand().deserialize(Objects.requireNonNull(CONFIG.getString("chat.custom_messages.leave")).replace("%player%", name)));
+                    instance.chat.broadcastDiscordAnnouncement(message, "disconnect");
                 }
 
             }

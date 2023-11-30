@@ -69,7 +69,7 @@ public class ZoneMenu extends Gui {
                             u.mainGui = null;
 
                             //Switch to zone info.
-                            u.mainGui = new ZoneInfo(zones.get(finalI), u.player.getUniqueId().toString());
+                            u.mainGui = new ZoneInfo(u, zones.get(finalI), u.player.getUniqueId().toString());
                             u.mainGui.open(u);
 
                         });

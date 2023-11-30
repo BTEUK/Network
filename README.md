@@ -1,4 +1,4 @@
-# Network V1.3.0
+# Network V1.3.1
 Developed by: [@LM-Wolfert](https://www.github.com/LM-Wolfert)
 ___
 A general purpose Minecraft plugin for BTE-related server features.
@@ -26,4 +26,4 @@ Features such as global chat and discord integration require a Velocity Proxy, r
 - [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/)
 - [Protocollib](https://www.spigotmc.org/resources/protocollib.1997/)
 ## PlotSystem
-The Network plugin is the backbone of the [PlotSystem](https://github.com/BTEUK/Network), it adds the GUIs and cross-server compatibility that make the PlotSystem function on a multi-server Network.
+The Network plugin is the backbone of the [PlotSystem](https://github.com/BTEUK/Plotsystem), it adds the GUIs and cross-server compatibility that make the PlotSystem function on a multi-server Network.
