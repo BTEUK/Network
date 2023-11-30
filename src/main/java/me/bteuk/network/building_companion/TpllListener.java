@@ -61,7 +61,12 @@ public class TpllListener implements Listener {
 
             l = Tpll.applyCoordinateTransformIfPlotSystem(region, l);
 
-            //Verify that location is valid. (It must be in a buildable region/plot for the player)
+            //TODO: Verify that location is valid. (It must be in a buildable region/plot for the player)
+            if (false) {
+                //Notify the player!
+            }
+
+            //Add a new corner, or update an existing one.
 
         }
     }

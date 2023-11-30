@@ -2,9 +2,7 @@ package me.bteuk.network.building_companion;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.utils.NetworkUser;
-import me.bteuk.network.utils.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -26,9 +24,6 @@ public class HotbarControl implements Listener {
 
         this.companion = companion;
 
-        //TODO: Create hotbar items.
-        Utils.createItem(Material.EMERALD, 1, Utils.title("Review Menu"), Utils.line("Click to open review menu."));
-
         //Register listeners.
         Bukkit.getServer().getPluginManager().registerEvents(this, Network.getInstance());
 
@@ -45,14 +40,13 @@ public class HotbarControl implements Listener {
             return;
         }
 
-        //Check if player equals the reviewer.
-        if (!e.getWhoClicked().equals(u.player)) {
+        //Check if player equals the companion owner.
+        if (!companion.playerEquals((Player) e.getWhoClicked())) {
             return;
         }
 
-        User u = PlotSystem.getInstance().getUser((Player) e.getWhoClicked());
-
         //If item is review gui then open the gui.
+
         if (e.getCurrentItem().equals(reviewGuiItem)) {
             e.setCancelled(true);
 
