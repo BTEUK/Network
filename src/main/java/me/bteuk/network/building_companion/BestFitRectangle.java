@@ -42,23 +42,19 @@ public class BestFitRectangle {
             return false;
         }
         double[][] sortedPoints = getSortedPoints(pointDIndex);
-        System.out.println("Sorted Points: " + Arrays.deepToString(sortedPoints));
         Line[] initialLines = getInitialLines(sortedPoints);
-        System.out.println(Arrays.toString(initialLines));
 
         // Create right-angled lines.
         // This implies, line A and B are at the same angle.
         // Line C and D are at the same angle.
         // That the lines together form a rectangle (90-degree corners between the lines).
         Line[] lines = getRightAngledLines(initialLines);
-        System.out.println(Arrays.toString(lines));
 
         // Use an iterative process to find the best placement of the line.
         // This will be done by cycling through the lines and adjusting the b-value marginally.
         // We do this until the distance of the corner does not decrease the summed distance
         // for both the corners of the line to the initial corners.
         improveLinePlacement(lines, sortedPoints);
-        System.out.println(Arrays.toString(lines));
 
         // Set the output corners.
         output = new double[][]{
@@ -188,7 +184,6 @@ public class BestFitRectangle {
             min = angles[0];
             max = angles[3];
         }
-        System.out.println("Angles: " + Arrays.toString(angles));
         return (Arrays.stream(angles).sum() / 4);
     }
 
@@ -247,7 +242,6 @@ public class BestFitRectangle {
             isDone[3] = true;
             timeout--;
         }
-        System.out.println(timeout);
     }
 
     private double getSummedDistance(double[] cornerA, double[] pointA, double[] cornerB, double[] pointB) {

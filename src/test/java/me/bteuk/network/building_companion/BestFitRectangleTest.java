@@ -8,7 +8,6 @@ class BestFitRectangleTest {
 
     @Test
     void testSimpleCorners() {
-
         double[][] input = new double[][] {
                 new double[] {0, 0},
                 new double[] {4, 0.5},
@@ -20,12 +19,10 @@ class BestFitRectangleTest {
         rectangle.findBestFitRectangleCorners();
 
         System.out.println(Arrays.deepToString(rectangle.getOutput()));
-
     }
 
     @Test
     void testPerfectRectangle() {
-
         double[][] input = new double[][] {
                 new double[] {0, 0},
                 new double[] {3, 2},
@@ -37,12 +34,10 @@ class BestFitRectangleTest {
         rectangle.findBestFitRectangleCorners();
 
         System.out.println(Arrays.deepToString(rectangle.getOutput()));
-
     }
 
     @Test
     void testComplexCorners() {
-
         double[][] input = new double[][] {
                 new double[] {25, 25},
                 new double[] {27, 30},
@@ -54,12 +49,10 @@ class BestFitRectangleTest {
         rectangle.findBestFitRectangleCorners();
 
         System.out.println(Arrays.deepToString(rectangle.getOutput()));
-
     }
 
     @Test
     void testComplexNumbers() {
-
         double[][] input = new double[][] {
                 new double[] {25.667, 25.1},
                 new double[] {27.99, 30.2},
@@ -71,6 +64,20 @@ class BestFitRectangleTest {
         rectangle.findBestFitRectangleCorners();
 
         System.out.println(Arrays.deepToString(rectangle.getOutput()));
+    }
 
+    @Test
+    void testWeirdShape() {
+        double[][] input = new double[][] {
+                new double[] {0, 0},
+                new double[] {-5, 0.2},
+                new double[] {-6, 30},
+                new double[] {5, 0.2}
+        };
+
+        BestFitRectangle rectangle = new BestFitRectangle(null, input);
+        rectangle.findBestFitRectangleCorners();
+
+        System.out.println(Arrays.deepToString(rectangle.getOutput()));
     }
 }
