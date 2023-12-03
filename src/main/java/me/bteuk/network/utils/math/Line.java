@@ -1,6 +1,7 @@
 package me.bteuk.network.utils.math;
 
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Representation of a line.
@@ -9,7 +10,8 @@ import lombok.Getter;
 public class Line {
 
     private final double a;
-    private final double b;
+    @Setter
+    private double b;
 
     public Line(double[] pointA, double[] pointB) {
         // Calculate the slope A and B, the starting y at x=0.
@@ -20,10 +22,6 @@ public class Line {
     public Line(double a, double b) {
         this.a = a;
         this.b = b;
-    }
-
-    public static double distanceToLine(double[] point, Line line) {
-
     }
 
     /**
@@ -44,5 +42,14 @@ public class Line {
         double y = (lineA.a * x) + lineA.b;
         // Return the coordinate as a double[].
         return new double[]{x, y};
+    }
+
+    public Line copyWithOffsetB(double offsetB) {
+        return new Line(a, b + offsetB);
+    }
+
+    @Override
+    public String toString() {
+        return "[Line] a=" + a + ", b=" + b;
     }
 }
