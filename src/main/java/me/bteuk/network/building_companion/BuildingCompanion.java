@@ -142,6 +142,15 @@ public class BuildingCompanion {
         if (input_corners.size() == 4) {
             // Get the average of the corners.
             double[][] corners = input_corners.stream().map(this::getAverage).toArray(double[][]::new);
+
+            // Fit the corners to a rectangle.
+            BestFitRectangle rectangle = new BestFitRectangle(user, corners);
+            rectangle.findBestFitRectangleCorners();
+            double[][] fitted_corners = rectangle.getOutput();
+
+            // Get Minecraft usable corners from the output.
+            // Find the option with the least error, while keeping the walls parallel.
+            int[][] output = MinecraftRectangleConverter.convertRectangleToMinecraftCoordinates(fitted_corners);
         }
     }
 

@@ -19,6 +19,7 @@ class BestFitRectangleTest {
         rectangle.findBestFitRectangleCorners();
 
         System.out.println(Arrays.deepToString(rectangle.getOutput()));
+        System.out.println(Arrays.deepToString(MinecraftRectangleConverter.convertRectangleToMinecraftCoordinates(rectangle.getOutput())));
     }
 
     @Test
@@ -79,5 +80,6 @@ class BestFitRectangleTest {
         rectangle.findBestFitRectangleCorners();
 
         System.out.println(Arrays.deepToString(rectangle.getOutput()));
+        System.out.println(Arrays.deepToString(MinecraftRectangleConverter.convertRectangleToMinecraftCoordinates(rectangle.getOutput())));
     }
 }
