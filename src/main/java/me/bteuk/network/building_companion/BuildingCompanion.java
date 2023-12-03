@@ -139,7 +139,10 @@ public class BuildingCompanion {
     }
 
     private void drawOutline() {
-
+        if (input_corners.size() == 4) {
+            // Get the average of the corners.
+            double[][] corners = input_corners.stream().map(this::getAverage).toArray(double[][]::new);
+        }
     }
 
     private record ItemEvent(@Getter int slot, Runnable event) {
