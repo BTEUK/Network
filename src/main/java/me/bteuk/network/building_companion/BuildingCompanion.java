@@ -151,6 +151,9 @@ public class BuildingCompanion {
             // Get Minecraft usable corners from the output.
             // Find the option with the least error, while keeping the walls parallel.
             int[][] output = MinecraftRectangleConverter.convertRectangleToMinecraftCoordinates(fitted_corners);
+
+            // Optimise the corners for Minecraft.
+            output = MinecraftRectangleConverter.optimiseForBlockSize(output);
         }
     }
 
