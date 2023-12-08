@@ -1,12 +1,14 @@
 package me.bteuk.network.building_companion;
 
 import lombok.Getter;
-import me.bteuk.network.utils.FakeBlocks;
+import me.bteuk.network.Network;
+import me.bteuk.network.utils.Blocks;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -15,8 +17,11 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * This class stored all the information about the building companion.
@@ -26,6 +31,8 @@ import java.util.Set;
 public class BuildingCompanion {
 
     private static final int MAX_DISTANCE = 2;
+
+    private static final long TIMEOUT = 20 * 15;
 
     // Set of inputs for each corner. No duplicates can exist in a set,
     // this prevents the player from teleporting to the same corner multiple times
@@ -41,12 +48,17 @@ public class BuildingCompanion {
 
     private World world;
 
+    private final Map<UUID, int[][]> saved_corners;
+
+    private boolean asyncActive = false;
+
     public BuildingCompanion(NetworkUser user) {
 
         this.user = user;
         this.world = user.player.getWorld();
         //itemEvents = new HashMap<>();
         input_corners = new HashSet<>();
+        saved_corners = new HashMap<>();
 
         // Enable the tpll listener.
         listeners = new HashSet<>();
@@ -64,6 +76,31 @@ public class BuildingCompanion {
 
     }
 
+    public void clearSelection() {
+        input_corners.clear();
+        sendFeedback(Utils.error("Your selection has been cleared."));
+    }
+
+    public void drawSavedOutlines(String uuid) {
+        int[][] corners = saved_corners.get(UUID.fromString(uuid));
+
+        if (corners == null) {
+            sendFeedback(Utils.error("The outlines are not longer available."));
+        } else {
+            drawOutlines(corners, true);
+        }
+    }
+
+    public void deleteSavedOutlines(String uuid) {
+        int[][] corners = saved_corners.get(UUID.fromString(uuid));
+
+        if (corners == null) {
+            sendFeedback(Utils.error("The outlines are not longer available."));
+        } else {
+            // TODO: deleteOutlines(corners);
+        }
+    }
+
     /**
      * Attempt to add a location to the set of inputs.
      * If it is near the average of a set, add it to the set.
@@ -77,7 +114,7 @@ public class BuildingCompanion {
         if (!location.getWorld().equals(world)) {
             world = user.player.getWorld();
             input_corners.clear();
-            sendFeedback(Component.text("You have switched worlds, resetting existing corners.", NamedTextColor.YELLOW));
+            sendFeedback(Component.text("You have switched worlds, resetting any existing corners.", NamedTextColor.YELLOW));
         }
 
         double[] input = new double[]{
@@ -163,31 +200,60 @@ public class BuildingCompanion {
 //    }
 
     public void drawOutlines() {
-        if (input_corners.size() == 4) {
+        if (input_corners.size() == 4 && !asyncActive) {
             // Get the average of the corners.
-            double[][] corners = input_corners.stream().map(this::getAverage).toArray(double[][]::new);
+            // Use an async task to not block the main thread.
+            int taskId = Bukkit.getScheduler().runTaskAsynchronously(Network.getInstance(), () -> {
 
-            // Fit the corners to a rectangle.
-            BestFitRectangle rectangle = new BestFitRectangle(user, corners);
-            rectangle.findBestFitRectangleCorners();
-            double[][] fitted_corners = rectangle.getOutput();
+                double[][] corners = input_corners.stream().map(this::getAverage).toArray(double[][]::new);
 
-            // Get Minecraft usable corners from the output.
-            // Find the option with the least error, while keeping the walls parallel.
-            int[][] output = MinecraftRectangleConverter.convertRectangleToMinecraftCoordinates(fitted_corners);
+                // Fit the corners to a rectangle.
+                BestFitRectangle rectangle = new BestFitRectangle(user, corners);
+                rectangle.findBestFitRectangleCorners();
+                double[][] fitted_corners = rectangle.getOutput();
 
-            // Optimise the corners for Minecraft.
-            output = MinecraftRectangleConverter.optimiseForBlockSize(output);
+                // Get Minecraft usable corners from the output.
+                // Find the option with the least error, while keeping the walls parallel.
+                int[][] output = MinecraftRectangleConverter.convertRectangleToMinecraftCoordinates(fitted_corners);
 
-            // Draw the lines with fake blocks.
-            FakeBlocks.drawLine(user.player, world, output[0], output[1], Material.ORANGE_CONCRETE.createBlockData());
-            FakeBlocks.drawLine(user.player, world, output[1], output[3], Material.ORANGE_CONCRETE.createBlockData());
-            FakeBlocks.drawLine(user.player, world, output[3], output[2], Material.ORANGE_CONCRETE.createBlockData());
-            FakeBlocks.drawLine(user.player, world, output[2], output[0], Material.ORANGE_CONCRETE.createBlockData());
+                // Optimise the corners for Minecraft.
+                int[][] finalOutput = MinecraftRectangleConverter.optimiseForBlockSize(output);
 
+                // Draw the lines with fake blocks.
+                Bukkit.getScheduler().runTask(Network.getInstance(), () -> {
+                    // TODO: Check if the player has permission to build where the outlines are to be drawn.
+                    drawOutlines(finalOutput, false);
+                    sendFeedback(Utils.success("The outlines have been drawn."));
+                    UUID uuid = UUID.randomUUID();
+                    saved_corners.put(uuid, finalOutput);
+                    sendFeedback(Component.text("Save outlines: ", NamedTextColor.WHITE)
+                            .append(Component.text("[Yes]", NamedTextColor.GREEN)
+                                    .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/buildingcompanion save " + uuid)))
+                            .append(Component.text(" - ", NamedTextColor.WHITE))
+                            .append(Component.text("[No]", NamedTextColor.RED)
+                                    .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/buildingcompanion remove " + uuid))));
+                });
+                asyncActive = false;
+            }).getTaskId();
+            // Run a task later to cancel the task if it has not yet been completed.
+            Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
+                if (asyncActive && Bukkit.getScheduler().isCurrentlyRunning(taskId)) {
+                    sendFeedback(Utils.error("Drawing outlines task timed out, the selection was too difficult to process."));
+                    clearSelection();
+                }
+            }, TIMEOUT);
+        } else if (asyncActive) {
+            sendFeedback(Utils.error("The outlines are already being drawn."));
         } else {
             sendFeedback(Utils.error("You must select at least 4 corners to draw outlines."));
         }
+    }
+
+    private void drawOutlines(int[][] corners, boolean permanent) {
+        Blocks.drawLine(user.player, world, corners[0], corners[1], Material.ORANGE_CONCRETE.createBlockData(), permanent);
+        Blocks.drawLine(user.player, world, corners[1], corners[3], Material.ORANGE_CONCRETE.createBlockData(), permanent);
+        Blocks.drawLine(user.player, world, corners[3], corners[2], Material.ORANGE_CONCRETE.createBlockData(), permanent);
+        Blocks.drawLine(user.player, world, corners[2], corners[0], Material.ORANGE_CONCRETE.createBlockData(), permanent);
     }
 
     private static boolean contains(Set<double[]> list, double[] input) {

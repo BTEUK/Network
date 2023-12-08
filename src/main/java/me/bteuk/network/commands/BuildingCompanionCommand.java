@@ -73,6 +73,7 @@ public class BuildingCompanionCommand extends AbstractCommand {
 
     public void drawOutlines(NetworkUser user) {
         if (user.getCompanion() != null) {
+            user.player.sendMessage(Utils.success("Drawing outlines..."));
             user.getCompanion().drawOutlines();
         }
     }

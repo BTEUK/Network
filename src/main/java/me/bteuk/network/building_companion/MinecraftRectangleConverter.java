@@ -70,7 +70,6 @@ public class MinecraftRectangleConverter {
                 }
             }
         }
-        System.out.println(checkX + ", " + checkZ);
         if (checkX && !checkZ) {
             // The 2nd largest X that was also shifted in Z needs to be shifted for the rectangle to still be accurate.
             for (int i = 0; i < input.length; i++) {
