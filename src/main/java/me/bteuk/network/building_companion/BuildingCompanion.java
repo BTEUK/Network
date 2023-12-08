@@ -1,25 +1,21 @@
 package me.bteuk.network.building_companion;
 
 import lombok.Getter;
-import me.bteuk.network.Network;
 import me.bteuk.network.utils.FakeBlocks;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -88,25 +84,30 @@ public class BuildingCompanion {
                 location.getX(),
                 location.getZ()
         };
+
+        boolean done = false;
         // Check if it's near an existing corner.
         for (Set<double[]> corner : input_corners) {
             if (isNearCorner(input, getAverage(corner))) {
-                if (corner.contains(input)) {
+                if (contains(corner, input)) {
                     sendFeedback(Utils.success("This location has already been recorded."));
                 } else {
                     corner.add(input);
                     sendFeedback(Utils.success("Updated existing corner with new location"));
                 }
+                done = true;
             }
         }
         // It is not near an existing corner, add if the limit has not yet been reached.
-        if (input_corners.size() < 4) {
-            Set<double[]> new_corner = new HashSet<>();
-            new_corner.add(input);
-            input_corners.add(new_corner);
-            sendFeedback(Utils.success("New corner recorded."));
-        } else {
-            sendFeedback(Utils.success("You have already recorded 4 corners, and it is not close enough to an existing one."));
+        if (!done) {
+            if (input_corners.size() < 4) {
+                Set<double[]> new_corner = new HashSet<>();
+                new_corner.add(input);
+                input_corners.add(new_corner);
+                sendFeedback(Utils.success("New corner recorded."));
+            } else {
+                sendFeedback(Utils.success("You have already recorded 4 corners, and it is not close enough to an existing one."));
+            }
         }
 
         // Notify the player if they have 4 corners selected.
@@ -132,7 +133,7 @@ public class BuildingCompanion {
 //    }
 
     private boolean isNearCorner(double[] input, double[] corner) {
-        return ((input[0]-corner[0])*(input[0]-corner[0]) + (input[1]-corner[1])*(input[1]-corner[1])) <= (MAX_DISTANCE*MAX_DISTANCE);
+        return ((input[0] - corner[0]) * (input[0] - corner[0]) + (input[1] - corner[1]) * (input[1] - corner[1])) <= (MAX_DISTANCE * MAX_DISTANCE);
     }
 
     private double[] getAverage(Set<double[]> input) {
@@ -140,8 +141,8 @@ public class BuildingCompanion {
             return null;
         }
         return new double[]{
-                input.stream().map(location -> location[0]).reduce(0d, Double::sum),
-                input.stream().map(location -> location[1]).reduce(0d, Double::sum)
+                input.stream().mapToDouble(location -> location[0]).average().orElseThrow(),
+                input.stream().mapToDouble(location -> location[1]).average().orElseThrow()
         };
     }
 
@@ -187,6 +188,15 @@ public class BuildingCompanion {
         } else {
             sendFeedback(Utils.error("You must select at least 4 corners to draw outlines."));
         }
+    }
+
+    private static boolean contains(Set<double[]> list, double[] input) {
+        for (double[] array : list) {
+            if (Arrays.equals(array, input)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private record ItemEvent(@Getter int slot, Runnable event) {

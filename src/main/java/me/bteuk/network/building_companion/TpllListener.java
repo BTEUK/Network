@@ -12,6 +12,7 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
 import java.util.Arrays;
 
+import static me.bteuk.network.utils.Constants.LOGGER;
 import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public class TpllListener implements Listener {
@@ -31,7 +32,9 @@ public class TpllListener implements Listener {
             return;
         }
 
-        if (e.getMessage().startsWith("/tpll")) {
+        LOGGER.info(e.getMessage());
+
+        if (e.getMessage().startsWith("/network:tpll")) {
 
             String[] command = e.getMessage().split(" ");
 
