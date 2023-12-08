@@ -2,11 +2,8 @@ package me.bteuk.network.building_companion;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-
-import static me.bteuk.network.utils.Constants.LOGGER;
 
 public class MinecraftRectangleConverter {
 
@@ -19,14 +16,14 @@ public class MinecraftRectangleConverter {
         int[][] cornerC = getCorner(input[2]);
         int[][] cornerD = getCorner(input[3]);
         // Iterate through all the options.
-        for (int i = 0; i < cornerA.length; i++) {
-            for (int j = 0; j < cornerB.length; j++) {
-                for (int k = 0; k < cornerC.length; k++) {
-                    for (int l = 0; l < cornerD.length; l++) {
-                        double newError = getSummedDistance(input, cornerA[i], cornerB[j], cornerC[k], cornerD[l]);
-                        if (isValidShape(cornerA[i], cornerB[j], cornerC[k], cornerD[l]) && newError < error) {
+        for (int[] coordA : cornerA) {
+            for (int[] coordB : cornerB) {
+                for (int[] coordC : cornerC) {
+                    for (int[] coordD : cornerD) {
+                        double newError = getSummedDistance(input, coordA, coordB, coordC, coordD);
+                        if (isValidShape(coordA, coordB, coordC, coordD) && newError < error) {
                             error = newError;
-                            bestFit = new int[][] {cornerA[i], cornerB[j], cornerC[k], cornerD[l]};
+                            bestFit = new int[][]{coordA, coordB, coordC, coordD};
                         }
                     }
                 }

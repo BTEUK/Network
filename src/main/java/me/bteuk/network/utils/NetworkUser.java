@@ -3,6 +3,7 @@ package me.bteuk.network.utils;
 import lombok.Getter;
 import lombok.Setter;
 import me.bteuk.network.Network;
+import me.bteuk.network.building_companion.BuildingCompanion;
 import me.bteuk.network.commands.Nightvision;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.utils.regions.Region;
@@ -70,6 +71,11 @@ public class NetworkUser {
     @Getter
     @Setter
     private boolean tips_enabled;
+
+    //Building companion tool.
+    @Getter
+    @Setter
+    private BuildingCompanion companion;
 
     public NetworkUser(Player player) {
 

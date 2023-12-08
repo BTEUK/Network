@@ -147,3 +147,7 @@ commands:
   exp:
     usage: /<command>
     description: Test command for adding exp.
+  buildingcompanion:
+    usage: /<command>
+    description: Toggle the building companion.
+    aliases: [ bc, companion ]

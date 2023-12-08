@@ -66,7 +66,8 @@ public class TpllListener implements Listener {
                 //Notify the player!
             }
 
-            //Add a new corner, or update an existing one.
+            // Add a new corner, or update an existing one.
+            companion.addLocation(l);
 
         }
     }
