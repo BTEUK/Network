@@ -105,7 +105,7 @@ public class Tpll extends AbstractCommand {
             return;
         }
         //Get location and region.
-        Location l = new Location(p.getWorld(), proj[0], 1, proj[1]);
+        Location l = new Location(p.getWorld(), proj[0], 1, proj[1], p.getLocation().getYaw(), p.getLocation().getPitch());
         Region region = null;
         if (regionsEnabled) {
             region = regionManager.getRegion(l);
