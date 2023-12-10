@@ -11,6 +11,7 @@ import me.bteuk.network.utils.enums.ServerType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -632,5 +633,10 @@ public record Region(String regionName) {
     //Get time that a region member was last in this region.
     public long lastActive(String uuid) {
         return (Network.getInstance().regionSQL.getLong("SELECT last_enter FROM region_members WHERE region='" + regionName + "' AND uuid='" + uuid + "';"));
+    }
+
+    // Check if the player can build in this region.
+    public boolean canBuild(Player p) {
+        return ((status() == RegionStatus.OPEN && p.hasPermission("group.jrbuilder")) || isOwner(p.getUniqueId().toString()) || isMember(p.getUniqueId().toString()));
     }
 }

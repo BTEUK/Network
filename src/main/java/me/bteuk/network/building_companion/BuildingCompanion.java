@@ -3,8 +3,11 @@ package me.bteuk.network.building_companion;
 import lombok.Getter;
 import me.bteuk.network.Network;
 import me.bteuk.network.utils.Blocks;
+import me.bteuk.network.utils.Constants;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.regions.Region;
+import me.bteuk.network.utils.regions.RegionManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -71,15 +74,13 @@ public class BuildingCompanion {
      * Disable the building companion.
      */
     public void disable() {
-
         // Unregister the events.
         listeners.forEach(HandlerList::unregisterAll);
-
     }
 
     public void clearSelection() {
         input_corners.clear();
-        sendFeedback(Utils.line("Your selection has been cleared."));
+        sendFeedback(Component.text("Your selection has been cleared.", NamedTextColor.YELLOW));
     }
 
     public boolean saveOutlines(String sUuid, BlockData block, boolean permanent) {
@@ -194,7 +195,7 @@ public class BuildingCompanion {
 //    }
 
     public void drawOutlines() {
-        if (input_corners.size() == 4 && !asyncActive) {
+        if (input_corners.size() == 4 && world.equals(user.player.getWorld()) && !asyncActive) {
             // Get the average of the corners.
             // Use an async task to not block the main thread.
             int taskId = Bukkit.getScheduler().runTaskAsynchronously(Network.getInstance(), () -> {
@@ -215,7 +216,17 @@ public class BuildingCompanion {
 
                 // Draw the lines with fake blocks.
                 Bukkit.getScheduler().runTask(Network.getInstance(), () -> {
-                    // TODO: Check if the player has permission to build where the outlines are to be drawn.
+                    if (Constants.REGIONS_ENABLED) {
+                        RegionManager manager = Network.getInstance().getRegionManager();
+                        for (int[] block : finalOutput) {
+                            Region region = manager.getRegion(new Location(world, block[0], 1, block[1]), user.dx, user.dz);
+                            if (!region.canBuild(user.player)) {
+                                sendFeedback(Utils.error("You do not have permission to build in this region, cancelling drawing outlines."));
+                                asyncActive = false;
+                                return;
+                            }
+                        }
+                    }
                     drawOutlines(finalOutput, Material.ORANGE_CONCRETE.createBlockData(), false);
                     sendFeedback(Utils.success("The outlines have been drawn."));
                     UUID uuid = UUID.randomUUID();
@@ -238,7 +249,9 @@ public class BuildingCompanion {
             }, TIMEOUT);
         } else if (asyncActive) {
             sendFeedback(Utils.error("The outlines are already being drawn."));
-        } else {
+        } else if (!world.equals(user.player.getWorld())) {
+            sendFeedback(Utils.error("You have switched worlds, unable to draw outlines."));
+        }else {
             sendFeedback(Utils.error("You must select at least 4 corners to draw outlines."));
         }
     }
