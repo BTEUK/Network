@@ -20,7 +20,7 @@ import java.util.Objects;
 import static me.bteuk.network.utils.Constants.EARTH_WORLD;
 import static me.bteuk.network.utils.Constants.SERVER_TYPE;
 
-public record Region(String regionName) {
+public record Region(String regionName, int x, int z) {
 
     //Get the tag of the region for a specific player, or name if no tag is set.
     public String getTag(String uuid) {
@@ -638,5 +638,23 @@ public record Region(String regionName) {
     // Check if the player can build in this region.
     public boolean canBuild(Player p) {
         return ((status() == RegionStatus.OPEN && p.hasPermission("group.jrbuilder")) || isOwner(p.getUniqueId().toString()) || isMember(p.getUniqueId().toString()));
+    }
+
+    public boolean equals(int x, int z) {
+        return this.x == x && this.z == z;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+        if (this.equals(o)) {
+            return true;
+        }
+        if (o instanceof String str) {
+            return str.equals(regionName);
+        }
+        return false;
     }
 }
