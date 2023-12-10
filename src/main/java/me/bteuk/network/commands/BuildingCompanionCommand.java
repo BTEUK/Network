@@ -4,6 +4,8 @@ import me.bteuk.network.Network;
 import me.bteuk.network.building_companion.BuildingCompanion;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -14,6 +16,8 @@ import static me.bteuk.network.utils.Constants.LOGGER;
 public class BuildingCompanionCommand extends AbstractCommand {
 
     private final Network instance;
+
+    private static final Component ERROR = Utils.error("/buildingcompanion <clear>");
 
     public BuildingCompanionCommand(Network instance) {
         super(instance, "companion");
@@ -49,9 +53,13 @@ public class BuildingCompanionCommand extends AbstractCommand {
         // Without args, toggle companion.
         if (args.length == 0) {
             toggleCompanion(user);
-        } else if (args.length == 1) {
-            if (args[0].equals("drawoutlines")) {
-                drawOutlines(user);
+        } else {
+            switch (args[0]) {
+                case "drawoutlines" -> drawOutlines(user);
+                case "clear" -> clearOutlines(user);
+                case "save" -> saveOutlines(user, args);
+                case "remove" -> removeOutlines(user, args);
+                default -> user.player.sendMessage(ERROR);
             }
         }
         return true;
@@ -71,10 +79,36 @@ public class BuildingCompanionCommand extends AbstractCommand {
         }
     }
 
-    public void drawOutlines(NetworkUser user) {
+    private void drawOutlines(NetworkUser user) {
         if (user.getCompanion() != null) {
-            user.player.sendMessage(Utils.success("Drawing outlines..."));
+            user.player.sendMessage(Utils.line("Drawing outlines..."));
             user.getCompanion().drawOutlines();
+        }
+    }
+
+    private void clearOutlines(NetworkUser user) {
+        if (user.getCompanion() != null) {
+            user.getCompanion().clearSelection();
+        } else {
+            user.player.sendMessage(Utils.error("Your building companion is not enabled"));
+        }
+    }
+
+    private void saveOutlines(NetworkUser user, String[] args) {
+        if (args.length > 1 && user.getCompanion() != null) {
+            if (user.getCompanion().saveOutlines(args[1], Material.ORANGE_CONCRETE.createBlockData(), true)) {
+                user.player.sendMessage(Utils.success("Saved outlines"));
+                // Also clear the outlines.
+                user.getCompanion().clearSelection();
+            }
+        }
+    }
+
+    private void removeOutlines(NetworkUser user, String[] args) {
+        if (args.length > 1 && user.getCompanion() != null) {
+            if (user.getCompanion().saveOutlines(args[1], Material.AIR.createBlockData(), false)) {
+                user.player.sendMessage(Utils.success("Removed outlines"));
+            }
         }
     }
 }

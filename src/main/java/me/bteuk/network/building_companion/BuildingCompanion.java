@@ -12,6 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -78,26 +79,19 @@ public class BuildingCompanion {
 
     public void clearSelection() {
         input_corners.clear();
-        sendFeedback(Utils.error("Your selection has been cleared."));
+        sendFeedback(Utils.line("Your selection has been cleared."));
     }
 
-    public void drawSavedOutlines(String uuid) {
-        int[][] corners = saved_corners.get(UUID.fromString(uuid));
-
+    public boolean saveOutlines(String sUuid, BlockData block, boolean permanent) {
+        UUID uuid = UUID.fromString(sUuid);
+        int[][] corners = saved_corners.get(uuid);
         if (corners == null) {
             sendFeedback(Utils.error("The outlines are not longer available."));
+            return false;
         } else {
-            drawOutlines(corners, true);
-        }
-    }
-
-    public void deleteSavedOutlines(String uuid) {
-        int[][] corners = saved_corners.get(UUID.fromString(uuid));
-
-        if (corners == null) {
-            sendFeedback(Utils.error("The outlines are not longer available."));
-        } else {
-            // TODO: deleteOutlines(corners);
+            drawOutlines(corners, block, permanent);
+            saved_corners.remove(uuid);
+            return true;
         }
     }
 
@@ -222,7 +216,7 @@ public class BuildingCompanion {
                 // Draw the lines with fake blocks.
                 Bukkit.getScheduler().runTask(Network.getInstance(), () -> {
                     // TODO: Check if the player has permission to build where the outlines are to be drawn.
-                    drawOutlines(finalOutput, false);
+                    drawOutlines(finalOutput, Material.ORANGE_CONCRETE.createBlockData(), false);
                     sendFeedback(Utils.success("The outlines have been drawn."));
                     UUID uuid = UUID.randomUUID();
                     saved_corners.put(uuid, finalOutput);
@@ -249,11 +243,11 @@ public class BuildingCompanion {
         }
     }
 
-    private void drawOutlines(int[][] corners, boolean permanent) {
-        Blocks.drawLine(user.player, world, corners[0], corners[1], Material.ORANGE_CONCRETE.createBlockData(), permanent);
-        Blocks.drawLine(user.player, world, corners[1], corners[3], Material.ORANGE_CONCRETE.createBlockData(), permanent);
-        Blocks.drawLine(user.player, world, corners[3], corners[2], Material.ORANGE_CONCRETE.createBlockData(), permanent);
-        Blocks.drawLine(user.player, world, corners[2], corners[0], Material.ORANGE_CONCRETE.createBlockData(), permanent);
+    private void drawOutlines(int[][] corners, BlockData block, boolean permanent) {
+        Blocks.drawLine(user.player, world, corners[0], corners[1], block, permanent);
+        Blocks.drawLine(user.player, world, corners[1], corners[3], block, permanent);
+        Blocks.drawLine(user.player, world, corners[3], corners[2], block, permanent);
+        Blocks.drawLine(user.player, world, corners[2], corners[0], block, permanent);
     }
 
     private static boolean contains(Set<double[]> list, double[] input) {
