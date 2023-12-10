@@ -85,8 +85,8 @@ public class MoveListener implements Listener {
         if (REGIONS_ENABLED && u.inRegion) {
 
             // Get x and z of the region as int rounded down with any necessary coordinate transforms.
-            int x = ((e.getTo().getX() >= 0 ? (int) e.getTo().getX() : ((int) e.getTo().getX()) + 1) + u.dx) >> 9;
-            int z = ((e.getTo().getZ() >= 0 ? (int) e.getTo().getZ() : ((int) e.getTo().getZ()) + 1) + u.dz) >> 9;
+            int x = ((e.getTo().getX() >= 0 ? (int) e.getTo().getX() : ((int) e.getTo().getX()) - 1) + u.dx) >> 9;
+            int z = ((e.getTo().getZ() >= 0 ? (int) e.getTo().getZ() : ((int) e.getTo().getZ()) - 1) + u.dz) >> 9;
 
             // Check if the player has moved to another region.
             if (!u.region.equals(x, z)) {

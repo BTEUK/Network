@@ -4,7 +4,6 @@ import me.bteuk.network.Network;
 import me.bteuk.network.commands.navigation.Tpll;
 import me.bteuk.network.utils.Constants;
 import me.bteuk.network.utils.TpllFormat;
-import me.bteuk.network.utils.regions.Region;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
@@ -26,7 +25,7 @@ public class TpllListener implements Listener {
 
     @EventHandler
     public void onCommandPreProcess(PlayerCommandPreprocessEvent e) {
-        if (!companion.playerEquals(e.getPlayer())) {
+        if (companion.playerNotEquals(e.getPlayer())) {
             return;
         }
 

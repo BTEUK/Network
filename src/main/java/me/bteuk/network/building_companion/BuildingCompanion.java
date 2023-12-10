@@ -1,6 +1,5 @@
 package me.bteuk.network.building_companion;
 
-import lombok.Getter;
 import me.bteuk.network.Network;
 import me.bteuk.network.utils.Blocks;
 import me.bteuk.network.utils.Constants;
@@ -43,8 +42,6 @@ public class BuildingCompanion {
     // causing the weighting to be skewed.
     private final Set<Set<double[]>> input_corners;
 
-    //private final Map<ItemStack, ItemEvent> itemEvents;
-
     private final Set<Listener> listeners;
 
     // The player that this building companion is for.
@@ -60,7 +57,6 @@ public class BuildingCompanion {
 
         this.user = user;
         this.world = user.player.getWorld();
-        //itemEvents = new HashMap<>();
         input_corners = new HashSet<>();
         saved_corners = new HashMap<>();
 
@@ -150,19 +146,9 @@ public class BuildingCompanion {
         }
     }
 
-    protected boolean playerEquals(Player p) {
-        return p.equals(user.player);
+    protected boolean playerNotEquals(Player p) {
+        return !p.equals(user.player);
     }
-
-//    protected boolean runIfEqualsItemEvent(ItemStack item) {
-//        ItemEvent event = itemEvents.get(item);
-//        if (event != null) {
-//            event.runEvent();
-//            return true;
-//        } else {
-//            return false;
-//        }
-//    }
 
     private boolean isNearCorner(double[] input, double[] corner) {
         return ((input[0] - corner[0]) * (input[0] - corner[0]) + (input[1] - corner[1]) * (input[1] - corner[1])) <= (MAX_DISTANCE * MAX_DISTANCE);
@@ -181,18 +167,6 @@ public class BuildingCompanion {
     private void sendFeedback(Component feedback) {
         user.player.sendMessage(feedback);
     }
-
-//    private void addDrawOutlinesEvent() {
-//        // Add stick item to draw outlines.
-//        itemEvents.put(
-//                Utils.createItem(Material.STICK, 1, Utils.success("Create Outlines")),
-//                new ItemEvent(2, this::drawOutline)
-//        );
-//    }
-//
-//    private void removeDrawOutlinesEvent() {
-//        itemEvents.remove(Utils.createItem(Material.STICK, 1, Utils.success("Create Outlines")));
-//    }
 
     public void drawOutlines() {
         if (input_corners.size() == 4 && world.equals(user.player.getWorld()) && !asyncActive) {
@@ -270,11 +244,5 @@ public class BuildingCompanion {
             }
         }
         return false;
-    }
-
-    private record ItemEvent(@Getter int slot, Runnable event) {
-        public void runEvent() {
-            event.run();
-        }
     }
 }
