@@ -18,6 +18,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -134,7 +135,7 @@ public class BuildingCompanion {
                 input_corners.add(new_corner);
                 sendFeedback(Utils.success("New corner recorded."));
             } else {
-                sendFeedback(Utils.success("You have already recorded 4 corners, and it is not close enough to an existing one."));
+                sendFeedback(Utils.error("You have already recorded 4 corners, and it is not close enough to an existing one."));
             }
         }
 
@@ -172,48 +173,7 @@ public class BuildingCompanion {
         if (input_corners.size() == 4 && world.equals(user.player.getWorld()) && !asyncActive) {
             // Get the average of the corners.
             // Use an async task to not block the main thread.
-            int taskId = Bukkit.getScheduler().runTaskAsynchronously(Network.getInstance(), () -> {
-
-                double[][] corners = input_corners.stream().map(this::getAverage).toArray(double[][]::new);
-
-                // Fit the corners to a rectangle.
-                BestFitRectangle rectangle = new BestFitRectangle(user, corners);
-                rectangle.findBestFitRectangleCorners();
-                double[][] fitted_corners = rectangle.getOutput();
-
-                // Get Minecraft usable corners from the output.
-                // Find the option with the least error, while keeping the walls parallel.
-                int[][] output = MinecraftRectangleConverter.convertRectangleToMinecraftCoordinates(fitted_corners);
-
-                // Optimise the corners for Minecraft.
-                int[][] finalOutput = MinecraftRectangleConverter.optimiseForBlockSize(output);
-
-                // Draw the lines with fake blocks.
-                Bukkit.getScheduler().runTask(Network.getInstance(), () -> {
-                    if (Constants.REGIONS_ENABLED) {
-                        RegionManager manager = Network.getInstance().getRegionManager();
-                        for (int[] block : finalOutput) {
-                            Region region = manager.getRegion(new Location(world, block[0], 1, block[1]), user.dx, user.dz);
-                            if (!region.canBuild(user.player)) {
-                                sendFeedback(Utils.error("You do not have permission to build in this region, cancelling drawing outlines."));
-                                asyncActive = false;
-                                return;
-                            }
-                        }
-                    }
-                    drawOutlines(finalOutput, Material.ORANGE_CONCRETE.createBlockData(), false);
-                    sendFeedback(Utils.success("The outlines have been drawn."));
-                    UUID uuid = UUID.randomUUID();
-                    saved_corners.put(uuid, finalOutput);
-                    sendFeedback(Component.text("Save outlines: ", NamedTextColor.WHITE)
-                            .append(Component.text("[Yes]", NamedTextColor.GREEN)
-                                    .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/buildingcompanion save " + uuid)))
-                            .append(Component.text(" - ", NamedTextColor.WHITE))
-                            .append(Component.text("[No]", NamedTextColor.RED)
-                                    .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/buildingcompanion remove " + uuid))));
-                });
-                asyncActive = false;
-            }).getTaskId();
+            int taskId = drawOutlinesTask().getTaskId();
             // Run a task later to cancel the task if it has not yet been completed.
             Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
                 if (asyncActive && Bukkit.getScheduler().isCurrentlyRunning(taskId)) {
@@ -230,11 +190,65 @@ public class BuildingCompanion {
         }
     }
 
+    private BukkitTask drawOutlinesTask() {
+        return Bukkit.getScheduler().runTaskAsynchronously(Network.getInstance(), () -> {
+
+            double[][] corners = input_corners.stream().map(this::getAverage).toArray(double[][]::new);
+
+            // Fit the corners to a rectangle.
+            BestFitRectangle rectangle = new BestFitRectangle(corners);
+            if (rectangle.findBestFitRectangleCorners()) {
+                double[][] fitted_corners = rectangle.getOutput();
+
+                // Get Minecraft usable corners from the output.
+                // Find the option with the least error, while keeping the walls parallel.
+                int[][] output = MinecraftRectangleConverter.convertRectangleToMinecraftCoordinates(fitted_corners);
+
+                // Optimise the corners for Minecraft.
+                int[][] finalOutput = MinecraftRectangleConverter.optimiseForBlockSize(output);
+
+                // Draw the lines with fake blocks.
+                drawTempOutlinesTaskWithFeedback(finalOutput);
+            } else {
+                sendFeedback(Utils.error("Unable to generate a rectangle using the given corners, clearing selection."));
+                clearSelection();
+            }
+            asyncActive = false;
+        });
+    }
+
+    private void drawTempOutlinesTaskWithFeedback(int[][] corners) {
+        // Draw the lines with fake blocks.
+        Bukkit.getScheduler().runTask(Network.getInstance(), () -> {
+            if (Constants.REGIONS_ENABLED) {
+                RegionManager manager = Network.getInstance().getRegionManager();
+                for (int[] block : corners) {
+                    Region region = manager.getRegion(new Location(world, block[0], 1, block[1]), user.dx, user.dz);
+                    if (!region.canBuild(user.player)) {
+                        sendFeedback(Utils.error("You do not have permission to build in this region, cancelling drawing outlines."));
+                        asyncActive = false;
+                        return;
+                    }
+                }
+            }
+            drawOutlines(corners, Material.ORANGE_CONCRETE.createBlockData(), false);
+            sendFeedback(Utils.success("The outlines have been drawn."));
+            UUID uuid = UUID.randomUUID();
+            saved_corners.put(uuid, corners);
+            sendFeedback(Component.text("Save outlines: ", NamedTextColor.YELLOW)
+                    .append(Component.text("[Yes]", NamedTextColor.GREEN)
+                            .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/buildingcompanion save " + uuid)))
+                    .append(Component.text(" - ", NamedTextColor.YELLOW))
+                    .append(Component.text("[No]", NamedTextColor.RED)
+                            .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/buildingcompanion remove " + uuid))));
+        });
+    }
+
     private void drawOutlines(int[][] corners, BlockData block, boolean permanent) {
-        Blocks.drawLine(user.player, world, corners[0], corners[1], block, permanent);
-        Blocks.drawLine(user.player, world, corners[1], corners[3], block, permanent);
-        Blocks.drawLine(user.player, world, corners[3], corners[2], block, permanent);
-        Blocks.drawLine(user.player, world, corners[2], corners[0], block, permanent);
+        Blocks.drawLine(user.player, world, corners[0], corners[1], block, permanent, true);
+        Blocks.drawLine(user.player, world, corners[1], corners[3], block, permanent, true);
+        Blocks.drawLine(user.player, world, corners[3], corners[2], block, permanent, true);
+        Blocks.drawLine(user.player, world, corners[2], corners[0], block, permanent, true);
     }
 
     private static boolean contains(Set<double[]> list, double[] input) {

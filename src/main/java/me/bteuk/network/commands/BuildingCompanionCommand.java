@@ -5,6 +5,7 @@ import me.bteuk.network.building_companion.BuildingCompanion;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -59,6 +60,7 @@ public class BuildingCompanionCommand extends AbstractCommand {
                 case "clear" -> clearOutlines(user);
                 case "save" -> saveOutlines(user, args);
                 case "remove" -> removeOutlines(user, args);
+                case "walls" -> createWalls(user, args);
                 default -> user.player.sendMessage(ERROR);
             }
         }
@@ -81,7 +83,7 @@ public class BuildingCompanionCommand extends AbstractCommand {
 
     private void drawOutlines(NetworkUser user) {
         if (user.getCompanion() != null) {
-            user.player.sendMessage(Utils.line("Drawing outlines..."));
+            user.player.sendMessage(Component.text("Drawing outlines...", NamedTextColor.YELLOW));
             user.getCompanion().drawOutlines();
         }
     }
@@ -110,5 +112,9 @@ public class BuildingCompanionCommand extends AbstractCommand {
                 user.player.sendMessage(Utils.success("Removed outlines"));
             }
         }
+    }
+
+    private void createWalls(NetworkUser user, String[] args) {
+
     }
 }

@@ -1,7 +1,6 @@
 package me.bteuk.network.building_companion;
 
 import lombok.Getter;
-import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.math.Line;
 
 import java.util.Arrays;
@@ -10,8 +9,6 @@ import java.util.Arrays;
  * Utility class to find the best fit rectangle, given an input of 4 points.
  */
 public class BestFitRectangle {
-
-    private final NetworkUser user;
 
     private final double[][] input;
 
@@ -22,8 +19,7 @@ public class BestFitRectangle {
 
     private static final double ADDITIVE = 0.01;
 
-    public BestFitRectangle(NetworkUser user, double[][] input) {
-        this.user = user;
+    public BestFitRectangle(double[][] input) {
         this.input = input;
     }
 
@@ -202,44 +198,16 @@ public class BestFitRectangle {
         while (!Arrays.equals(done, isDone) && timeout > 0) {
 
             // Line 1
-            while (canImprove(points[0], points[1], lines[0], lines[2], lines[3])) {
-                // Set all done to false.
-                Arrays.fill(isDone, false);
-                // Try to improve.
-                improve(points[0], points[1], lines[0], lines[2], lines[3]);
-            }
-            // Line 1 has been optimised, set it to done.
-            isDone[0] = true;
+            tryImprove(lines, points, isDone, 0, 2, 3, 0, 1);
 
             // Line 2
-            while (canImprove(points[2], points[3], lines[1], lines[2], lines[3])) {
-                // Set all done to false.
-                Arrays.fill(isDone, false);
-                // Try to improve.
-                improve(points[2], points[3], lines[1], lines[2], lines[3]);
-            }
-            // Line 2 has been optimised, set it to done.
-            isDone[1] = true;
+            tryImprove(lines, points, isDone, 1, 2, 3, 2, 3);
 
             // Line 3
-            while (canImprove(points[0], points[2], lines[2], lines[0], lines[1])) {
-                // Set all done to false.
-                Arrays.fill(isDone, false);
-                // Try to improve.
-                improve(points[0], points[2], lines[2], lines[0], lines[1]);
-            }
-            // Line 3 has been optimised, set it to done.
-            isDone[2] = true;
+            tryImprove(lines, points, isDone, 2, 0, 1, 0, 2);
 
             // Line 4
-            while (canImprove(points[1], points[3], lines[3], lines[0], lines[1])) {
-                // Set all done to false.
-                Arrays.fill(isDone, false);
-                // Try to improve.
-                improve(points[1], points[3], lines[3], lines[0], lines[1]);
-            }
-            // Line 1 has been optimised, set it to done.
-            isDone[3] = true;
+            tryImprove(lines, points, isDone, 3, 0, 1, 1, 3);
             timeout--;
         }
     }
@@ -248,44 +216,47 @@ public class BestFitRectangle {
         return distanceBetween(cornerA, pointA) + distanceBetween(cornerB, pointB);
     }
 
-    private boolean canImprove(double[] pointA, double[] pointB, Line main, Line left, Line right) {
-        double[] intersectA = Line.getIntersect(main, left);
-        double[] intersectB = Line.getIntersect(main, right);
-
-        Line mainMin = main.copyWithOffsetB(-ALPHA);
-        Line mainMax = main.copyWithOffsetB(ALPHA);
-
-        double[] intersectAMin = Line.getIntersect(mainMin, left);
-        double[] intersectBMin = Line.getIntersect(mainMin, right);
-
-        double[] intersectAMax = Line.getIntersect(mainMax, left);
-        double[] intersectBMax = Line.getIntersect(mainMax, right);
-
-        return getSummedDistance(intersectA, pointA, intersectB, pointB) > getSummedDistance(intersectAMin, pointA, intersectBMin, pointB) ||
-                getSummedDistance(intersectA, pointA, intersectB, pointB) > getSummedDistance(intersectAMax, pointA, intersectBMax, pointB);
+    private void tryImprove(Line[] lines, double[][] points, boolean[] isDone,
+                            int lineIndex, int lineIdxLeft, int lineIdxRight, int pointIdxLeft, int pointIdxRight) {
+        double improve = 0;
+        double tempImprove = ALPHA;
+        // First try improving in the positive direction.
+        while (canImprove(improve + tempImprove, points[pointIdxLeft], points[pointIdxRight], lines[lineIndex], lines[lineIdxLeft], lines[lineIdxRight])) {
+            improve += tempImprove;
+            tempImprove *= 2;
+        }
+        // Reset tempImprove
+        tempImprove = ALPHA;
+        // Then try improving in the negative direction, if not yet improved.
+        while (canImprove(improve - tempImprove, points[pointIdxLeft], points[pointIdxRight], lines[lineIndex], lines[lineIdxLeft], lines[lineIdxRight])) {
+            improve -= tempImprove;
+            tempImprove *= 2;
+        }
+        // Update the B-value of the line with the improvement.
+        // If there is no improvement set this line to done.
+        if (improve == 0) {
+            isDone[lineIndex] = true;
+        } else {
+            improve(improve, lines[lineIndex]);
+        }
     }
 
-    private void improve(double[] pointA, double[] pointB, Line main, Line left, Line right) {
+    private boolean canImprove(double improvement, double[] pointA, double[] pointB, Line main, Line left, Line right) {
         double[] intersectA = Line.getIntersect(main, left);
         double[] intersectB = Line.getIntersect(main, right);
 
-        Line mainMin = main.copyWithOffsetB(-ALPHA);
-        Line mainMax = main.copyWithOffsetB(ALPHA);
+        // Offset the line and see if the distance between the intersections of the lines
+        // and the initial points is better or worse than before.
+        Line newMain = main.copyWithOffsetB(improvement);
 
-        double[] intersectAMin = Line.getIntersect(mainMin, left);
-        double[] intersectBMin = Line.getIntersect(mainMin, right);
+        double[] intersectAMin = Line.getIntersect(newMain, left);
+        double[] intersectBMin = Line.getIntersect(newMain, right);
 
-        double[] intersectAMax = Line.getIntersect(mainMax, left);
-        double[] intersectBMax = Line.getIntersect(mainMax, right);
+        return getSummedDistance(intersectA, pointA, intersectB, pointB) > getSummedDistance(intersectAMin, pointA, intersectBMin, pointB);
+    }
 
-        if (getSummedDistance(intersectAMin, pointA, intersectBMin, pointB) < getSummedDistance(intersectA, pointA, intersectB, pointB)) {
-            main.setB(mainMin.getB());
-            return;
-        }
-
-        if (getSummedDistance(intersectAMax, pointA, intersectBMax, pointB) < getSummedDistance(intersectA, pointA, intersectB, pointB)) {
-            main.setB(mainMax.getB());
-        }
+    private void improve(double improvement, Line main) {
+        main.setB(main.getB() + improvement);
     }
 }
 

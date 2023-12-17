@@ -15,7 +15,7 @@ import static me.bteuk.network.utils.Constants.LOGGER;
 public class Blocks {
 
     // Add a line.
-    public static void drawLine(Player player, World world, int[] block1, int[] block2, BlockData block, boolean permanent) {
+    public static void drawLine(Player player, World world, int[] block1, int[] block2, BlockData block, boolean permanent, boolean skipFirst) {
 
         LOGGER.info(Arrays.toString(block1) + " - " + Arrays.toString(block2));
 
@@ -25,8 +25,11 @@ public class Blocks {
 
         int length = max(abs(lengthX), abs(lengthZ));
 
-        //Iterate over the largest length of the two.
+        // Iterate over the largest length of the two.
         for (int i = 0; i <= length; i++) {
+            if (skipFirst && i == 0) {
+                continue;
+            }
             // Remove the points from the list.
             drawBlock(player, world,
                     ((int) (round(block1[0] + ((i * lengthX) / (double) length)))),

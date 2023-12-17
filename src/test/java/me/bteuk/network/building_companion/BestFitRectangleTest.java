@@ -15,7 +15,7 @@ class BestFitRectangleTest {
                 new double[] {4, 3}
         };
 
-        BestFitRectangle rectangle = new BestFitRectangle(null, input);
+        BestFitRectangle rectangle = new BestFitRectangle(input);
         rectangle.findBestFitRectangleCorners();
 
         System.out.println(Arrays.deepToString(rectangle.getOutput()));
@@ -35,7 +35,7 @@ class BestFitRectangleTest {
                 new double[] {0, 2}
         };
 
-        BestFitRectangle rectangle = new BestFitRectangle(null, input);
+        BestFitRectangle rectangle = new BestFitRectangle(input);
         rectangle.findBestFitRectangleCorners();
 
         System.out.println(Arrays.deepToString(rectangle.getOutput()));
@@ -50,7 +50,7 @@ class BestFitRectangleTest {
                 new double[] {28, 27}
         };
 
-        BestFitRectangle rectangle = new BestFitRectangle(null, input);
+        BestFitRectangle rectangle = new BestFitRectangle(input);
         rectangle.findBestFitRectangleCorners();
 
         System.out.println(Arrays.deepToString(rectangle.getOutput()));
@@ -65,7 +65,7 @@ class BestFitRectangleTest {
                 new double[] {28.678, 27.123}
         };
 
-        BestFitRectangle rectangle = new BestFitRectangle(null, input);
+        BestFitRectangle rectangle = new BestFitRectangle(input);
         rectangle.findBestFitRectangleCorners();
 
         System.out.println(Arrays.deepToString(rectangle.getOutput()));
@@ -80,7 +80,7 @@ class BestFitRectangleTest {
                 new double[] {5, 0.2}
         };
 
-        BestFitRectangle rectangle = new BestFitRectangle(null, input);
+        BestFitRectangle rectangle = new BestFitRectangle(input);
         rectangle.findBestFitRectangleCorners();
 
         System.out.println(Arrays.deepToString(rectangle.getOutput()));
