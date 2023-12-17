@@ -249,10 +249,10 @@ public class BestFitRectangle {
         // and the initial points is better or worse than before.
         Line newMain = main.copyWithOffsetB(improvement);
 
-        double[] intersectAMin = Line.getIntersect(newMain, left);
-        double[] intersectBMin = Line.getIntersect(newMain, right);
+        double[] newIntersectA = Line.getIntersect(newMain, left);
+        double[] newIntersectB = Line.getIntersect(newMain, right);
 
-        return getSummedDistance(intersectA, pointA, intersectB, pointB) > getSummedDistance(intersectAMin, pointA, intersectBMin, pointB);
+        return getSummedDistance(intersectA, pointA, intersectB, pointB) > getSummedDistance(newIntersectA, pointA, newIntersectB, pointB);
     }
 
     private void improve(double improvement, Line main) {

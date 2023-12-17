@@ -649,12 +649,17 @@ public record Region(String regionName, int x, int z) {
         if (o == null) {
             return false;
         }
-        if (this.equals(o)) {
+        if (this == o) {
             return true;
         }
         if (o instanceof String str) {
             return str.equals(regionName);
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, z);
     }
 }
