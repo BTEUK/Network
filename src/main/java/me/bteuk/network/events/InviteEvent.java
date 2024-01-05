@@ -28,7 +28,7 @@ public class InviteEvent extends AbstractEvent {
                 if (p != null) {
 
                     GlobalSQL globalSQL = Network.getInstance().globalSQL;
-                    PlotSQL plotSQL = Network.getInstance().plotSQL;
+                    PlotSQL plotSQL = Network.getInstance().getPlotSQL();
 
                     int id = Integer.parseInt(event[2]);
 

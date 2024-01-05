@@ -56,14 +56,14 @@ public class Warp implements CommandExecutor {
                 String worldName = Network.getInstance().globalSQL.getString("SELECT world FROM coordinates WHERE id=" + coordinate_id + ";");
 
                 //Check if world is in plotsystem.
-                if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + worldName + "';")) {
+                if (Network.getInstance().getPlotSQL().hasRow("SELECT name FROM location_data WHERE name='" + worldName + "';")) {
 
                     //Add coordinate transformation.
                     l = new Location(
                             Bukkit.getWorld(worldName),
-                            l.getX() + Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + worldName + "';"),
+                            l.getX() + Network.getInstance().getPlotSQL().getInt("SELECT xTransform FROM location_data WHERE name='" + worldName + "';"),
                             l.getY(),
-                            l.getZ() + Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + worldName + "';"),
+                            l.getZ() + Network.getInstance().getPlotSQL().getInt("SELECT zTransform FROM location_data WHERE name='" + worldName + "';"),
                             l.getYaw(),
                             l.getPitch()
                     );

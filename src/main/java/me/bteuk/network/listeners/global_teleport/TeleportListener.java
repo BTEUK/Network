@@ -1,6 +1,7 @@
 package me.bteuk.network.listeners.global_teleport;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.RegionStatus;
@@ -25,6 +26,8 @@ public class TeleportListener implements Listener {
 
     private boolean blocked;
 
+    private final PlotSQL plotSQL;
+
     public TeleportListener(Network instance) {
 
         Bukkit.getServer().getPluginManager().registerEvents(this, instance);
@@ -32,6 +35,8 @@ public class TeleportListener implements Listener {
         regionManager = instance.getRegionManager();
 
         blocked = false;
+
+        plotSQL = instance.getPlotSQL();
 
     }
 
@@ -258,13 +263,11 @@ public class TeleportListener implements Listener {
             } else if (SERVER_TYPE == ServerType.PLOT) {
 
                 //Check if the player is teleporting to a buildable world in the plot system.
-                if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + e.getTo().getWorld().getName() + "';")) {
+                if (plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + e.getTo().getWorld().getName() + "';")) {
 
                     //Get negative coordinate transform of new location.
-                    u.dx = -Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + e.getTo().getWorld().getName() + "';");
-                    u.dz = -Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + e.getTo().getWorld().getName() + "';");
-
                     Location l = e.getTo().clone();
+                    u.updateCoordinateTransform(plotSQL, l);
 
                     //Alter location to add necessary coordinate transformation.
                     l.setX(l.getX() + u.dx);

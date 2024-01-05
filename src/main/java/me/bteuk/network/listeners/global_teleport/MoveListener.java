@@ -2,6 +2,7 @@ package me.bteuk.network.listeners.global_teleport;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.events.EventManager;
+import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Time;
@@ -28,6 +29,8 @@ public class MoveListener implements Listener {
 
     private boolean blocked;
 
+    private final PlotSQL plotSQL;
+
     public MoveListener(Network instance) {
 
         Bukkit.getServer().getPluginManager().registerEvents(this, instance);
@@ -37,6 +40,8 @@ public class MoveListener implements Listener {
         regionManager = instance.getRegionManager();
 
         blocked = false;
+
+        plotSQL = instance.getPlotSQL();
 
     }
 
@@ -114,10 +119,10 @@ public class MoveListener implements Listener {
                                 if (region.status() == RegionStatus.PLOT) {
 
                                     //Get server and world of region.
-                                    String location = Network.getInstance().plotSQL.getString("SELECT location FROM regions WHERE region='" + region.regionName() + "';");
+                                    String location = plotSQL.getString("SELECT location FROM regions WHERE region='" + region.regionName() + "';");
 
-                                    int xTransform = Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + location + "';");
-                                    int zTransform = Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
+                                    int xTransform = plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + location + "';");
+                                    int zTransform = plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
 
                                     //Set join event to teleport there.
                                     EventManager.createJoinEvent(u.player.getUniqueId().toString(), "network", "teleport " +

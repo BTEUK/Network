@@ -23,7 +23,7 @@ public class PlotMenu extends Gui {
         super(45, Component.text("Plot Menu", NamedTextColor.AQUA, TextDecoration.BOLD));
 
         this.user = user;
-        plotSQL = Network.getInstance().plotSQL;
+        plotSQL = Network.getInstance().getPlotSQL();
 
         createGui();
 

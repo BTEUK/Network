@@ -119,7 +119,8 @@ public final class Network extends JavaPlugin {
     public ItemStack navigator;
 
     //SQL
-    public PlotSQL plotSQL;
+    @Getter
+    private PlotSQL plotSQL;
     public GlobalSQL globalSQL;
     public RegionSQL regionSQL;
 
@@ -346,7 +347,7 @@ public final class Network extends JavaPlugin {
 
         getCommand("discord").setExecutor(new Discord());
 
-        getCommand("ll").setExecutor(new ll());
+        new ll(this);
 
         getCommand("nightvision").setExecutor(new Nightvision());
         getCommand("speed").setExecutor(new Speed());

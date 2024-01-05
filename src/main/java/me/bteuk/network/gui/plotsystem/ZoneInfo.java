@@ -37,7 +37,7 @@ public class ZoneInfo extends Gui {
         this.uuid = uuid;
 
         //Get plot sql.
-        plotSQL = Network.getInstance().plotSQL;
+        plotSQL = Network.getInstance().getPlotSQL();
 
         createGui();
 

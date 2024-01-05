@@ -32,7 +32,7 @@ public class PlotsystemLocations extends Gui {
 
         super(45, Component.text("Plotsystem Locations", NamedTextColor.AQUA, TextDecoration.BOLD));
 
-        plotSQL = Network.getInstance().plotSQL;
+        plotSQL = Network.getInstance().getPlotSQL();
         globalSQL = Network.getInstance().globalSQL;
 
         createGui();

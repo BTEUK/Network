@@ -4,6 +4,7 @@ import io.papermc.lib.PaperLib;
 import me.bteuk.network.Network;
 import me.bteuk.network.commands.AbstractCommand;
 import me.bteuk.network.events.EventManager;
+import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.Statistics;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Time;
@@ -44,6 +45,8 @@ public class Tpll extends AbstractCommand {
     public static final EarthGeneratorSettings bteGeneratorSettings = EarthGeneratorSettings.parse(EarthGeneratorSettings.BTE_DEFAULT_SETTINGS);
 
     private final RegionManager regionManager;
+
+    private final PlotSQL plotSQL;
     private static final boolean regionsEnabled = CONFIG.getBoolean("regions_enabled");
 
     private static final Component USAGE = Utils.error("/tpll <latitude> <longitude> [altitude]");
@@ -53,7 +56,8 @@ public class Tpll extends AbstractCommand {
 
         this.requires_permission = requires_permission;
 
-        regionManager = Network.getInstance().getRegionManager();
+        regionManager = instance.getRegionManager();
+        plotSQL = instance.getPlotSQL();
 
     }
 
@@ -228,11 +232,11 @@ public class Tpll extends AbstractCommand {
 
             //Check if the region is on a plot server.
             if (region.isPlot()) {
-                String location = Network.getInstance().plotSQL.getString("SELECT location FROM regions WHERE region='" + region.regionName() + "';");
+                String location = Network.getInstance().getPlotSQL().getString("SELECT location FROM regions WHERE region='" + region.regionName() + "';");
 
                 //Get the coordinate transformations.
-                int xTransform = Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + location + "';");
-                int zTransform = Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
+                int xTransform = Network.getInstance().getPlotSQL().getInt("SELECT xTransform FROM location_data WHERE name='" + location + "';");
+                int zTransform = Network.getInstance().getPlotSQL().getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
 
                 Location newLocation = l.clone();
                 newLocation.setX(l.getX() + xTransform);

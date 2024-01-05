@@ -6,9 +6,11 @@ import me.bteuk.network.Network;
 import me.bteuk.network.building_companion.BuildingCompanion;
 import me.bteuk.network.commands.Nightvision;
 import me.bteuk.network.gui.Gui;
+import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.regions.Region;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -144,9 +146,8 @@ public class NetworkUser {
                 }
             } else if (SERVER_TYPE == PLOT) {
                 //Check if the player is in a buildable plot world and apply coordinate transform if true.
-                if (instance.plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';")) {
-                    dx = -instance.plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';");
-                    dz = -instance.plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';");
+                if (instance.getPlotSQL().hasRow("SELECT name FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';")) {
+                    updateCoordinateTransform(instance.getPlotSQL(), player.getLocation());
 
                     region = instance.getRegionManager().getRegion(player.getLocation(), dx, dz);
                     inRegion = true;
@@ -277,5 +278,10 @@ public class NetworkUser {
      */
     public static void sendOfflineMessage(String uuid, String message) {
         Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','" + message + "');");
+    }
+
+    public void updateCoordinateTransform(PlotSQL plotSQL, Location l) {
+        dx = -plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + l.getWorld().getName() + "';");
+        dz = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + l.getWorld().getName() + "';");
     }
 }

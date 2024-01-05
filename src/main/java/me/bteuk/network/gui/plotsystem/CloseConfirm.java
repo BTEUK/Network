@@ -27,7 +27,7 @@ public class CloseConfirm extends Gui {
     private void createGui() {
 
         //Get plot sql.
-        PlotSQL plotSQL = Network.getInstance().plotSQL;
+        PlotSQL plotSQL = Network.getInstance().getPlotSQL();
 
         //Save and Close zone.
         setItem(13, Utils.createItem(Material.LIME_CONCRETE, 1,

@@ -45,7 +45,7 @@ public record Region(String regionName, int x, int z) {
     public String getServer() {
         if (Network.getInstance().regionSQL.hasRow("SELECT region FROM regions WHERE region='" + regionName + "' AND status='plot'")) {
             //Region is on a plot server.
-            return (Network.getInstance().plotSQL.getString("SELECT server FROM regions WHERE region='" + regionName + "';"));
+            return (Network.getInstance().getPlotSQL().getString("SELECT server FROM regions WHERE region='" + regionName + "';"));
         } else {
             //Region is on earth server.
             return (Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';"));

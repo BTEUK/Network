@@ -223,6 +223,8 @@ public class BuildingCompanion {
             if (Constants.REGIONS_ENABLED) {
                 RegionManager manager = Network.getInstance().getRegionManager();
                 for (int[] block : corners) {
+                    //TODO: Allow outlines in plotsystem, Network needs a module to deal with plotsystem regions.
+                    //TODO: Move Worldguard functions from Plotsystem to Network.
                     Region region = manager.getRegion(new Location(world, block[0], 1, block[1]), user.dx, user.dz);
                     if (!region.canBuild(user.player)) {
                         sendFeedback(Utils.error("You do not have permission to build in this region, cancelling drawing outlines."));
