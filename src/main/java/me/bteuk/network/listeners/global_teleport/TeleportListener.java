@@ -71,6 +71,11 @@ public class TeleportListener implements Listener {
             return;
         }
 
+        //If building companion is enabled, check if the player changed world.
+        if (u.getCompanion() != null) {
+            u.getCompanion().checkChangeWorld(e.getTo().getWorld());
+        }
+
         //If regions are enabled, check for movement between regions.
         if (REGIONS_ENABLED) {
 

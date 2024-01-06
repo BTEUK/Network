@@ -1,14 +1,13 @@
 package me.bteuk.network.worldguard;
 
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.protection.regions.RegionContainer;
 import me.bteuk.network.exceptions.RegionManagerNotFoundException;
 import me.bteuk.network.exceptions.RegionNotFoundException;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
@@ -84,5 +83,10 @@ public class WorldguardMembers {
         } catch (StorageException e1) {
             e1.printStackTrace();
         }
+    }
+
+    public static boolean isMemberOrOwner(ProtectedRegion region, Player p) {
+        LocalPlayer player = WorldguardManager.wrapPlayer(p);
+        return region.isMember(player);
     }
 }

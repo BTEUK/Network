@@ -70,8 +70,8 @@ public class ZoneInfo extends Gui {
                     u.player.closeInventory();
 
                     //Get the server of the plot.
-                    String server = Network.getInstance().plotSQL.getString("SELECT server FROM location_data WHERE name='"
-                            + Network.getInstance().plotSQL.getString("SELECT location FROM zones WHERE id=" + zoneID + ";")
+                    String server = Network.getInstance().getPlotSQL().getString("SELECT server FROM location_data WHERE name='"
+                            + Network.getInstance().getPlotSQL().getString("SELECT location FROM zones WHERE id=" + zoneID + ";")
                             + "';");
 
                     //If the plot is on the current server teleport them directly.
@@ -255,7 +255,7 @@ public class ZoneInfo extends Gui {
         this.clearGui();
 
         // If the plot no longer exists, return to the plot menu.
-        if (Network.getInstance().plotSQL.hasRow("SELECT id FROM zones WHERE id=" + zoneID + ";")) {
+        if (Network.getInstance().getPlotSQL().hasRow("SELECT id FROM zones WHERE id=" + zoneID + ";")) {
             createGui();
         } else {
             //Delete this gui.

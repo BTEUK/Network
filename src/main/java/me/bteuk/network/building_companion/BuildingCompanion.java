@@ -1,12 +1,18 @@
 package me.bteuk.network.building_companion;
 
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.bteuk.network.Network;
+import me.bteuk.network.exceptions.NoBuildPermissionException;
+import me.bteuk.network.exceptions.RegionNotFoundException;
 import me.bteuk.network.utils.Blocks;
-import me.bteuk.network.utils.Constants;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.enums.ServerType;
 import me.bteuk.network.utils.regions.Region;
 import me.bteuk.network.utils.regions.RegionManager;
+import me.bteuk.network.worldguard.WorldguardMembers;
+import me.bteuk.network.worldguard.WorldguardUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -23,9 +29,11 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+
+import static me.bteuk.network.utils.Constants.REGIONS_ENABLED;
+import static me.bteuk.network.utils.Constants.SERVER_TYPE;
 
 /**
  * This class stored all the information about the building companion.
@@ -50,7 +58,7 @@ public class BuildingCompanion {
 
     private World world;
 
-    private final Map<UUID, int[][]> saved_corners;
+    private final HashMap<UUID, SavedOutline> saved_outlines;
 
     private boolean asyncActive = false;
 
@@ -59,7 +67,7 @@ public class BuildingCompanion {
         this.user = user;
         this.world = user.player.getWorld();
         input_corners = new HashSet<>();
-        saved_corners = new HashMap<>();
+        saved_outlines = new HashMap<>();
 
         // Enable the tpll listener.
         listeners = new HashSet<>();
@@ -80,16 +88,25 @@ public class BuildingCompanion {
         sendFeedback(Component.text("Your selection has been cleared.", NamedTextColor.YELLOW));
     }
 
+    public void checkChangeWorld(World playerWorld) {
+        // If the world has changed, clear all saved data.
+        if (!playerWorld.equals(world)) {
+            world = user.player.getWorld();
+            input_corners.clear();
+            saved_outlines.clear();
+            sendFeedback(Component.text("You have switched worlds, resetting building companion data.", NamedTextColor.YELLOW));
+        }
+    }
+
     public boolean saveOutlines(String sUuid, BlockData block, boolean permanent) {
         UUID uuid = UUID.fromString(sUuid);
-        int[][] corners = saved_corners.get(uuid);
-        if (corners == null) {
+        SavedOutline outline = saved_outlines.get(uuid);
+        if (outline == null) {
             sendFeedback(Utils.error("The outlines are not longer available."));
             return false;
         } else {
-            drawOutlines(corners, block, permanent);
-            saved_corners.remove(uuid);
-            return true;
+            saved_outlines.remove(uuid);
+            return drawOutlines(outline, block, permanent);
         }
     }
 
@@ -102,13 +119,6 @@ public class BuildingCompanion {
      * @param location the location to add
      */
     public void addLocation(Location location) {
-        // If the world has changed, clear the set first.
-        if (!location.getWorld().equals(world)) {
-            world = user.player.getWorld();
-            input_corners.clear();
-            sendFeedback(Component.text("You have switched worlds, resetting any existing corners.", NamedTextColor.YELLOW));
-        }
-
         double[] input = new double[]{
                 location.getX(),
                 location.getZ()
@@ -185,7 +195,7 @@ public class BuildingCompanion {
             sendFeedback(Utils.error("The outlines are already being drawn."));
         } else if (!world.equals(user.player.getWorld())) {
             sendFeedback(Utils.error("You have switched worlds, unable to draw outlines."));
-        }else {
+        } else {
             sendFeedback(Utils.error("You must select at least 4 corners to draw outlines."));
         }
     }
@@ -220,37 +230,65 @@ public class BuildingCompanion {
     private void drawTempOutlinesTaskWithFeedback(int[][] corners) {
         // Draw the lines with fake blocks.
         Bukkit.getScheduler().runTask(Network.getInstance(), () -> {
-            if (Constants.REGIONS_ENABLED) {
-                RegionManager manager = Network.getInstance().getRegionManager();
-                for (int[] block : corners) {
-                    //TODO: Allow outlines in plotsystem, Network needs a module to deal with plotsystem regions.
-                    //TODO: Move Worldguard functions from Plotsystem to Network.
-                    Region region = manager.getRegion(new Location(world, block[0], 1, block[1]), user.dx, user.dz);
-                    if (!region.canBuild(user.player)) {
-                        sendFeedback(Utils.error("You do not have permission to build in this region, cancelling drawing outlines."));
-                        asyncActive = false;
-                        return;
-                    }
-                }
+            SavedOutline outline = new SavedOutline(UUID.randomUUID(), corners, world);
+            if (drawOutlines(outline, Material.ORANGE_CONCRETE.createBlockData(), false)) {
+                sendFeedback(Utils.success("The outlines have been drawn."));
+                saved_outlines.put(outline.uuid(), outline);
+                sendFeedback(Component.text("Save outlines: ", NamedTextColor.YELLOW)
+                        .append(Component.text("[Yes]", NamedTextColor.GREEN)
+                                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/buildingcompanion save " + outline.uuid())))
+                        .append(Component.text(" - ", NamedTextColor.YELLOW))
+                        .append(Component.text("[No]", NamedTextColor.RED)
+                                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/buildingcompanion remove " + outline.uuid()))));
             }
-            drawOutlines(corners, Material.ORANGE_CONCRETE.createBlockData(), false);
-            sendFeedback(Utils.success("The outlines have been drawn."));
-            UUID uuid = UUID.randomUUID();
-            saved_corners.put(uuid, corners);
-            sendFeedback(Component.text("Save outlines: ", NamedTextColor.YELLOW)
-                    .append(Component.text("[Yes]", NamedTextColor.GREEN)
-                            .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/buildingcompanion save " + uuid)))
-                    .append(Component.text(" - ", NamedTextColor.YELLOW))
-                    .append(Component.text("[No]", NamedTextColor.RED)
-                            .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/buildingcompanion remove " + uuid))));
         });
     }
 
-    private void drawOutlines(int[][] corners, BlockData block, boolean permanent) {
-        Blocks.drawLine(user.player, world, corners[0], corners[1], block, permanent, true);
-        Blocks.drawLine(user.player, world, corners[1], corners[3], block, permanent, true);
-        Blocks.drawLine(user.player, world, corners[3], corners[2], block, permanent, true);
-        Blocks.drawLine(user.player, world, corners[2], corners[0], block, permanent, true);
+    /**
+     * Draw the outlines, check if the player can build there first.
+     *
+     * @param outline   the {@link SavedOutline} outline
+     * @param block     the block to draw the outline with
+     * @param permanent should the outline be a real block, or temporary
+     * @return whether the player has permission to build here, else don't draw the outline
+     */
+    private boolean drawOutlines(SavedOutline outline, BlockData block, boolean permanent) {
+        ProtectedRegion wgRegion = null;
+        if (SERVER_TYPE == ServerType.PLOT) {
+            // Get region at first corner. If no region is found return false.
+            try {
+                wgRegion = WorldguardUtils.getRegionAt(world, BlockVector3.at(outline.corners()[0][0], 1, outline.corners()[0][1]));
+                if (wgRegion == null) {
+                    throw new RegionNotFoundException("No region found at location.");
+                } else {
+                    // Check region build permission.
+                    if (!WorldguardMembers.isMemberOrOwner(wgRegion, user.player)) {
+                        throw new NoBuildPermissionException("No permission to build in this region.");
+                    }
+                }
+            } catch (Exception e) {
+                sendFeedback(Utils.error("All or part of your selection is not in a plot you can build in, cancelled drawing outlines."));
+                return false;
+            }
+        } else if (REGIONS_ENABLED) {
+            RegionManager manager = Network.getInstance().getRegionManager();
+            for (int[] point : outline.corners()) {
+                Region region = manager.getRegion(new Location(world, point[0], 1, point[1]), user.dx, user.dz);
+                if (!region.canBuild(user.player)) {
+                    sendFeedback(Utils.error("All or part of your selection is not in a region you can build in, cancelled drawing outlines."));
+                    return false;
+                }
+            }
+        }
+        if (Blocks.drawLine(user.player, world, outline.corners()[0], outline.corners()[1], block, permanent, true, wgRegion)
+                && Blocks.drawLine(user.player, world, outline.corners()[1], outline.corners()[3], block, permanent, true, wgRegion)
+                && Blocks.drawLine(user.player, world, outline.corners()[3], outline.corners()[2], block, permanent, true, wgRegion)
+                && Blocks.drawLine(user.player, world, outline.corners()[2], outline.corners()[0], block, permanent, true, wgRegion)) {
+            return true;
+        } else {
+            sendFeedback(Utils.error("All or part of your selection is not in a plot you can build in, cancelled drawing outlines."));
+            return false;
+        }
     }
 
     private static boolean contains(Set<double[]> list, double[] input) {

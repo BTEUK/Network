@@ -1,28 +1,18 @@
 package me.bteuk.network.worldguard;
 
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.protection.regions.RegionContainer;
 import me.bteuk.network.exceptions.RegionManagerNotFoundException;
 import me.bteuk.network.exceptions.RegionNotFoundException;
-import me.bteuk.network.exceptions.WorldNotFoundException;
-import me.bteuk.network.utils.Utils;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.configuration.file.FileConfiguration;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+import java.util.Optional;
 
 public class WorldguardUtils {
 
@@ -63,5 +53,23 @@ public class WorldguardUtils {
         ApplicableRegionSet set = regionManager.getApplicableRegions(v);
 
         return set.size() > 0;
+    }
+
+    /**
+     * Get a region at the location, or null if no regions can be found.
+     * @param world the {@link World} to check the location
+     * @param bv3 the location as {@link BlockVector3}
+     * @return the {@link ProtectedRegion}
+     * @throws RegionManagerNotFoundException if no region manager exists for the world
+     */
+    public static ProtectedRegion getRegionAt(World world, BlockVector3 bv3) throws RegionManagerNotFoundException {
+
+        RegionManager regionManager = WorldguardManager.getRegionManager(world);
+
+        //Check whether there are any regions at this block.
+        ApplicableRegionSet set = regionManager.getApplicableRegions(bv3);
+        Optional<ProtectedRegion> optionalRegion = set.getRegions().stream().findFirst();
+
+        return optionalRegion.orElse(null);
     }
 }

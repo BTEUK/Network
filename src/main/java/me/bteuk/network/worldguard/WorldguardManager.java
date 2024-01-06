@@ -1,11 +1,14 @@
 package me.bteuk.network.worldguard;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import me.bteuk.network.exceptions.RegionManagerNotFoundException;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 
 public class WorldguardManager {
 
@@ -33,5 +36,9 @@ public class WorldguardManager {
             throw new RegionManagerNotFoundException(String.format("No region manager found for World %s", world.getName()));
         }
         return regionManager;
+    }
+
+    public static LocalPlayer wrapPlayer(Player player) {
+        return WorldGuardPlugin.inst().wrapPlayer(player);
     }
 }

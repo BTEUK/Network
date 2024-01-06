@@ -1,5 +1,6 @@
 package me.bteuk.network.utils;
 
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
@@ -15,7 +16,7 @@ import static me.bteuk.network.utils.Constants.LOGGER;
 public class Blocks {
 
     // Add a line.
-    public static void drawLine(Player player, World world, int[] block1, int[] block2, BlockData block, boolean permanent, boolean skipFirst) {
+    public static boolean drawLine(Player player, World world, int[] block1, int[] block2, BlockData block, boolean permanent, boolean skipFirst, ProtectedRegion checkRegionPermission) {
 
         LOGGER.info(Arrays.toString(block1) + " - " + Arrays.toString(block2));
 
@@ -31,11 +32,16 @@ public class Blocks {
                 continue;
             }
             // Remove the points from the list.
-            drawBlock(player, world,
-                    ((int) (round(block1[0] + ((i * lengthX) / (double) length)))),
-                    ((int) (round(block1[1] + ((i * lengthZ) / (double) length)))),
-                    block, permanent);
+            int x = (int) (round(block1[0] + ((i * lengthX) / (double) length)));
+            int z = (int) (round(block1[1] + ((i * lengthZ) / (double) length)));
+            // Check permission.
+            if (checkRegionPermission == null || checkRegionPermission.contains(x, 1, z)) {
+                drawBlock(player, world, x, z, block, permanent);
+            } else {
+                return false;
+            }
         }
+        return true;
     }
 
     // Draw a specific block.

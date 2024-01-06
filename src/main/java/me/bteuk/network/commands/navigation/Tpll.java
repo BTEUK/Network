@@ -260,7 +260,7 @@ public class Tpll extends AbstractCommand {
 
             //Check if the region is on the plot server.
             if (region.isPlot()) {
-                String location = Network.getInstance().plotSQL.getString("SELECT location FROM regions WHERE region='" + region.regionName() + "';");
+                String location = plotSQL.getString("SELECT location FROM regions WHERE region='" + region.regionName() + "';");
                 l.setWorld(Bukkit.getWorld(location));
             } else {
                 l.setWorld(Bukkit.getWorld(EARTH_WORLD));
