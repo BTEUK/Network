@@ -24,9 +24,11 @@ public class PlotSQL {
 
     public int getInt(String sql) {
 
-        try (Connection conn = conn();
-             PreparedStatement statement = conn.prepareStatement(sql);
-             ResultSet results = statement.executeQuery()) {
+        try (
+                Connection conn = conn();
+                PreparedStatement statement = conn.prepareStatement(sql);
+                ResultSet results = statement.executeQuery()
+        ) {
 
             if (results.next()) {
 
@@ -46,9 +48,11 @@ public class PlotSQL {
 
     public String getString(String sql) {
 
-        try (Connection conn = conn();
-             PreparedStatement statement = conn.prepareStatement(sql);
-             ResultSet results = statement.executeQuery()) {
+        try (
+                Connection conn = conn();
+                PreparedStatement statement = conn.prepareStatement(sql);
+                ResultSet results = statement.executeQuery()
+        ) {
 
             if (results.next()) {
 

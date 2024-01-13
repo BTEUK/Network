@@ -45,7 +45,7 @@ public class Zone implements CommandExecutor {
             return true;
         }
 
-        PlotSQL plotSQL = Network.getInstance().plotSQL;
+        PlotSQL plotSQL = Network.getInstance().getPlotSQL();
 
         //Check if they have an invite for this plot.
         if (plotSQL.hasRow("SELECT id FROM zone_invites WHERE id=" + zoneID + " AND uuid='" + p.getUniqueId() + "';")) {

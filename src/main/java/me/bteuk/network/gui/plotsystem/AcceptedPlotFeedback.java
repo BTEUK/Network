@@ -36,7 +36,7 @@ public class AcceptedPlotFeedback extends Gui {
         globalSQL = Network.getInstance().globalSQL;
 
         //Get plot sql.
-        plotSQL = Network.getInstance().plotSQL;
+        plotSQL = Network.getInstance().getPlotSQL();
 
         createGui();
 

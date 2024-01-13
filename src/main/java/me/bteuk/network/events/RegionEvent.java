@@ -13,14 +13,13 @@ public class RegionEvent extends AbstractEvent {
         Region region;
 
         switch (event[1]) {
-            case "set":
+            case "set" -> {
 
                 //Get region.
                 region = Network.getInstance().getRegionManager().getRegion(event[3]);
 
                 //If the region is not in the database add it.
                 region.addToPlotsystem();
-
                 if (event[2].equals("plotsystem")) {
 
                     //If region is not already set to plotsystem.
@@ -42,10 +41,8 @@ public class RegionEvent extends AbstractEvent {
                     }
 
                 }
-
-                break;
-            case "request":
-
+            }
+            case "request" -> {
                 if (event[2].equals("accept")) {
 
                     //If length is 4 then no user is specified, this implies that it should accept all requests for the region, rather than a specific request.
@@ -74,9 +71,8 @@ public class RegionEvent extends AbstractEvent {
                     Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aDenied region request for &3" + Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + event[4] + "';") + " &ain the region &3 " + event[3] + ".');");
 
                 }
-
-                break;
-            case "leave": {
+            }
+            case "leave" -> {
 
                 //Get region.
                 region = Network.getInstance().getRegionManager().getRegion(event[2]);
@@ -102,9 +98,8 @@ public class RegionEvent extends AbstractEvent {
                     region.setDefault();
 
                 }
-                break;
             }
-            case "join": {
+            case "join" -> {
 
                 //Get the region.
                 region = Network.getInstance().getRegionManager().getRegion(event[2]);
@@ -120,7 +115,6 @@ public class RegionEvent extends AbstractEvent {
                 //Send message to plot owner.
                 Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + region.getOwner() + "','&3" +
                         Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " &ahas joined region &3" + region.getTag(region.getOwner()) + "');");
-                break;
             }
         }
     }

@@ -224,7 +224,7 @@ public class Connect implements Listener {
 
         if (p.hasPermission("group.reviewer")) {
             //Show the number of submitted plots.
-            int plots = instance.plotSQL.getInt("SELECT COUNT(id) FROM plot_data WHERE status='submitted';");
+            int plots = instance.getPlotSQL().getInt("SELECT COUNT(id) FROM plot_data WHERE status='submitted';");
 
             if (plots != 0) {
                 if (plots == 1) {

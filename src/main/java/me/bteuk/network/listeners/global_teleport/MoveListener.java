@@ -2,6 +2,7 @@ package me.bteuk.network.listeners.global_teleport;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.events.EventManager;
+import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Time;
@@ -12,7 +13,6 @@ import me.bteuk.network.utils.regions.RegionManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -29,6 +29,8 @@ public class MoveListener implements Listener {
 
     private boolean blocked;
 
+    private final PlotSQL plotSQL;
+
     public MoveListener(Network instance) {
 
         Bukkit.getServer().getPluginManager().registerEvents(this, instance);
@@ -38,6 +40,8 @@ public class MoveListener implements Listener {
         regionManager = instance.getRegionManager();
 
         blocked = false;
+
+        plotSQL = instance.getPlotSQL();
 
     }
 
@@ -80,166 +84,161 @@ public class MoveListener implements Listener {
             Network.getInstance().chat.broadcastAFK(u.player, false);
         }
 
-        //If regions are enabled, check for movement between regions.
-        if (REGIONS_ENABLED) {
+        // If regions are enabled, check for movement between regions.
+        // If the player is currently not in a region then that implies they are in a world without regions, so movement will not effect this.
+        // Not being in a region also means that region is null.
+        if (REGIONS_ENABLED && u.inRegion) {
 
-            //If the player is currently not in a region then that implies they are in a world without regions, so movement will not effect this.
-            //Not being in a region also means that region is null.
-            if (u.inRegion) {
+            // Get x and z of the region as int rounded down with any necessary coordinate transforms.
+            int x = ((e.getTo().getX() >= 0 ? (int) e.getTo().getX() : ((int) e.getTo().getX()) - 1) + u.dx) >> 9;
+            int z = ((e.getTo().getZ() >= 0 ? (int) e.getTo().getZ() : ((int) e.getTo().getZ()) - 1) + u.dz) >> 9;
 
-                Location l = e.getTo().clone();
+            // Check if the player has moved to another region.
+            if (!u.region.equals(x, z)) {
 
-                //Alter location to add necessary coordinate transformation.
-                l.setX(l.getX() + u.dx);
-                l.setZ(l.getZ() + u.dz);
+                //Get new region.
+                Region region = regionManager.getRegion(x, z);
 
-                //Check if the player has moved to another region.
-                if (!u.region.equals(regionManager.getRegion(l))) {
+                //Check if the new region is on this server or not.
+                if (!u.region.getServer().equals(region.getServer())) {
 
-                    //Get new region.
-                    Region region = regionManager.getRegion(l);
-
-                    //Check if the new region is on this server or not.
-                    if (!u.region.getServer().equals(region.getServer())) {
-
-                        //If cross-server teleport is enabled teleport them to the correct server and location.
-                        if (teleportEnabled) {
-
-                            //Check if the player can enter the region.
-                            if (region.inDatabase() || p.hasPermission("group.jrbuilder")) {
-
-                                //If the server is offline, notify the player.
-                                if (Network.getInstance().globalSQL.getBoolean("SELECT online FROM server_data WHERE name='" + region.getServer() + "';")) {
-
-                                    //Add region to database if not exists.
-                                    region.addToDatabase();
-
-                                    //Region is on another server, teleport them accordingly.
-                                    //If the new region is on a plot server, check for coordinate transform.
-                                    if (region.status() == RegionStatus.PLOT) {
-
-                                        //Get server and world of region.
-                                        String location = Network.getInstance().plotSQL.getString("SELECT location FROM regions WHERE region='" + region.regionName() + "';");
-
-                                        int xTransform = Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + location + "';");
-                                        int zTransform = Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
-
-                                        //Set join event to teleport there.
-                                        EventManager.createJoinEvent(u.player.getUniqueId().toString(), "network", "teleport " +
-                                                location + " " + (l.getX() + xTransform) + " " + (l.getZ() + zTransform) + " " + l.getYaw() + " " + l.getPitch());
-
-                                    } else {
-
-                                        //Set join event to teleport there.
-                                        EventManager.createJoinEvent(u.player.getUniqueId().toString(), "network", "teleport " +
-                                                EARTH_WORLD + " " + l.getX() + " " + l.getZ() + " " + l.getYaw() + " " + l.getPitch());
-
-                                    }
-
-                                    //Switch server.
-                                    u.switching = true;
-                                    SwitchServer.switchServer(u.player, region.getServer());
-
-                                } else {
-
-                                    p.sendMessage(Utils.error("This region is on another server, however the server is currently offline."));
-
-                                }
-
-                            } else {
-
-                                //You can't enter this region.
-                                p.sendMessage(Utils.error("The terrain for this region has not been generated, you must be at least Jr.Builder to load new terrain."));
-                            }
-
-                        } else {
-
-                            //Cancel movement as the location is on another server.
-                            p.sendMessage(Utils.error("The terrain for this location is on another server, you may not enter."));
-                        }
-                        e.setCancelled(true);
-                    } else {
+                    //If cross-server teleport is enabled teleport them to the correct server and location.
+                    if (teleportEnabled) {
 
                         //Check if the player can enter the region.
                         if (region.inDatabase() || p.hasPermission("group.jrbuilder")) {
 
-                            //Add region to database if not exists.
-                            region.addToDatabase();
+                            //If the server is offline, notify the player.
+                            if (Network.getInstance().globalSQL.getBoolean("SELECT online FROM server_data WHERE name='" + region.getServer() + "';")) {
 
-                            //If the player is the region owner update last enter and tell set the message.
-                            if (region.isOwner(p.getUniqueId().toString())) {
+                                //Add region to database if not exists.
+                                region.addToDatabase();
 
-                                p.sendActionBar(
-                                        Utils.success("You have entered ")
-                                                .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
-                                                .append(Utils.success(" and left "))
-                                                .append(Component.text(u.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
-                                                .append(Utils.success(", you are the owner of this region.")));
-                                region.setLastEnter(p.getUniqueId().toString());
+                                //Region is on another server, teleport them accordingly.
+                                //If the new region is on a plot server, check for coordinate transform.
+                                if (region.status() == RegionStatus.PLOT) {
 
-                                //If the region is inactive, set it to active.
-                                if (region.status() == RegionStatus.INACTIVE) {
-                                    region.setDefault();
-                                    p.sendMessage(Utils.success("This region is no longer \"Inactive\", it has been set back to default settings."));
-                                }
+                                    //Get server and world of region.
+                                    String location = plotSQL.getString("SELECT location FROM regions WHERE region='" + region.regionName() + "';");
 
-                                //Check if the player is a region members.
-                            } else if (region.isMember(p.getUniqueId().toString())) {
+                                    int xTransform = plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + location + "';");
+                                    int zTransform = plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
 
-                                p.sendActionBar(
-                                        Utils.success("You have entered ")
-                                                .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
-                                                .append(Utils.success(" and left "))
-                                                .append(Component.text(u.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
-                                                .append(Utils.success(", you are a member of this region.")));
-                                region.setLastEnter(p.getUniqueId().toString());
+                                    //Set join event to teleport there.
+                                    EventManager.createJoinEvent(u.player.getUniqueId().toString(), "network", "teleport " +
+                                            location + " " + (e.getTo().getX() + xTransform) + " " + (e.getTo().getZ() + zTransform) + " " + e.getTo().getYaw() + " " + e.getTo().getPitch());
 
-                                //If the region is inactive, make this member to owner.
-                                if (region.status() == RegionStatus.INACTIVE) {
-                                    //Make the previous owner a member.
-                                    region.makeMember();
+                                } else {
 
-                                    //Give the new player ownership.
-                                    region.makeOwner(p.getUniqueId().toString());
-
-                                    //Update any requests to take into account the new region owner.
-                                    region.updateRequests();
-
-                                    p.sendMessage(Utils.success("This region is no longer \"Inactive\", it has been set back to default settings."));
-                                    p.sendMessage(Utils.success("You have been made the new region owner."));
+                                    //Set join event to teleport there.
+                                    EventManager.createJoinEvent(u.player.getUniqueId().toString(), "network", "teleport " +
+                                            EARTH_WORLD + " " + e.getTo().getX() + " " + e.getTo().getZ() + " " + e.getTo().getYaw() + " " + e.getTo().getPitch());
 
                                 }
 
-                                //Check if the region is open and the player is at least jr.builder.
-                            } else if (region.status() == RegionStatus.OPEN && p.hasPermission("group.jrbuilder")) {
-
-                                p.sendActionBar(
-                                        Utils.success("You have entered ")
-                                                .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
-                                                .append(Utils.success(" and left "))
-                                                .append(Component.text(u.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
-                                                .append(Utils.success(", you can build in this region.")));
+                                //Switch server.
+                                e.setCancelled(true);
+                                SwitchServer.switchServer(u.player, region.getServer());
 
                             } else {
 
-                                //Send default enter message.
-                                p.sendActionBar(
-                                        Utils.success("You have entered ")
-                                                .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
-                                                .append(Utils.success(" and left "))
-                                                .append(Component.text(u.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA)));
+                                p.sendMessage(Utils.error("This region is on another server, however the server is currently offline."));
 
                             }
-
-                            //Update the region the player is in.
-                            u.region = region;
 
                         } else {
 
                             //You can't enter this region.
                             p.sendMessage(Utils.error("The terrain for this region has not been generated, you must be at least Jr.Builder to load new terrain."));
-                            e.setCancelled(true);
                         }
+
+                    } else {
+
+                        //Cancel movement as the location is on another server.
+                        p.sendMessage(Utils.error("The terrain for this location is on another server, you may not enter."));
+                    }
+                    e.setCancelled(true);
+                } else {
+
+                    //Check if the player can enter the region.
+                    if (region.inDatabase() || p.hasPermission("group.jrbuilder")) {
+
+                        //Add region to database if not exists.
+                        region.addToDatabase();
+
+                        //If the player is the region owner update last enter and tell set the message.
+                        if (region.isOwner(p.getUniqueId().toString())) {
+
+                            p.sendActionBar(
+                                    Utils.success("You have entered ")
+                                            .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                            .append(Utils.success(" and left "))
+                                            .append(Component.text(u.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                            .append(Utils.success(", you are the owner of this region.")));
+                            region.setLastEnter(p.getUniqueId().toString());
+
+                            //If the region is inactive, set it to active.
+                            if (region.status() == RegionStatus.INACTIVE) {
+                                region.setDefault();
+                                p.sendMessage(Utils.success("This region is no longer \"Inactive\", it has been set back to default settings."));
+                            }
+
+                            //Check if the player is a region members.
+                        } else if (region.isMember(p.getUniqueId().toString())) {
+
+                            p.sendActionBar(
+                                    Utils.success("You have entered ")
+                                            .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                            .append(Utils.success(" and left "))
+                                            .append(Component.text(u.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                            .append(Utils.success(", you are a member of this region.")));
+                            region.setLastEnter(p.getUniqueId().toString());
+
+                            //If the region is inactive, make this member to owner.
+                            if (region.status() == RegionStatus.INACTIVE) {
+                                //Make the previous owner a member.
+                                region.makeMember();
+
+                                //Give the new player ownership.
+                                region.makeOwner(p.getUniqueId().toString());
+
+                                //Update any requests to take into account the new region owner.
+                                region.updateRequests();
+
+                                p.sendMessage(Utils.success("This region is no longer \"Inactive\", it has been set back to default settings."));
+                                p.sendMessage(Utils.success("You have been made the new region owner."));
+
+                            }
+
+                            //Check if the region is open and the player is at least jr.builder.
+                        } else if (region.status() == RegionStatus.OPEN && p.hasPermission("group.jrbuilder")) {
+
+                            p.sendActionBar(
+                                    Utils.success("You have entered ")
+                                            .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                            .append(Utils.success(" and left "))
+                                            .append(Component.text(u.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                            .append(Utils.success(", you can build in this region.")));
+
+                        } else {
+
+                            //Send default enter message.
+                            p.sendActionBar(
+                                    Utils.success("You have entered ")
+                                            .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                            .append(Utils.success(" and left "))
+                                            .append(Component.text(u.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA)));
+
+                        }
+
+                        //Update the region the player is in.
+                        u.region = region;
+
+                    } else {
+
+                        //You can't enter this region.
+                        p.sendMessage(Utils.error("The terrain for this region has not been generated, you must be at least Jr.Builder to load new terrain."));
+                        e.setCancelled(true);
                     }
                 }
             }
