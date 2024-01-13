@@ -43,7 +43,7 @@ public class PlotInfo extends Gui {
     public void createGui() {
 
         //Get plot sql.
-        PlotSQL plotSQL = Network.getInstance().plotSQL;
+        PlotSQL plotSQL = Network.getInstance().getPlotSQL();
 
         //Get global sql.
         GlobalSQL globalSQL = Network.getInstance().globalSQL;
@@ -69,8 +69,8 @@ public class PlotInfo extends Gui {
                     u.player.closeInventory();
 
                     //Get the server of the plot.
-                    String server = Network.getInstance().plotSQL.getString("SELECT server FROM location_data WHERE name='"
-                            + Network.getInstance().plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";")
+                    String server = plotSQL.getString("SELECT server FROM location_data WHERE name='"
+                            + plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";")
                             + "';");
 
                     //If the plot is on the current server teleport them directly.
@@ -307,7 +307,7 @@ public class PlotInfo extends Gui {
         this.clearGui();
 
         // If the plot no longer exists, return to the plot menu.
-        if (Network.getInstance().plotSQL.hasRow("SELECT id FROM plot_data WHERE id=" + plotID + ";")) {
+        if (Network.getInstance().getPlotSQL().hasRow("SELECT id FROM plot_data WHERE id=" + plotID + ";")) {
             createGui();
         } else {
             //Delete this gui.

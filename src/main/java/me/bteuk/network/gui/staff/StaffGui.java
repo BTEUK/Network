@@ -162,7 +162,7 @@ public class StaffGui extends Gui {
 
         //Click to review plot.
         //Show review plot button in gui.
-        int plot_count = Network.getInstance().plotSQL.getInt("SELECT count(id) FROM plot_data WHERE status='submitted';");
+        int plot_count = Network.getInstance().getPlotSQL().getInt("SELECT count(id) FROM plot_data WHERE status='submitted';");
         Component message;
 
         if (plot_count == 1) {
@@ -183,11 +183,11 @@ public class StaffGui extends Gui {
 
                     //Check if there is a plot available to review,
                     //that you are not already the owner or member of.
-                    if (Network.getInstance().plotSQL.hasRow("SELECT id FROM plot_data WHERE status='submitted';")) {
+                    if (Network.getInstance().getPlotSQL().hasRow("SELECT id FROM plot_data WHERE status='submitted';")) {
 
                         //Get arraylist of submitted plots.
                         //Order them by submit time, so the oldest submissions are reviewed first.
-                        ArrayList<Integer> nPlots = Network.getInstance().plotSQL.getIntList("SELECT pd.id FROM plot_data AS pd INNER JOIN plot_submissions AS ps ON pd.id=ps.id WHERE pd.status='submitted' ORDER BY ps.submit_time ASC;");
+                        ArrayList<Integer> nPlots = Network.getInstance().getPlotSQL().getIntList("SELECT pd.id FROM plot_data AS pd INNER JOIN plot_submissions AS ps ON pd.id=ps.id WHERE pd.status='submitted' ORDER BY ps.submit_time ASC;");
 
                         int counter = 0;
 
@@ -198,14 +198,14 @@ public class StaffGui extends Gui {
                             counter++;
 
                             //If you are not owner or member of the plot select it for the next review.
-                            if (!Network.getInstance().plotSQL.hasRow("SELECT id FROM plot_members WHERE uuid='" + u.player.getUniqueId() + "' AND id=" + nPlot + ";")) {
+                            if (!Network.getInstance().getPlotSQL().hasRow("SELECT id FROM plot_members WHERE uuid='" + u.player.getUniqueId() + "' AND id=" + nPlot + ";")) {
 
                                 //Check if the player has permission to review a plot.
                                 if (u.player.hasPermission("uknet.plots.review")) {
 
                                     //Get server of plot.
-                                    String server = Network.getInstance().plotSQL.getString("SELECT server FROM location_data WHERE name='" +
-                                            Network.getInstance().plotSQL.getString("SELECT location FROM plot_data WHERE id=" + nPlot + ";") + "';");
+                                    String server = Network.getInstance().getPlotSQL().getString("SELECT server FROM location_data WHERE name='" +
+                                            Network.getInstance().getPlotSQL().getString("SELECT location FROM plot_data WHERE id=" + nPlot + ";") + "';");
 
                                     //If they are not in the same server as the plot teleport them to that server and start the reviewing process.
                                     if (server.equals(SERVER_NAME)) {

@@ -1,6 +1,7 @@
 package me.bteuk.network.commands;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
 import net.buildtheearth.terraminusminus.generator.EarthGeneratorSettings;
@@ -9,7 +10,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -22,21 +22,25 @@ import static me.bteuk.network.utils.Constants.REGIONS_ENABLED;
 import static me.bteuk.network.utils.Constants.SERVER_TYPE;
 import static me.bteuk.network.utils.enums.ServerType.PLOT;
 
-public class ll implements CommandExecutor {
+public class ll extends AbstractCommand {
 
     private final EarthGeneratorSettings bteGeneratorSettings = EarthGeneratorSettings.parse(EarthGeneratorSettings.BTE_DEFAULT_SETTINGS);
     private static final DecimalFormat DECIMAL_FORMATTER = new DecimalFormat("##.#####");
 
-    @Deprecated
+    private final PlotSQL plotSQL;
+
+    public ll(Network instance) {
+        super(instance, "ll");
+        plotSQL = instance.getPlotSQL();
+    }
+
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
 
         //Check if the sender is a player.
-        if (!(sender instanceof Player p)) {
-
-            sender.sendMessage(Utils.error("This command can only be run by a player."));
+        Player p = getPlayer(sender);
+        if (p == null) {
             return true;
-
         }
 
         //Get coordinates at the location of the player if they're in a region.
@@ -68,11 +72,11 @@ public class ll implements CommandExecutor {
                 //TEMP: The following if statement is only necessary because the server does not update the dx,dz
                 // on teleport when regions are disabled, this will be fixed in BTEUK-315!
                 // If the player is in the plotsystem update their dx,dz.
-                if (SERVER_TYPE == PLOT && Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + p.getWorld().getName() + "';")) {
+                if (SERVER_TYPE == PLOT && plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + p.getWorld().getName() + "';")) {
 
                         //Get negative coordinate transform of new location.
-                        u.dx = -Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + p.getWorld().getName() + "';");
-                        u.dz = -Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + p.getWorld().getName() + "';");
+                        u.dx = -plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + p.getWorld().getName() + "';");
+                        u.dz = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + p.getWorld().getName() + "';");
                 }
 
                 double[] coords = bteGeneratorSettings.projection().toGeo(p.getLocation().getX() + u.dx, p.getLocation().getZ() + u.dz);

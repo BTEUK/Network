@@ -43,7 +43,7 @@ public class InviteMembers extends Gui {
 
         globalSQL = Network.getInstance().globalSQL;
         regionSQL = Network.getInstance().regionSQL;
-        plotSQL = Network.getInstance().plotSQL;
+        plotSQL = Network.getInstance().getPlotSQL();
 
         createGui();
 
