@@ -5,6 +5,8 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.bteuk.network.Network;
 import me.bteuk.network.exceptions.NoBuildPermissionException;
 import me.bteuk.network.exceptions.RegionNotFoundException;
+import me.bteuk.network.exceptions.building_companion.DistanceLimitException;
+import me.bteuk.network.exceptions.building_companion.OutsidePlotException;
 import me.bteuk.network.utils.Blocks;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
@@ -280,14 +282,14 @@ public class BuildingCompanion {
                 }
             }
         }
-        //TODO: Limit max distance between corners.
-        if (Blocks.drawLine(user.player, world, outline.corners()[0], outline.corners()[1], block, permanent, true, wgRegion)
-                && Blocks.drawLine(user.player, world, outline.corners()[1], outline.corners()[3], block, permanent, true, wgRegion)
-                && Blocks.drawLine(user.player, world, outline.corners()[3], outline.corners()[2], block, permanent, true, wgRegion)
-                && Blocks.drawLine(user.player, world, outline.corners()[2], outline.corners()[0], block, permanent, true, wgRegion)) {
+        try {
+            Blocks.drawLine(user.player, world, outline.corners()[0], outline.corners()[1], block, permanent, true, wgRegion);
+            Blocks.drawLine(user.player, world, outline.corners()[1], outline.corners()[3], block, permanent, true, wgRegion);
+            Blocks.drawLine(user.player, world, outline.corners()[3], outline.corners()[2], block, permanent, true, wgRegion);
+            Blocks.drawLine(user.player, world, outline.corners()[2], outline.corners()[0], block, permanent, true, wgRegion);
             return true;
-        } else {
-            sendFeedback(Utils.error("All or part of your selection is not in a plot you can build in, cancelled drawing outlines."));
+        } catch (Exception e) {
+            sendFeedback(Utils.error(e.getMessage()));
             return false;
         }
     }

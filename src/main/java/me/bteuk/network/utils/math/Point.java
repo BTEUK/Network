@@ -25,4 +25,14 @@ public class Point {
         return (BlockVector2.at(x, z));
 
     }
+
+    /** Get the distance between point 1 and point 2.
+     *
+     * @param p1 point 1
+     * @param p2 point 2
+     * @return the distance between the points
+     */
+    public static double distanceBetween(int[] p1, int[] p2) {
+        return Math.sqrt(((p2[0] - p1[0]) * (p2[0] - p1[0])) + ((p2[1] - p1[1]) * (p2[1] - p1[1])));
+    }
 }

@@ -1,6 +1,9 @@
 package me.bteuk.network.utils;
 
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import me.bteuk.network.exceptions.building_companion.DistanceLimitException;
+import me.bteuk.network.exceptions.building_companion.OutsidePlotException;
+import me.bteuk.network.utils.math.Point;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
@@ -15,12 +18,17 @@ import static me.bteuk.network.utils.Constants.LOGGER;
 
 public class Blocks {
 
+    private static int MAX_DISTANCE = 200;
+
     // Add a line.
-    public static boolean drawLine(Player player, World world, int[] block1, int[] block2, BlockData block, boolean permanent, boolean skipFirst, ProtectedRegion checkRegionPermission) {
+    public static void drawLine(Player player, World world, int[] block1, int[] block2, BlockData block, boolean permanent, boolean skipFirst, ProtectedRegion checkRegionPermission) throws OutsidePlotException, DistanceLimitException {
 
-        LOGGER.info(Arrays.toString(block1) + " - " + Arrays.toString(block2));
+        // Check for maximum distance.
+        if (Point.distanceBetween(block1, block2) > MAX_DISTANCE) {
+            throw new DistanceLimitException("The distance between 2 corners too big, cancelled drawing outlines.");
+        }
 
-        //Get length in x and z direction.
+        // Get length in x and z direction.
         int lengthX = block2[0] - block1[0];
         int lengthZ = block2[1] - block1[1];
 
@@ -38,10 +46,9 @@ public class Blocks {
             if (checkRegionPermission == null || checkRegionPermission.contains(x, 1, z)) {
                 drawBlock(player, world, x, z, block, permanent);
             } else {
-                return false;
+                throw new OutsidePlotException("All or part of your selection is not in a plot you can build in, cancelled drawing outlines.");
             }
         }
-        return true;
     }
 
     // Draw a specific block.
