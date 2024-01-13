@@ -280,6 +280,7 @@ public class BuildingCompanion {
                 }
             }
         }
+        //TODO: Limit max distance between corners.
         if (Blocks.drawLine(user.player, world, outline.corners()[0], outline.corners()[1], block, permanent, true, wgRegion)
                 && Blocks.drawLine(user.player, world, outline.corners()[1], outline.corners()[3], block, permanent, true, wgRegion)
                 && Blocks.drawLine(user.player, world, outline.corners()[3], outline.corners()[2], block, permanent, true, wgRegion)

@@ -10,6 +10,8 @@ import me.bteuk.network.exceptions.RegionManagerNotFoundException;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import static net.buildtheearth.terraminusminus.TerraMinusMinus.LOGGER;
+
 public class WorldguardManager {
 
     private static WorldGuard instance;
@@ -17,8 +19,9 @@ public class WorldguardManager {
     /**
      * Constructor, initialises the WorldGuard instance.
      */
-    public WorldguardManager() {
+    public static void setInstance() {
         instance = WorldGuard.getInstance();
+        LOGGER.info("Set WorldGuard instance");
     }
 
     /**
@@ -29,6 +32,9 @@ public class WorldguardManager {
      * @throws RegionManagerNotFoundException if no region manager exists
      */
     public static RegionManager getRegionManager(World world) throws RegionManagerNotFoundException {
+        if (instance == null) {
+            setInstance();
+        }
         RegionContainer container = instance.getPlatform().getRegionContainer();
         RegionManager regionManager = container.get(BukkitAdapter.adapt(world));
 
