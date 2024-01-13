@@ -2,6 +2,7 @@ package me.bteuk.network.building_companion;
 
 import lombok.Getter;
 import me.bteuk.network.utils.math.Line;
+import me.bteuk.network.utils.math.Point;
 
 import java.util.Arrays;
 
@@ -134,10 +135,6 @@ public class BestFitRectangle {
         return 0;
     }
 
-    private double distanceBetween(double[] pointA, double[] pointB) {
-        return Math.sqrt((pointA[0] - pointB[0]) * (pointA[0] - pointB[0]) + (pointA[1] - pointB[1]) * (pointA[1] - pointB[1]));
-    }
-
     /**
      * Get the angles of the lines.
      * Add 90 degrees to the last 2 lines.
@@ -213,7 +210,7 @@ public class BestFitRectangle {
     }
 
     private double getSummedDistance(double[] cornerA, double[] pointA, double[] cornerB, double[] pointB) {
-        return distanceBetween(cornerA, pointA) + distanceBetween(cornerB, pointB);
+        return Point.distanceBetween(cornerA, pointA) + Point.distanceBetween(cornerB, pointB);
     }
 
     private void tryImprove(Line[] lines, double[][] points, boolean[] isDone,
