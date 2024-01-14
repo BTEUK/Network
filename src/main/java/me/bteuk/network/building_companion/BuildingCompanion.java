@@ -272,7 +272,7 @@ public class BuildingCompanion {
                 sendFeedback(Utils.error("All or part of your selection is not in a plot you can build in, cancelled drawing outlines."));
                 return false;
             }
-        } else if (REGIONS_ENABLED) {
+        } else if (REGIONS_ENABLED && SERVER_TYPE == ServerType.EARTH) {
             RegionManager manager = Network.getInstance().getRegionManager();
             for (int[] point : outline.corners()) {
                 Region region = manager.getRegion(new Location(world, point[0], 1, point[1]), user.dx, user.dz);
@@ -281,6 +281,9 @@ public class BuildingCompanion {
                     return false;
                 }
             }
+        } else {
+            sendFeedback(Utils.error("You are not able to generate outlines on this server."));
+            return false;
         }
         try {
             Blocks.drawLine(user.player, world, outline.corners()[0], outline.corners()[1], block, permanent, true, wgRegion);
