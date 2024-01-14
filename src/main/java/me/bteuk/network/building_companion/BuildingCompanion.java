@@ -281,7 +281,7 @@ public class BuildingCompanion {
                     return false;
                 }
             }
-        } else {
+        } else if (SERVER_TYPE != ServerType.EARTH) {
             sendFeedback(Utils.error("You are not able to generate outlines on this server."));
             return false;
         }
