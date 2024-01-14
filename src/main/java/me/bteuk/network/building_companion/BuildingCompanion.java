@@ -5,8 +5,6 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.bteuk.network.Network;
 import me.bteuk.network.exceptions.NoBuildPermissionException;
 import me.bteuk.network.exceptions.RegionNotFoundException;
-import me.bteuk.network.exceptions.building_companion.DistanceLimitException;
-import me.bteuk.network.exceptions.building_companion.OutsidePlotException;
 import me.bteuk.network.utils.Blocks;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
@@ -34,6 +32,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import static me.bteuk.network.utils.Constants.LOGGER;
 import static me.bteuk.network.utils.Constants.REGIONS_ENABLED;
 import static me.bteuk.network.utils.Constants.SERVER_TYPE;
 
@@ -82,6 +81,7 @@ public class BuildingCompanion {
      */
     public void disable() {
         // Unregister the events.
+        LOGGER.info("Disabling the building companion for " + user.player.getName());
         listeners.forEach(HandlerList::unregisterAll);
     }
 
