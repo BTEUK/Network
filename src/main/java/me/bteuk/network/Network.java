@@ -2,6 +2,7 @@ package me.bteuk.network;
 
 import lombok.Getter;
 import me.bteuk.network.commands.AFK;
+import me.bteuk.network.commands.BuildingCompanionCommand;
 import me.bteuk.network.commands.Clear;
 import me.bteuk.network.commands.Discord;
 import me.bteuk.network.commands.Gamemode;
@@ -118,7 +119,8 @@ public final class Network extends JavaPlugin {
     public ItemStack navigator;
 
     //SQL
-    public PlotSQL plotSQL;
+    @Getter
+    private PlotSQL plotSQL;
     public GlobalSQL globalSQL;
     public RegionSQL regionSQL;
 
@@ -348,7 +350,7 @@ public final class Network extends JavaPlugin {
 
         getCommand("discord").setExecutor(new Discord());
 
-        getCommand("ll").setExecutor(new ll());
+        new ll(this);
 
         getCommand("nightvision").setExecutor(new Nightvision());
         getCommand("speed").setExecutor(new Speed());
@@ -439,6 +441,8 @@ public final class Network extends JavaPlugin {
         }
 
         new Exp(this);
+
+        new BuildingCompanionCommand(this);
 
         //Enable server in server table.
         globalSQL.update("UPDATE server_data SET online=1 WHERE name='" + SERVER_NAME + "';");

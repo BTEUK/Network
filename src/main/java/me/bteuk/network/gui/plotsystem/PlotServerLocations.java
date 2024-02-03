@@ -34,7 +34,7 @@ public class PlotServerLocations extends Gui {
 
         super(45, Component.text("Plot Locations", NamedTextColor.AQUA, TextDecoration.BOLD));
 
-        plotSQL = Network.getInstance().plotSQL;
+        plotSQL = Network.getInstance().getPlotSQL();
 
         //Set default values of gui.
 
@@ -174,27 +174,27 @@ public class PlotServerLocations extends Gui {
 
                                 //Select a random plot of the hard difficulty.
                                 //Since this is the next plot difficulty to get Builder.
-                                id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location = '" + location +
+                                id = plotSQL.getInt("SELECT id FROM plot_data WHERE location = '" + location +
                                         "' AND status='unclaimed' AND difficulty=3 ORDER BY RAND() LIMIT 1;");
 
                             } else if (Roles.builderRole(u.player).equals("apprentice")) {
 
                                 //Select a random plot of the normal difficulty.
                                 //Since this is the next plot difficulty to get Jr.Builder.
-                                id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location = '" + location +
+                                id = plotSQL.getInt("SELECT id FROM plot_data WHERE location = '" + location +
                                         "' AND status='unclaimed' AND difficulty=2 ORDER BY RAND() LIMIT 1;");
 
                             } else if (Roles.builderRole(u.player).equals("default")) {
 
                                 //Select a random plot of the easy difficulty.
                                 //Since this is the next plot difficulty to get Apprentice.
-                                id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location = '" + location +
+                                id = plotSQL.getInt("SELECT id FROM plot_data WHERE location = '" + location +
                                         "' AND status='unclaimed' AND difficulty=1 ORDER BY RAND() LIMIT 1;");
 
                             } else {
 
                                 //Select a random plot of any difficulty.
-                                id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location = '" + location +
+                                id = plotSQL.getInt("SELECT id FROM plot_data WHERE location = '" + location +
                                         "' AND status='unclaimed' ORDER BY RAND() LIMIT 1;");
 
                             }
@@ -206,26 +206,26 @@ public class PlotServerLocations extends Gui {
 
                                 //Select a random plot of the hard difficulty.
                                 //Since this is the next plot difficulty to get Builder.
-                                id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location = '" + location +
+                                id = plotSQL.getInt("SELECT id FROM plot_data WHERE location = '" + location +
                                         "' AND status='unclaimed' AND difficulty=3 AND size=" + plotSize + " ORDER BY RAND() LIMIT 1;");
 
                             } else if (Roles.builderRole(u.player).equals("apprentice")) {
 
                                 //Select a random plot of the normal difficulty.
                                 //Since this is the next plot difficulty to get Jr.Builder.
-                                id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location = '" + location +
+                                id = plotSQL.getInt("SELECT id FROM plot_data WHERE location = '" + location +
                                         "' AND status='unclaimed' AND difficulty=2 AND size=" + plotSize + " ORDER BY RAND() LIMIT 1;");
 
                             } else if (Roles.builderRole(u.player).equals("default")) {
 
                                 //Select a random plot of the easy difficulty.
                                 //Since this is the next plot difficulty to get Apprentice.
-                                id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location = '" + location +
+                                id = plotSQL.getInt("SELECT id FROM plot_data WHERE location = '" + location +
                                         "' AND status='unclaimed' AND difficulty=1 AND size=" + plotSize + " ORDER BY RAND() LIMIT 1;");
 
                             } else {
                                 //Select a random plot of any difficulty.
-                                id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location = '" + location +
+                                id = plotSQL.getInt("SELECT id FROM plot_data WHERE location = '" + location +
                                         "' AND status='unclaimed' AND size=" + plotSize + " ORDER BY RAND() LIMIT 1;");
                             }
 
@@ -233,14 +233,14 @@ public class PlotServerLocations extends Gui {
                         } else if (plotSize == 0) {
                             //Pick plot with random size but fixed difficulty.
 
-                            id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location='" + location +
+                            id = plotSQL.getInt("SELECT id FROM plot_data WHERE location='" + location +
                                     "' AND status='unclaimed' AND difficulty=" + plotDifficulty + " ORDER BY RAND() LIMIT 1;");
 
                         } else {
                             //Both size and difficulty are specified.
 
                             //Select a random plot of any difficulty.
-                            id = Network.getInstance().plotSQL.getInt("SELECT id FROM plot_data WHERE location='" + location +
+                            id = plotSQL.getInt("SELECT id FROM plot_data WHERE location='" + location +
                                     "' AND status='unclaimed' AND difficulty=" + plotDifficulty + " AND size=" + plotSize + " ORDER BY RAND() LIMIT 1;");
 
                         }
@@ -254,8 +254,8 @@ public class PlotServerLocations extends Gui {
                         } else {
 
                             //Get the server of the plot.
-                            String server = Network.getInstance().plotSQL.getString("SELECT server FROM location_data WHERE name='"
-                                    + Network.getInstance().plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";")
+                            String server = plotSQL.getString("SELECT server FROM location_data WHERE name='"
+                                    + plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";")
                                     + "';");
 
                             //If the plot is on the current server teleport them directly.

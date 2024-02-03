@@ -5,6 +5,7 @@ import me.bteuk.network.events.EventManager;
 import me.bteuk.network.gui.*;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
+import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.PlotValues;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
@@ -25,10 +26,13 @@ public class PlotInfo extends Gui {
     private final int plotID;
     private final String uuid;
 
-    public PlotInfo(int plotID, String uuid) {
+    private final NetworkUser user;
+
+    public PlotInfo(NetworkUser user, int plotID, String uuid) {
 
         super(27, Component.text("Plot " + plotID, NamedTextColor.AQUA, TextDecoration.BOLD));
 
+        this.user = user;
         this.plotID = plotID;
         this.uuid = uuid;
 
@@ -39,7 +43,7 @@ public class PlotInfo extends Gui {
     public void createGui() {
 
         //Get plot sql.
-        PlotSQL plotSQL = Network.getInstance().plotSQL;
+        PlotSQL plotSQL = Network.getInstance().getPlotSQL();
 
         //Get global sql.
         GlobalSQL globalSQL = Network.getInstance().globalSQL;
@@ -65,8 +69,8 @@ public class PlotInfo extends Gui {
                     u.player.closeInventory();
 
                     //Get the server of the plot.
-                    String server = Network.getInstance().plotSQL.getString("SELECT server FROM location_data WHERE name='"
-                            + Network.getInstance().plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";")
+                    String server = plotSQL.getString("SELECT server FROM location_data WHERE name='"
+                            + plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";")
                             + "';");
 
                     //If the plot is on the current server teleport them directly.
@@ -301,7 +305,18 @@ public class PlotInfo extends Gui {
     public void refresh() {
 
         this.clearGui();
-        createGui();
 
+        // If the plot no longer exists, return to the plot menu.
+        if (Network.getInstance().getPlotSQL().hasRow("SELECT id FROM plot_data WHERE id=" + plotID + ";")) {
+            createGui();
+        } else {
+            //Delete this gui.
+            this.delete();
+            user.mainGui = null;
+
+            //Switch back to plot menu.
+            user.mainGui = new PlotMenu(user);
+            user.mainGui.open(user);
+        }
     }
 }

@@ -2,7 +2,6 @@ package me.bteuk.network.commands;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.events.EventManager;
-import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.Utils;
 import org.bukkit.command.Command;
@@ -46,8 +45,7 @@ public class Plot implements CommandExecutor {
             return true;
         }
 
-        GlobalSQL globalSQL = Network.getInstance().globalSQL;
-        PlotSQL plotSQL = Network.getInstance().plotSQL;
+        PlotSQL plotSQL = Network.getInstance().getPlotSQL();
 
         //Check if they have an invite for this plot.
         if (plotSQL.hasRow("SELECT id FROM plot_invites WHERE id=" + plotID + " AND uuid='" + p.getUniqueId() + "';")) {

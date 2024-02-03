@@ -238,14 +238,14 @@ public class AddLocation extends Gui {
                             String worldName = u.player.getLocation().getWorld().getName();
 
                             //If location exists.
-                            if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + worldName + "';")) {
+                            if (Network.getInstance().getPlotSQL().hasRow("SELECT name FROM location_data WHERE name='" + worldName + "';")) {
 
                                 //Add coordinate transformation.
                                 l = new Location(
                                         l.getWorld(),
-                                        l.getX() - Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + worldName + "';"),
+                                        l.getX() - Network.getInstance().getPlotSQL().getInt("SELECT xTransform FROM location_data WHERE name='" + worldName + "';"),
                                         l.getY(),
-                                        l.getZ() - Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + worldName + "';"),
+                                        l.getZ() - Network.getInstance().getPlotSQL().getInt("SELECT zTransform FROM location_data WHERE name='" + worldName + "';"),
                                         l.getYaw(),
                                         l.getPitch()
                                 );
@@ -306,15 +306,15 @@ public class AddLocation extends Gui {
                                 String worldName = u.player.getLocation().getWorld().getName();
 
                                 //If location exists.
-                                if (Network.getInstance().plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + worldName + "';")) {
+                                if (Network.getInstance().getPlotSQL().hasRow("SELECT name FROM location_data WHERE name='" + worldName + "';")) {
 
                                     //Add coordinate transformation.
 
                                     l = new Location(
                                             l.getWorld(),
-                                            l.getX() - Network.getInstance().plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + worldName + "';"),
+                                            l.getX() - Network.getInstance().getPlotSQL().getInt("SELECT xTransform FROM location_data WHERE name='" + worldName + "';"),
                                             l.getY(),
-                                            l.getZ() - Network.getInstance().plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + worldName + "';"),
+                                            l.getZ() - Network.getInstance().getPlotSQL().getInt("SELECT zTransform FROM location_data WHERE name='" + worldName + "';"),
                                             l.getYaw(),
                                             l.getPitch()
                                     );
@@ -396,7 +396,8 @@ public class AddLocation extends Gui {
                         globalSQL.update("DELETE FROM location_requests WHERE location='" + name + "';");
 
                         //Notify player.
-                        u.player.sendMessage(Utils.error("Denied location request &4" + name + "&c."));
+                        u.player.sendMessage(Utils.error("Denied location request ")
+                                        .append(Component.text(name, NamedTextColor.DARK_RED)));
 
                         //Delete gui and return to previous menu.
                         this.delete();

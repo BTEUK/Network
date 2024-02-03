@@ -23,7 +23,7 @@ public class PlotMenu extends Gui {
         super(45, Component.text("Plot Menu", NamedTextColor.AQUA, TextDecoration.BOLD));
 
         this.user = user;
-        plotSQL = Network.getInstance().plotSQL;
+        plotSQL = Network.getInstance().getPlotSQL();
 
         createGui();
 
@@ -55,7 +55,7 @@ public class PlotMenu extends Gui {
                         u.mainGui = null;
 
                         //Switch to plot info.
-                        u.mainGui = new PlotInfo(plots.get(finalI), u.player.getUniqueId().toString());
+                        u.mainGui = new PlotInfo(u, plots.get(finalI), u.player.getUniqueId().toString());
                         u.mainGui.open(u);
 
                     });

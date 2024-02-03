@@ -59,6 +59,7 @@ public class Timers {
     private final long afk;
 
     //Discord roles
+    @Getter
     private final HashMap<String, Long> roles;
 
     //Event manager
@@ -294,10 +295,6 @@ public class Timers {
             Bukkit.getScheduler().cancelTask(timer);
         }
 
-    }
-
-    public HashMap<String, Long> getRoles() {
-        return roles;
     }
 
     //TODO: Only run this on role add/remove as well as discord link/unlink.

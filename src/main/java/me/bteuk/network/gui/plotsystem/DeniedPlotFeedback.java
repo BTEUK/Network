@@ -27,7 +27,7 @@ public class DeniedPlotFeedback extends Gui {
         this.plotID = plotID;
 
         //Get plot sql.
-        plotSQL = Network.getInstance().plotSQL;
+        plotSQL = Network.getInstance().getPlotSQL();
 
         //Get global sql.
         globalSQL = Network.getInstance().globalSQL;
@@ -121,7 +121,7 @@ public class DeniedPlotFeedback extends Gui {
                     u.mainGui = null;
 
                     //Switch back to plot menu.
-                    u.mainGui = new PlotInfo(plotID, u.player.getUniqueId().toString());
+                    u.mainGui = new PlotInfo(u, plotID, u.player.getUniqueId().toString());
                     u.mainGui.open(u);
 
                 });

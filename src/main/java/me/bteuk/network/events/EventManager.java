@@ -32,12 +32,14 @@ public class EventManager extends AbstractEvent {
 
     public static void createJoinEvent(String uuid, String type, String event) {
         Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) " +
-                "VALUES('" + uuid + "','" + type + "','" + event + "');");
+                "VALUES('" + uuid + "','" + type + "','" + event + "') " +
+                "ON DUPLICATE KEY UPDATE type='" + type + "', event='" + event + "';");
     }
 
     public static void createJoinEvent(String uuid, String type, String event, String message) {
         Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event,message) " +
-                "VALUES('" + uuid + "','" + type + "','" + event + "','" + message + "');");
+                "VALUES('" + uuid + "','" + type + "','" + event + "','" + message + "') " +
+                "ON DUPLICATE KEY UPDATE type='" + type + "', event='" + event + "', message='" + message + "';");
     }
 
     /**

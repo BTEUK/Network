@@ -201,10 +201,10 @@ public class CommandPreProcess extends Moderation implements Listener {
                 String uuid = u.player.getUniqueId().toString();
 
                 //Remove any outstanding invites that this player has sent.
-                instance.plotSQL.update("DELETE FROM plot_invites WHERE owner='" + uuid + "';");
+                instance.getPlotSQL().update("DELETE FROM plot_invites WHERE owner='" + uuid + "';");
 
                 //Remove any outstanding invites that this player has received.
-                instance.plotSQL.update("DELETE FROM plot_invites WHERE uuid='" + uuid + "';");
+                instance.getPlotSQL().update("DELETE FROM plot_invites WHERE uuid='" + uuid + "';");
 
                 //Set last_online time in playerdata.
                 instance.globalSQL.update("UPDATE player_data SET last_online=" + Time.currentTime() + " WHERE UUID='" + uuid + "';");
@@ -226,9 +226,9 @@ public class CommandPreProcess extends Moderation implements Listener {
 
                 //Run disconnect message.
                 if (DISCORD_CHAT) {
-                    instance.chat.broadcastMessage(Component.text(TextureUtils.getAvatarUrl(u.player.getUniqueId(), player_skin) + " ")
-                                    .append(LegacyComponentSerializer.legacyAmpersand().deserialize(Objects.requireNonNull(CONFIG.getString("chat.custom_messages.leave")).replace("%player%", name)))
-                            , "uknet:discord_disconnect");
+                    Component message = Component.text(TextureUtils.getAvatarUrl(u.player.getUniqueId(), player_skin) + " ")
+                            .append(LegacyComponentSerializer.legacyAmpersand().deserialize(Objects.requireNonNull(CONFIG.getString("chat.custom_messages.leave")).replace("%player%", name)));
+                    instance.chat.broadcastDiscordAnnouncement(message, "disconnect");
                 }
 
             }

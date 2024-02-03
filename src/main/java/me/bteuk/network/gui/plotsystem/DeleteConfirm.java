@@ -31,7 +31,7 @@ public class DeleteConfirm extends Gui {
     private void createGui() {
 
         //Get plot sql.
-        PlotSQL plotSQL = Network.getInstance().plotSQL;
+        PlotSQL plotSQL = Network.getInstance().getPlotSQL();
 
         //Delete plot
         setItem(13, Utils.createItem(Material.TNT, 1,
@@ -80,11 +80,11 @@ public class DeleteConfirm extends Gui {
                     //Switch back to plot or zone info.
                     if (regionType == RegionType.PLOT) {
 
-                        u.mainGui = new PlotInfo(id, u.player.getUniqueId().toString());
+                        u.mainGui = new PlotInfo(u, id, u.player.getUniqueId().toString());
 
                     } else if (regionType == RegionType.ZONE) {
 
-                        u.mainGui = new ZoneInfo(id, u.player.getUniqueId().toString());
+                        u.mainGui = new ZoneInfo(u, id, u.player.getUniqueId().toString());
 
                     } else {
 
