@@ -2,6 +2,7 @@ package me.bteuk.network.listeners;
 
 import lombok.Setter;
 import me.bteuk.network.Network;
+import me.bteuk.network.building_companion.BuildingCompanion;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
@@ -117,6 +118,12 @@ public class Connect implements Listener {
         if (u.afk) {
             u.last_time_log = u.last_movement = Time.currentTime();
             u.afk = false;
+        }
+
+        // If the companion is enabled, disable it.
+        BuildingCompanion companion = u.getCompanion();
+        if (companion != null) {
+            companion.disable();
         }
 
         //Update statistics

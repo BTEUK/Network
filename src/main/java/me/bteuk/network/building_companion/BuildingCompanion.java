@@ -5,8 +5,6 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.bteuk.network.Network;
 import me.bteuk.network.exceptions.NoBuildPermissionException;
 import me.bteuk.network.exceptions.RegionNotFoundException;
-import me.bteuk.network.exceptions.building_companion.DistanceLimitException;
-import me.bteuk.network.exceptions.building_companion.OutsidePlotException;
 import me.bteuk.network.utils.Blocks;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
@@ -34,6 +32,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import static me.bteuk.network.utils.Constants.LOGGER;
 import static me.bteuk.network.utils.Constants.REGIONS_ENABLED;
 import static me.bteuk.network.utils.Constants.SERVER_TYPE;
 
@@ -82,6 +81,7 @@ public class BuildingCompanion {
      */
     public void disable() {
         // Unregister the events.
+        LOGGER.info("Disabling the building companion for " + user.player.getName());
         listeners.forEach(HandlerList::unregisterAll);
     }
 
@@ -272,7 +272,7 @@ public class BuildingCompanion {
                 sendFeedback(Utils.error("All or part of your selection is not in a plot you can build in, cancelled drawing outlines."));
                 return false;
             }
-        } else if (REGIONS_ENABLED) {
+        } else if (REGIONS_ENABLED && SERVER_TYPE == ServerType.EARTH) {
             RegionManager manager = Network.getInstance().getRegionManager();
             for (int[] point : outline.corners()) {
                 Region region = manager.getRegion(new Location(world, point[0], 1, point[1]), user.dx, user.dz);
@@ -281,6 +281,9 @@ public class BuildingCompanion {
                     return false;
                 }
             }
+        } else if (SERVER_TYPE != ServerType.EARTH) {
+            sendFeedback(Utils.error("You are not able to generate outlines on this server."));
+            return false;
         }
         try {
             Blocks.drawLine(user.player, world, outline.corners()[0], outline.corners()[1], block, permanent, true, wgRegion);

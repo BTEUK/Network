@@ -132,7 +132,7 @@ public class MoveListener implements Listener {
 
                                     //Set join event to teleport there.
                                     EventManager.createJoinEvent(u.player.getUniqueId().toString(), "network", "teleport " +
-                                            EARTH_WORLD + " " + e.getTo().getX() + " " + e.getTo().getZ() + " " + e.getTo().getYaw() + " " + e.getTo().getPitch());
+                                            EARTH_WORLD + " " + (e.getTo().getX() + u.dx) + " " + (e.getTo().getZ()  + u.dz) + " " + e.getTo().getYaw() + " " + e.getTo().getPitch());
 
                                 }
 
