@@ -29,35 +29,31 @@ public class GuiListener implements Listener {
     @EventHandler
     public void onClick(InventoryClickEvent e){
 
-        if (!(e.getWhoClicked() instanceof Player)){
-
-            return;
-
-        }
-
-        NetworkUser u = instance.getUser((Player) e.getWhoClicked());
-
-        //If u is null, cancel.
-        if (u == null) {
-            LOGGER.severe("User " + e.getWhoClicked().getName() + " can not be found!");
-            e.getWhoClicked().sendMessage(Utils.error("User can not be found, please relog!"));
+        if (!(e.getWhoClicked() instanceof Player player)){
             return;
         }
 
-        UUID playerUUID = u.player.getUniqueId();
+        UUID playerUUID = player.getUniqueId();
 
         UUID inventoryUUID = Gui.openInventories.get(playerUUID);
 
         if (inventoryUUID != null){
+
+            NetworkUser u = instance.getUser(player);
+
+            //If u is null, cancel.
+            if (u == null) {
+                LOGGER.severe("User " + e.getWhoClicked().getName() + " can not be found!");
+                e.getWhoClicked().sendMessage(Utils.error("User can not be found, please relog!"));
+                return;
+            }
 
             e.setCancelled(true);
             Gui gui = Gui.inventoriesByUUID.get(inventoryUUID);
             Gui.guiAction action = gui.getActions().get(e.getRawSlot());
 
             if (action != null){
-
                 action.click(u);
-
             }
         }
     }
@@ -68,8 +64,21 @@ public class GuiListener implements Listener {
         Player p = (Player) e.getPlayer();
         UUID playerUUID = p.getUniqueId();
 
-        //Remove the player from the list of open inventories.
-        Gui.openInventories.remove(playerUUID);
+        // Get the uuid of the open inventory, if exists.
+        UUID guiUuid = Gui.openInventories.get(playerUUID);
 
+        if (guiUuid != null) {
+
+            // Get the gui.
+            Gui gui = Gui.inventoriesByUUID.get(guiUuid);
+
+            // If the gui should delete on close, delete it.
+            if (gui != null && gui.isDeleteOnClose()) {
+                gui.delete();
+            } else {
+                //Remove the player from the list of open inventories.
+                Gui.openInventories.remove(playerUUID);
+            }
+        }
     }
 }

@@ -284,4 +284,15 @@ public class NetworkUser {
         dx = -plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + l.getWorld().getName() + "';");
         dz = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + l.getWorld().getName() + "';");
     }
+
+    public Location getLocationWithCoordinateTransform() {
+        return new Location(
+                player.getWorld(),
+                player.getLocation().getX() + dx,
+                player.getLocation().getY(),
+                player.getLocation().getZ() + dz,
+                player.getLocation().getYaw(),
+                player.getLocation().getPitch()
+        )
+    }
 }

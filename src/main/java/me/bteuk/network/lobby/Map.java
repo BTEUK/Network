@@ -1,15 +1,12 @@
 package me.bteuk.network.lobby;
 
 import me.bteuk.network.Network;
-import me.bteuk.network.utils.NetworkUser;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Listener;
 
 import java.io.File;
-import java.util.Objects;
 import java.util.Set;
 
 import static me.bteuk.network.utils.Constants.LOGGER;
