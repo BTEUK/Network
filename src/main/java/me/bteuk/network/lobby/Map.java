@@ -1,23 +1,24 @@
 package me.bteuk.network.lobby;
 
-import com.sk89q.worldedit.entity.Player;
 import me.bteuk.network.Network;
-import me.bteuk.network.gui.Gui;
 import me.bteuk.network.gui.navigation.LocationMenu;
 import me.bteuk.network.listeners.ClickableItemListener;
 import me.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
+import java.util.Objects;
 import java.util.Set;
 
 import static me.bteuk.network.utils.Constants.LOGGER;
@@ -38,6 +39,7 @@ public class Map extends AbstractLobbyComponent implements Listener {
      */
     private boolean enabled;
 
+    private ItemStack clickableItem;
     private ClickableItemListener clickableItemListener;
 
     private int[][] bounds;
@@ -107,7 +109,7 @@ public class Map extends AbstractLobbyComponent implements Listener {
         radius = config.getInt("range");
 
         // Create and register the clickable map item.
-        ItemStack clickableItem = Utils.createItem(Material.ENDER_PEARL, 1, Utils.success("Teleport to nearby locations!"),
+        clickableItem = Utils.createItem(Material.ENDER_PEARL, 1, Utils.success("Teleport to nearby locations!"),
                 Utils.line("Click to open a menu"), Utils.line("that lists all nearby warps."));
         clickableItemListener = new ClickableItemListener(instance, clickableItem, user -> {
             // Get current location on map.
@@ -122,6 +124,9 @@ public class Map extends AbstractLobbyComponent implements Listener {
                 gui.open(user);
             }
         });
+
+        // Register the move listener.
+        Bukkit.getServer().getPluginManager().registerEvents(this, instance);
 
         enabled = true;
 
@@ -148,12 +153,16 @@ public class Map extends AbstractLobbyComponent implements Listener {
 
     private void giveMapItem(Player p) {
         // Set the clickable item in slot 5 of the players inventory.
-
+        p.getInventory().setItem(5, clickableItem);
     }
 
     private void removeMapItem(Player p) {
         // Remove the clickable item from the players inventory, no matter which slot it's in.
-
+        for (int i = 0; i < p.getInventory().getSize(); i++) {
+            if (Objects.equals(p.getInventory().getItem(i), clickableItem)) {
+                p.getInventory().clear(i);
+            }
+        }
     }
 
     private void addBounds(int idx, String key, ConfigurationSection section) {
