@@ -49,7 +49,6 @@ public class MoveListener implements Listener {
         blocked = true;
     }
 
-    @Deprecated
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent e) {
 

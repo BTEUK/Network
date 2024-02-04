@@ -1,15 +1,27 @@
 package me.bteuk.network.lobby;
 
+import com.sk89q.worldedit.entity.Player;
 import me.bteuk.network.Network;
+import me.bteuk.network.gui.Gui;
+import me.bteuk.network.gui.navigation.LocationMenu;
+import me.bteuk.network.listeners.ClickableItemListener;
+import me.bteuk.network.utils.Utils;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.util.Set;
 
 import static me.bteuk.network.utils.Constants.LOGGER;
+import static net.kyori.adventure.text.format.NamedTextColor.DARK_RED;
 
 /**
  * This class manages the ingame map in the lobby.
@@ -17,7 +29,7 @@ import static me.bteuk.network.utils.Constants.LOGGER;
  * Clicking on the item will list all nearby locations (radius of 50km) to the players position.
  * Locations will be sorted by distance to the player.
  */
-public class Map implements Listener {
+public class Map extends AbstractLobbyComponent implements Listener {
 
     private final Network instance;
 
@@ -26,32 +38,30 @@ public class Map implements Listener {
      */
     private boolean enabled;
 
+    private ClickableItemListener clickableItemListener;
+
     private int[][] bounds;
     private double[][] coordinates;
+
+    private int radius = 50;
+
+    private static final String INVALID_MAP_CONFIG = "The map.yml file is invalid, please delete it and let it regenerate.";
 
     public Map(Network instance) {
         this.instance = instance;
     }
 
     /**
-     * Reloads the map.
-     */
-    protected void reload() {
-
-        //If the map is enabled, first unload it, then load it again.
-        if (enabled) {
-            unload();
-        }
-
-        load();
-
-    }
-
-    /**
      * Loads the map using the config from map.yml
      * If there are issues with the config, then loading will be unsuccessful and the map will not be enabled.
      */
-    private void load() {
+    @Override
+    public void load() {
+
+        if (enabled) {
+            LOGGER.warning("An attempt was made to load the Map while it is already enabled.");
+            return;
+        }
 
         //Create map.yml if not exists.
         //The data folder should already exist since the plugin will always create config.yml first.
@@ -72,13 +82,13 @@ public class Map implements Listener {
         //Get the coordinates.
         ConfigurationSection section = config.getConfigurationSection("bounds");
         if (section == null) {
-            LOGGER.warning("The map.yml file is invalid, please delete it to let it regenerate.");
+            LOGGER.warning(INVALID_MAP_CONFIG);
             enabled = false;
             return;
         }
         Set<String> keys = section.getKeys(false);
         if (keys.size() != 4) {
-            LOGGER.warning("The map.yml file is invalid, please delete it to let it regenerate.");
+            LOGGER.warning(INVALID_MAP_CONFIG);
             enabled = false;
             return;
         }
@@ -93,6 +103,26 @@ public class Map implements Listener {
             return;
         }
 
+        // Set nearby location radius.
+        radius = config.getInt("range");
+
+        // Create and register the clickable map item.
+        ItemStack clickableItem = Utils.createItem(Material.ENDER_PEARL, 1, Utils.success("Teleport to nearby locations!"),
+                Utils.line("Click to open a menu"), Utils.line("that lists all nearby warps."));
+        clickableItemListener = new ClickableItemListener(instance, clickableItem, user -> {
+            // Get current location on map.
+            Location l = user.getLocationWithCoordinateTransform();
+            // Create temporary gui.
+            LocationMenu gui = new LocationMenu("Locations within " + radius + "km", l, radius);
+            if (gui.isEmpty()) {
+                user.player.sendMessage(Utils.error("There are no locations within a ")
+                        .append(Component.text(radius + "km", DARK_RED))
+                        .append(Utils.error(" range.")));
+            } else {
+                gui.open(user);
+            }
+        });
+
         enabled = true;
 
     }
@@ -100,10 +130,30 @@ public class Map implements Listener {
     /**
      * Unloads the map if currently enabled.
      */
-    private void unload() {
+    @Override
+    public void unload() {
         if (enabled) {
+            // Disable the movement listener.
+            PlayerMoveEvent.getHandlerList().unregister(this);
 
+            // Disable the clickable item.
+            clickableItemListener.unregister();
         }
+    }
+
+    @EventHandler
+    public void onPlayerMove(PlayerMoveEvent e) {
+
+    }
+
+    private void giveMapItem(Player p) {
+        // Set the clickable item in slot 5 of the players inventory.
+
+    }
+
+    private void removeMapItem(Player p) {
+        // Remove the clickable item from the players inventory, no matter which slot it's in.
+
     }
 
     private void addBounds(int idx, String key, ConfigurationSection section) {

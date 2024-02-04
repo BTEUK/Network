@@ -293,6 +293,6 @@ public class NetworkUser {
                 player.getLocation().getZ() + dz,
                 player.getLocation().getYaw(),
                 player.getLocation().getPitch()
-        )
+        );
     }
 }

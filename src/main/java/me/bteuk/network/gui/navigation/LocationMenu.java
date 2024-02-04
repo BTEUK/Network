@@ -32,6 +32,8 @@ public class LocationMenu extends Gui {
     private String returnMenu = null;
     private Location l = null;
 
+    private int radius;
+
     public LocationMenu(String title, NetworkUser u, String type, String returnMenu) {
         super(45, Component.text(title, NamedTextColor.AQUA, TextDecoration.BOLD));
 
@@ -41,6 +43,7 @@ public class LocationMenu extends Gui {
         // If the type is Nearby.
         if (type.equals("Nearby")) {
             l = u.getLocationWithCoordinateTransform();
+            radius = CONFIG.getInt("navigation_radius");
         }
 
         createLocationMenu();
@@ -50,11 +53,12 @@ public class LocationMenu extends Gui {
      * Create a temporary gui that will delete itself on close.
      * The gui will show all nearby locations to the inputted location.
      */
-    public LocationMenu(String title, Location l) {
+    public LocationMenu(String title, Location l, int radius) {
         super(45, Component.text(title, NamedTextColor.AQUA, TextDecoration.BOLD));
 
         setDeleteOnClose(true);
         this.l = l;
+        this.radius = radius;
 
         createLocationMenu();
     }
@@ -301,7 +305,7 @@ public class LocationMenu extends Gui {
         return new LinkedHashSet<>(Network.getInstance().globalSQL.getStringList("SELECT location_data.location FROM location_data INNER JOIN coordinates ON location_data.coordinate=coordinates.id " +
                 "WHERE ((((coordinates.x/1000)-" + (l.getX() / 1000) + ")*((coordinates.x/1000)-" + (l.getX() / 1000) + ")) + " +
                 "(((coordinates.z/1000)-" + (l.getZ() / 1000) + ")*((coordinates.z/1000)-" + (l.getZ() / 1000) + "))) < " +
-                (CONFIG.getInt("navigation_radius") * CONFIG.getInt("navigation_radius")) +
+                (radius * radius) +
                 " ORDER BY ((((coordinates.x/1000)-" + (l.getX() / 1000) + ")*((coordinates.x/1000)-" + (l.getX() / 1000) + ")) + " +
                 "(((coordinates.z/1000)-" + (l.getZ() / 1000) + ")*((coordinates.z/1000)-" + (l.getZ() / 1000) + "))) ASC;"));
     }
