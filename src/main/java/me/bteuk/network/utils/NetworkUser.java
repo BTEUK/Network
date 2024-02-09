@@ -79,6 +79,11 @@ public class NetworkUser {
     @Setter
     private BuildingCompanion companion;
 
+    // Is the player in the map area, or not. Only relevant for the lobby.
+    @Getter
+    @Setter
+    private boolean inMap;
+
     public NetworkUser(Player player) {
 
         this.instance = Network.getInstance();

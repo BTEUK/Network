@@ -4,6 +4,8 @@ enabled: false
 
 # Bounds of the map in both Minecraft and IRL coordinates.
 # Minecraft coordinates must be block coordinates (no decimals).
+# The coordinates must be the coordinate of the outside edge of the map.
+# For example if the edge of the map in the positive x direction is between the border of 23 and 24, then 24 is the edge.
 # Irl coordinates must be in decimal format.
 # The map must be rectangular.
 # The coordinates will be used to indicate the outer corner of the block for the specific corner.
@@ -13,26 +15,29 @@ enabled: false
 # Longitude has a range of -180 (west) to 180 (east)
 # The cardinal directions used for the bounds names are Minecraft cardinal directions.
 bounds:
+  # Negative x (west) negative z (north)
   north_west:
     x:
     z:
-    latitude:
-    longitude:
-  north_east:
-    x:
-    z:
-    latitude:
-    longitude:
-  south_west:
-    x:
-    z:
-    latitude:
-    longitude:
+  # Positive x (east) positive z (south)
   south_east:
     x:
     z:
-    latitude:
-    longitude:
+  # Latitude and longitude corners
+  # Order in terms of Minecraft direction is.
+  # North-west
+  # North-east
+  # South-west
+  # South-east
+  corners:
+    - latitude:
+      longitude:
+    - latitude:
+      longitude:
+    - latitude:
+      longitude:
+    - latitude:
+      longitude:
 
 # The range is the distance in KM from the location of the player in which locations will be shown in the menu.
 range: 50

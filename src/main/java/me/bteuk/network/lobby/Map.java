@@ -1,9 +1,12 @@
 package me.bteuk.network.lobby;
 
 import me.bteuk.network.Network;
+import me.bteuk.network.commands.navigation.Tpll;
 import me.bteuk.network.gui.navigation.LocationMenu;
 import me.bteuk.network.listeners.ClickableItemListener;
+import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
+import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -18,8 +21,8 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 import static me.bteuk.network.utils.Constants.LOGGER;
 import static net.kyori.adventure.text.format.NamedTextColor.DARK_RED;
@@ -88,17 +91,10 @@ public class Map extends AbstractLobbyComponent implements Listener {
             enabled = false;
             return;
         }
-        Set<String> keys = section.getKeys(false);
-        if (keys.size() != 4) {
-            LOGGER.warning(INVALID_MAP_CONFIG);
-            enabled = false;
-            return;
-        }
-        bounds = new int[4][2];
+        bounds = new int[2][2];
+        addBounds(section);
         coordinates = new double[4][2];
-        for (int i = 0; i < keys.size(); i++) {
-            addBounds(i, (String) keys.toArray()[i], section);
-        }
+        addCoordinates(section);
         if (!validBounds()) {
             LOGGER.warning("The map bounds are not valid, please check the config.");
             enabled = false;
@@ -113,7 +109,14 @@ public class Map extends AbstractLobbyComponent implements Listener {
                 Utils.line("Click to open a menu"), Utils.line("that lists all nearby warps."));
         clickableItemListener = new ClickableItemListener(instance, clickableItem, user -> {
             // Get current location on map.
-            Location l = user.getLocationWithCoordinateTransform();
+            Location l = null;
+            try {
+                l = getLocationOnMap(user.player.getLocation());
+            } catch (OutOfProjectionBoundsException e) {
+                LOGGER.warning("Map contains invalid coordinates, please setup the map correctly.");
+                user.player.sendMessage(Utils.error("An error occurred, please contact an admin."));
+                return;
+            }
             // Create temporary gui.
             LocationMenu gui = new LocationMenu("Locations within " + radius + "km", l, radius);
             if (gui.isEmpty()) {
@@ -148,7 +151,18 @@ public class Map extends AbstractLobbyComponent implements Listener {
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent e) {
-
+        NetworkUser user = instance.getUser(e.getPlayer());
+        if (user != null) {
+            if (user.isInMap() && !isInMapArea(e.getTo())) {
+                // The player was in the map area, but has exited it, remove the map item.
+                user.setInMap(false);
+                removeMapItem(e.getPlayer());
+            } else if (!user.isInMap() && isInMapArea(e.getTo())) {
+                // The player has entered the map area, give them the map item.
+                user.setInMap(true);
+                giveMapItem(e.getPlayer());
+            }
+        }
     }
 
     private void giveMapItem(Player p) {
@@ -165,38 +179,70 @@ public class Map extends AbstractLobbyComponent implements Listener {
         }
     }
 
-    private void addBounds(int idx, String key, ConfigurationSection section) {
-        bounds[idx][0] = section.getInt(key + ".x");
-        bounds[idx][1] = section.getInt(key + ".z");
-        coordinates[idx][0] = section.getDouble(key + ".latitude");
-        coordinates[idx][1] = section.getDouble(key + ".longitude");
+    private void addBounds(ConfigurationSection section) {
+        bounds[0][0] = section.getInt("north_west.x");
+        bounds[0][1] = section.getInt("north_west.z");
+        bounds[1][0] = section.getInt("south_east.x");
+        bounds[1][1] = section.getInt("south_east.z");
+    }
+
+    /**
+     * The coordinates are stored in an array, in the other of.
+     * North-west, north-east, south-west, south-east.
+     *
+     * @param section configuration section.
+     */
+    private void addCoordinates(ConfigurationSection section) {
+        List<?> corners = section.getList("corners");
+        if (corners == null) {
+            return;
+        }
+        for (int i = 0; i < corners.size(); i++) {
+            ConfigurationSection corner = (ConfigurationSection) corners.get(0);
+            coordinates[i][0] = corner.getDouble("latitude");
+            coordinates[i][1] = corner.getDouble("longitude");
+        }
     }
 
     /**
      * Check if the bounds of the map are valid for both Minecraft and irl coordinates.
-     * Invalid means that all the coordinates are the same or that the Minecraft coordinates don't form a rectangle.
+     *
      * @return if the bounds are valid
      */
     private boolean validBounds() {
-        int x = bounds[0][0];
-        int z = bounds[0][1];
-        double lat = coordinates[0][0];
-        double lon = coordinates[0][1];
-        for (int i = 1; i < 4; i++) {
-            if (bounds[i][0] != bounds[0][0]) {
-                x = bounds[i][0];
-            }
-            if (bounds[i][1] != bounds[0][1]) {
-                z = bounds[i][1];
-            }
-            if (coordinates[i][0] != coordinates[0][0]) {
-                lat = coordinates[i][0];
-            }
-            if (coordinates[i][1] != coordinates[0][1]) {
-                lon = coordinates[i][1];
-            }
-        }
-        return (!(x == bounds[0][0] || z == bounds[0][1] || lat == coordinates[0][0] || lon == coordinates[0][1]) &&
-                bounds[0][0] == bounds[2][0] && bounds[1][0] == bounds[3][0] && bounds[0][1] == bounds[2][1] && bounds[1][1] == bounds[3][1]);
+        return (bounds[0][0] != bounds[1][0] && bounds[0][1] != bounds[1][1] &&
+                coordinates[0][0] != coordinates[1][0] && coordinates[0][1] != coordinates[1][1]);
+    }
+
+    /**
+     * Check whether the location is in the map area.
+     *
+     * @param l the location to check.
+     * @return whether the location is in the map area.
+     */
+    private boolean isInMapArea(Location l) {
+        return l.getX() >= bounds[0][0] && l.getX() <= bounds[1][0] &&
+                l.getZ() >= bounds[0][1] && l.getZ() <= bounds[1][1];
+    }
+
+    /**
+     * Get the location on the map using the given location.
+     * Comparing the location to the coordinate bound, get the coordinate of the location.
+     * Then convert the coordinates to the location in Minecraft.
+     *
+     * @param l the location on the map.
+     * @return the Minecraft coordinates of the location on the map.
+     */
+    private Location getLocationOnMap(Location l) throws OutOfProjectionBoundsException {
+        double xDis = (l.getX() - bounds[0][0]) / (bounds[1][0] - bounds[0][0]);
+        double zDis = (l.getZ() - bounds[0][1]) / (bounds[1][1] - bounds[0][1]);
+        double lat = ((1 - zDis) * coordinates[0][0]) + (zDis * coordinates[2][0]) + (xDis * (coordinates[1][0] - coordinates[0][0]));
+        double lon = ((1 - zDis) * coordinates[0][1]) + (zDis * coordinates[2][1]) + (xDis * (coordinates[1][1] - coordinates[0][1]));
+
+        double[] coords = Tpll.bteGeneratorSettings.projection().fromGeo(lon, lat);
+        Location newLocation = l.clone();
+        newLocation.setX(coords[0]);
+        newLocation.setZ(coords[1]);
+        return newLocation;
     }
 }
