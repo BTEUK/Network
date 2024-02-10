@@ -9,6 +9,7 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCreativeEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -60,7 +61,7 @@ public class ClickableItemListener implements Listener {
     private void clickActionIfCorrectItem(Cancellable cancellableEvent, Player player, ItemStack clickedItem) {
         NetworkUser user = getUserIfExists(player);
 
-        if (clickedItem != null && clickedItem.equals(item)) {
+        if (item.isSimilar(clickedItem)) {
             cancellableEvent.setCancelled(true);
             //Run click action if user not null.
             if (user != null) {
@@ -77,11 +78,17 @@ public class ClickableItemListener implements Listener {
     @EventHandler
     public void onClick(InventoryClickEvent e) {
         clickActionIfCorrectItem(e, (Player) e.getWhoClicked(), e.getCurrentItem());
+        if (!e.isCancelled()) {
+            clickActionIfCorrectItem(e, (Player) e.getWhoClicked(), e.getCursor());
+        }
     }
 
     @EventHandler
     public void swapHands(PlayerSwapHandItemsEvent e) {
-        clickActionIfCorrectItem(e, e.getPlayer(), e.getOffHandItem());
+        clickActionIfCorrectItem(e, e.getPlayer(), e.getMainHandItem());
+        if (!e.isCancelled()) {
+            clickActionIfCorrectItem(e, e.getPlayer(), e.getOffHandItem());
+        }
     }
 
     @EventHandler
@@ -92,5 +99,16 @@ public class ClickableItemListener implements Listener {
     @EventHandler
     public void moveItem(InventoryDragEvent e) {
         clickActionIfCorrectItem(e, (Player) e.getWhoClicked(), e.getOldCursor());
+        if (!e.isCancelled()) {
+            clickActionIfCorrectItem(e, (Player) e.getWhoClicked(), e.getCursor());
+        }
+    }
+
+    @EventHandler
+    public void creativeItem(InventoryCreativeEvent e) {
+        clickActionIfCorrectItem(e, (Player) e.getWhoClicked(), e.getCurrentItem());
+        if (!e.isCancelled()) {
+            clickActionIfCorrectItem(e, (Player) e.getWhoClicked(), e.getCursor());
+        }
     }
 }

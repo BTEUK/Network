@@ -21,8 +21,8 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
 
 import static me.bteuk.network.utils.Constants.LOGGER;
 import static net.kyori.adventure.text.format.NamedTextColor.DARK_RED;
@@ -109,7 +109,7 @@ public class Map extends AbstractLobbyComponent implements Listener {
                 Utils.line("Click to open a menu"), Utils.line("that lists all nearby warps."));
         clickableItemListener = new ClickableItemListener(instance, clickableItem, user -> {
             // Get current location on map.
-            Location l = null;
+            Location l;
             try {
                 l = getLocationOnMap(user.player.getLocation());
             } catch (OutOfProjectionBoundsException e) {
@@ -167,13 +167,13 @@ public class Map extends AbstractLobbyComponent implements Listener {
 
     private void giveMapItem(Player p) {
         // Set the clickable item in slot 5 of the players inventory.
-        p.getInventory().setItem(5, clickableItem);
+        p.getInventory().setItem(4, clickableItem);
     }
 
     private void removeMapItem(Player p) {
         // Remove the clickable item from the players inventory, no matter which slot it's in.
         for (int i = 0; i < p.getInventory().getSize(); i++) {
-            if (Objects.equals(p.getInventory().getItem(i), clickableItem)) {
+            if (clickableItem.isSimilar(p.getInventory().getItem(i))) {
                 p.getInventory().clear(i);
             }
         }
@@ -198,9 +198,9 @@ public class Map extends AbstractLobbyComponent implements Listener {
             return;
         }
         for (int i = 0; i < corners.size(); i++) {
-            ConfigurationSection corner = (ConfigurationSection) corners.get(0);
-            coordinates[i][0] = corner.getDouble("latitude");
-            coordinates[i][1] = corner.getDouble("longitude");
+            LinkedHashMap<?, ?> corner = (LinkedHashMap<?, ?>) corners.get(i);
+            coordinates[i][0] = (double) corner.get("latitude");
+            coordinates[i][1] = (double) corner.get("longitude");
         }
     }
 
@@ -210,8 +210,8 @@ public class Map extends AbstractLobbyComponent implements Listener {
      * @return if the bounds are valid
      */
     private boolean validBounds() {
-        return (bounds[0][0] != bounds[1][0] && bounds[0][1] != bounds[1][1] &&
-                coordinates[0][0] != coordinates[1][0] && coordinates[0][1] != coordinates[1][1]);
+        return (bounds[0][0] != bounds[1][0]) && (bounds[0][1] != bounds[1][1]) &&
+                (coordinates[0][0] != coordinates[1][0]) && (coordinates[0][1] != coordinates[1][1]);
     }
 
     /**
@@ -243,6 +243,7 @@ public class Map extends AbstractLobbyComponent implements Listener {
         Location newLocation = l.clone();
         newLocation.setX(coords[0]);
         newLocation.setZ(coords[1]);
+        LOGGER.info("Location is " + lat + ", " + lon + ": " + coords[0] + ", " + coords[1]);
         return newLocation;
     }
 }

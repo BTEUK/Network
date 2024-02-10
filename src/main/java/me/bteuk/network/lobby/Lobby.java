@@ -245,6 +245,9 @@ public class Lobby {
      */
     public void reloadMap() {
 
+        if (map == null) {
+            map = new Map(instance);
+        }
         map.reload();
 
     }
