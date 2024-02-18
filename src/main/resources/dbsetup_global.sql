@@ -118,11 +118,29 @@ CREATE TABLE IF NOT EXISTS location_data
 (
     location    VARCHAR(128)    NOT NULL,
     category    VARCHAR(128)    NOT NULL,
-    subcategory VARCHAR(128)    NULL DEFAULT NULL,
+    subcategory INT             NULL DEFAULT NULL,
     coordinate  INT             NOT NULL,
     suggested   TINYINT(1)      NULL DEFAULT 0,
     PRIMARY KEY(location),
-    CONSTRAINT fk_location_data_1 FOREIGN KEY(coordinate) REFERENCES coordinates(id)
+    CONSTRAINT fk_location_data_1 FOREIGN KEY(coordinate) REFERENCES coordinates(id),
+    CONSTRAINT fk_location_data_2 FOREIGN KEY(subcategory) REFERENCES location_category(id)
+);
+
+CREATE TABLE IF NOT EXISTS location_category
+(
+    id          INT         AUTO_INCREMENT,
+    name        VARCHAR(64) NOT NULL,
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE IF NOT EXISTS location_marker
+(
+    id          INT             AUTO_INCREMENT,
+    location    VARCHAR(128)    NULL DEFAULT NULL,
+    category    INT             NULL DEFAULT NULL,
+    PRIMARY KEY(id),
+    CONSTRAINT fk_location_marker_1 FOREIGN KEY(location) REFERENCES location_data(location),
+    CONSTRAINT fk_location_marker_2 FOREIGN KEY(category) REFERENCES location_category(id)
 );
 
 CREATE TABLE IF NOT EXISTS location_requests
