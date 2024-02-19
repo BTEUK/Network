@@ -30,7 +30,7 @@ public class Back implements CommandExecutor {
         }
 
         //Get the coordinate ID.
-        int coordinateID = Network.getInstance().globalSQL.getInt("SELECT previous_coordinate FROM player_data WHERE uuid='" + p.getUniqueId() + "';");
+        int coordinateID = Network.getInstance().getGlobalSQL().getInt("SELECT previous_coordinate FROM player_data WHERE uuid='" + p.getUniqueId() + "';");
 
         //Check if the player has a previous coordinate.
         if (coordinateID == 0) {
@@ -41,11 +41,11 @@ public class Back implements CommandExecutor {
         }
 
         //Check if the server is this server.
-        String server = Network.getInstance().globalSQL.getString("SELECT server FROM coordinates WHERE id=" + coordinateID + ";");
+        String server = Network.getInstance().getGlobalSQL().getString("SELECT server FROM coordinates WHERE id=" + coordinateID + ";");
         if (Objects.equals(SERVER_NAME, server)) {
 
             //Get location.
-            Location l = Network.getInstance().globalSQL.getCoordinate(coordinateID);
+            Location l = Network.getInstance().getGlobalSQL().getCoordinate(coordinateID);
 
             //Set current location to previous location.
             setPreviousCoordinate(p.getUniqueId().toString(), p.getLocation());
@@ -57,7 +57,7 @@ public class Back implements CommandExecutor {
         } else {
 
             //Teleport the player to the correct server with a join event to teleport to the coordinate id.
-            GlobalSQL globalSQL = Network.getInstance().globalSQL;
+            GlobalSQL globalSQL = Network.getInstance().getGlobalSQL();
 
             //Create teleport event for location of coordinate id
             EventManager.createTeleportEvent(true, p.getUniqueId().toString(), "network", "teleport " +
@@ -81,21 +81,21 @@ public class Back implements CommandExecutor {
     public static void setPreviousCoordinate(String uuid, Location l) {
 
         //Set previous location for /back.
-        if (Network.getInstance().globalSQL.getInt("SELECT previous_coordinate FROM player_data WHERE uuid='" + uuid + "';") == 0) {
+        if (Network.getInstance().getGlobalSQL().getInt("SELECT previous_coordinate FROM player_data WHERE uuid='" + uuid + "';") == 0) {
 
             //No coordinate exists, create new.
-            int coordinateID = Network.getInstance().globalSQL.addCoordinate(l);
+            int coordinateID = Network.getInstance().getGlobalSQL().addCoordinate(l);
 
             //Set coordinate id in player data.
-            Network.getInstance().globalSQL.update("UPDATE player_data SET previous_coordinate=" + coordinateID + " WHERE uuid='" + uuid + "';");
+            Network.getInstance().getGlobalSQL().update("UPDATE player_data SET previous_coordinate=" + coordinateID + " WHERE uuid='" + uuid + "';");
 
         } else {
 
             //Get coordinate id.
-            int coordinateID = Network.getInstance().globalSQL.getInt("SELECT previous_coordinate FROM player_data WHERE uuid='" + uuid + "';");
+            int coordinateID = Network.getInstance().getGlobalSQL().getInt("SELECT previous_coordinate FROM player_data WHERE uuid='" + uuid + "';");
 
             //Update existing coordinate.
-            Network.getInstance().globalSQL.updateCoordinate(coordinateID, l);
+            Network.getInstance().getGlobalSQL().updateCoordinate(coordinateID, l);
 
         }
     }

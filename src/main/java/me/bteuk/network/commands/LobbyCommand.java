@@ -12,7 +12,7 @@ public class LobbyCommand extends AbstractCommand {
 
     private final Lobby lobby;
 
-    private static final Component INVALID_FORMAT = Utils.error("/lobby reload portals|map");
+    private static final Component INVALID_FORMAT = Utils.error("/lobby reload portals");
 
     public LobbyCommand(Network instance, Lobby lobby) {
         super(instance, "lobby");
@@ -38,15 +38,6 @@ public class LobbyCommand extends AbstractCommand {
 
             lobby.reloadPortals();
             sender.sendMessage(Utils.success("Reloaded portals"));
-
-        } else if (args[1].equalsIgnoreCase("map")) {
-
-            if (!hasPermission(sender, "uknet.lobby.reload.map")) {
-                return true;
-            }
-
-            lobby.reloadMap();
-            sender.sendMessage(Utils.success("Reloaded map"));
 
         } else {
             sender.sendMessage(INVALID_FORMAT);

@@ -151,3 +151,6 @@ commands:
     usage: /<command>
     description: Toggle the building companion.
     aliases: [ bc, companion ]
+  map:
+    usage: /<command>
+    description: Map command.

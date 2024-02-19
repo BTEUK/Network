@@ -1,10 +1,14 @@
 package me.bteuk.network.lobby;
 
+import io.papermc.lib.PaperLib;
+import lombok.Getter;
 import me.bteuk.network.Network;
 import me.bteuk.network.commands.navigation.Tpll;
+import me.bteuk.network.events.EventManager;
 import me.bteuk.network.gui.navigation.LocationMenu;
 import me.bteuk.network.listeners.ClickableItemListener;
 import me.bteuk.network.utils.NetworkUser;
+import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
 import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
 import net.kyori.adventure.text.Component;
@@ -12,19 +16,23 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.io.File;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Objects;
 
 import static me.bteuk.network.utils.Constants.LOGGER;
+import static me.bteuk.network.utils.Constants.SERVER_NAME;
+import static me.bteuk.network.utils.NetworkConfig.CONFIG;
 import static net.kyori.adventure.text.format.NamedTextColor.DARK_RED;
 
 /**
@@ -33,22 +41,43 @@ import static net.kyori.adventure.text.format.NamedTextColor.DARK_RED;
  * Clicking on the item will list all nearby locations (radius of 50km) to the players position.
  * Locations will be sorted by distance to the player.
  */
-public class Map extends AbstractLobbyComponent implements Listener {
+public class Map extends AbstractReloadableComponent implements Listener {
 
     private final Network instance;
 
     /**
      * Indicates whether them map is enabled.
      */
+    @Getter
     private boolean enabled;
+
+    /**
+     * The server that has the physical map.
+     */
+    private String server;
+
+    /**
+     * Coordinates of the map.
+     */
+    private Location map_location;
+
+    /**
+     * Map command.
+     */
+    private MapCommand map_command;
+
+    /**
+     * HashMap of the map markers.
+     * Key: Location of the marker on the map.
+     * Value: Name of the marker (warp or subcategory).
+     */
+    private HashMap<Location, String> map_markers;
 
     private ItemStack clickableItem;
     private ClickableItemListener clickableItemListener;
 
-    private int[][] bounds;
-    private double[][] coordinates;
 
-    private int radius = 50;
+    private final double radius = 0.5;
 
     private static final String INVALID_MAP_CONFIG = "The map.yml file is invalid, please delete it and let it regenerate.";
 
@@ -68,68 +97,50 @@ public class Map extends AbstractLobbyComponent implements Listener {
             return;
         }
 
-        //Create map.yml if not exists.
-        //The data folder should already exist since the plugin will always create config.yml first.
-        File configFile = new File(instance.getDataFolder(), "map.yml");
-        if (!configFile.exists()) {
-            instance.saveResource("map.yml", false);
-        }
-
-        //Load the config.
-        FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
-
-        //Check if the map is enabled.
-        if (!config.getBoolean("enabled")) {
+        // Check if the map is enabled.
+        if (!CONFIG.getBoolean("map.enabled")) {
             enabled = false;
             return;
         }
 
-        //Get the coordinates.
-        ConfigurationSection section = config.getConfigurationSection("bounds");
-        if (section == null) {
-            LOGGER.warning(INVALID_MAP_CONFIG);
+        // Get the server of the map, this is important in deciding which features to enable.
+        // If the server is not
+        server = CONFIG.getString("map.server");
+        if (server == null || instance.getGlobalSQL().hasRow("SELECT * FROM server_data WHERE name='" + server + "';")) {
             enabled = false;
-            return;
-        }
-        bounds = new int[2][2];
-        addBounds(section);
-        coordinates = new double[4][2];
-        addCoordinates(section);
-        if (!validBounds()) {
-            LOGGER.warning("The map bounds are not valid, please check the config.");
-            enabled = false;
+            LOGGER.warning("The map has been enabled without a valid server, disabling the map.");
             return;
         }
 
-        // Set nearby location radius.
-        radius = config.getInt("range");
-
-        // Create and register the clickable map item.
-        clickableItem = Utils.createItem(Material.ENDER_PEARL, 1, Utils.success("Teleport to nearby locations!"),
-                Utils.line("Click to open a menu"), Utils.line("that lists all nearby warps."));
-        clickableItemListener = new ClickableItemListener(instance, clickableItem, user -> {
-            // Get current location on map.
-            Location l;
-            try {
-                l = getLocationOnMap(user.player.getLocation());
-            } catch (OutOfProjectionBoundsException e) {
-                LOGGER.warning("Map contains invalid coordinates, please setup the map correctly.");
-                user.player.sendMessage(Utils.error("An error occurred, please contact an admin."));
+        // Set the location of the map.
+        // If the map is on this server the world must exist.
+        // Set the coordinates of the location first, the server is not relevant for this part.
+        map_location = new Location(null, CONFIG.getDouble("map.location.x", 0), CONFIG.getDouble("map.location.y", 0),
+                CONFIG.getDouble("map.location.z", 0), (float) CONFIG.getDouble("map.location.yaw", 0), (float) CONFIG.getDouble("map.location.pitch", 0));
+        if (Objects.equals(SERVER_NAME, server)) {
+            String world = CONFIG.getString("map.location.world");
+            if (world == null || Bukkit.getWorld(world) == null) {
+                enabled = false;
+                LOGGER.warning("The map world does not exist on this server, disabling the map.");
                 return;
             }
-            // Create temporary gui.
-            LocationMenu gui = new LocationMenu("Locations within " + radius + "km", l, radius);
-            if (gui.isEmpty()) {
-                user.player.sendMessage(Utils.error("There are no locations within a ")
-                        .append(Component.text(radius + "km", DARK_RED))
-                        .append(Utils.error(" range.")));
-            } else {
-                gui.open(user);
-            }
-        });
+            // Set the world, the coordinates have already been set.
+            map_location.setWorld(Bukkit.getWorld(world));
 
-        // Register the move listener.
-        Bukkit.getServer().getPluginManager().registerEvents(this, instance);
+            // Load the map markers and linked location.
+            try {
+                loadMarkers();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+            // Register the move listener.
+            Bukkit.getServer().getPluginManager().registerEvents(this, instance);
+        }
+
+        // Enable the map command.
+        map_command = new MapCommand(instance, this, "map");
+
 
         enabled = true;
 
@@ -165,6 +176,67 @@ public class Map extends AbstractLobbyComponent implements Listener {
         }
     }
 
+    protected void teleport(Player p) {
+        // If the map is on this server teleport the player directly, else switch server first.
+        if (Objects.equals(SERVER_NAME, server)) {
+            PaperLib.teleportAsync(p, map_location);
+        } else {
+            // Create teleport event.
+            EventManager.createTeleportEvent(true, p.getUniqueId().toString(), "network", String.format("teleport %f %f %f %f %f",
+                            map_location.getX(), map_location.getY(), map_location.getZ(), map_location.getYaw(), map_location.getPitch()),
+                    "&aTeleporting to the map.", p.getLocation());
+
+            // Switch server.
+            SwitchServer.switchServer(p, server);
+        }
+    }
+
+    protected void addMarker(Player p, String marker) {
+
+    }
+
+    protected void removeMarker(Player p, String marker) {
+
+    }
+
+    private void loadMarkers() throws SQLException {
+
+        // Retrieve all the markers from the database.
+        ResultSet results = instance.getGlobalSQL().getResultSet("SELECT * FROM location_marker");
+
+        while (results.next()) {
+            String location = results.getString("location");
+            int coordinate_id = results.getInt("coordinate_id");
+            if (location == null) {
+                // Load category.
+                loadCategoryMarker(results.getInt("category"), coordinate_id);
+            } else {
+                loadLocationMarker(location, coordinate_id);
+            }
+        }
+
+    }
+
+    private void loadLocationMarker(String name, int coordinate_id) {
+        map_markers.put(instance.getGlobalSQL().getCoordinate(coordinate_id), name);
+
+        // Create the visual marker.
+    }
+
+    private void loadCategoryMarker(int category_id, int coordinate_id) {
+        map_markers.put(instance.getGlobalSQL().getCoordinate(coordinate_id), instance.getGlobalSQL().getString("SELECT name FROM location_category WHERE id=" + category_id + ";"));
+
+        // Create the visual marker.
+    }
+
+    private void removeLocationMarker() {
+
+    }
+
+    private void removeCategoryMarker() {
+
+    }
+
     private void giveMapItem(Player p) {
         // Set the clickable item in slot 5 of the players inventory.
         p.getInventory().setItem(4, clickableItem);
@@ -177,41 +249,6 @@ public class Map extends AbstractLobbyComponent implements Listener {
                 p.getInventory().clear(i);
             }
         }
-    }
-
-    private void addBounds(ConfigurationSection section) {
-        bounds[0][0] = section.getInt("north_west.x");
-        bounds[0][1] = section.getInt("north_west.z");
-        bounds[1][0] = section.getInt("south_east.x");
-        bounds[1][1] = section.getInt("south_east.z");
-    }
-
-    /**
-     * The coordinates are stored in an array, in the other of.
-     * North-west, north-east, south-west, south-east.
-     *
-     * @param section configuration section.
-     */
-    private void addCoordinates(ConfigurationSection section) {
-        List<?> corners = section.getList("corners");
-        if (corners == null) {
-            return;
-        }
-        for (int i = 0; i < corners.size(); i++) {
-            LinkedHashMap<?, ?> corner = (LinkedHashMap<?, ?>) corners.get(i);
-            coordinates[i][0] = (double) corner.get("latitude");
-            coordinates[i][1] = (double) corner.get("longitude");
-        }
-    }
-
-    /**
-     * Check if the bounds of the map are valid for both Minecraft and irl coordinates.
-     *
-     * @return if the bounds are valid
-     */
-    private boolean validBounds() {
-        return (bounds[0][0] != bounds[1][0]) && (bounds[0][1] != bounds[1][1]) &&
-                (coordinates[0][0] != coordinates[1][0]) && (coordinates[0][1] != coordinates[1][1]);
     }
 
     /**

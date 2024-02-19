@@ -121,7 +121,8 @@ public final class Network extends JavaPlugin {
     //SQL
     @Getter
     private PlotSQL plotSQL;
-    public GlobalSQL globalSQL;
+    @Getter
+    private GlobalSQL globalSQL;
     public RegionSQL regionSQL;
 
     //Chat

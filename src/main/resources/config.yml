@@ -63,6 +63,18 @@ spawn:
   yaw: -90
   pitch: 0
 
+# Map info. Must be set to enabled to be available.
+map:
+  enabled: false
+  server: lobby
+  location:
+    world: Lobby
+    x: 100.5
+    y: 69.0
+    z: 100.5
+    yaw: 90
+    pitch: 0
+
 #Staff features
 staff:
   staff_chat:
