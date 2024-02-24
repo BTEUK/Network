@@ -5,7 +5,7 @@ import me.bteuk.network.gui.Gui;
 import me.bteuk.network.gui.navigation.AddLocation;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.AddLocationType;
-import me.bteuk.network.utils.enums.Categories;
+import me.bteuk.network.utils.enums.Category;
 import me.bteuk.network.utils.enums.Regions;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -46,10 +46,10 @@ public class LocationRequests extends Gui {
                         u.staffGui = null;
 
                         int coordinate_id = Network.getInstance().globalSQL.getInt("SELECT coordinate FROM location_requests WHERE location='" + location + "';");
-                        Categories category = Categories.valueOf(Network.getInstance().globalSQL.getString("SELECT category FROM location_requests WHERE location='" + location + "';"));
+                        Category category = Category.valueOf(Network.getInstance().globalSQL.getString("SELECT category FROM location_requests WHERE location='" + location + "';"));
 
                         Regions subcategory = null;
-                        if (category == Categories.ENGLAND) {
+                        if (category == Category.ENGLAND) {
                             subcategory = Regions.valueOf(Network.getInstance().globalSQL.getString("SELECT subcategory FROM location_requests WHERE location='" + location + "';"));
                         }
 

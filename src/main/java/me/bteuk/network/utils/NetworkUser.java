@@ -79,10 +79,10 @@ public class NetworkUser {
     @Setter
     private BuildingCompanion companion;
 
-    // Is the player in the map area, or not. Only relevant for the lobby.
+    // If the player has the map teleport item.
     @Getter
     @Setter
-    private boolean inMap;
+    private boolean hasMapItem;
 
     public NetworkUser(Player player) {
 
@@ -97,23 +97,23 @@ public class NetworkUser {
         last_movement = Time.currentTime();
 
         //Set tips based on database value.
-        tips_enabled = instance.globalSQL.hasRow("SELECT tips_enabled FROM player_data WHERE uuid='" + player.getUniqueId() + "' AND tips_enabled=1;");
+        tips_enabled = instance.getGlobalSQL().hasRow("SELECT tips_enabled FROM player_data WHERE uuid='" + player.getUniqueId() + "' AND tips_enabled=1;");
 
         //Update builder role in database.
-        instance.globalSQL.update("UPDATE player_data SET builder_role='" + Roles.builderRole(player) + "' WHERE uuid='" + player.getUniqueId() + "';");
+        instance.getGlobalSQL().update("UPDATE player_data SET builder_role='" + Roles.builderRole(player) + "' WHERE uuid='" + player.getUniqueId() + "';");
 
         //Load tab for the user.
         loadTab();
 
         //Get discord linked status.
         //If they're linked get discord id.
-        isLinked = instance.globalSQL.hasRow("SELECT uuid FROM discord WHERE uuid='" + player.getUniqueId() + "';");
+        isLinked = instance.getGlobalSQL().hasRow("SELECT uuid FROM discord WHERE uuid='" + player.getUniqueId() + "';");
         if (isLinked) {
-            discord_id = instance.globalSQL.getLong("SELECT discord_id FROM discord WHERE uuid='" + player.getUniqueId() + "';");
+            discord_id = instance.getGlobalSQL().getLong("SELECT discord_id FROM discord WHERE uuid='" + player.getUniqueId() + "';");
         }
 
         //Set navigator enabled/disabled.
-        navigator = instance.globalSQL.hasRow("SELECT navigator FROM player_data WHERE uuid='" + player.getUniqueId() + "' AND navigator=1;");
+        navigator = instance.getGlobalSQL().hasRow("SELECT navigator FROM player_data WHERE uuid='" + player.getUniqueId() + "' AND navigator=1;");
         //If navigator is disabled, remove the navigator if in the inventory.
         if (!navigator) {
 
@@ -127,13 +127,13 @@ public class NetworkUser {
         }
 
         //Set staff chat value, if user is no longer staff, auto-disable.
-        if (instance.globalSQL.hasRow("SELECT uuid FROM player_data WHERE uuid='" + player.getUniqueId() + "' AND staff_chat=1;")) {
+        if (instance.getGlobalSQL().hasRow("SELECT uuid FROM player_data WHERE uuid='" + player.getUniqueId() + "' AND staff_chat=1;")) {
             if (player.hasPermission("uknet.staff")) {
                 staffChat = true;
             } else {
                 staffChat = false;
                 //And remove staff from database.
-                instance.globalSQL.update("UPDATE player_data SET staff_chat=0 WHERE uuid='" + player.getUniqueId() + "';");
+                instance.getGlobalSQL().update("UPDATE player_data SET staff_chat=0 WHERE uuid='" + player.getUniqueId() + "';");
             }
         } else {
             staffChat = false;
@@ -166,7 +166,7 @@ public class NetworkUser {
         active_time = 0;
 
         //Give the player nightvision if enabled or remove it if disabled.
-        if (instance.globalSQL.hasRow("SELECT nightvision_enabled FROM player_data WHERE nightvision_enabled=1 AND uuid='" + player.getUniqueId() + "';")) {
+        if (instance.getGlobalSQL().hasRow("SELECT nightvision_enabled FROM player_data WHERE nightvision_enabled=1 AND uuid='" + player.getUniqueId() + "';")) {
 
             Nightvision.giveNightvision(player);
 
@@ -182,7 +182,7 @@ public class NetworkUser {
         //If this is the first player on the server, add all players from other servers to tab.
         if (instance.getServer().getOnlinePlayers().size() == 1 && TAB) {
             //Add all players from other servers to the fake players list, so they will show in tab when players connect.
-            for (String uuid : instance.globalSQL.getStringList("SELECT uuid FROM online_users WHERE server<>'" + SERVER_NAME + "';")) {
+            for (String uuid : instance.getGlobalSQL().getStringList("SELECT uuid FROM online_users WHERE server<>'" + SERVER_NAME + "';")) {
                 instance.tab.addFakePlayer(uuid);
             }
         }
@@ -205,19 +205,19 @@ public class NetworkUser {
         //Check if the player has any join events, if try run them.
         //Delay by 1 second for all plugins to run their join events.
         Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> {
-            if (instance.globalSQL.hasRow("SELECT uuid FROM join_events WHERE uuid='" + player.getUniqueId() + "' AND type='network';")) {
+            if (instance.getGlobalSQL().hasRow("SELECT uuid FROM join_events WHERE uuid='" + player.getUniqueId() + "' AND type='network';")) {
 
                 //Get the event from the database.
-                String event = instance.globalSQL.getString("SELECT event FROM join_events WHERE uuid='" + player.getUniqueId() + "' AND type='network'");
+                String event = instance.getGlobalSQL().getString("SELECT event FROM join_events WHERE uuid='" + player.getUniqueId() + "' AND type='network'");
 
                 //Get message.
-                String message = instance.globalSQL.getString("SELECT message FROM join_events WHERE uuid='" + player.getUniqueId() + "' AND type='network'");
+                String message = instance.getGlobalSQL().getString("SELECT message FROM join_events WHERE uuid='" + player.getUniqueId() + "' AND type='network'");
 
                 //Split the event by word.
                 String[] aEvent = event.split(" ");
 
                 //Clear the events.
-                instance.globalSQL.update("DELETE FROM join_events WHERE uuid='" + player.getUniqueId() + "' AND type='network';");
+                instance.getGlobalSQL().update("DELETE FROM join_events WHERE uuid='" + player.getUniqueId() + "' AND type='network';");
 
                 //Send the event to the event handler.
                 instance.getTimers().getEventManager().event(player.getUniqueId().toString(), aEvent, message);
@@ -262,7 +262,7 @@ public class NetworkUser {
      * @return true if the user is online
      */
     public static boolean isOnline(String uuid) {
-        return Network.getInstance().globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "';");
+        return Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "';");
     }
 
     /**
@@ -272,7 +272,7 @@ public class NetworkUser {
      * @return {@link String} name of the user
      */
     public static String getName(String uuid) {
-        return Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
+        return Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
     }
 
     /**
@@ -282,7 +282,7 @@ public class NetworkUser {
      * @param message the message to send using legacy ampersand format
      */
     public static void sendOfflineMessage(String uuid, String message) {
-        Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','" + message + "');");
+        Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','" + message + "');");
     }
 
     public void updateCoordinateTransform(PlotSQL plotSQL, Location l) {

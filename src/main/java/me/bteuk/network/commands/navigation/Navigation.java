@@ -5,7 +5,7 @@ import me.bteuk.network.gui.navigation.AddLocation;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.AddLocationType;
-import me.bteuk.network.utils.enums.Categories;
+import me.bteuk.network.utils.enums.Category;
 import me.bteuk.network.utils.enums.Regions;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -72,9 +72,9 @@ public class Navigation implements CommandExecutor {
                             u.staffGui.delete();
                         }
                         //Get details from the location.
-                        Categories category = Categories.valueOf(Network.getInstance().globalSQL.getString("SELECT category FROM location_data WHERE location='" + location + "';"));
+                        Category category = Category.valueOf(Network.getInstance().globalSQL.getString("SELECT category FROM location_data WHERE location='" + location + "';"));
                         Regions subcategory = null;
-                        if (category == Categories.ENGLAND) {
+                        if (category == Category.ENGLAND) {
                             //Get subcategory.
                             subcategory = Regions.valueOf(Network.getInstance().globalSQL.getString("SELECT subcategory FROM location_data WHERE location='" + location + "';"));
                         }

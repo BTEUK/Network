@@ -41,6 +41,11 @@ public class DatabaseUpdates {
         if (oldVersionInt <= 3) {
             update3_4();
         }
+
+        // 1.3.0 -> 1.4.4
+        if (oldVersionInt <= 4) {
+            update4_5();
+        }
     }
 
     private int getVersionInt(String version) {

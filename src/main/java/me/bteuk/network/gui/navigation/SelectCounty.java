@@ -3,7 +3,6 @@ package me.bteuk.network.gui.navigation;
 import me.bteuk.network.gui.Gui;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.AddLocationType;
-import me.bteuk.network.utils.enums.Counties;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;

@@ -26,7 +26,7 @@ public class AddLocation extends Gui {
 
     private String old_name;
     private String name;
-    private Categories category;
+    private Category category;
     private Counties county;
 
     private Regions subcategory;
@@ -46,7 +46,7 @@ public class AddLocation extends Gui {
         super(27, Component.text(type.label + " Location", NamedTextColor.AQUA, TextDecoration.BOLD));
 
         //Set default category to England, since it is the most common.
-        category = Categories.ENGLAND;
+        category = Category.ENGLAND;
 
         //Set default county to London, since it is the most common.
         county = Counties.GREATER_LONDON;
@@ -59,7 +59,7 @@ public class AddLocation extends Gui {
     }
 
     //This is used when location details need to be updated.
-    public AddLocation(AddLocationType type, String name, int coordinate_id, Categories category, Regions subcategory) {
+    public AddLocation(AddLocationType type, String name, int coordinate_id, Category category, Regions subcategory) {
 
         super(27, Component.text(type.label + " Location", NamedTextColor.AQUA, TextDecoration.BOLD));
 
@@ -72,11 +72,6 @@ public class AddLocation extends Gui {
 
         //Set category from input.
         this.category = category;
-
-        //Set county from input, if null then set greater london as default.
-        if (category == Categories.ENGLAND) {
-            county = Counties.GREATER_LONDON;
-        }
 
         this.subcategory = subcategory;
 
@@ -151,7 +146,7 @@ public class AddLocation extends Gui {
                 u -> {
 
                     //Cycle to next category and refresh the gui.
-                    Categories[] categories = Categories.values();
+                    Category[] categories = Category.values();
                     for (int i = 0; i < categories.length; i++) {
                         if (categories[i] == category) {
                             //Get next.
@@ -172,7 +167,7 @@ public class AddLocation extends Gui {
 
         //If category is England, select county.
         //Has to have it's own menu since there's too many option to cycle through.
-        if (category == Categories.ENGLAND) {
+        if (category == Category.ENGLAND) {
 
             setItem(16, Utils.createItem(Material.COMPASS, 1,
                             Utils.title("Select County"),
@@ -457,7 +452,7 @@ public class AddLocation extends Gui {
 
     public void addLocation(NetworkUser u) {
 
-        if (category == Categories.ENGLAND) {
+        if (category == Category.ENGLAND) {
             globalSQL.update("INSERT INTO location_data(location,category,subcategory,coordinate) " +
                     "VALUES('" + name + "','" + category + "','" + subcategory + "'," + coordinate_id + ");");
         } else {
@@ -480,7 +475,7 @@ public class AddLocation extends Gui {
 
     public void updateLocation(NetworkUser u) {
 
-        if (category == Categories.ENGLAND) {
+        if (category == Category.ENGLAND) {
             globalSQL.update("UPDATE location_data SET location='" + name + "',category='" + category + "',subcategory='" + subcategory + "' WHERE location='" + old_name + "';");
         } else {
             globalSQL.update("UPDATE location_data SET location='" + name + "',category='" + category + "' WHERE location='" + old_name + "';");
@@ -503,7 +498,7 @@ public class AddLocation extends Gui {
         globalSQL.update("DELETE FROM location_requests WHERE location='" + old_name + "';");
 
         //Add location.
-        if (category == Categories.ENGLAND) {
+        if (category == Category.ENGLAND) {
             globalSQL.update("INSERT INTO location_data(location,category,subcategory,coordinate) " +
                     "VALUES('" + name + "','" + category + "','" + subcategory + "'," + coordinate_id + ");");
         } else {
@@ -519,7 +514,7 @@ public class AddLocation extends Gui {
 
     public void requestLocation(NetworkUser u) {
 
-        if (category == Categories.ENGLAND) {
+        if (category == Category.ENGLAND) {
             globalSQL.update("INSERT INTO location_requests(location,category,subcategory,coordinate) " +
                     "VALUES('" + name + "','" + category + "','" + subcategory + "'," + coordinate_id + ");");
         } else {

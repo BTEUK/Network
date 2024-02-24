@@ -5,17 +5,12 @@ import lombok.Getter;
 import me.bteuk.network.Network;
 import me.bteuk.network.commands.navigation.Tpll;
 import me.bteuk.network.events.EventManager;
-import me.bteuk.network.gui.navigation.LocationMenu;
 import me.bteuk.network.listeners.ClickableItemListener;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.SwitchServer;
-import me.bteuk.network.utils.Utils;
 import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -25,15 +20,11 @@ import org.bukkit.inventory.ItemStack;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Objects;
 
 import static me.bteuk.network.utils.Constants.LOGGER;
 import static me.bteuk.network.utils.Constants.SERVER_NAME;
 import static me.bteuk.network.utils.NetworkConfig.CONFIG;
-import static net.kyori.adventure.text.format.NamedTextColor.DARK_RED;
 
 /**
  * This class manages the ingame map in the lobby.
@@ -157,6 +148,8 @@ public class Map extends AbstractReloadableComponent implements Listener {
 
             // Disable the clickable item.
             clickableItemListener.unregister();
+
+            // Remove all visible markers.
         }
     }
 
@@ -164,13 +157,13 @@ public class Map extends AbstractReloadableComponent implements Listener {
     public void onPlayerMove(PlayerMoveEvent e) {
         NetworkUser user = instance.getUser(e.getPlayer());
         if (user != null) {
-            if (user.isInMap() && !isInMapArea(e.getTo())) {
-                // The player was in the map area, but has exited it, remove the map item.
-                user.setInMap(false);
+            if (user.isHasMapItem() && !isNearMarker(e.getTo())) {
+                // The player has the map item, but it not near a marker, remove the map item.
+                user.setHasMapItem(false);
                 removeMapItem(e.getPlayer());
-            } else if (!user.isInMap() && isInMapArea(e.getTo())) {
-                // The player has entered the map area, give them the map item.
-                user.setInMap(true);
+            } else if (!user.isHasMapItem() && isNearMarker(e.getTo())) {
+                // The player is near a marker, give them the map item.
+                user.setHasMapItem(true);
                 giveMapItem(e.getPlayer());
             }
         }
@@ -252,14 +245,13 @@ public class Map extends AbstractReloadableComponent implements Listener {
     }
 
     /**
-     * Check whether the location is in the map area.
+     * Check if the location is within the radius of a marker.
      *
      * @param l the location to check.
-     * @return whether the location is in the map area.
+     * @return whether the location is within the radius of a marker
      */
-    private boolean isInMapArea(Location l) {
-        return l.getX() >= bounds[0][0] && l.getX() <= bounds[1][0] &&
-                l.getZ() >= bounds[0][1] && l.getZ() <= bounds[1][1];
+    private boolean isNearMarker(Location l) {
+        return map_markers.keySet().stream().anyMatch(location -> location.distance(l) < radius);
     }
 
     /**
