@@ -20,14 +20,14 @@ public class PlayerSelector implements TabCompleter {
         //Get array of online players, excluding yourself.
         ArrayList<String> uuids;
         if (sender instanceof Player p) {
-            uuids = Network.getInstance().globalSQL.getStringList("SELECT uuid FROM online_users WHERE uuid<>'" + p.getUniqueId() + "';");
+            uuids = Network.getInstance().getGlobalSQL().getStringList("SELECT uuid FROM online_users WHERE uuid<>'" + p.getUniqueId() + "';");
         } else {
-            uuids = Network.getInstance().globalSQL.getStringList("SELECT uuid FROM online_users;");
+            uuids = Network.getInstance().getGlobalSQL().getStringList("SELECT uuid FROM online_users;");
         }
         ArrayList<String> names = new ArrayList<>();
         ArrayList<String> returns = new ArrayList<>();
         for (String uuid : uuids) {
-            names.add(Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';"));
+            names.add(Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';"));
         }
 
         //If args is empty then return full array.

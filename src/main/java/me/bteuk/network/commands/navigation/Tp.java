@@ -1,7 +1,6 @@
 package me.bteuk.network.commands.navigation;
 
 import me.bteuk.network.Network;
-import me.bteuk.network.commands.navigation.Back;
 import me.bteuk.network.events.EventManager;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
@@ -40,22 +39,21 @@ public class Tp implements CommandExecutor {
         }
 
         //Check whether the first arg is a valid player.
-        if (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM player_data WHERE name='" + args[0] + "';")) {
+        if (Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM player_data WHERE name='" + args[0] + "';")) {
 
             //Get the uuid of the player.
-            String uuid = Network.getInstance().globalSQL.getString("SELECT uuid FROM player_data WHERE name='" + args[0] + "';");
+            String uuid = Network.getInstance().getGlobalSQL().getString("SELECT uuid FROM player_data WHERE name='" + args[0] + "';");
 
             //Check if the player is online.
-            if (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "';")) {
+            if (Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "';")) {
 
                 //Check if the player has teleport enabled/disabled.
                 //If disabled cancel teleport.
-                //TODO add method to bypass teleport blocking for mods.
-                if (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM player_data WHERE uuid='" + uuid + "' AND teleport_enabled=1;") || p.hasPermission("uknet.navigation.teleport.bypass")) {
+                if (Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM player_data WHERE uuid='" + uuid + "' AND teleport_enabled=1;") || p.hasPermission("uknet.navigation.teleport.bypass")) {
 
                     //If the player is on your server teleport.
                     //Else switch server and add teleport join event.
-                    if (Network.getInstance().globalSQL.getString("SELECT server FROM online_users WHERE uuid='" + uuid + "';").equals(SERVER_NAME)) {
+                    if (Network.getInstance().getGlobalSQL().getString("SELECT server FROM online_users WHERE uuid='" + uuid + "';").equals(SERVER_NAME)) {
 
                         //Get player location.
                         Player player = Bukkit.getPlayer(UUID.fromString(uuid));
@@ -77,7 +75,7 @@ public class Tp implements CommandExecutor {
                     } else {
 
                         EventManager.createTeleportEvent(true, p.getUniqueId().toString(), "network", "teleport player " + uuid, p.getLocation());
-                        SwitchServer.switchServer(p, Network.getInstance().globalSQL.getString("SELECT server FROM online_users WHERE uuid='" + uuid + "';"));
+                        SwitchServer.switchServer(p, Network.getInstance().getGlobalSQL().getString("SELECT server FROM online_users WHERE uuid='" + uuid + "';"));
 
                     }
 

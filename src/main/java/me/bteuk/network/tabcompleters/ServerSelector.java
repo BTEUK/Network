@@ -19,7 +19,7 @@ public class ServerSelector implements TabCompleter {
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
 
         //Get array of online players, excluding yourself.
-        ArrayList<String> servers = Network.getInstance().globalSQL.getStringList("SELECT name FROM server_data WHERE server<>'" + SERVER_NAME + ";");
+        ArrayList<String> servers = Network.getInstance().getGlobalSQL().getStringList("SELECT name FROM server_data WHERE server<>'" + SERVER_NAME + ";");
         ArrayList<String> returns = new ArrayList<>();
 
         //If args is empty then return full array.

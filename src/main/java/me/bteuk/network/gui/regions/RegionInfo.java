@@ -36,7 +36,7 @@ public class RegionInfo extends Gui {
         this.region = region;
         this.uuid = uuid;
 
-        globalSQL = Network.getInstance().globalSQL;
+        globalSQL = Network.getInstance().getGlobalSQL();
 
         createGui();
 
@@ -155,7 +155,7 @@ public class RegionInfo extends Gui {
 
                             //Update the previous coordinate.
                             int coordinateID = region.getCoordinateID(uuid);
-                            Network.getInstance().globalSQL.updateCoordinate(coordinateID, u.player.getLocation());
+                            globalSQL.updateCoordinate(coordinateID, u.player.getLocation());
 
                             //Create coordinate id for location of player and set that as the new coordinate id.
                             region.setCoordinateID(uuid, coordinateID);
@@ -203,8 +203,8 @@ public class RegionInfo extends Gui {
                             //Make sure this is done on the correct server.
                             //Create teleport region event.
                             if (region.hasRequests()) {
-                                Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + u.player.getUniqueId() + "','network'," +
-                                        Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';") + "'region request accept "
+                                globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + u.player.getUniqueId() + "','network'," +
+                                        globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';") + "'region request accept "
                                         + region + "');");
                             }
 

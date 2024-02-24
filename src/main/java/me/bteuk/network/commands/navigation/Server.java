@@ -42,7 +42,7 @@ public class Server implements CommandExecutor {
         //If no args are given send a clickable list of servers.
         //Sort by online servers and highlight the player's current server.
         if (args.length == 0) {
-            ArrayList<String> servers = Network.getInstance().globalSQL.getStringList("SELECT name FROM server_data ORDER BY online DESC");
+            ArrayList<String> servers = Network.getInstance().getGlobalSQL().getStringList("SELECT name FROM server_data ORDER BY online DESC");
 
             Component message = Component.text("Available servers: ", NamedTextColor.GREEN);
 
@@ -54,7 +54,7 @@ public class Server implements CommandExecutor {
                 if (Objects.equals(SERVER_NAME, servers.get(i))) {
                     server = Component.text(servers.get(i), TextColor.color(245, 173, 100));
                     server = server.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Utils.line("You are connected to this server.")));
-                } else if (Network.getInstance().globalSQL.hasRow("SELECT name FROM server_data WHERE name='" + servers.get(i) + "' AND online=0;")) {
+                } else if (Network.getInstance().getGlobalSQL().hasRow("SELECT name FROM server_data WHERE name='" + servers.get(i) + "' AND online=0;")) {
                     server = Component.text(servers.get(i), NamedTextColor.GRAY);
                     server = server.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Utils.line("This server is offline.")));
                 }else {
@@ -80,7 +80,7 @@ public class Server implements CommandExecutor {
 
             //Teleport to the server of the first arg.
             //If that is not a server notify the player.
-            if (Network.getInstance().globalSQL.hasRow("SELECT name FROM server_data WHERE name='" + args[0] + "';")) {
+            if (Network.getInstance().getGlobalSQL().hasRow("SELECT name FROM server_data WHERE name='" + args[0] + "';")) {
 
                 //Check if the player is not already on this server.
                 if (Objects.equals(SERVER_NAME, args[0])) {

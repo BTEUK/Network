@@ -43,7 +43,7 @@ public class ReviewRegionRequest extends Gui {
         setItem(4, Utils.createItem(Material.BOOK, 1,
                 Utils.title("Region " + request.region),
                 Utils.line("Requested by ")
-                        .append(Component.text(Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
+                        .append(Component.text(Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" +
                                 request.uuid + "';"), NamedTextColor.GRAY))));
 
         setItem(11, Utils.createItem(Material.LIME_CONCRETE, 1,
@@ -54,7 +54,7 @@ public class ReviewRegionRequest extends Gui {
                 {
 
                     //Create event to accept request.
-                    EventManager.createEvent(u.player.getUniqueId().toString(), "network", Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';"),
+                    EventManager.createEvent(u.player.getUniqueId().toString(), "network", Network.getInstance().getGlobalSQL().getString("SELECT name FROM server_data WHERE type='EARTH';"),
                             "region request accept " + request.region + " " + request.uuid);
 
                     //Return to request menu.
@@ -91,7 +91,7 @@ public class ReviewRegionRequest extends Gui {
                 {
 
                     //Create event to deny request.
-                    EventManager.createEvent(u.player.getUniqueId().toString(), "network", Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';"),
+                    EventManager.createEvent(u.player.getUniqueId().toString(), "network", Network.getInstance().getGlobalSQL().getString("SELECT name FROM server_data WHERE type='EARTH';"),
                             "region request deny " + request.region + " " + request.uuid);
 
                     //Return to request menu.
@@ -126,7 +126,7 @@ public class ReviewRegionRequest extends Gui {
 
                 {
 
-                    GlobalSQL globalSQL = Network.getInstance().globalSQL;
+                    GlobalSQL globalSQL = Network.getInstance().getGlobalSQL();
 
                     //Get coordinate.
                     Location l = globalSQL.getCoordinate(regionSQL.getInt("SELECT coordinate_id FROM region_requests WHERE region='" + request.region + "' AND uuid='" + request.uuid + "';"));

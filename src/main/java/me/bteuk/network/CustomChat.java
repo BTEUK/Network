@@ -210,7 +210,7 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
                         if (p.isOnline()) {
 
                             //Link account.
-                            instance.globalSQL.update("INSERT INTO discord(uuid,discord_id) VALUES('" + args[1] + "','" + args[2] + "');");
+                            instance.getGlobalSQL().update("INSERT INTO discord(uuid,discord_id) VALUES('" + args[1] + "','" + args[2] + "');");
                             NetworkUser u = Network.getInstance().getUser(p);
 
                             //If u is null, cancel.

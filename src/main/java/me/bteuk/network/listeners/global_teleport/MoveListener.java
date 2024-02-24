@@ -108,7 +108,7 @@ public class MoveListener implements Listener {
                         if (region.inDatabase() || p.hasPermission("group.jrbuilder")) {
 
                             //If the server is offline, notify the player.
-                            if (Network.getInstance().globalSQL.getBoolean("SELECT online FROM server_data WHERE name='" + region.getServer() + "';")) {
+                            if (Network.getInstance().getGlobalSQL().getBoolean("SELECT online FROM server_data WHERE name='" + region.getServer() + "';")) {
 
                                 //Add region to database if not exists.
                                 region.addToDatabase();

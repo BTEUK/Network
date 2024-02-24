@@ -45,10 +45,10 @@ public class TeleportEvent extends AbstractEvent {
 
                     p.teleport(player.getLocation());
                     p.sendMessage(Utils.success("Teleported to ")
-                            .append(Component.text(Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + event[2] + "';"), NamedTextColor.DARK_AQUA)));
+                            .append(Component.text(Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + event[2] + "';"), NamedTextColor.DARK_AQUA)));
 
                 } else {
-                    p.sendMessage(Component.text(Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + event[2] + "';"), NamedTextColor.DARK_RED)
+                    p.sendMessage(Component.text(Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + event[2] + "';"), NamedTextColor.DARK_RED)
                             .append(Utils.error(" is not online.")));
                 }
             }
@@ -56,7 +56,7 @@ public class TeleportEvent extends AbstractEvent {
             //Check if the teleport is to a specific coordinate ID.
             case "coordinateID" -> {
 
-                p.teleport(Network.getInstance().globalSQL.getCoordinate(Integer.parseInt(event[2])));
+                p.teleport(Network.getInstance().getGlobalSQL().getCoordinate(Integer.parseInt(event[2])));
 
                 //Check if a message is set.
                 if (message == null) {
@@ -73,14 +73,14 @@ public class TeleportEvent extends AbstractEvent {
                 //Get the coordinate id.
                 int coordinate_id;
                 if (event[1].equals("location")) {
-                    coordinate_id = Network.getInstance().globalSQL.getInt("SELECT coordinate FROM location_data WHERE location='" + location + "';");
+                    coordinate_id = Network.getInstance().getGlobalSQL().getInt("SELECT coordinate FROM location_data WHERE location='" + location + "';");
                 } else {
-                    coordinate_id = Network.getInstance().globalSQL.getInt("SELECT coordinate FROM location_requests WHERE location='" + location + "';");
+                    coordinate_id = Network.getInstance().getGlobalSQL().getInt("SELECT coordinate FROM location_requests WHERE location='" + location + "';");
                 }
 
-                Location l = Network.getInstance().globalSQL.getCoordinate(coordinate_id);
+                Location l = Network.getInstance().getGlobalSQL().getCoordinate(coordinate_id);
 
-                String worldName = Network.getInstance().globalSQL.getString("SELECT world FROM coordinates WHERE id=" + coordinate_id + ";");
+                String worldName = Network.getInstance().getGlobalSQL().getString("SELECT world FROM coordinates WHERE id=" + coordinate_id + ";");
 
                 //Check if world is in plotsystem.
                 if (Network.getInstance().getPlotSQL().hasRow("SELECT name FROM location_data WHERE name='" + worldName + "';")) {
@@ -106,7 +106,7 @@ public class TeleportEvent extends AbstractEvent {
 
                 //Get the region.
                 Region region = Network.getInstance().getRegionManager().getRegion(event[2]);
-                Location l = Network.getInstance().globalSQL.getCoordinate(region.getCoordinateID(uuid));
+                Location l = Network.getInstance().getGlobalSQL().getCoordinate(region.getCoordinateID(uuid));
 
                 if (l == null) {
                     p.sendMessage(Utils.error("An error occurred while fetching the location to teleport."));
@@ -133,7 +133,7 @@ public class TeleportEvent extends AbstractEvent {
 
                     //Set teleport event to go to spawn.
                     EventManager.createTeleportEvent(true, p.getUniqueId().toString(), "network", "teleport spawn", p.getLocation());
-                    SwitchServer.switchServer(p, Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='LOBBY';"));
+                    SwitchServer.switchServer(p, Network.getInstance().getGlobalSQL().getString("SELECT name FROM server_data WHERE type='LOBBY';"));
 
                 }
             }

@@ -64,20 +64,20 @@ public class Navigation implements CommandExecutor {
                     String location = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
 
                     //Check if the location exists.
-                    if (Network.getInstance().globalSQL.hasRow("SELECT location FROM location_data WHERE location='" + location + "';")) {
+                    if (Network.getInstance().getGlobalSQL().hasRow("SELECT location FROM location_data WHERE location='" + location + "';")) {
                         //Open update location menu.
                         //They must be staff to access this.
                         if (u.staffGui != null) {
                             u.staffGui.delete();
                         }
                         //Get details from the location.
-                        Category category = Category.valueOf(Network.getInstance().globalSQL.getString("SELECT category FROM location_data WHERE location='" + location + "';"));
-                        Regions subcategory = null;
-                        if (category == Category.ENGLAND) {
-                            //Get subcategory.
-                            subcategory = Regions.valueOf(Network.getInstance().globalSQL.getString("SELECT subcategory FROM location_data WHERE location='" + location + "';"));
+                        Category category = Category.valueOf(Network.getInstance().getGlobalSQL().getString("SELECT category FROM location_data WHERE location='" + location + "';"));
+                        int subcategory_id = Network.getInstance().getGlobalSQL().getInt("SELECT subcategory FROM location_requests WHERE location='" + location + "';");
+                        String subcategory = null;
+                        if (subcategory_id != 0) {
+                            subcategory = Network.getInstance().getGlobalSQL().getString("SELECT name FROM location_subcategory WHERE id=" + subcategory_id + ";");
                         }
-                        int coordinate_id = Network.getInstance().globalSQL.getInt("SELECT coordinate FROM location_data WHERE location='" + location + "';");
+                        int coordinate_id = Network.getInstance().getGlobalSQL().getInt("SELECT coordinate FROM location_data WHERE location='" + location + "';");
                         u.staffGui = new AddLocation(AddLocationType.UPDATE, location, coordinate_id, category, subcategory);
                         u.staffGui.open(u);
                     } else {
@@ -101,9 +101,9 @@ public class Navigation implements CommandExecutor {
                     String location = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
 
                     //Check if the location exists.
-                    if (Network.getInstance().globalSQL.hasRow("SELECT location FROM location_data WHERE location='" + location + "';")) {
+                    if (Network.getInstance().getGlobalSQL().hasRow("SELECT location FROM location_data WHERE location='" + location + "';")) {
                         //Delete location.
-                        Network.getInstance().globalSQL.update("DELETE FROM location_data WHERE location='" + location + "';");
+                        Network.getInstance().getGlobalSQL().update("DELETE FROM location_data WHERE location='" + location + "';");
                         p.sendMessage(Utils.success("Location ")
                                 .append(Component.text(location, NamedTextColor.DARK_AQUA))
                                 .append(Utils.success(" removed.")));
@@ -128,17 +128,17 @@ public class Navigation implements CommandExecutor {
                     String location = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
 
                     //Check if the location exists.
-                    if (Network.getInstance().globalSQL.hasRow("SELECT location FROM location_data WHERE location='" + location + "';")) {
+                    if (Network.getInstance().getGlobalSQL().hasRow("SELECT location FROM location_data WHERE location='" + location + "';")) {
                         //Change suggested status of location.
-                        if (Network.getInstance().globalSQL.hasRow("SELECT location FROM location_data WHERE location='" + location + "' AND suggested=1;")) {
+                        if (Network.getInstance().getGlobalSQL().hasRow("SELECT location FROM location_data WHERE location='" + location + "' AND suggested=1;")) {
                             //Location is already suggested, remove that.
-                            Network.getInstance().globalSQL.update("UPDATE location_data SET suggested=0 WHERE location='" + location + "';");
+                            Network.getInstance().getGlobalSQL().update("UPDATE location_data SET suggested=0 WHERE location='" + location + "';");
                             p.sendMessage(Utils.success("The location ")
                                     .append(Component.text(location, NamedTextColor.DARK_AQUA))
                                     .append(Utils.success(" will no longer be suggested.")));
                         } else {
                             //Set location as suggested.
-                            Network.getInstance().globalSQL.update("UPDATE location_data SET suggested=1 WHERE location='" + location + "';");
+                            Network.getInstance().getGlobalSQL().update("UPDATE location_data SET suggested=1 WHERE location='" + location + "';");
                             p.sendMessage(Utils.success("The location ")
                                     .append(Component.text(location, NamedTextColor.DARK_AQUA))
                                     .append(Utils.success(" will now be suggested.")));

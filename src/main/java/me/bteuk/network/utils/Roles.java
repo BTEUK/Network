@@ -108,12 +108,12 @@ public final class Roles {
         Bukkit.getServer().dispatchCommand(console, "lp user " + uuid + " parent remove " + pRole);
 
         //Update database.
-        Network.getInstance().globalSQL.update("UPDATE player_data SET builder_role='" + nRole + "' WHERE uuid='" + uuid + "';");
+        Network.getInstance().getGlobalSQL().update("UPDATE player_data SET builder_role='" + nRole + "' WHERE uuid='" + uuid + "';");
 
         //Sync with discord if linked and enabled.
-        if (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM discord WHERE uuid='" + uuid + "';") && DISCORD_LINKING) {
+        if (Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM discord WHERE uuid='" + uuid + "';") && DISCORD_LINKING) {
             //Get discord id.
-            long discord_id = Network.getInstance().globalSQL.getLong("SELECT discord_id FROM discord WHERE uuid='" + uuid + "';");
+            long discord_id = Network.getInstance().getGlobalSQL().getLong("SELECT discord_id FROM discord WHERE uuid='" + uuid + "';");
 
             //Sync roles.
             Network.getInstance().getTimers().discordSync(discord_id, nRole);
@@ -124,7 +124,7 @@ public final class Roles {
         //Send a message to the user if not online, so they'll be notified of their promotion next time they join the server.
         String colouredRole = CONFIG.getString("roles." + nRole + ".colour") + CONFIG.getString("roles." + nRole + ".name");
         if (CONFIG.getBoolean("chat.announce_promotions")) {
-            String name = Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
+            String name = Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
 
 
             Component promotation_message = Component.text(name)
@@ -139,10 +139,10 @@ public final class Roles {
         }
 
         //Check if the player is online.
-        if (!Network.getInstance().globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "';")) {
+        if (!Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "';")) {
 
             //Send a message that will show when they next log in.
-            Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','" +
+            Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','" +
                     PROMOTION_SELF + colouredRole
                     + "');");
 

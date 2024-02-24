@@ -33,7 +33,7 @@ public class StaffGui extends Gui {
 
         //Check if any location requests exist.
         //To make sure the string makes grammatical sense we check if the number is 1, in this case we change 'are' to 'is'.
-        int lRequestCount = Network.getInstance().globalSQL.getInt("SELECT COUNT(location) FROM location_requests");
+        int lRequestCount = Network.getInstance().getGlobalSQL().getInt("SELECT COUNT(location) FROM location_requests");
         Component lRequestString;
         if (lRequestCount == 1) {
             lRequestString = Utils.line("There is currently ")
@@ -53,7 +53,7 @@ public class StaffGui extends Gui {
                 u -> {
 
                     //Check if the user has the relevant permissions.
-                    if (Network.getInstance().globalSQL.getInt("SELECT COUNT(location) FROM location_requests") > 0) {
+                    if (Network.getInstance().getGlobalSQL().getInt("SELECT COUNT(location) FROM location_requests") > 0) {
                         if (u.player.hasPermission("uknet.navigation.review")) {
 
                             //Open the LocationRequest gui.
@@ -211,14 +211,14 @@ public class StaffGui extends Gui {
                                     if (server.equals(SERVER_NAME)) {
 
                                         u.player.closeInventory();
-                                        Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('"
+                                        Network.getInstance().getGlobalSQL().update("INSERT INTO server_events(uuid,type,server,event) VALUES('"
                                                 + u.player.getUniqueId() + "','plotsystem','" + SERVER_NAME + "','review plot " + nPlot + "');");
 
                                     } else {
 
                                         //Player is not on the current server.
                                         //Set the server join event.
-                                        Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) VALUES('"
+                                        Network.getInstance().getGlobalSQL().update("INSERT INTO join_events(uuid,type,event) VALUES('"
                                                 + u.player.getUniqueId() + "','plotsystem',"
                                                 + "'review plot " + nPlot + "');");
 

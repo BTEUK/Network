@@ -3,12 +3,10 @@ package me.bteuk.network.lobby;
 import io.papermc.lib.PaperLib;
 import lombok.Getter;
 import me.bteuk.network.Network;
-import me.bteuk.network.commands.navigation.Tpll;
 import me.bteuk.network.events.EventManager;
 import me.bteuk.network.listeners.ClickableItemListener;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.SwitchServer;
-import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -252,27 +250,5 @@ public class Map extends AbstractReloadableComponent implements Listener {
      */
     private boolean isNearMarker(Location l) {
         return map_markers.keySet().stream().anyMatch(location -> location.distance(l) < radius);
-    }
-
-    /**
-     * Get the location on the map using the given location.
-     * Comparing the location to the coordinate bound, get the coordinate of the location.
-     * Then convert the coordinates to the location in Minecraft.
-     *
-     * @param l the location on the map.
-     * @return the Minecraft coordinates of the location on the map.
-     */
-    private Location getLocationOnMap(Location l) throws OutOfProjectionBoundsException {
-        double xDis = (l.getX() - bounds[0][0]) / (bounds[1][0] - bounds[0][0]);
-        double zDis = (l.getZ() - bounds[0][1]) / (bounds[1][1] - bounds[0][1]);
-        double lat = ((1 - zDis) * coordinates[0][0]) + (zDis * coordinates[2][0]) + (xDis * (coordinates[1][0] - coordinates[0][0]));
-        double lon = ((1 - zDis) * coordinates[0][1]) + (zDis * coordinates[2][1]) + (xDis * (coordinates[1][1] - coordinates[0][1]));
-
-        double[] coords = Tpll.bteGeneratorSettings.projection().fromGeo(lon, lat);
-        Location newLocation = l.clone();
-        newLocation.setX(coords[0]);
-        newLocation.setZ(coords[1]);
-        LOGGER.info("Location is " + lat + ", " + lon + ": " + coords[0] + ", " + coords[1]);
-        return newLocation;
     }
 }

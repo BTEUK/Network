@@ -49,7 +49,7 @@ public class RegionCommand implements CommandExecutor {
                 if (p.hasPermission("uknet.regions.join")) {
 
                     //Add server event to join plot.
-                    Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + p.getUniqueId() + "'," + "'network'" + ",'" +
+                    Network.getInstance().getGlobalSQL().update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + p.getUniqueId() + "'," + "'network'" + ",'" +
                             EARTH_WORLD +
                             "','region join " + region.regionName() + "');");
 

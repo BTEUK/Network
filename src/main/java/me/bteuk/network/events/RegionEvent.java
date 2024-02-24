@@ -58,7 +58,7 @@ public class RegionEvent extends AbstractEvent {
                         region.acceptRequest(event[4]);
 
                         //Send feedback to user who accepted the request.
-                        Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aAccepted region request for &3" + Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + event[4] + "';") + " &ain the region &3 " + event[3] + ".');");
+                        Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aAccepted region request for &3" + Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + event[4] + "';") + " &ain the region &3 " + event[3] + ".');");
 
                     }
                 } else if (event[2].equals("deny")) {
@@ -68,7 +68,7 @@ public class RegionEvent extends AbstractEvent {
                     region.denyRequest(event[4]);
 
                     //Send feedback to user who accepted the request.
-                    Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aDenied region request for &3" + Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + event[4] + "';") + " &ain the region &3 " + event[3] + ".');");
+                    Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aDenied region request for &3" + Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + event[4] + "';") + " &ain the region &3 " + event[3] + ".');");
 
                 }
             }
@@ -89,7 +89,7 @@ public class RegionEvent extends AbstractEvent {
                     region.makeOwner(member);
 
                     //Send message to member that they are now the owner.
-                    Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + member + "','&aTransferred ownership of region "
+                    Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('" + member + "','&aTransferred ownership of region "
                             + region.getTag(member) + " to you due to the previous owner leaving the region.');");
 
                 } else if (!region.hasOwner() && !region.hasMember()) {
@@ -108,13 +108,13 @@ public class RegionEvent extends AbstractEvent {
                 //Create a copy of the coordinate id that the owner has.
                 //The reason for a copy rather than using the same copy id is for if the user wants to set a new location.
                 //This then allows us to update the existing coordinate rather than create a new coordinate each time this is done.
-                Location l = Network.getInstance().globalSQL.getCoordinate(region.getCoordinateID(region.getOwner()));
-                int coordinateID = Network.getInstance().globalSQL.addCoordinate(l);
+                Location l = Network.getInstance().getGlobalSQL().getCoordinate(region.getCoordinateID(region.getOwner()));
+                int coordinateID = Network.getInstance().getGlobalSQL().addCoordinate(l);
                 region.joinRegion(uuid, coordinateID);
 
                 //Send message to plot owner.
-                Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + region.getOwner() + "','&3" +
-                        Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " &ahas joined region &3" + region.getTag(region.getOwner()) + "');");
+                Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('" + region.getOwner() + "','&3" +
+                        Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " &ahas joined region &3" + region.getTag(region.getOwner()) + "');");
             }
         }
     }

@@ -17,7 +17,7 @@ public class LocationSelector implements TabCompleter {
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
 
         //Get array of locations.
-        ArrayList<String> locations = Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data;");
+        ArrayList<String> locations = Network.getInstance().getGlobalSQL().getStringList("SELECT location FROM location_data;");
         ArrayList<String> returns = new ArrayList<>();
 
         //If args is empty then return full array.

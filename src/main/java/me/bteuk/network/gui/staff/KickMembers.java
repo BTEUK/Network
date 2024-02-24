@@ -28,7 +28,7 @@ public class KickMembers extends Gui {
 
         page = 1;
 
-        globalSQL = Network.getInstance().globalSQL;
+        globalSQL = Network.getInstance().getGlobalSQL();
 
         createGui();
 

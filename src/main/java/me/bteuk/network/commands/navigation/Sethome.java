@@ -110,6 +110,6 @@ public class Sethome implements CommandExecutor {
 
     private int getCoordinateID(Location l) {
         //Create location coordinate.
-        return Network.getInstance().globalSQL.addCoordinate(l);
+        return Network.getInstance().getGlobalSQL().addCoordinate(l);
     }
 }

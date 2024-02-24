@@ -37,7 +37,7 @@ public class Nightvision implements CommandExecutor {
             p.removePotionEffect(PotionEffectType.NIGHT_VISION);
 
             //Disable nightvision in database.
-            Network.getInstance().globalSQL.update("UPDATE player_data SET nightvision_enabled=0 WHERE uuid='" + p.getUniqueId() + "';");
+            Network.getInstance().getGlobalSQL().update("UPDATE player_data SET nightvision_enabled=0 WHERE uuid='" + p.getUniqueId() + "';");
 
             p.sendMessage(Utils.success("Disabled nightvision."));
 
@@ -47,7 +47,7 @@ public class Nightvision implements CommandExecutor {
             p.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 1, false, false));
 
             //Enable nightvision in database.
-            Network.getInstance().globalSQL.update("UPDATE player_data SET nightvision_enabled=1 WHERE uuid='" + p.getUniqueId() + "';");
+            Network.getInstance().getGlobalSQL().update("UPDATE player_data SET nightvision_enabled=1 WHERE uuid='" + p.getUniqueId() + "';");
 
             p.sendMessage(Utils.success("Enabled nightvision."));
         }

@@ -10,7 +10,7 @@ public class Points {
 
     public static void addPoints(String uuid, int points, PointsType type) {
 
-        GlobalSQL globalSQL = Network.getInstance().globalSQL;
+        GlobalSQL globalSQL = Network.getInstance().getGlobalSQL();
 
         if (type == PointsType.POINTS) {
 
@@ -68,7 +68,7 @@ public class Points {
 
     public static void updateWeekly() {
 
-        GlobalSQL globalSQL = Network.getInstance().globalSQL;
+        GlobalSQL globalSQL = Network.getInstance().getGlobalSQL();
 
         //Get all users.
         ArrayList<String> uuids = globalSQL.getStringList("SELECT uuid FROM points_data;");
@@ -89,7 +89,7 @@ public class Points {
 
     public static void updateMonthly() {
 
-        GlobalSQL globalSQL = Network.getInstance().globalSQL;
+        GlobalSQL globalSQL = Network.getInstance().getGlobalSQL();
 
         //Get all users.
         ArrayList<String> uuids = globalSQL.getStringList("SELECT uuid FROM points_data;");

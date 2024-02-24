@@ -154,7 +154,7 @@ public class BuildGui extends Gui {
 
                         //Set the claim event.
                         u.player.closeInventory();
-                        Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('"
+                        Network.getInstance().getGlobalSQL().update("INSERT INTO server_events(uuid,type,server,event) VALUES('"
                                 + u.player.getUniqueId()
                                 + "','plotsystem','" + SERVER_NAME
                                 + "','claim plot');");
@@ -469,7 +469,7 @@ public class BuildGui extends Gui {
                     this.delete();
                     u.mainGui = null;
 
-                    u.mainGui = new PlotsystemLocations(u);
+                    u.mainGui = new PlotsystemLocations();
                     u.mainGui.open(u);
 
                 });

@@ -261,7 +261,7 @@ public class Connect implements Listener {
             }
 
             //Show the number of submitted navigation requests;
-            int navigation = instance.globalSQL.getInt("SELECT COUNT(location) FROM location_requests;");
+            int navigation = globalSQL.getInt("SELECT COUNT(location) FROM location_requests;");
 
             if (navigation != 0) {
                 if (navigation == 1) {

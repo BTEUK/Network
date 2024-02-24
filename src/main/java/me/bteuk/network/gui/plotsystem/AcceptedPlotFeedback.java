@@ -33,7 +33,7 @@ public class AcceptedPlotFeedback extends Gui {
         page = 1;
 
         //Get global sql.
-        globalSQL = Network.getInstance().globalSQL;
+        globalSQL = Network.getInstance().getGlobalSQL();
 
         //Get plot sql.
         plotSQL = Network.getInstance().getPlotSQL();

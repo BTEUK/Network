@@ -74,13 +74,13 @@ public class Season extends AbstractCommand {
         String name = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
 
         //Create the season if it does not already exist.
-        if (Network.getInstance().globalSQL.hasRow("SELECT id FROM seasons WHERE id='" + name + "';")) {
+        if (Network.getInstance().getGlobalSQL().hasRow("SELECT id FROM seasons WHERE id='" + name + "';")) {
             return Utils.error("A season with the name ")
                     .append(Component.text(name, NamedTextColor.DARK_RED)
                             .append(Utils.error(" already exists.")));
         }
 
-        if (Network.getInstance().globalSQL.update("INSERT INTO seasons(id) VALUES('" + name + "');")) {
+        if (Network.getInstance().getGlobalSQL().update("INSERT INTO seasons(id) VALUES('" + name + "');")) {
             return Utils.success("Season created with name ")
                     .append(Component.text(name, NamedTextColor.DARK_AQUA));
         } else {
@@ -94,21 +94,21 @@ public class Season extends AbstractCommand {
         String name = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
 
         //Check if the season exists, and is not already active.
-        if (!Network.getInstance().globalSQL.hasRow("SELECT id FROM seasons WHERE id='" + name + "';")) {
+        if (!Network.getInstance().getGlobalSQL().hasRow("SELECT id FROM seasons WHERE id='" + name + "';")) {
             return Utils.error("A season with the name ")
                     .append(Component.text(name, NamedTextColor.DARK_RED)
                             .append(Utils.error(" doesn't exists.")));
-        } else if (Network.getInstance().globalSQL.hasRow("SELECT id FROM seasons WHERE id='" + name + "' AND active=1;")) {
+        } else if (Network.getInstance().getGlobalSQL().hasRow("SELECT id FROM seasons WHERE id='" + name + "' AND active=1;")) {
             return Utils.error("The season ")
                     .append(Component.text(name, NamedTextColor.DARK_RED)
                             .append(Utils.error(" has already started.")));
-        } else if (Network.getInstance().globalSQL.getInt("SELECT id FROM seasons WHERE id='" + name + "' AND active=1;") > 1) {
+        } else if (Network.getInstance().getGlobalSQL().getInt("SELECT id FROM seasons WHERE id='" + name + "' AND active=1;") > 1) {
             return Utils.error("There is already an active season, cancel season ")
-                    .append(Component.text(Network.getInstance().globalSQL.getString("SELECT id FROM seasons WHERE active=1 and id<>'default';"), NamedTextColor.DARK_RED))
+                    .append(Component.text(Network.getInstance().getGlobalSQL().getString("SELECT id FROM seasons WHERE active=1 and id<>'default';"), NamedTextColor.DARK_RED))
                     .append(Utils.error(" first."));
         }
 
-        if (Network.getInstance().globalSQL.update("UPDATE seasons SET active=1 WHERE id='" + name + "';")) {
+        if (Network.getInstance().getGlobalSQL().update("UPDATE seasons SET active=1 WHERE id='" + name + "';")) {
             return Utils.success("Started season ")
                     .append(Component.text(name, NamedTextColor.DARK_AQUA));
         } else {
@@ -122,17 +122,17 @@ public class Season extends AbstractCommand {
         String name = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
 
         //Check if the season exists, and is active.
-        if (!Network.getInstance().globalSQL.hasRow("SELECT id FROM seasons WHERE id='" + name + "';")) {
+        if (!Network.getInstance().getGlobalSQL().hasRow("SELECT id FROM seasons WHERE id='" + name + "';")) {
             return Utils.error("A season with the name ")
                     .append(Component.text(name, NamedTextColor.DARK_RED)
                             .append(Utils.error(" doesn't exists.")));
-        } else if (!Network.getInstance().globalSQL.hasRow("SELECT id FROM seasons WHERE id='" + name + "' AND active=1;")) {
+        } else if (!Network.getInstance().getGlobalSQL().hasRow("SELECT id FROM seasons WHERE id='" + name + "' AND active=1;")) {
             return Utils.error("The season ")
                     .append(Component.text(name, NamedTextColor.DARK_RED)
                             .append(Utils.error(" is not active.")));
         }
 
-        if (Network.getInstance().globalSQL.update("UPDATE seasons SET active=0 WHERE id='" + name + "';")) {
+        if (Network.getInstance().getGlobalSQL().update("UPDATE seasons SET active=0 WHERE id='" + name + "';")) {
             return Utils.success("Ended season ")
                     .append(Component.text(name, NamedTextColor.DARK_AQUA));
         } else {

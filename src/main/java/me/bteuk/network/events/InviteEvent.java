@@ -27,7 +27,7 @@ public class InviteEvent extends AbstractEvent {
                 //Send the player a message telling them the command to join the plot.
                 if (p != null) {
 
-                    GlobalSQL globalSQL = Network.getInstance().globalSQL;
+                    GlobalSQL globalSQL = Network.getInstance().getGlobalSQL();
                     PlotSQL plotSQL = Network.getInstance().getPlotSQL();
 
                     int id = Integer.parseInt(event[2]);
@@ -52,7 +52,7 @@ public class InviteEvent extends AbstractEvent {
                 //Send the player a message telling them the command to join the plot.
                 if (p != null) {
 
-                    GlobalSQL globalSQL = Network.getInstance().globalSQL;
+                    GlobalSQL globalSQL = Network.getInstance().getGlobalSQL();
                     PlotSQL plotSQL = Network.getInstance().getPlotSQL();
 
                     int id = Integer.parseInt(event[2]);
@@ -77,7 +77,7 @@ public class InviteEvent extends AbstractEvent {
                 //Send the player a message telling them the command to join the plot.
                 if (p != null) {
 
-                    GlobalSQL globalSQL = Network.getInstance().globalSQL;
+                    GlobalSQL globalSQL = Network.getInstance().getGlobalSQL();
                     Region region = Network.getInstance().getRegionManager().getRegion(event[2]);
 
                     p.sendMessage(Utils.success("You have been invited to region ")

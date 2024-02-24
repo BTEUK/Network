@@ -1,7 +1,6 @@
 package me.bteuk.network.commands.navigation;
 
 import me.bteuk.network.Network;
-import me.bteuk.network.commands.navigation.Back;
 import me.bteuk.network.events.EventManager;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
@@ -39,21 +38,21 @@ public class Warp implements CommandExecutor {
         String location = String.join(" ", Arrays.copyOfRange(args, 0, args.length));
 
         //Find a location.
-        if (Network.getInstance().globalSQL.hasRow("SELECT location FROM location_data WHERE location='" + location + "';")) {
+        if (Network.getInstance().getGlobalSQL().hasRow("SELECT location FROM location_data WHERE location='" + location + "';")) {
 
             //Get coordinate id.
-            int coordinate_id = Network.getInstance().globalSQL.getInt("SELECT coordinate FROM location_data WHERE location='" + location + "';");
+            int coordinate_id = Network.getInstance().getGlobalSQL().getInt("SELECT coordinate FROM location_data WHERE location='" + location + "';");
 
             //Get server, if server is not current server,
             // teleport the player to the correct server with join event to teleport them to the location.
-            String server = Network.getInstance().globalSQL.getString("SELECT server FROM coordinates WHERE id=" + coordinate_id + ";");
+            String server = Network.getInstance().getGlobalSQL().getString("SELECT server FROM coordinates WHERE id=" + coordinate_id + ";");
             if (server.equals(SERVER_NAME)) {
                 //Server is equal.
 
                 //Get location from coordinate id.
-                Location l = Network.getInstance().globalSQL.getCoordinate(coordinate_id);
+                Location l = Network.getInstance().getGlobalSQL().getCoordinate(coordinate_id);
 
-                String worldName = Network.getInstance().globalSQL.getString("SELECT world FROM coordinates WHERE id=" + coordinate_id + ";");
+                String worldName = Network.getInstance().getGlobalSQL().getString("SELECT world FROM coordinates WHERE id=" + coordinate_id + ";");
 
                 //Check if world is in plotsystem.
                 if (Network.getInstance().getPlotSQL().hasRow("SELECT name FROM location_data WHERE name='" + worldName + "';")) {

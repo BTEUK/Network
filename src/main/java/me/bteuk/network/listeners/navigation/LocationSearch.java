@@ -48,7 +48,7 @@ public class LocationSearch implements Listener {
                 e.getPlayer().sendMessage(Utils.error("The phrase can't be longer than 64 characters."));
             } else {
 
-                LocationMenu gui = new LocationMenu("Search: " + PlainTextComponentSerializer.plainText().serialize(e.message()), u, Category.SEARCH, Category.EXPLORE, false, PlainTextComponentSerializer.plainText().serialize(e.message()));
+                LocationMenu gui = new LocationMenu("Search: " + PlainTextComponentSerializer.plainText().serialize(e.message()), u, Category.SEARCH, Category.EXPLORE, PlainTextComponentSerializer.plainText().serialize(e.message()));
 
 
                 //If there are no locations notify the user.

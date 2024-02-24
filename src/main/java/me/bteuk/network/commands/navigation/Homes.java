@@ -9,12 +9,9 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
-import org.bukkit.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static me.bteuk.network.utils.Constants.LOGGER;
 
@@ -70,7 +67,7 @@ public class Homes implements CommandExecutor {
         }
 
         //Get all homes in alphabetical order.
-        ArrayList<String> homes = Network.getInstance().globalSQL.getStringList("SELECT name FROM home WHERE uuid='" + p.getUniqueId() + "' ORDER BY name ASC;");
+        ArrayList<String> homes = Network.getInstance().getGlobalSQL().getStringList("SELECT name FROM home WHERE uuid='" + p.getUniqueId() + "' ORDER BY name ASC;");
 
         //If there are no locations notify the user.
         if (homes.isEmpty()) {

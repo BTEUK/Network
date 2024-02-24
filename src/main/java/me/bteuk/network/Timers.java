@@ -183,10 +183,10 @@ public class Timers {
                 }
 
                 //Check for messages that have been sent to this player.
-                if (instance.globalSQL.hasRow("SELECT message FROM messages WHERE recipient='" + user.player.getUniqueId() + "';")) {
+                if (globalSQL.hasRow("SELECT message FROM messages WHERE recipient='" + user.player.getUniqueId() + "';")) {
 
                     //Get messages.
-                    messages = instance.globalSQL.getStringList("SELECT message FROM messages WHERE recipient='" + user.player.getUniqueId() + "';");
+                    messages = globalSQL.getStringList("SELECT message FROM messages WHERE recipient='" + user.player.getUniqueId() + "';");
 
                     for (String message : messages) {
 
@@ -195,7 +195,7 @@ public class Timers {
                     }
 
                     //Delete messages.
-                    instance.globalSQL.update("DELETE FROM messages WHERE recipient='" + user.player.getUniqueId() + "'");
+                    globalSQL.update("DELETE FROM messages WHERE recipient='" + user.player.getUniqueId() + "'");
                 }
 
                 //Check if the player is afk.

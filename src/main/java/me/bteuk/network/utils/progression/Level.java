@@ -6,8 +6,8 @@ public class Level {
 
     protected static void addPlayerIfNotExists(String season, String uuid) {
 
-        if (!Network.getInstance().globalSQL.hasRow("SELECT uuid FROM progression WHERE uuid='" + uuid + "' AND season='" + season + "';")) {
-            Network.getInstance().globalSQL.update("INSERT INTO progression(season,uuid) VALUES('" + season + "','" + uuid + "');");
+        if (!Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM progression WHERE uuid='" + uuid + "' AND season='" + season + "';")) {
+            Network.getInstance().getGlobalSQL().update("INSERT INTO progression(season,uuid) VALUES('" + season + "','" + uuid + "');");
         }
     }
 
@@ -55,7 +55,7 @@ public class Level {
      */
     public static int getLevel(String season, String uuid) {
 
-        return Network.getInstance().globalSQL.getInt("SELECT lvl FROM progression WHERE uuid='" + uuid + "' AND season='" + season + "';");
+        return Network.getInstance().getGlobalSQL().getInt("SELECT lvl FROM progression WHERE uuid='" + uuid + "' AND season='" + season + "';");
 
     }
 
@@ -67,7 +67,7 @@ public class Level {
      */
     public static int getExp(String season, String uuid) {
 
-        return Network.getInstance().globalSQL.getInt("SELECT exp FROM progression WHERE uuid='" + uuid + "' AND season='" + season + "';");
+        return Network.getInstance().getGlobalSQL().getInt("SELECT exp FROM progression WHERE uuid='" + uuid + "' AND season='" + season + "';");
 
     }
 
@@ -80,7 +80,7 @@ public class Level {
      */
     public static boolean setLevel(String season, String uuid, int level) {
 
-        return Network.getInstance().globalSQL.update("UPDATE progression SET lvl=" + level + " WHERE uuid='" + uuid + "' AND season='" + season + "';");
+        return Network.getInstance().getGlobalSQL().update("UPDATE progression SET lvl=" + level + " WHERE uuid='" + uuid + "' AND season='" + season + "';");
 
     }
 
@@ -93,7 +93,7 @@ public class Level {
      */
     public static boolean setExp(String season, String uuid, int exp) {
 
-        return Network.getInstance().globalSQL.update("UPDATE progression SET exp=" + exp + " WHERE uuid='" + uuid + "' AND season='" + season + "';");
+        return Network.getInstance().getGlobalSQL().update("UPDATE progression SET exp=" + exp + " WHERE uuid='" + uuid + "' AND season='" + season + "';");
 
     }
 }

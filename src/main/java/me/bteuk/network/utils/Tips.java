@@ -93,7 +93,7 @@ public class Tips {
                             if (user.isTips_enabled()) {
 
                                 //Get builder role from database.
-                                String role = Network.getInstance().globalSQL.getString("SELECT builder_role FROM player_data WHERE uuid='" + user.player.getUniqueId() + "';");
+                                String role = Network.getInstance().getGlobalSQL().getString("SELECT builder_role FROM player_data WHERE uuid='" + user.player.getUniqueId() + "';");
 
                                 if (tipsMap.containsKey(role)) {
                                     user.player.sendMessage(Utils.tip(tipsMap.get(role).getTip()));

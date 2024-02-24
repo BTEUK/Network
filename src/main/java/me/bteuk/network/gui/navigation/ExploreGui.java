@@ -161,7 +161,7 @@ public class ExploreGui extends Gui {
 
     private void openLocation(String name, NetworkUser u, Category category) {
 
-        LocationMenu gui = new LocationMenu(name, u, category, Category.EXPLORE, false);
+        LocationMenu gui = new LocationMenu(name, u, category, Category.EXPLORE);
 
         if (gui.isEmpty()) {
 

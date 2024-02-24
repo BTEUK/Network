@@ -77,11 +77,11 @@ public class Discord implements CommandExecutor {
                         }
 
                         //Get linked discord id.
-                        long discord_id = Network.getInstance().globalSQL.getLong("SELECT discord_id FROM discord WHERE uuid='" + user.player.getUniqueId() + "';");
+                        long discord_id = Network.getInstance().getGlobalSQL().getLong("SELECT discord_id FROM discord WHERE uuid='" + user.player.getUniqueId() + "';");
 
                         //Remove linked roles from discord, then unlink.
                         //Since discord connections are handled via the proxy, get all the roles that must be unlinked and send that to the proxy with the chat socket.
-                        Network.getInstance().globalSQL.update("DELETE FROM discord WHERE uuid='" + user.player.getUniqueId() + "';");
+                        Network.getInstance().getGlobalSQL().update("DELETE FROM discord WHERE uuid='" + user.player.getUniqueId() + "';");
                         user.isLinked = false;
 
                         for (Map.Entry<String, Long> entry : Network.getInstance().getTimers().getRoles().entrySet()) {

@@ -43,7 +43,7 @@ public class ModerationActionGui extends Gui {
         this.type = type;
         this.uuid = uuid;
 
-        name = Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
+        name = Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
 
         createGui();
 
@@ -68,7 +68,7 @@ public class ModerationActionGui extends Gui {
                             u -> {
 
                                 //If a reason has been set, kick the user, if they're still online.
-                                if (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "';")) {
+                                if (Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "';")) {
                                     if (reason != null) {
 
                                         //Kick the user.

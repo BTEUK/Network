@@ -34,7 +34,7 @@ public class RegionMembers extends Gui {
 
         transfer = false;
 
-        globalSQL = Network.getInstance().globalSQL;
+        globalSQL = Network.getInstance().getGlobalSQL();
 
         createGui();
 
@@ -160,7 +160,7 @@ public class RegionMembers extends Gui {
                                     .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid ='" + region.getOwner() + "';"), NamedTextColor.DARK_AQUA)));
 
                             //Send message to new owner.
-                            Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aYou are now the owner of region &3" + region.getTag(uuid) + "');");
+                            globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aYou are now the owner of region &3" + region.getTag(uuid) + "');");
 
                             //Return to region info.
                             this.delete();
