@@ -6,7 +6,6 @@ import me.bteuk.network.gui.navigation.AddLocation;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.AddLocationType;
 import me.bteuk.network.utils.enums.Category;
-import me.bteuk.network.utils.enums.Regions;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;

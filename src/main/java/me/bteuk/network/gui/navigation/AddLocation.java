@@ -1,6 +1,7 @@
 package me.bteuk.network.gui.navigation;
 
 import lombok.Getter;
+import lombok.Setter;
 import me.bteuk.network.Network;
 import me.bteuk.network.commands.navigation.Back;
 import me.bteuk.network.events.EventManager;
@@ -19,20 +20,25 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
+import java.util.Arrays;
+
 import static me.bteuk.network.utils.Constants.SERVER_NAME;
 import static me.bteuk.network.utils.Constants.SERVER_TYPE;
 
 public class AddLocation extends Gui {
 
     private String old_name;
+    @Setter
     private String name;
-    private Category category;
-    private Counties county;
 
-    private Regions subcategory;
+    @Getter
+    private Category category = Category.ENGLAND;
+
+    @Setter
+    private String subcategory = "None";
     private int coordinate_id;
 
-    public SelectCounty selectCounty;
+    public SelectSubcategory selectSubcategory;
 
     private LocationNameListener locationNameListener;
 
@@ -45,13 +51,6 @@ public class AddLocation extends Gui {
 
         super(27, Component.text(type.label + " Location", NamedTextColor.AQUA, TextDecoration.BOLD));
 
-        //Set default category to England, since it is the most common.
-        category = Category.ENGLAND;
-
-        //Set default county to London, since it is the most common.
-        county = Counties.GREATER_LONDON;
-        subcategory = county.region;
-
         this.type = type;
 
         createGui();
@@ -59,7 +58,7 @@ public class AddLocation extends Gui {
     }
 
     //This is used when location details need to be updated.
-    public AddLocation(AddLocationType type, String name, int coordinate_id, Category category, Regions subcategory) {
+    public AddLocation(AddLocationType type, String name, int coordinate_id, Category category, String subcategory) {
 
         super(27, Component.text(type.label + " Location", NamedTextColor.AQUA, TextDecoration.BOLD));
 
@@ -81,19 +80,10 @@ public class AddLocation extends Gui {
 
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setCounty(Counties county) {
-        this.county = county;
-        this.subcategory = county.region;
-    }
-
     private void createGui() {
 
         //Get globalSQL.
-        globalSQL = Network.getInstance().globalSQL;
+        globalSQL = Network.getInstance().getGlobalSQL();
 
         //Set/edit name.
         if (name != null) {
@@ -139,14 +129,14 @@ public class AddLocation extends Gui {
                         Utils.title("Select Category"),
                         Utils.line("Click to cycle through categories."),
                         Utils.line("Current category is: ")
-                                .append(Component.text(category.label, NamedTextColor.GRAY)),
+                                .append(Component.text(category.getLabel(), NamedTextColor.GRAY)),
                         Utils.line("Available categories are:"),
                         Utils.line("England, Scotland, Wales, Northern Ireland and Other")),
 
                 u -> {
 
                     //Cycle to next category and refresh the gui.
-                    Category[] categories = Category.values();
+                    Category[] categories = (Category[]) Arrays.stream(Category.values()).filter(Category::isSelectable).toArray();
                     for (int i = 0; i < categories.length; i++) {
                         if (categories[i] == category) {
                             //Get next.
@@ -165,25 +155,23 @@ public class AddLocation extends Gui {
 
                 });
 
-        //If category is England, select county.
-        //Has to have it's own menu since there's too many option to cycle through.
-        if (category == Category.ENGLAND) {
+        //Select subcategory.
+        setItem(16, Utils.createItem(Material.COMPASS, 1,
+                        Utils.title("Select Subcategory"),
+                        Utils.line("Click to select a subcategory."),
+                        Utils.line("This is optional, you can"),
+                        Utils.line("leave it as 'None' if there"),
+                        Utils.line("are no suitable options"),
+                        Utils.line("Current subcategory is: ")
+                                .append(Component.text(subcategory, NamedTextColor.GRAY))),
 
-            setItem(16, Utils.createItem(Material.COMPASS, 1,
-                            Utils.title("Select County"),
-                            Utils.line("Click to select a county."),
-                            Utils.line("This will update the region."),
-                            Utils.line("Current region is: ")
-                                    .append(Component.text(county.region.label, NamedTextColor.GRAY))),
+                u -> {
 
-                    u -> {
+                    //Open select county menu.
+                    selectSubcategory = new SelectSubcategory(this);
+                    selectSubcategory.open(u);
 
-                        //Open select county menu.
-                        selectCounty = new SelectCounty(this);
-                        selectCounty.open(u);
-
-                    });
-        }
+                });
 
         //Teleport location update.
         //Teleport to location.
@@ -201,10 +189,10 @@ public class AddLocation extends Gui {
 
                         //If location is on this server teleport the player, else switch server.
                         //Teleport to location.
-                        String server = Network.getInstance().globalSQL.getString("SELECT server FROM coordinates WHERE id=" + coordinate_id + ";");
+                        String server = globalSQL.getString("SELECT server FROM coordinates WHERE id=" + coordinate_id + ";");
                         if (SERVER_NAME.equalsIgnoreCase(server)) {
                             //Get location from coordinate id.
-                            Location l = Network.getInstance().globalSQL.getCoordinate(coordinate_id);
+                            Location l = globalSQL.getCoordinate(coordinate_id);
 
                             //Set current location for /back
                             Back.setPreviousCoordinate(u.player.getUniqueId().toString(), u.player.getLocation());
@@ -249,7 +237,7 @@ public class AddLocation extends Gui {
                         }
 
 
-                        Network.getInstance().globalSQL.updateCoordinate(coordinate_id, l);
+                        globalSQL.updateCoordinate(coordinate_id, l);
                         u.player.sendMessage(Utils.success("Updated location to your current position."));
 
                     });
@@ -270,9 +258,6 @@ public class AddLocation extends Gui {
 
                     u -> {
 
-                        //Get globalSQL.
-                        GlobalSQL globalSQL = Network.getInstance().globalSQL;
-
                         //Checks:
                         //Name has been set
                         if (name == null) {
@@ -280,10 +265,10 @@ public class AddLocation extends Gui {
                             u.player.sendMessage(Utils.error("You have not set a name for the location."));
                             u.player.closeInventory();
 
-                            //Name isn't duplicate
-                        } else if (globalSQL.hasRow("SELECT location FROM location_data WHERE location='" + name + "';")) {
+                            //Name isn't duplicate (location or subcategory.
+                        } else if (globalSQL.hasRow("SELECT location FROM location_data WHERE location='" + name + "';") || globalSQL.hasRow("SELECT name FROM location_subcategory WHERE name='" + name + "';")) {
 
-                            u.player.sendMessage(Utils.error("A location with this name already exists."));
+                            u.player.sendMessage(Utils.error("A location or subcategory with this name already exists."));
                             u.player.closeInventory();
 
                         } else if (globalSQL.hasRow("SELECT location FROM location_requests WHERE location = '" + name + "';")) {
@@ -304,7 +289,6 @@ public class AddLocation extends Gui {
                                 if (Network.getInstance().getPlotSQL().hasRow("SELECT name FROM location_data WHERE name='" + worldName + "';")) {
 
                                     //Add coordinate transformation.
-
                                     l = new Location(
                                             l.getWorld(),
                                             l.getX() - Network.getInstance().getPlotSQL().getInt("SELECT xTransform FROM location_data WHERE name='" + worldName + "';"),
@@ -318,9 +302,8 @@ public class AddLocation extends Gui {
                             }
 
                             //Create location coordinate.
-                            coordinate_id = Network.getInstance().globalSQL.addCoordinate(l);
+                            coordinate_id = globalSQL.addCoordinate(l);
 
-                            //If category is england.
                             if (u.player.hasPermission("uknet.navigation.add")) {
 
                                 addLocation(u);
@@ -343,9 +326,9 @@ public class AddLocation extends Gui {
 
                         //Checks:
                         //Name isn't duplicate
-                        if (globalSQL.hasRow("SELECT location FROM location_data WHERE location='" + name + " AND coordinate<>" + coordinate_id + "';")) {
+                        if (globalSQL.hasRow("SELECT location FROM location_data WHERE location='" + name + "';") || globalSQL.hasRow("SELECT name FROM location_subcategory WHERE name='" + name + "';")) {
 
-                            u.player.sendMessage(Utils.error("Another location with this name already exists."));
+                            u.player.sendMessage(Utils.error("Another location or subcategory with this name already exists."));
                             u.player.closeInventory();
 
                         } else if (globalSQL.hasRow("SELECT location FROM location_requests WHERE location = '" + name + " AND coordinate<>" + coordinate_id + "';")) {
@@ -358,7 +341,6 @@ public class AddLocation extends Gui {
                             updateLocation(u);
 
                         }
-
                     });
         } else if (type == AddLocationType.REVIEW) {
 
@@ -378,7 +360,6 @@ public class AddLocation extends Gui {
 
                         u.staffGui = new LocationRequests();
                         u.staffGui.open(u);
-
                     });
 
             //Deny request.
@@ -392,7 +373,7 @@ public class AddLocation extends Gui {
 
                         //Notify player.
                         u.player.sendMessage(Utils.error("Denied location request ")
-                                        .append(Component.text(name, NamedTextColor.DARK_RED)));
+                                .append(Component.text(name, NamedTextColor.DARK_RED)));
 
                         //Delete gui and return to previous menu.
                         this.delete();
@@ -450,14 +431,23 @@ public class AddLocation extends Gui {
 
     }
 
-    public void addLocation(NetworkUser u) {
+    private void addLocation(NetworkUser u) {
 
-        if (category == Category.ENGLAND) {
-            globalSQL.update("INSERT INTO location_data(location,category,subcategory,coordinate) " +
-                    "VALUES('" + name + "','" + category + "','" + subcategory + "'," + coordinate_id + ");");
-        } else {
+        // If the subcategory has been set, find the subcategory id.
+        int subcategory_id = 0;
+        if (!subcategory.equals("None")) {
+            subcategory_id = globalSQL.getInt("SELECT id FROM location_subcategory WHERE name='" + subcategory + "';");
+            if (subcategory_id == 0) {
+                u.player.sendMessage(Utils.error("The subcategory no longer exists, adding location without subcategory."));
+            }
+        }
+
+        if (subcategory_id == 0) {
             globalSQL.update("INSERT INTO location_data(location,category,coordinate) " +
                     "VALUES('" + name + "','" + category + "'," + coordinate_id + ");");
+        } else {
+            globalSQL.update("INSERT INTO location_data(location,category,subcategory,coordinate) " +
+                    "VALUES('" + name + "','" + category + "'," + subcategory_id + "," + coordinate_id + ");");
         }
 
         u.player.sendMessage(Utils.success("Location ")
@@ -470,15 +460,23 @@ public class AddLocation extends Gui {
 
         u.mainGui = new ExploreGui(u);
         u.player.closeInventory();
-
     }
 
     public void updateLocation(NetworkUser u) {
 
-        if (category == Category.ENGLAND) {
-            globalSQL.update("UPDATE location_data SET location='" + name + "',category='" + category + "',subcategory='" + subcategory + "' WHERE location='" + old_name + "';");
-        } else {
+        // If the subcategory has been set, find the subcategory id.
+        int subcategory_id = 0;
+        if (!subcategory.equals("None")) {
+            subcategory_id = globalSQL.getInt("SELECT id FROM location_subcategory WHERE name='" + subcategory + "';");
+            if (subcategory_id == 0) {
+                u.player.sendMessage(Utils.error("The subcategory no longer exists, adding location without subcategory."));
+            }
+        }
+
+        if (subcategory_id == 0) {
             globalSQL.update("UPDATE location_data SET location='" + name + "',category='" + category + "' WHERE location='" + old_name + "';");
+        } else {
+            globalSQL.update("UPDATE location_data SET location='" + name + "',category='" + category + "',subcategory=" + subcategory_id + " WHERE location='" + old_name + "';");
         }
 
         u.player.sendMessage(Utils.success("Updated location ")
@@ -497,13 +495,22 @@ public class AddLocation extends Gui {
         //Delete request.
         globalSQL.update("DELETE FROM location_requests WHERE location='" + old_name + "';");
 
+        // If the subcategory has been set, find the subcategory id.
+        int subcategory_id = 0;
+        if (!subcategory.equals("None")) {
+            subcategory_id = globalSQL.getInt("SELECT id FROM location_subcategory WHERE name='" + subcategory + "';");
+            if (subcategory_id == 0) {
+                u.player.sendMessage(Utils.error("The subcategory no longer exists, adding location without subcategory."));
+            }
+        }
+
         //Add location.
-        if (category == Category.ENGLAND) {
-            globalSQL.update("INSERT INTO location_data(location,category,subcategory,coordinate) " +
-                    "VALUES('" + name + "','" + category + "','" + subcategory + "'," + coordinate_id + ");");
-        } else {
+        if (subcategory_id == 0) {
             globalSQL.update("INSERT INTO location_data(location,category,coordinate) " +
                     "VALUES('" + name + "','" + category + "'," + coordinate_id + ");");
+        } else {
+            globalSQL.update("INSERT INTO location_data(location,category,subcategory,coordinate) " +
+                    "VALUES('" + name + "','" + category + "'," + subcategory_id + "," + coordinate_id + ");");
         }
 
         //Notify player.
@@ -514,12 +521,21 @@ public class AddLocation extends Gui {
 
     public void requestLocation(NetworkUser u) {
 
-        if (category == Category.ENGLAND) {
-            globalSQL.update("INSERT INTO location_requests(location,category,subcategory,coordinate) " +
-                    "VALUES('" + name + "','" + category + "','" + subcategory + "'," + coordinate_id + ");");
-        } else {
+        // If the subcategory has been set, find the subcategory id.
+        int subcategory_id = 0;
+        if (!subcategory.equals("None")) {
+            subcategory_id = globalSQL.getInt("SELECT id FROM location_subcategory WHERE name='" + subcategory + "';");
+            if (subcategory_id == 0) {
+                u.player.sendMessage(Utils.error("The subcategory no longer exists, adding location without subcategory."));
+            }
+        }
+
+        if (subcategory_id == 0) {
             globalSQL.update("INSERT INTO location_requests(location,category,coordinate) " +
                     "VALUES('" + name + "','" + category + "'," + coordinate_id + ");");
+        } else {
+            globalSQL.update("INSERT INTO location_requests(location,category,subcategory,coordinate) " +
+                    "VALUES('" + name + "','" + category + "'," + subcategory_id + "," + coordinate_id + ");");
         }
 
         //Notify reviewers.
@@ -550,9 +566,9 @@ public class AddLocation extends Gui {
         super.delete();
 
         //If selectCounty exists, delete it.
-        if (selectCounty != null) {
-            selectCounty.delete();
-            selectCounty = null;
+        if (selectSubcategory != null) {
+            selectSubcategory.delete();
+            selectSubcategory = null;
         }
     }
 }
