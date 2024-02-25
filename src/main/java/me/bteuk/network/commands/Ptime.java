@@ -2,7 +2,7 @@ package me.bteuk.network.commands;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.exceptions.InvalidFormatException;
-import me.bteuk.network.tabcompleters.Arg1Selector;
+import me.bteuk.network.tabcompleters.FixedArgSelector;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.TimesOfDay;
 import net.kyori.adventure.text.Component;
@@ -24,7 +24,7 @@ public class Ptime extends AbstractCommand {
 
     public Ptime(Network instance) {
         super(instance, "ptime");
-        command.setTabCompleter(new Arg1Selector(Arrays.stream(TimesOfDay.values()).map(t -> t.label).toList()));
+        command.setTabCompleter(new FixedArgSelector(Arrays.stream(TimesOfDay.values()).map(t -> t.label).toList(), 0));
     }
 
     @Override

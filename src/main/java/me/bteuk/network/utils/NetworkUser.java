@@ -276,6 +276,14 @@ public class NetworkUser {
     }
 
     /**
+     * Sends the given message to player.
+     * @param message the message to send
+     */
+    public void sendMessage(Component message) {
+        player.sendMessage(message);
+    }
+
+    /**
      * Send the user an offline message. This also works for online players.
      *
      * @param uuid uuid of the user

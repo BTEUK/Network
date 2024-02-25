@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum Category {
 
-    EXPLORE("Explore", true),
+    EXPLORE("Explore", false),
 
     ENGLAND("England", true),
     SCOTLAND("Scotland", true),

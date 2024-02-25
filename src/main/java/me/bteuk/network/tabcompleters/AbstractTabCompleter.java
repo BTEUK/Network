@@ -6,9 +6,12 @@ import org.bukkit.util.StringUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbstractTabcompleter implements TabCompleter {
+/**
+ * Abstract tab completer, provides the logic for getting the correct arguments based on a list of options and argument index using the provided input.
+ */
+public abstract class AbstractTabCompleter implements TabCompleter {
 
-    public List<String> onTabCompleteArg1(String[] inputArgs, List<String> options) {
+    public static List<String> onTabCompleteArg(String[] inputArgs, List<String> options, int argIndex) {
 
         //Return list.
         List<String> returns = new ArrayList<>();
@@ -16,13 +19,13 @@ public abstract class AbstractTabcompleter implements TabCompleter {
         //If args is empty then return full array.
         //If args length is 1 then return any matching names with the existing characters.
         //Else return null, the tp command only has 1 valid arg.
-        if (inputArgs.length == 0) {
+        if (inputArgs.length == argIndex) {
 
             return options;
 
-        } else if (inputArgs.length == 1) {
+        } else if (inputArgs.length == (argIndex + 1)) {
 
-            StringUtil.copyPartialMatches(inputArgs[0], options, returns);
+            StringUtil.copyPartialMatches(inputArgs[argIndex], options, returns);
             return returns;
 
         } else {

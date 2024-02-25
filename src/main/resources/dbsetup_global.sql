@@ -117,7 +117,7 @@ CREATE TABLE IF NOT EXISTS server_switch
 CREATE TABLE IF NOT EXISTS location_subcategory
 (
     id          INT             AUTO_INCREMENT,
-    name        VARCHAR(64)     NOT NULL,
+    name        VARCHAR(128)    NOT NULL,
     category    ENUM('ENGLAND',
     'SCOTLAND','WALES',
     'NORTHERN_IRELAND','OTHER') NOT NULL,
@@ -142,7 +142,7 @@ CREATE TABLE IF NOT EXISTS location_marker
 (
     id              INT             AUTO_INCREMENT,
     location        VARCHAR(128)    NULL DEFAULT NULL,
-    subcategory        INT          NULL DEFAULT NULL,
+    subcategory     INT          NULL DEFAULT NULL,
     coordinate_id   INT             NOT NULL,
     PRIMARY KEY(id),
     CONSTRAINT fk_location_marker_1 FOREIGN KEY(location) REFERENCES location_data(location),
