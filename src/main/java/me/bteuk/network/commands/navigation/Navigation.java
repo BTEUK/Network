@@ -104,7 +104,7 @@ public class Navigation extends AbstractCommand {
                     }
                     //Get details from the location.
                     Category category = Category.valueOf(Network.getInstance().getGlobalSQL().getString("SELECT category FROM location_data WHERE location='" + location + "';"));
-                    int subcategory_id = Network.getInstance().getGlobalSQL().getInt("SELECT subcategory FROM location_requests WHERE location='" + location + "';");
+                    int subcategory_id = Network.getInstance().getGlobalSQL().getInt("SELECT subcategory FROM location_data WHERE location='" + location + "';");
                     String subcategory = null;
                     if (subcategory_id != 0) {
                         subcategory = Network.getInstance().getGlobalSQL().getString("SELECT name FROM location_subcategory WHERE id=" + subcategory_id + ";");

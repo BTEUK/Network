@@ -138,7 +138,7 @@ public class LocationMenu extends Gui {
                                 gui = new LocationMenu(location.getKey(), u, Category.TEMPORARY, Category.TEMPORARY, ArrayUtils.add(extraInfo, 0, location.getKey()));
                                 gui.setDeleteOnClose(true);
                             } else {
-                                gui = new LocationMenu(location.getKey(), u, Category.TEMPORARY, category, location.getKey());
+                                gui = new LocationMenu(location.getKey(), u, Category.SUBCATEGORY, category, location.getKey());
                                 u.mainGui = gui;
                             }
                             //Switch to location menu.
@@ -155,7 +155,7 @@ public class LocationMenu extends Gui {
                         u -> {
 
                             //Get the coordinate id.
-                            int coordinate_id = Network.getInstance().getGlobalSQL().getInt("SELECT coordinate FROM location_data WHERE location='" + location + "';");
+                            int coordinate_id = Network.getInstance().getGlobalSQL().getInt("SELECT coordinate FROM location_data WHERE location='" + location.getKey() + "';");
 
                             //Get the server of the location.
                             String server = Network.getInstance().getGlobalSQL().getString("SELECT server FROM coordinates WHERE id=" + coordinate_id + ";");
@@ -280,9 +280,12 @@ public class LocationMenu extends Gui {
                         .stream().collect(Collectors.toMap(location -> location, location -> false)));
             }
             // Subcategory, can only include locations.
-            case SUBCATEGORY ->
-                    locations.putAll(Network.getInstance().getGlobalSQL().getStringList("SELECT location FROM location_data WHERE subcategory='" + extraInfo[0] + "' ORDER BY location ASC;")
-                            .stream().collect(Collectors.toMap(location -> location, location -> false)));
+            case SUBCATEGORY -> {
+                // Get the subcategory id from the name.
+                int id = Network.getInstance().getGlobalSQL().getInt("SELECT id FROM location_subcategory WHERE name='" + extraInfo[0] + "';");
+                locations.putAll(Network.getInstance().getGlobalSQL().getStringList("SELECT location FROM location_data WHERE subcategory=" + id + " ORDER BY location ASC;")
+                        .stream().collect(Collectors.toMap(location -> location, location -> false)));
+            }
 
             // Suggested locations can only include locations.
             case SUGGESTED ->
@@ -311,7 +314,9 @@ public class LocationMenu extends Gui {
                         }
                     }
                 } else {
-                    locations.putAll(Network.getInstance().getGlobalSQL().getStringList("SELECT location FROM location_data WHERE subcategory='" + extraInfo[0] + "' ORDER BY location ASC;")
+                    // Get the subcategory id from the name.
+                    int id = Network.getInstance().getGlobalSQL().getInt("SELECT id FROM location_subcategory WHERE name='" + extraInfo[0] + "';");
+                    locations.putAll(Network.getInstance().getGlobalSQL().getStringList("SELECT location FROM location_data WHERE subcategory=" + id + " ORDER BY location ASC;")
                             .stream().collect(Collectors.toMap(location -> location, location -> false)));
                 }
             }

@@ -147,7 +147,7 @@ CREATE TABLE IF NOT EXISTS location_marker
     PRIMARY KEY(id),
     CONSTRAINT fk_location_marker_1 FOREIGN KEY(location) REFERENCES location_data(location),
     CONSTRAINT fk_location_marker_2 FOREIGN KEY(subcategory) REFERENCES location_subcategory(id),
-    CONSTRAINT fk_location_marker_3 FOREIGN KEY(coordinate_id) REFERENCES coordinates(id),
+    CONSTRAINT fk_location_marker_3 FOREIGN KEY(coordinate_id) REFERENCES coordinates(id)
 );
 
 CREATE TABLE IF NOT EXISTS location_requests
@@ -160,7 +160,7 @@ CREATE TABLE IF NOT EXISTS location_requests
     coordinate  INT                     NOT NULL,
     PRIMARY KEY(location),
     CONSTRAINT fk_location_requests_1 FOREIGN KEY(coordinate) REFERENCES coordinates(id),
-    CONSTRAINT fk_location_requests_2 FOREIGN KEY(subcategory) REFERENCES location_subcategory(id),
+    CONSTRAINT fk_location_requests_2 FOREIGN KEY(subcategory) REFERENCES location_subcategory(id)
 );
 
 CREATE TABLE IF NOT EXISTS moderation

@@ -72,7 +72,6 @@ public class SelectSubcategory extends Gui {
                         addLocation.setSubcategory(subcategory);
                         returnToAddLocation(u);
                     });
-            slot++;
 
             //If the slot is greater than the number that fit in a page, create a new page.
             if (slot > 34) {

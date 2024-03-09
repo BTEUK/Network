@@ -72,7 +72,9 @@ public class AddLocation extends Gui {
         //Set category from input.
         this.category = category;
 
-        this.subcategory = subcategory;
+        if (subcategory != null) {
+            this.subcategory = subcategory;
+        }
 
         this.type = type;
 
@@ -136,7 +138,7 @@ public class AddLocation extends Gui {
                 u -> {
 
                     //Cycle to next category and refresh the gui.
-                    Category[] categories = (Category[]) Arrays.stream(Category.values()).filter(Category::isSelectable).toArray();
+                    Category[] categories = Arrays.stream(Category.values()).filter(Category::isSelectable).toArray(Category[]::new);
                     for (int i = 0; i < categories.length; i++) {
                         if (categories[i] == category) {
                             //Get next.
@@ -326,7 +328,7 @@ public class AddLocation extends Gui {
 
                         //Checks:
                         //Name isn't duplicate
-                        if (globalSQL.hasRow("SELECT location FROM location_data WHERE location='" + name + "';") || globalSQL.hasRow("SELECT name FROM location_subcategory WHERE name='" + name + "';")) {
+                        if (globalSQL.hasRow("SELECT location FROM location_data WHERE location='" + name + " AND coordinate<>" + coordinate_id + "';") || globalSQL.hasRow("SELECT name FROM location_subcategory WHERE name='" + name + "';")) {
 
                             u.player.sendMessage(Utils.error("Another location or subcategory with this name already exists."));
                             u.player.closeInventory();
