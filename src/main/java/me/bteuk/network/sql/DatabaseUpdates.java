@@ -94,10 +94,10 @@ public class DatabaseUpdates {
         // Update column in location_requests for the new subcategory id as int.
         Network.getInstance().getGlobalSQL().update("ALTER TABLE location_requests MODIFY subcategory INT NULL DEFAULT NULL;");
 
-        // Add foreign key to location_data referencing the new location_category table.
+        // Add foreign key to location_data referencing the new location_subcategory table.
         Network.getInstance().getGlobalSQL().update("ALTER TABLE location_data ADD CONSTRAINT fk_location_data_2 FOREIGN KEY (subcategory) REFERENCES location_subcategory(id);");
 
-        // Add foreign key to location_requests referencing the new location_category table.
+        // Add foreign key to location_requests referencing the new location_subcategory table.
         Network.getInstance().getGlobalSQL().update("ALTER TABLE location_requests ADD CONSTRAINT fk_location_requests_2 FOREIGN KEY (subcategory) REFERENCES location_subcategory(id);");
     }
 

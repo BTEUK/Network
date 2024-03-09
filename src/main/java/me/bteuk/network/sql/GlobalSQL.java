@@ -221,6 +221,28 @@ public class GlobalSQL {
         return list;
     }
 
+    public ArrayList<Integer> getIntList(String sql) {
+
+        ArrayList<Integer> list = new ArrayList<>();
+
+        try (Connection conn = conn();
+             PreparedStatement statement = conn.prepareStatement(sql);
+             ResultSet results = statement.executeQuery()) {
+
+            while (results.next()) {
+
+                list.add(results.getInt(1));
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        return list;
+    }
+
     //Get a hashmap of all events for this server for the Network plugin.
     public ArrayList<String[]> getEvents(String serverName, ArrayList<String[]> list) {
 

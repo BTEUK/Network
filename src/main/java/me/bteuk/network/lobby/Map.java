@@ -18,6 +18,7 @@ import org.bukkit.inventory.ItemStack;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
 import static me.bteuk.network.utils.Constants.LOGGER;
@@ -68,8 +69,6 @@ public class Map extends AbstractReloadableComponent implements Listener {
 
     private final double radius = 0.5;
 
-    private static final String INVALID_MAP_CONFIG = "The map.yml file is invalid, please delete it and let it regenerate.";
-
     public Map(Network instance) {
         this.instance = instance;
     }
@@ -95,7 +94,7 @@ public class Map extends AbstractReloadableComponent implements Listener {
         // Get the server of the map, this is important in deciding which features to enable.
         // If the server is not
         server = CONFIG.getString("map.server");
-        if (server == null || instance.getGlobalSQL().hasRow("SELECT * FROM server_data WHERE name='" + server + "';")) {
+        if (server == null || !instance.getGlobalSQL().hasRow("SELECT * FROM server_data WHERE name='" + server + "';")) {
             enabled = false;
             LOGGER.warning("The map has been enabled without a valid server, disabling the map.");
             return;
@@ -193,19 +192,20 @@ public class Map extends AbstractReloadableComponent implements Listener {
     private void loadMarkers() throws SQLException {
 
         // Retrieve all the markers from the database.
-        ResultSet results = instance.getGlobalSQL().getResultSet("SELECT * FROM location_marker");
+        List<Integer> markers = instance.getGlobalSQL().getIntList("SELECT id FROM location_marker");
 
-        while (results.next()) {
-            String location = results.getString("location");
-            int coordinate_id = results.getInt("coordinate_id");
+        markers.forEach(id -> {
+            // Get the name;
+            String location = instance.getGlobalSQL().getString("SELECT location FROM location_marker WHERE id=" + id + ";");
+            int coordinate_id = instance.getGlobalSQL().getInt("SELECT coordinate_id FROM location_marker WHERE id=" + id + ";");
             if (location == null) {
-                // Load category.
-                loadCategoryMarker(results.getInt("category"), coordinate_id);
+                // Load subcategory.
+                int subcategory_id = instance.getGlobalSQL().getInt("SELECT subcategory FROM location_marker WHERE id=" + id + ";");
+                loadCategoryMarker(subcategory_id, coordinate_id);
             } else {
                 loadLocationMarker(location, coordinate_id);
             }
-        }
-
+        });
     }
 
     private void loadLocationMarker(String name, int coordinate_id) {
@@ -215,7 +215,7 @@ public class Map extends AbstractReloadableComponent implements Listener {
     }
 
     private void loadCategoryMarker(int category_id, int coordinate_id) {
-        map_markers.put(instance.getGlobalSQL().getCoordinate(coordinate_id), instance.getGlobalSQL().getString("SELECT name FROM location_category WHERE id=" + category_id + ";"));
+        map_markers.put(instance.getGlobalSQL().getCoordinate(coordinate_id), instance.getGlobalSQL().getString("SELECT name FROM location_subcategory WHERE id=" + category_id + ";"));
 
         // Create the visual marker.
     }
