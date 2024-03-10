@@ -194,7 +194,7 @@ public class AddLocation extends Gui {
                         String server = globalSQL.getString("SELECT server FROM coordinates WHERE id=" + coordinate_id + ";");
                         if (SERVER_NAME.equalsIgnoreCase(server)) {
                             //Get location from coordinate id.
-                            Location l = globalSQL.getCoordinate(coordinate_id);
+                            Location l = globalSQL.getLocation(coordinate_id);
 
                             //Set current location for /back
                             Back.setPreviousCoordinate(u.player.getUniqueId().toString(), u.player.getLocation());

@@ -108,7 +108,7 @@ public class RegionEvent extends AbstractEvent {
                 //Create a copy of the coordinate id that the owner has.
                 //The reason for a copy rather than using the same copy id is for if the user wants to set a new location.
                 //This then allows us to update the existing coordinate rather than create a new coordinate each time this is done.
-                Location l = Network.getInstance().getGlobalSQL().getCoordinate(region.getCoordinateID(region.getOwner()));
+                Location l = Network.getInstance().getGlobalSQL().getLocation(region.getCoordinateID(region.getOwner()));
                 int coordinateID = Network.getInstance().getGlobalSQL().addCoordinate(l);
                 region.joinRegion(uuid, coordinateID);
 

@@ -122,7 +122,7 @@ public class RegionInfo extends Gui {
                         //Set current location for /back
                         Back.setPreviousCoordinate(u.player.getUniqueId().toString(), u.player.getLocation());
 
-                        Location l = globalSQL.getCoordinate(region.getCoordinateID(uuid));
+                        Location l = globalSQL.getLocation(region.getCoordinateID(uuid));
                         u.player.teleport(l);
                         u.player.sendMessage(Utils.success("Teleported to region ")
                                 .append(Component.text(region.getTag(uuid), NamedTextColor.DARK_AQUA)));

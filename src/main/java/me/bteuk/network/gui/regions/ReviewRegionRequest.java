@@ -129,7 +129,7 @@ public class ReviewRegionRequest extends Gui {
                     GlobalSQL globalSQL = Network.getInstance().getGlobalSQL();
 
                     //Get coordinate.
-                    Location l = globalSQL.getCoordinate(regionSQL.getInt("SELECT coordinate_id FROM region_requests WHERE region='" + request.region + "' AND uuid='" + request.uuid + "';"));
+                    Location l = globalSQL.getLocation(regionSQL.getInt("SELECT coordinate_id FROM region_requests WHERE region='" + request.region + "' AND uuid='" + request.uuid + "';"));
 
                     //If the player is on the earth server get the coordinate.
                     if (SERVER_NAME.equals(globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';"))) {

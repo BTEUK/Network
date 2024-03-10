@@ -1,22 +1,23 @@
 package me.bteuk.network.lobby;
 
+import eu.decentsoftware.holograms.api.holograms.Hologram;
 import io.papermc.lib.PaperLib;
-import lombok.Getter;
 import me.bteuk.network.Network;
 import me.bteuk.network.events.EventManager;
-import me.bteuk.network.listeners.ClickableItemListener;
+import me.bteuk.network.gui.navigation.LocationMenu;
+import me.bteuk.network.utils.Holograms;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.SwitchServer;
+import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.enums.Category;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.inventory.ItemStack;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -31,15 +32,9 @@ import static me.bteuk.network.utils.NetworkConfig.CONFIG;
  * Clicking on the item will list all nearby locations (radius of 50km) to the players position.
  * Locations will be sorted by distance to the player.
  */
-public class Map extends AbstractReloadableComponent implements Listener {
+public class Map extends AbstractReloadableComponent {
 
     private final Network instance;
-
-    /**
-     * Indicates whether them map is enabled.
-     */
-    @Getter
-    private boolean enabled;
 
     /**
      * The server that has the physical map.
@@ -52,22 +47,13 @@ public class Map extends AbstractReloadableComponent implements Listener {
     private Location map_location;
 
     /**
-     * Map command.
+     * HashMap of the holograms
+     * Key: Hologram
+     * Value: Click action for the hologram
      */
-    private MapCommand map_command;
+    private HashMap<Hologram, HologramClickAction> holograms;
 
-    /**
-     * HashMap of the map markers.
-     * Key: Location of the marker on the map.
-     * Value: Name of the marker (warp or subcategory).
-     */
-    private HashMap<Location, String> map_markers;
-
-    private ItemStack clickableItem;
-    private ClickableItemListener clickableItemListener;
-
-
-    private final double radius = 0.5;
+    private HologramClickEvent hologramClickEvent;
 
     public Map(Network instance) {
         this.instance = instance;
@@ -79,15 +65,14 @@ public class Map extends AbstractReloadableComponent implements Listener {
      */
     @Override
     public void load() {
-
-        if (enabled) {
+        if (isEnabled()) {
             LOGGER.warning("An attempt was made to load the Map while it is already enabled.");
             return;
         }
 
         // Check if the map is enabled.
         if (!CONFIG.getBoolean("map.enabled")) {
-            enabled = false;
+            setEnabled(false);
             return;
         }
 
@@ -95,7 +80,7 @@ public class Map extends AbstractReloadableComponent implements Listener {
         // If the server is not
         server = CONFIG.getString("map.server");
         if (server == null || !instance.getGlobalSQL().hasRow("SELECT * FROM server_data WHERE name='" + server + "';")) {
-            enabled = false;
+            setEnabled(false);
             LOGGER.warning("The map has been enabled without a valid server, disabling the map.");
             return;
         }
@@ -108,7 +93,7 @@ public class Map extends AbstractReloadableComponent implements Listener {
         if (Objects.equals(SERVER_NAME, server)) {
             String world = CONFIG.getString("map.location.world");
             if (world == null || Bukkit.getWorld(world) == null) {
-                enabled = false;
+                setEnabled(false);
                 LOGGER.warning("The map world does not exist on this server, disabling the map.");
                 return;
             }
@@ -122,16 +107,14 @@ public class Map extends AbstractReloadableComponent implements Listener {
                 throw new RuntimeException(e);
             }
 
-            // Register the move listener.
-            Bukkit.getServer().getPluginManager().registerEvents(this, instance);
+            // Register the hologram click event.
+            hologramClickEvent = new HologramClickEvent(instance, this);
         }
 
         // Enable the map command.
-        map_command = new MapCommand(instance, this, "map");
+        new MapCommand(instance, this, "map");
 
-
-        enabled = true;
-
+        setEnabled(true);
     }
 
     /**
@@ -139,31 +122,20 @@ public class Map extends AbstractReloadableComponent implements Listener {
      */
     @Override
     public void unload() {
-        if (enabled) {
-            // Disable the movement listener.
-            PlayerMoveEvent.getHandlerList().unregister(this);
-
-            // Disable the clickable item.
-            clickableItemListener.unregister();
+        if (isEnabled()) {
+            // Disable the hologram click event.
+            hologramClickEvent.unregister();
+            hologramClickEvent = null;
 
             // Remove all visible markers.
+            holograms.forEach((hologram, clickAction) -> hologram.delete());
+            holograms.clear();
+            setEnabled(false);
         }
     }
 
-    @EventHandler
-    public void onPlayerMove(PlayerMoveEvent e) {
-        NetworkUser user = instance.getUser(e.getPlayer());
-        if (user != null) {
-            if (user.isHasMapItem() && !isNearMarker(e.getTo())) {
-                // The player has the map item, but it not near a marker, remove the map item.
-                user.setHasMapItem(false);
-                removeMapItem(e.getPlayer());
-            } else if (!user.isHasMapItem() && isNearMarker(e.getTo())) {
-                // The player is near a marker, give them the map item.
-                user.setHasMapItem(true);
-                giveMapItem(e.getPlayer());
-            }
-        }
+    public HologramClickAction getHologramClickAction(Hologram hologram) {
+        return holograms.get(hologram);
     }
 
     protected void teleport(Player p) {
@@ -181,27 +153,91 @@ public class Map extends AbstractReloadableComponent implements Listener {
         }
     }
 
-    protected void addMarker(Player p, String marker) {
+    /**
+     * Add a new marker to the map.
+     * @param l location where the marker should be placed
+     * @param marker the name of the marker, must be the name of a location or subcategory
+     * @return feedback for the player
+     */
+    protected Component addMarker(Location l, String marker) {
 
+        // Adjust the location to have the correct y.
+        Location marker_location = l.clone();
+        marker_location.setY(l.getY() + 0.5);
+
+        // Check of the name is valid.
+        if (instance.getGlobalSQL().hasRow("SELECT location FROM location_data WHERE location='" + marker + "';")) {
+            // Check if marker does not already exist.
+            if (instance.getGlobalSQL().hasRow("SELECT location FROM location_marker WHERE location='" + marker + "';")) {
+                return Component.text(marker, NamedTextColor.DARK_RED).append(Utils.error(" already exists on the map."));
+            }
+            // Create coordinate id.
+            int coordinate_id = instance.getGlobalSQL().addCoordinate(marker_location);
+            // Add marker.
+            instance.getGlobalSQL().update("INSERT INTO location_marker(location,coordinate_id) VALUES('" + marker + "'," + coordinate_id + ");");
+            reload();
+            return Utils.success("Added marker for location ").append(Component.text(marker, NamedTextColor.DARK_AQUA));
+        } else {
+            // Get the subcategory id.
+            int subcategory_id = instance.getGlobalSQL().getInt("SELECT id FROM location_subcategory WHERE name='" + marker + "';");
+            if (subcategory_id == 0) {
+                return Component.text(marker, NamedTextColor.DARK_RED).append(Utils.error(" is not a valid location or subcategory name."));
+            }
+            // Check if marker does not already exist.
+            if (instance.getGlobalSQL().hasRow("SELECT subcategory FROM location_marker WHERE subcategory='" + subcategory_id + "';")) {
+                return Component.text(marker, NamedTextColor.DARK_RED).append(Utils.error(" already exists on the map."));
+            }
+            // Create coordinate id.
+            int coordinate_id = instance.getGlobalSQL().addCoordinate(marker_location);
+            // Add marker.
+            instance.getGlobalSQL().update("INSERT INTO location_marker(subcategory,coordinate_id) VALUES('" + subcategory_id + "'," + coordinate_id + ");");
+            reload();
+            return Utils.success("Added marker for subcategory ").append(Component.text(marker, NamedTextColor.DARK_AQUA));
+        }
     }
 
-    protected void removeMarker(Player p, String marker) {
-
+    protected Component removeMarker(String marker) {
+        // Check if the marker is a valid location.
+        if (instance.getGlobalSQL().hasRow("SELECT location FROM location_marker WHERE location='" + marker + "';")) {
+            // Remove coordinate id.
+            int coordinate_id = instance.getGlobalSQL().getInt("SELECT coordinate_id FROM location_marker WHERE location='" + marker + "';");
+            // Remove marker of location.
+            instance.getGlobalSQL().update("DELETE FROM location_marker WHERE location='" + marker + "';");
+            instance.getGlobalSQL().update("DELETE FROM coordinates WHERE id=" + coordinate_id);
+            reload();
+            return Utils.success("Removed marker for location ").append(Component.text(marker, NamedTextColor.DARK_AQUA));
+        } else {
+            // Else check if it's a valid subcategory.
+            int subcategory_id = instance.getGlobalSQL().getInt("SELECT id FROM location_subcategory WHERE name='" + marker + "';");
+            if (subcategory_id == 0) {
+                return Component.text(marker, NamedTextColor.DARK_RED).append(Utils.error(" is not a valid marker."));
+            }
+            // Remove coordinate id.
+            int coordinate_id = instance.getGlobalSQL().getInt("SELECT coordinate_id FROM location_marker WHERE subcategory=" + subcategory_id + ";");
+            // Remove marker of location.
+            instance.getGlobalSQL().update("DELETE FROM location_marker WHERE subcategory=" + subcategory_id + ";");
+            instance.getGlobalSQL().update("DELETE FROM coordinates WHERE id=" + coordinate_id);
+            reload();
+            return Utils.success("Removed marker for subcategory ").append(Component.text(marker, NamedTextColor.DARK_AQUA));
+        }
     }
 
     private void loadMarkers() throws SQLException {
+
+        // Create the holograms map.
+        holograms = new HashMap<>();
 
         // Retrieve all the markers from the database.
         List<Integer> markers = instance.getGlobalSQL().getIntList("SELECT id FROM location_marker");
 
         markers.forEach(id -> {
-            // Get the name;
+            // Get the name
             String location = instance.getGlobalSQL().getString("SELECT location FROM location_marker WHERE id=" + id + ";");
             int coordinate_id = instance.getGlobalSQL().getInt("SELECT coordinate_id FROM location_marker WHERE id=" + id + ";");
             if (location == null) {
                 // Load subcategory.
                 int subcategory_id = instance.getGlobalSQL().getInt("SELECT subcategory FROM location_marker WHERE id=" + id + ";");
-                loadCategoryMarker(subcategory_id, coordinate_id);
+                loadSubcategoryMarker(subcategory_id, coordinate_id);
             } else {
                 loadLocationMarker(location, coordinate_id);
             }
@@ -209,46 +245,93 @@ public class Map extends AbstractReloadableComponent implements Listener {
     }
 
     private void loadLocationMarker(String name, int coordinate_id) {
-        map_markers.put(instance.getGlobalSQL().getCoordinate(coordinate_id), name);
 
-        // Create the visual marker.
-    }
+        Hologram hologram = createMarker(name, coordinate_id);
 
-    private void loadCategoryMarker(int category_id, int coordinate_id) {
-        map_markers.put(instance.getGlobalSQL().getCoordinate(coordinate_id), instance.getGlobalSQL().getString("SELECT name FROM location_subcategory WHERE id=" + category_id + ";"));
-
-        // Create the visual marker.
-    }
-
-    private void removeLocationMarker() {
-
-    }
-
-    private void removeCategoryMarker() {
-
-    }
-
-    private void giveMapItem(Player p) {
-        // Set the clickable item in slot 5 of the players inventory.
-        p.getInventory().setItem(4, clickableItem);
-    }
-
-    private void removeMapItem(Player p) {
-        // Remove the clickable item from the players inventory, no matter which slot it's in.
-        for (int i = 0; i < p.getInventory().getSize(); i++) {
-            if (clickableItem.isSimilar(p.getInventory().getItem(i))) {
-                p.getInventory().clear(i);
-            }
+        if (hologram == null) {
+            LOGGER.warning(String.format("Hologram %s was not created due to an error, a hologram with this name probably already exists.", name));
+            return;
         }
+
+        // Create the click action.
+        HologramClickAction clickAction = u -> teleportToLocation(u, name);
+        holograms.put(hologram, clickAction);
     }
 
-    /**
-     * Check if the location is within the radius of a marker.
-     *
-     * @param l the location to check.
-     * @return whether the location is within the radius of a marker
-     */
-    private boolean isNearMarker(Location l) {
-        return map_markers.keySet().stream().anyMatch(location -> location.distance(l) < radius);
+    private void loadSubcategoryMarker(int subcategory_id, int coordinate_id) {
+
+        // Get subcategory name.
+        String subcategory = instance.getGlobalSQL().getString("SELECT name FROM location_subcategory WHERE id=" + subcategory_id + ";");
+
+        if (subcategory == null) {
+            LOGGER.warning(String.format("Subcategory with id %d does not exist!", subcategory_id));
+            return;
+        }
+
+        Hologram hologram = createMarker(subcategory, coordinate_id);
+
+        if (hologram == null) {
+            LOGGER.warning(String.format("Hologram %s was not created due to an error, a hologram with this name probably already exists.", subcategory));
+            return;
+        }
+
+        // Create the click action.
+        HologramClickAction clickAction = u -> Bukkit.getScheduler().runTask(instance, () -> openSubcateogryMenu(u, subcategory));
+        holograms.put(hologram, clickAction);
+    }
+
+    private Hologram createMarker(String name, int coordinate_id) {
+        // Get location.
+        Location l = instance.getGlobalSQL().getLocation(coordinate_id);
+
+        // Create a hologram for the location.
+        if (l.getWorld() == null) {
+            LOGGER.warning(String.format("Unable to create hologram %s, world can not be found.", name));
+            return null;
+        }
+        return Holograms.createHologram(name, l, Arrays.asList("&b&l" + name, "&b&l↓"));
+    }
+
+    private void teleportToLocation(NetworkUser u, String location) {
+        //Get coordinate id.
+        int coordinate_id = instance.getGlobalSQL().getInt("SELECT coordinate FROM location_data WHERE location='" + location + "';");
+
+        // Get the server.
+        String server = instance.getGlobalSQL().getString("SELECT server FROM coordinates WHERE id=" + coordinate_id + ";");
+
+        if (server == null) {
+            u.sendMessage(Utils.error("An error occurred, please contact a server administrator."));
+            return;
+        }
+
+        // Create teleport event.
+        EventManager.createTeleportEvent(true, u.player.getUniqueId().toString(), "network",
+                "teleport location " + location, u.player.getLocation());
+
+        SwitchServer.switchServer(u.player, server);
+    }
+
+    private void openSubcateogryMenu(NetworkUser u, String subcategory) {
+        // Get the subcategory id.
+        int id = instance.getGlobalSQL().getInt("SELECT id FROM location_subcategory WHERE name='" + subcategory + "';");
+
+        if (id == 0) {
+            u.sendMessage(Utils.error("An error occurred, please contact a server administrator."));
+            return;
+        }
+
+        // Get all locations for the subcategory.
+        List<String> locations = instance.getGlobalSQL().getStringList("SELECT location FROM location_data WHERE subcategory=" + id + ";");
+
+        // Create temporary location menu.
+        LocationMenu menu = new LocationMenu(subcategory, u, Category.TEMPORARY, null, locations.toArray(String[]::new));
+        menu.setDeleteOnClose(true);
+
+        // Open the menu.
+        menu.open(u);
+    }
+
+    public interface HologramClickAction {
+        void click(NetworkUser u);
     }
 }

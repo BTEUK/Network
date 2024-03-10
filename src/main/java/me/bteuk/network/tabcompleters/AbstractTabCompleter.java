@@ -16,14 +16,7 @@ public abstract class AbstractTabCompleter implements TabCompleter {
         //Return list.
         List<String> returns = new ArrayList<>();
 
-        //If args is empty then return full array.
-        //If args length is 1 then return any matching names with the existing characters.
-        //Else return null, the tp command only has 1 valid arg.
-        if (inputArgs.length == argIndex) {
-
-            return options;
-
-        } else if (inputArgs.length == (argIndex + 1)) {
+        if (inputArgs.length == (argIndex + 1)) {
 
             StringUtil.copyPartialMatches(inputArgs[argIndex], options, returns);
             return returns;

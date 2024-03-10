@@ -56,7 +56,7 @@ public class TeleportEvent extends AbstractEvent {
             //Check if the teleport is to a specific coordinate ID.
             case "coordinateID" -> {
 
-                p.teleport(Network.getInstance().getGlobalSQL().getCoordinate(Integer.parseInt(event[2])));
+                p.teleport(Network.getInstance().getGlobalSQL().getLocation(Integer.parseInt(event[2])));
 
                 //Check if a message is set.
                 if (message == null) {
@@ -78,7 +78,7 @@ public class TeleportEvent extends AbstractEvent {
                     coordinate_id = Network.getInstance().getGlobalSQL().getInt("SELECT coordinate FROM location_requests WHERE location='" + location + "';");
                 }
 
-                Location l = Network.getInstance().getGlobalSQL().getCoordinate(coordinate_id);
+                Location l = Network.getInstance().getGlobalSQL().getLocation(coordinate_id);
 
                 String worldName = Network.getInstance().getGlobalSQL().getString("SELECT world FROM coordinates WHERE id=" + coordinate_id + ";");
 
@@ -106,7 +106,7 @@ public class TeleportEvent extends AbstractEvent {
 
                 //Get the region.
                 Region region = Network.getInstance().getRegionManager().getRegion(event[2]);
-                Location l = Network.getInstance().getGlobalSQL().getCoordinate(region.getCoordinateID(uuid));
+                Location l = Network.getInstance().getGlobalSQL().getLocation(region.getCoordinateID(uuid));
 
                 if (l == null) {
                     p.sendMessage(Utils.error("An error occurred while fetching the location to teleport."));

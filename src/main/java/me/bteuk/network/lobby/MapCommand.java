@@ -2,12 +2,15 @@ package me.bteuk.network.lobby;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.commands.AbstractCommand;
+import me.bteuk.network.tabcompleters.LocationAndSubcategorySelector;
 import me.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Arrays;
 
 /**
  * Map command class, adds commands to teleport to the map.
@@ -22,6 +25,7 @@ public class MapCommand extends AbstractCommand {
     protected MapCommand(Network instance, Map map, String commandName) {
         super(instance, commandName);
         this.map = map;
+        command.setTabCompleter(new LocationAndSubcategorySelector(1));
     }
 
     @Override
@@ -50,9 +54,9 @@ public class MapCommand extends AbstractCommand {
             return true;
         }
 
-        switch (args[1]) {
-            case "add" -> map.addMarker(p, args[2]);
-            case "remove" -> map.removeMarker(p, args[2]);
+        switch (args[0]) {
+            case "add" -> p.sendMessage(map.addMarker(p.getLocation(), String.join(" ", Arrays.copyOfRange(args, 1, args.length))));
+            case "remove" -> p.sendMessage(map.removeMarker(String.join(" ", Arrays.copyOfRange(args, 1, args.length))));
             default -> p.sendMessage(INVALID_USAGE);
         }
         return true;

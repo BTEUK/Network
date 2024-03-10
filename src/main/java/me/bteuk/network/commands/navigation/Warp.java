@@ -50,7 +50,7 @@ public class Warp implements CommandExecutor {
                 //Server is equal.
 
                 //Get location from coordinate id.
-                Location l = Network.getInstance().getGlobalSQL().getCoordinate(coordinate_id);
+                Location l = Network.getInstance().getGlobalSQL().getLocation(coordinate_id);
 
                 String worldName = Network.getInstance().getGlobalSQL().getString("SELECT world FROM coordinates WHERE id=" + coordinate_id + ";");
 

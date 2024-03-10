@@ -45,7 +45,7 @@ public class Back implements CommandExecutor {
         if (Objects.equals(SERVER_NAME, server)) {
 
             //Get location.
-            Location l = Network.getInstance().getGlobalSQL().getCoordinate(coordinateID);
+            Location l = Network.getInstance().getGlobalSQL().getLocation(coordinateID);
 
             //Set current location to previous location.
             setPreviousCoordinate(p.getUniqueId().toString(), p.getLocation());

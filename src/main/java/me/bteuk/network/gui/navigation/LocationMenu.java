@@ -11,7 +11,6 @@ import me.bteuk.network.utils.enums.Category;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.apache.commons.lang3.ArrayUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -41,11 +40,11 @@ public class LocationMenu extends Gui {
     /**
      * Create a new location menu.
      *
-     * @param title         The title of the menu
-     * @param u             The user that created the menu
-     * @param category      The category of the menu
-     * @param returnMenu    (Optional) return menu
-     * @param extraInfo     (Optional) extra info, for example the search term, subcategory, or just a list of locations.
+     * @param title      The title of the menu
+     * @param u          The user that created the menu
+     * @param category   The category of the menu
+     * @param returnMenu (Optional) return menu
+     * @param extraInfo  (Optional) extra info, for example the search term, subcategory, or just a list of locations.
      */
     public LocationMenu(String title, NetworkUser u, Category category, Category returnMenu, String... extraInfo) {
         super(45, Component.text(title, NamedTextColor.AQUA, TextDecoration.BOLD));
@@ -133,18 +132,11 @@ public class LocationMenu extends Gui {
                                 Utils.line("Click to open the menu for"),
                                 Utils.line("for this subcategory.")),
                         u -> {
-                            LocationMenu gui;
-                            if (category == Category.TEMPORARY) {
-                                gui = new LocationMenu(location.getKey(), u, Category.TEMPORARY, Category.TEMPORARY, ArrayUtils.add(extraInfo, 0, location.getKey()));
-                                gui.setDeleteOnClose(true);
-                            } else {
-                                gui = new LocationMenu(location.getKey(), u, Category.SUBCATEGORY, category, location.getKey());
-                                u.mainGui = gui;
-                            }
+                            u.mainGui = new LocationMenu(location.getKey(), u, Category.SUBCATEGORY, category, location.getKey());
+
                             //Switch to location menu.
                             this.delete();
                             u.mainGui.open(u);
-
                         });
             } else {
                 //Create location teleport button.
@@ -168,7 +160,7 @@ public class LocationMenu extends Gui {
                                 u.player.closeInventory();
 
                                 //Get location from coordinate id.
-                                Location l = Network.getInstance().getGlobalSQL().getCoordinate(coordinate_id);
+                                Location l = Network.getInstance().getGlobalSQL().getLocation(coordinate_id);
 
                                 String worldName = Network.getInstance().getGlobalSQL().getString("SELECT world FROM coordinates WHERE id=" + coordinate_id + ";");
 
@@ -197,7 +189,7 @@ public class LocationMenu extends Gui {
                             } else {
 
                                 //Create teleport event.
-                                EventManager.createTeleportEvent(true, u.player.getUniqueId().toString(), "network", "teleport location " + location, u.player.getLocation());
+                                EventManager.createTeleportEvent(true, u.player.getUniqueId().toString(), "network", "teleport location " + location.getKey(), u.player.getLocation());
 
                                 //Switch server.
                                 SwitchServer.switchServer(u.player, server);
@@ -302,22 +294,9 @@ public class LocationMenu extends Gui {
 
             // Temporary implies that the menu is being opened from the map.
             // A temporary menu provides the list of locations as extra args.
-            // If there is also a return menu set, then this should be a menu for a subcategory, and all other args the original menu values.
             case TEMPORARY -> {
-                if (returnMenu == null) {
-                    for (String value : extraInfo) {
-                        // If the location is not in the location data table then it must be a subcategory.
-                        if (Network.getInstance().getGlobalSQL().hasRow("SELECT location FROM location_data WHERE location='" + value + "';")) {
-                            locations.put(value, false);
-                        } else {
-                            locations.put(value, true);
-                        }
-                    }
-                } else {
-                    // Get the subcategory id from the name.
-                    int id = Network.getInstance().getGlobalSQL().getInt("SELECT id FROM location_subcategory WHERE name='" + extraInfo[0] + "';");
-                    locations.putAll(Network.getInstance().getGlobalSQL().getStringList("SELECT location FROM location_data WHERE subcategory=" + id + " ORDER BY location ASC;")
-                            .stream().collect(Collectors.toMap(location -> location, location -> false)));
+                for (String value : extraInfo) {
+                    locations.put(value, false);
                 }
             }
         }

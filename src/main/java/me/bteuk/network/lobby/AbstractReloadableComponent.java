@@ -1,5 +1,10 @@
 package me.bteuk.network.lobby;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public abstract class AbstractReloadableComponent {
 
     private boolean enabled = false;
