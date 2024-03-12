@@ -21,7 +21,6 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static me.bteuk.network.utils.Constants.SERVER_NAME;
 import static me.bteuk.network.utils.NetworkConfig.CONFIG;
@@ -266,31 +265,31 @@ public class LocationMenu extends Gui {
 
             // Main categories (can include subcategories.
             case ENGLAND, SCOTLAND, WALES, NORTHERN_IRELAND, OTHER -> {
-                locations.putAll(Network.getInstance().getGlobalSQL().getStringList("SELECT name FROM location_subcategory WHERE category='" + category + "' ORDER BY name ASC;")
-                        .stream().collect(Collectors.toMap(location -> location, location -> true)));
-                locations.putAll(Network.getInstance().getGlobalSQL().getStringList("SELECT location FROM location_data WHERE category='" + category + "' AND subcategory is null ORDER BY location ASC;")
-                        .stream().collect(Collectors.toMap(location -> location, location -> false)));
+                Network.getInstance().getGlobalSQL().getStringList("SELECT name FROM location_subcategory WHERE category='" + category + "' ORDER BY name ASC;")
+                        .forEach(name -> locations.put(name, true));
+                Network.getInstance().getGlobalSQL().getStringList("SELECT location FROM location_data WHERE category='" + category + "' AND subcategory is null ORDER BY location ASC;")
+                        .forEach(name -> locations.put(name, false));
             }
             // Subcategory, can only include locations.
             case SUBCATEGORY -> {
                 // Get the subcategory id from the name.
                 int id = Network.getInstance().getGlobalSQL().getInt("SELECT id FROM location_subcategory WHERE name='" + extraInfo[0] + "';");
-                locations.putAll(Network.getInstance().getGlobalSQL().getStringList("SELECT location FROM location_data WHERE subcategory=" + id + " ORDER BY location ASC;")
-                        .stream().collect(Collectors.toMap(location -> location, location -> false)));
+                Network.getInstance().getGlobalSQL().getStringList("SELECT location FROM location_data WHERE subcategory=" + id + " ORDER BY location ASC;")
+                        .forEach(name -> locations.put(name, false));
             }
 
             // Suggested locations can only include locations.
             case SUGGESTED ->
-                    locations.putAll(Network.getInstance().getGlobalSQL().getStringList("SELECT location FROM location_data WHERE suggested=1 ORDER BY location ASC;")
-                            .stream().collect(Collectors.toMap(location -> location, location -> false)));
+                    Network.getInstance().getGlobalSQL().getStringList("SELECT location FROM location_data WHERE suggested=1 ORDER BY location ASC;")
+                            .forEach(name -> locations.put(name, false));
 
             // Nearby locations can only include locations and are found based on the player's current location.
             case NEARBY ->
-                    locations.putAll(getNearbyLocations().stream().collect(Collectors.toMap(location -> location, location -> false)));
+                    getNearbyLocations().forEach(name -> locations.put(name, false));
 
             // Search locations based on the given string query.
             case SEARCH ->
-                    locations.putAll(searchLocations().stream().collect(Collectors.toMap(location -> location, location -> false)));
+                    searchLocations().forEach(name -> locations.put(name, false));
 
             // Temporary implies that the menu is being opened from the map.
             // A temporary menu provides the list of locations as extra args.

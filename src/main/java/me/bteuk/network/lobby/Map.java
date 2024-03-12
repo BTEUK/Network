@@ -276,7 +276,7 @@ public class Map extends AbstractReloadableComponent {
         }
 
         // Create the click action.
-        HologramClickAction clickAction = u -> Bukkit.getScheduler().runTask(instance, () -> openSubcateogryMenu(u, subcategory));
+        HologramClickAction clickAction = u -> Bukkit.getScheduler().runTask(instance, () -> openSubcategoryMenu(u, subcategory));
         holograms.put(hologram, clickAction);
     }
 
@@ -311,7 +311,7 @@ public class Map extends AbstractReloadableComponent {
         SwitchServer.switchServer(u.player, server);
     }
 
-    private void openSubcateogryMenu(NetworkUser u, String subcategory) {
+    private void openSubcategoryMenu(NetworkUser u, String subcategory) {
         // Get the subcategory id.
         int id = instance.getGlobalSQL().getInt("SELECT id FROM location_subcategory WHERE name='" + subcategory + "';");
 

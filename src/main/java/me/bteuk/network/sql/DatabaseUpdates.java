@@ -89,6 +89,7 @@ public class DatabaseUpdates {
         Network.getInstance().getGlobalSQL().update("UPDATE unique_data SET data_value='1.4.4' WHERE data_key='version';");
 
         // Update column in location_data for the new subcategory id as int.
+        Network.getInstance().getGlobalSQL().update("UPDATE location_data SET subcategory=NULL;");
         Network.getInstance().getGlobalSQL().update("ALTER TABLE location_data MODIFY subcategory INT NULL DEFAULT NULL;");
 
         // Update column in location_requests for the new subcategory id as int.

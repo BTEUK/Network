@@ -134,7 +134,6 @@ commands:
     usage: /<command>
     description: Sends a link of the progress map
     aliases:
-      - map
       - progress
   tips:
     aliases: [toggletips, tipstoggle]
