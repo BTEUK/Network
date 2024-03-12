@@ -60,7 +60,7 @@ public class NavigatorGui extends Gui {
 
                     } else {
                         if (TUTORIALS) {
-                            if (Network.getInstance().globalSQL.hasRow("SELECT name FROM server_data WHERE type='TUTORIAL' AND online=1;")) {
+                            if (Network.getInstance().getGlobalSQL().hasRow("SELECT name FROM server_data WHERE type='TUTORIAL' AND online=1;")) {
 
                                 u.mainGui = new TutorialsGui(u);
                                 u.mainGui.open(u);
@@ -91,7 +91,7 @@ public class NavigatorGui extends Gui {
                         u.player.getInventory().setItem(8, null);
 
                         //Disable navigator in database.
-                        Network.getInstance().globalSQL.update("UPDATE player_data SET navigator=0 WHERE uuid='" + u.player.getUniqueId() + "';");
+                        Network.getInstance().getGlobalSQL().update("UPDATE player_data SET navigator=0 WHERE uuid='" + u.player.getUniqueId() + "';");
 
                         u.player.sendMessage(Utils.success("Disabled navigator in inventory."));
 
@@ -101,7 +101,7 @@ public class NavigatorGui extends Gui {
                         u.navigator = true;
 
                         //Enable navigator in database.
-                        Network.getInstance().globalSQL.update("UPDATE player_data SET navigator=1 WHERE uuid='" + u.player.getUniqueId() + "';");
+                        Network.getInstance().getGlobalSQL().update("UPDATE player_data SET navigator=1 WHERE uuid='" + u.player.getUniqueId() + "';");
 
                         u.player.sendMessage(Utils.success("Enabled navigator in inventory."));
                     }
@@ -166,7 +166,7 @@ public class NavigatorGui extends Gui {
 
                         //Set teleport event to go to spawn.
                         EventManager.createTeleportEvent(true, u.player.getUniqueId().toString(), "network", "teleport spawn", u.player.getLocation());
-                        SwitchServer.switchServer(u.player, Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='LOBBY';"));
+                        SwitchServer.switchServer(u.player, Network.getInstance().getGlobalSQL().getString("SELECT name FROM server_data WHERE type='LOBBY';"));
 
                     }
 

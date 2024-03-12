@@ -109,7 +109,7 @@ public class ReviewRegionRequests extends Gui {
             setItem(slot, Utils.createItem(Material.LIME_CONCRETE, 1,
                     Utils.title("Region " + requests.get(i).region),
                     Utils.line("Requested by ")
-                            .append(Component.text(Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + requests.get(i).uuid + "';"), NamedTextColor.GRAY)), Utils.line("Click to open the menu for this request.")), u -> {
+                            .append(Component.text(Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + requests.get(i).uuid + "';"), NamedTextColor.GRAY)), Utils.line("Click to open the menu for this request.")), u -> {
 
                 //Delete this gui.
                 this.delete();

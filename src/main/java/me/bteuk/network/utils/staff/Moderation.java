@@ -32,9 +32,9 @@ public abstract class Moderation {
 
         //If the player is already banned, end the old ban.
         if (isBanned(uuid)) {
-            Network.getInstance().globalSQL.update("UPDATE moderation SET end_time=" + time + " WHERE uuid='" + uuid + "' AND end_time>" + time + " AND type='ban';");
+            Network.getInstance().getGlobalSQL().update("UPDATE moderation SET end_time=" + time + " WHERE uuid='" + uuid + "' AND end_time>" + time + " AND type='ban';");
         }
-        Network.getInstance().globalSQL.update("INSERT INTO moderation(uuid,start_time,end_time,reason,type) VALUES('" + uuid + "'," + time + "," + end_time + ",'" + reason + "','ban');");
+        Network.getInstance().getGlobalSQL().update("INSERT INTO moderation(uuid,start_time,end_time,reason,type) VALUES('" + uuid + "'," + time + "," + end_time + ",'" + reason + "','ban');");
 
         //If the player is currently online, ban them.
         kick(uuid, LegacyComponentSerializer.legacyAmpersand().serialize(getBannedComponent(uuid)));
@@ -49,12 +49,12 @@ public abstract class Moderation {
 
         //If the player is already muted, end the old mute.
         if (isMuted(uuid)) {
-            Network.getInstance().globalSQL.update("UPDATE moderation SET end_time=" + time + " WHERE uuid='" + uuid + "' AND end_time>" + time + " AND type='mute';");
+            Network.getInstance().getGlobalSQL().update("UPDATE moderation SET end_time=" + time + " WHERE uuid='" + uuid + "' AND end_time>" + time + " AND type='mute';");
         }
-        Network.getInstance().globalSQL.update("INSERT INTO moderation(uuid,start_time,end_time,reason,type) VALUES('" + uuid + "'," + time + "," + end_time + ",'" + reason + "','mute');");
+        Network.getInstance().getGlobalSQL().update("INSERT INTO moderation(uuid,start_time,end_time,reason,type) VALUES('" + uuid + "'," + time + "," + end_time + ",'" + reason + "','mute');");
 
         //Notify the user.
-        Network.getInstance().globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','" + LegacyComponentSerializer.legacyAmpersand().serialize(getMutedComponent(uuid)) + "');");
+        Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','" + LegacyComponentSerializer.legacyAmpersand().serialize(getMutedComponent(uuid)) + "');");
 
     }
 
@@ -62,24 +62,24 @@ public abstract class Moderation {
     public void unban(String uuid) {
         //Get time.
         long time = Time.currentTime();
-        Network.getInstance().globalSQL.update("UPDATE moderation SET end_time=" + time + " WHERE uuid='" + uuid + "' AND end_time>" + time + " AND type='ban';");
+        Network.getInstance().getGlobalSQL().update("UPDATE moderation SET end_time=" + time + " WHERE uuid='" + uuid + "' AND end_time>" + time + " AND type='ban';");
     }
 
     //Unmute the player.
     public void unmute(String uuid) {
         //Get time.
         long time = Time.currentTime();
-        Network.getInstance().globalSQL.update("UPDATE moderation SET end_time=" + time + " WHERE uuid='" + uuid + "' AND end_time>" + time + " AND type='mute';");
+        Network.getInstance().getGlobalSQL().update("UPDATE moderation SET end_time=" + time + " WHERE uuid='" + uuid + "' AND end_time>" + time + " AND type='mute';");
     }
 
     //Kick the player.
     public void kick(String uuid, String reason) {
 
         //Check if the player is currently online.
-        if (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "';")) {
+        if (Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "';")) {
             //Kick them with the reason.
             EventManager.createEvent(uuid, "network",
-                    Network.getInstance().globalSQL.getString("SELECT server FROM online_users WHERE uuid='" + uuid + "';"),
+                    Network.getInstance().getGlobalSQL().getString("SELECT server FROM online_users WHERE uuid='" + uuid + "';"),
                     "kick", reason);
         }
     }
@@ -91,33 +91,33 @@ public abstract class Moderation {
      * @return true if the player is currently banned, false if not
      */
     public boolean isBanned(String uuid) {
-        return (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM moderation WHERE uuid='" + uuid + "' AND end_time>" + Time.currentTime() + " AND type='ban';"));
+        return (Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM moderation WHERE uuid='" + uuid + "' AND end_time>" + Time.currentTime() + " AND type='ban';"));
     }
 
     //If the player is currently muted, return true.
     public boolean isMuted(String uuid) {
-        return (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM moderation WHERE uuid='" + uuid + "' AND end_time>" + Time.currentTime() + " AND type='mute';"));
+        return (Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM moderation WHERE uuid='" + uuid + "' AND end_time>" + Time.currentTime() + " AND type='mute';"));
     }
 
     //Get reason why player is banned.
     public String getBannedReason(String uuid) {
-        return (Network.getInstance().globalSQL.getString("SELECT reason FROM moderation WHERE uuid='" + uuid + "' AND end_time>" + Time.currentTime() + " AND type='ban';"));
+        return (Network.getInstance().getGlobalSQL().getString("SELECT reason FROM moderation WHERE uuid='" + uuid + "' AND end_time>" + Time.currentTime() + " AND type='ban';"));
     }
 
     //Get reason why player is muted.
     public String getMutedReason(String uuid) {
-        return (Network.getInstance().globalSQL.getString("SELECT reason FROM moderation WHERE uuid='" + uuid + "' AND end_time>" + Time.currentTime() + " AND type='mute';"));
+        return (Network.getInstance().getGlobalSQL().getString("SELECT reason FROM moderation WHERE uuid='" + uuid + "' AND end_time>" + Time.currentTime() + " AND type='mute';"));
     }
 
     //Get duration of ban.
     public String getBanDuration(String uuid) {
-        long time = Network.getInstance().globalSQL.getLong("SELECT end_time FROM moderation WHERE uuid='" + uuid + "' AND end_time>" + Time.currentTime() + " AND type='ban';");
+        long time = Network.getInstance().getGlobalSQL().getLong("SELECT end_time FROM moderation WHERE uuid='" + uuid + "' AND end_time>" + Time.currentTime() + " AND type='ban';");
         return Time.getDateTime(time);
     }
 
     //Get duration of mute.
     public String getMuteDuration(String uuid) {
-        long time = Network.getInstance().globalSQL.getLong("SELECT end_time FROM moderation WHERE uuid='" + uuid + "' AND end_time>" + Time.currentTime() + " AND type='mute';");
+        long time = Network.getInstance().getGlobalSQL().getLong("SELECT end_time FROM moderation WHERE uuid='" + uuid + "' AND end_time>" + Time.currentTime() + " AND type='mute';");
         return Time.getDateTime(time);
     }
 

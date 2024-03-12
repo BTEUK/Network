@@ -111,7 +111,7 @@ public class RegionRequestMenu extends Gui {
 
                                     (regionSQL.hasRow("SELECT region FROM region_requests WHERE region='" + requests.get(i) + "' AND uuid='" + u.player.getUniqueId() + "' AND staff_accept=0;"))
                                             ? "a reviewer"
-                                            : Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
+                                            : Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" +
                                             regionSQL.getString("SELECT owner FROM region_requests WHERE region='" + requests.get(i) + "' AND uuid='" + u.player.getUniqueId() + "';")
                                             + "';")
 

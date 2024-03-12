@@ -61,10 +61,10 @@ public class Phead implements CommandExecutor {
         }
 
         //Check if player exists in the database.
-        if (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM player_data WHERE name='" + args[0] + "';")) {
+        if (Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM player_data WHERE name='" + args[0] + "';")) {
 
             //Get uuid.
-            String uuid = Network.getInstance().globalSQL.getString("SELECT uuid FROM player_data WHERE name='" + args[0] + "';");
+            String uuid = Network.getInstance().getGlobalSQL().getString("SELECT uuid FROM player_data WHERE name='" + args[0] + "';");
 
             //Give item to player.
             Utils.giveItem(p, Utils.createPlayerSkull(uuid, 1, Component.text(args[0] + "'s head", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)), args[0] + "'s head");

@@ -10,7 +10,7 @@ import me.bteuk.network.exceptions.RegionManagerNotFoundException;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-import static net.buildtheearth.terraminusminus.TerraMinusMinus.LOGGER;
+import static me.bteuk.network.utils.Constants.LOGGER;
 
 public class WorldguardManager {
 

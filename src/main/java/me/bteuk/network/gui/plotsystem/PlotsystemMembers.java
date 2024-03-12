@@ -33,7 +33,7 @@ public class PlotsystemMembers extends Gui {
 
         page = 1;
 
-        globalSQL = Network.getInstance().globalSQL;
+        globalSQL = Network.getInstance().getGlobalSQL();
         plotSQL = Network.getInstance().getPlotSQL();
 
         createGui();

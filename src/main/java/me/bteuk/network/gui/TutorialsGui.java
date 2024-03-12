@@ -1,7 +1,6 @@
 package me.bteuk.network.gui;
 
 import me.bteuk.network.Network;
-import me.bteuk.network.gui.plotsystem.PlotServerLocations;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
@@ -122,7 +121,7 @@ public class TutorialsGui extends Gui {
     }
 
     private void switchServer() {
-        SwitchServer.switchServer(user.player, Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='TUTORIAL';"));
+        SwitchServer.switchServer(user.player, Network.getInstance().getGlobalSQL().getString("SELECT name FROM server_data WHERE type='TUTORIAL';"));
         user.player.closeInventory();
     }
 }

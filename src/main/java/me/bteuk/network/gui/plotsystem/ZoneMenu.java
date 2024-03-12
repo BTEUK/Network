@@ -102,7 +102,7 @@ public class ZoneMenu extends Gui {
                         Utils.line("This zone is private,"),
                         Utils.line("to join this zone you must be"),
                         Utils.line("invited by ")
-                                .append(Component.text(Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
+                                .append(Component.text(Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" +
                                         plotSQL.getString("SELECT uuid FROM zone_members WHERE id=" + zones.get(i) + " AND is_owner=1;") + "';"), NamedTextColor.GRAY))));
 
             }

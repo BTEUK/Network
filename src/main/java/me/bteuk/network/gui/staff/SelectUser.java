@@ -33,7 +33,7 @@ public class SelectUser extends Gui {
 
         this.type = type;
 
-        globalSQL = Network.getInstance().globalSQL;
+        globalSQL = Network.getInstance().getGlobalSQL();
 
         //Select all the players to show in the menu depending on the ModerationType.
         switch (type) {

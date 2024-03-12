@@ -6,6 +6,7 @@ import me.bteuk.network.commands.BuildingCompanionCommand;
 import me.bteuk.network.commands.Clear;
 import me.bteuk.network.commands.Discord;
 import me.bteuk.network.commands.Gamemode;
+import me.bteuk.network.commands.LobbyCommand;
 import me.bteuk.network.commands.Ptime;
 import me.bteuk.network.commands.Season;
 import me.bteuk.network.commands.give.GiveBarrier;
@@ -17,7 +18,6 @@ import me.bteuk.network.commands.Navigator;
 import me.bteuk.network.commands.Nightvision;
 import me.bteuk.network.commands.Phead;
 import me.bteuk.network.commands.Plot;
-import me.bteuk.network.commands.Portals;
 import me.bteuk.network.commands.RegionCommand;
 import me.bteuk.network.commands.Rules;
 import me.bteuk.network.commands.Speed;
@@ -50,6 +50,7 @@ import me.bteuk.network.listeners.Connect;
 import me.bteuk.network.listeners.GuiListener;
 import me.bteuk.network.listeners.PlayerInteract;
 import me.bteuk.network.listeners.PreJoinServer;
+import me.bteuk.network.sql.DatabaseInit;
 import me.bteuk.network.tabcompleters.LocationSelector;
 import me.bteuk.network.tabcompleters.PlayerSelector;
 import me.bteuk.network.tabcompleters.ServerSelector;
@@ -76,16 +77,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.stream.Collectors;
 
 import static me.bteuk.network.utils.Constants.REGIONS_ENABLED;
 import static me.bteuk.network.utils.Constants.SERVER_NAME;
@@ -121,7 +114,8 @@ public final class Network extends JavaPlugin {
     //SQL
     @Getter
     private PlotSQL plotSQL;
-    public GlobalSQL globalSQL;
+    @Getter
+    private GlobalSQL globalSQL;
     public RegionSQL regionSQL;
 
     //Chat
@@ -204,27 +198,34 @@ public final class Network extends JavaPlugin {
         //Setup MySQL
         try {
 
+            DatabaseInit init = new DatabaseInit();
+            boolean success;
+
             //Global Database
             String global_database = CONFIG.getString("database.global");
-            BasicDataSource global_dataSource = mysqlSetup(global_database);
+            BasicDataSource global_dataSource = init.mysqlSetup(global_database);
             globalSQL = new GlobalSQL(global_dataSource);
-            initDb("dbsetup_global.sql", global_dataSource);
+            success = init.initDb(getClassLoader(), "dbsetup_global.sql", global_dataSource);
 
             //Region Database
             String region_database = CONFIG.getString("database.region");
-            BasicDataSource region_dataSource = mysqlSetup(region_database);
+            BasicDataSource region_dataSource = init.mysqlSetup(region_database);
             regionSQL = new RegionSQL(region_dataSource);
-            initDb("dbsetup_regions.sql", region_dataSource);
+            success = success && init.initDb(getClassLoader(), "dbsetup_regions.sql", region_dataSource);
 
             //Plot Database
             String plot_database = CONFIG.getString("database.plot");
-            BasicDataSource plot_dataSource = mysqlSetup(plot_database);
+            BasicDataSource plot_dataSource = init.mysqlSetup(plot_database);
             plotSQL = new PlotSQL(plot_dataSource);
-            initDb("dbsetup_plots.sql", plot_dataSource);
+            success = success && init.initDb(getClassLoader(), "dbsetup_plots.sql", plot_dataSource);
 
-        } catch (SQLException | IOException e) {
-            e.printStackTrace();
+            if (!success) {
+                throw new RuntimeException("Error in database setup!");
+            }
+
+        } catch (SQLException | RuntimeException e) {
             getLogger().severe("Failed to connect to the database, please check that you have set the config values correctly.");
+            getLogger().severe("Disabling Network");
             return;
         }
 
@@ -315,8 +316,11 @@ public final class Network extends JavaPlugin {
 
             lobby.reloadPortals();
 
-            //Create portals reload command.
-            getCommand("portals").setExecutor(new Portals(lobby));
+            //Setup the map.
+            lobby.reloadMap();
+
+            //Create lobby command.
+            new LobbyCommand(this, lobby);
 
             //Set the rules lectern.
             lobby.setLectern();
@@ -358,7 +362,7 @@ public final class Network extends JavaPlugin {
         getCommand("warp").setTabCompleter(new LocationSelector());
         getCommand("warps").setExecutor(new Warps());
 
-        getCommand("navigation").setExecutor(new Navigation());
+        new Navigation(this);
 
         getCommand("afk").setExecutor(new AFK());
 
@@ -509,60 +513,6 @@ public final class Network extends JavaPlugin {
         //Disable bungeecord channel.
         instance.getServer().getMessenger().unregisterOutgoingPluginChannel(instance);
 
-    }
-
-    //Setup the tables for the database.
-    private void initDb(String fileName, BasicDataSource dataSource) throws SQLException, IOException {
-        // first lets read our setup file.
-        // This file contains statements to create our inital tables.
-        // it is located in the resources.
-        String setup;
-        try (InputStream in = getClassLoader().getResourceAsStream(fileName)) {
-            // Legacy way
-            setup = new BufferedReader(new InputStreamReader(in)).lines().collect(Collectors.joining("\n"));
-        } catch (IOException e) {
-            getLogger().log(Level.SEVERE, "Could not read db setup file.", e);
-            throw e;
-        }
-        // Mariadb can only handle a single query per statement. We need to split at ;.
-        String[] queries = setup.split(";");
-        // execute each query to the database.
-        for (String query : queries) {
-            // If you use the legacy way you have to check for empty queries here.
-            if (query.trim().isEmpty()) continue;
-            try (Connection conn = dataSource.getConnection();
-                 PreparedStatement stmt = conn.prepareStatement(query)) {
-                stmt.execute();
-            }
-        }
-        getLogger().info("Database setup complete for " + fileName);
-    }
-
-    //Creates the mysql connection.
-    private BasicDataSource mysqlSetup(String database) throws SQLException {
-
-        String host = CONFIG.getString("host");
-        int port = CONFIG.getInt("port");
-        String username = CONFIG.getString("username");
-        String password = CONFIG.getString("password");
-
-        BasicDataSource dataSource = new BasicDataSource();
-
-        dataSource.setUrl("jdbc:mysql://" + host + ":" + port + "/" + database + "?&useSSL=false&");
-        dataSource.setUsername(username);
-        dataSource.setPassword(password);
-
-        testDataSource(dataSource);
-        return dataSource;
-
-    }
-
-    public void testDataSource(BasicDataSource dataSource) throws SQLException {
-        try (Connection connection = dataSource.getConnection()) {
-            if (!connection.isValid(1000)) {
-                throw new SQLException("Could not establish database connection.");
-            }
-        }
     }
 
     //Get user from player.

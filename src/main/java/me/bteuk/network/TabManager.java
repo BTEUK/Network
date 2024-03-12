@@ -72,7 +72,7 @@ public class TabManager {
         if (!instance.hasPlayer(sUuid) && !fakePlayers.containsKey(sUuid)) {
 
             //Get name from database
-            String name = instance.globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + sUuid + "';");
+            String name = instance.getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + sUuid + "';");
 
             UUID uuid = UUID.fromString(sUuid);
             WrappedGameProfile profile = new WrappedGameProfile(uuid, name);
@@ -136,12 +136,12 @@ public class TabManager {
         UUID uuid = UUID.fromString(sUuid);
 
         //Get name from database
-        String name = instance.globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + sUuid + "';");
+        String name = instance.getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + sUuid + "';");
 
-        String displayName = instance.globalSQL.getString("SELECT display_name FROM online_users WHERE uuid='" + sUuid + "';");
+        String displayName = instance.getGlobalSQL().getString("SELECT display_name FROM online_users WHERE uuid='" + sUuid + "';");
 
         //Get the name of the team which the player needs adding to, this is to sort tab.
-        char teamName = Roles.tabSorting(instance.globalSQL.getString("SELECT primary_role FROM online_users WHERE uuid='" + sUuid + "';"));
+        char teamName = Roles.tabSorting(instance.getGlobalSQL().getString("SELECT primary_role FROM online_users WHERE uuid='" + sUuid + "';"));
 
         //Add player to the correct team.
         playerDisplayName.addEntry(name, String.valueOf(teamName));
@@ -211,14 +211,14 @@ public class TabManager {
                     infoList.forEach(info -> {
 
                         //If player is not online, skip.
-                        if (!instance.globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid='" + info.getProfile().getUUID() + "';")) {
+                        if (!instance.getGlobalSQL().hasRow("SELECT uuid FROM online_users WHERE uuid='" + info.getProfile().getUUID() + "';")) {
                             return;
                         }
 
-                        String displayName = instance.globalSQL.getString("SELECT display_name FROM online_users WHERE uuid='" + info.getProfile().getUUID() + "';");
+                        String displayName = instance.getGlobalSQL().getString("SELECT display_name FROM online_users WHERE uuid='" + info.getProfile().getUUID() + "';");
 
                         //Get the name of the team which the player needs adding to, this is to sort tab.
-                        char teamName = Roles.tabSorting(instance.globalSQL.getString("SELECT primary_role FROM online_users WHERE uuid='" + info.getProfile().getUUID() + "';"));
+                        char teamName = Roles.tabSorting(instance.getGlobalSQL().getString("SELECT primary_role FROM online_users WHERE uuid='" + info.getProfile().getUUID() + "';"));
 
                         //Add player to the correct team.
                         playerDisplayName.addEntry(info.getProfile().getName(), String.valueOf(teamName));
@@ -248,7 +248,7 @@ public class TabManager {
                 packet.getUUIDLists().read(0).forEach(uuid -> {
 
                     //If the player is on a different server.
-                    if (instance.globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "' AND server<>'" + SERVER_NAME + "';")) {
+                    if (instance.getGlobalSQL().hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "' AND server<>'" + SERVER_NAME + "';")) {
 
                         LOGGER.info("Removed player with uuid " + uuid + " from TAB, but they are on another server");
                         LOGGER.info("Adding them back as a fake player.");

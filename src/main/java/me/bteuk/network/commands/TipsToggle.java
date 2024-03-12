@@ -63,7 +63,7 @@ public class TipsToggle implements CommandExecutor {
             user.setTips_enabled(false);
 
             //Update the database value.
-            Network.getInstance().globalSQL.update("UPDATE player_data SET tips_enabled=0 WHERE uuid='" + p.getUniqueId() + "';");
+            Network.getInstance().getGlobalSQL().update("UPDATE player_data SET tips_enabled=0 WHERE uuid='" + p.getUniqueId() + "';");
 
             p.sendMessage(Utils.success("Disabled tips in chat."));
 
@@ -73,7 +73,7 @@ public class TipsToggle implements CommandExecutor {
             user.setTips_enabled(true);
 
             //Update the database value.
-            Network.getInstance().globalSQL.update("UPDATE player_data SET tips_enabled=1 WHERE uuid='" + p.getUniqueId() + "';");
+            Network.getInstance().getGlobalSQL().update("UPDATE player_data SET tips_enabled=1 WHERE uuid='" + p.getUniqueId() + "';");
 
             p.sendMessage(Utils.success("Enabled tips in chat."));
 

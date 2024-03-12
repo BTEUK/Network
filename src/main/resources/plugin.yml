@@ -4,6 +4,9 @@ main: me.bteuk.network.Network
 api-version: 1.20
 depend: [ PlaceholderAPI, WorldGuard, ProtocolLib]
 
+softdepend:
+  - DecentHolograms
+
 commands:
   plot:
     usage: /<command>
@@ -62,9 +65,9 @@ commands:
   afk:
     usage: /<command>
     description: Toggles afk status.
-  portals:
+  lobby:
     usage: /<command>
-    description: Command to reload portals.
+    description: Command for all lobby management.
   sethome:
     usage: /<command>
     description: Set a home to your current location.
@@ -151,3 +154,6 @@ commands:
     usage: /<command>
     description: Toggle the building companion.
     aliases: [ bc, companion ]
+  map:
+    usage: /<command>
+    description: Map command.

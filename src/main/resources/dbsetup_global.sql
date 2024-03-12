@@ -91,10 +91,10 @@ CREATE TABLE IF NOT EXISTS statistics
 
 CREATE TABLE IF NOT EXISTS online_users
 (
-    uuid        CHAR(36)        NOT NULL,
-    join_time   BIGINT          NOT NULL,
-    last_ping   BIGINT          NOT NULL,
-    server      VARCHAR(64)     NOT NULL,
+    uuid            CHAR(36)        NOT NULL,
+    join_time       BIGINT          NOT NULL,
+    last_ping       BIGINT          NOT NULL,
+    server          VARCHAR(64)     NOT NULL,
     primary_role    VARCHAR(64) NOT NULL,
     display_name    VARCHAR(64) NOT NULL,
     PRIMARY KEY(uuid),
@@ -114,25 +114,53 @@ CREATE TABLE IF NOT EXISTS server_switch
     CONSTRAINT fk_server_switch_3 FOREIGN KEY(to_server) REFERENCES server_data(name)
 );
 
+CREATE TABLE IF NOT EXISTS location_subcategory
+(
+    id          INT             AUTO_INCREMENT,
+    name        VARCHAR(128)    NOT NULL,
+    category    ENUM('ENGLAND',
+    'SCOTLAND','WALES',
+    'NORTHERN_IRELAND','OTHER') NOT NULL,
+    PRIMARY KEY(id)
+);
+
 CREATE TABLE IF NOT EXISTS location_data
 (
-    location    VARCHAR(128)    NOT NULL,
-    category    VARCHAR(128)    NOT NULL,
-    subcategory VARCHAR(128)    NULL DEFAULT NULL,
-    coordinate  INT             NOT NULL,
-    suggested   TINYINT(1)      NULL DEFAULT 0,
+    location    VARCHAR(128)        NOT NULL,
+    category    ENUM('ENGLAND',
+        'SCOTLAND','WALES',
+        'NORTHERN_IRELAND','OTHER') NOT NULL,
+    subcategory INT                 NULL DEFAULT NULL,
+    coordinate  INT                 NOT NULL,
+    suggested   TINYINT(1)          NULL DEFAULT 0,
     PRIMARY KEY(location),
-    CONSTRAINT fk_location_data_1 FOREIGN KEY(coordinate) REFERENCES coordinates(id)
+    CONSTRAINT fk_location_data_1 FOREIGN KEY(coordinate) REFERENCES coordinates(id),
+    CONSTRAINT fk_location_data_2 FOREIGN KEY(subcategory) REFERENCES location_subcategory(id)
+);
+
+CREATE TABLE IF NOT EXISTS location_marker
+(
+    id              INT             AUTO_INCREMENT,
+    location        VARCHAR(128)    NULL DEFAULT NULL,
+    subcategory     INT             NULL DEFAULT NULL,
+    coordinate_id   INT             NOT NULL,
+    PRIMARY KEY(id),
+    CONSTRAINT fk_location_marker_1 FOREIGN KEY(location) REFERENCES location_data(location),
+    CONSTRAINT fk_location_marker_2 FOREIGN KEY(subcategory) REFERENCES location_subcategory(id),
+    CONSTRAINT fk_location_marker_3 FOREIGN KEY(coordinate_id) REFERENCES coordinates(id)
 );
 
 CREATE TABLE IF NOT EXISTS location_requests
 (
-    location    VARCHAR(128)    NOT NULL,
-    category    VARCHAR(128)    NOT NULL,
-    subcategory VARCHAR(128)    NULL DEFAULT NULL,
-    coordinate  INT             NOT NULL,
+    location    VARCHAR(128)            NOT NULL,
+    category    ENUM('ENGLAND',
+            'SCOTLAND','WALES',
+            'NORTHERN_IRELAND','OTHER') NOT NULL,
+    subcategory INT                     NULL DEFAULT NULL,
+    coordinate  INT                     NOT NULL,
     PRIMARY KEY(location),
-    CONSTRAINT fk_location_requests_1 FOREIGN KEY(coordinate) REFERENCES coordinates(id)
+    CONSTRAINT fk_location_requests_1 FOREIGN KEY(coordinate) REFERENCES coordinates(id),
+    CONSTRAINT fk_location_requests_2 FOREIGN KEY(subcategory) REFERENCES location_subcategory(id)
 );
 
 CREATE TABLE IF NOT EXISTS moderation

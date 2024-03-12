@@ -78,7 +78,7 @@ public class Home extends HomeSelector implements CommandExecutor {
             if (Objects.equals(SERVER_NAME, server)) {
 
                 //Get default home location from the coordinate id.
-                Location l = globalSQL.getCoordinate(coordinate_id);
+                Location l = globalSQL.getLocation(coordinate_id);
 
                 //Teleport to the location.
                 p.teleport(l);
@@ -125,7 +125,7 @@ public class Home extends HomeSelector implements CommandExecutor {
             if (Objects.equals(SERVER_NAME, server)) {
 
                 //Get default home location from the coordinate id.
-                Location l = globalSQL.getCoordinate(coordinate_id);
+                Location l = globalSQL.getLocation(coordinate_id);
 
                 //Teleport to the location.
                 p.teleport(l);

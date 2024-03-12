@@ -1,7 +1,6 @@
 package me.bteuk.network.commands.navigation;
 
 import me.bteuk.network.Network;
-import me.bteuk.network.commands.navigation.Back;
 import me.bteuk.network.events.EventManager;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
@@ -46,7 +45,7 @@ public class Spawn implements CommandExecutor {
 
             //Set teleport event to go to spawn.
             EventManager.createTeleportEvent(true, p.getUniqueId().toString(), "network", "teleport spawn", p.getLocation());
-            SwitchServer.switchServer(p, Network.getInstance().globalSQL.getString("SELECT name FROM server_data WHERE type='LOBBY';"));
+            SwitchServer.switchServer(p, Network.getInstance().getGlobalSQL().getString("SELECT name FROM server_data WHERE type='LOBBY';"));
 
         }
 

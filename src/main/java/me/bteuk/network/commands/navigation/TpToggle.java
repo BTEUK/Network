@@ -22,17 +22,17 @@ public class TpToggle implements CommandExecutor {
         }
 
         //Invert status.
-        if (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM player_data WHERE uuid='" + p.getUniqueId() + "' AND teleport_enabled=1;")) {
+        if (Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM player_data WHERE uuid='" + p.getUniqueId() + "' AND teleport_enabled=1;")) {
 
             //Disable teleport.
-            Network.getInstance().globalSQL.update("UPDATE player_data SET teleport_enabled=0 WHERE uuid='" + p.getUniqueId() + "';");
+            Network.getInstance().getGlobalSQL().update("UPDATE player_data SET teleport_enabled=0 WHERE uuid='" + p.getUniqueId() + "';");
 
             p.sendMessage(Utils.success("Other players will now no longer be able to teleport to you."));
 
         } else {
 
             //Enable teleport.
-            Network.getInstance().globalSQL.update("UPDATE player_data SET teleport_enabled=1 WHERE uuid='" + p.getUniqueId() + "';");
+            Network.getInstance().getGlobalSQL().update("UPDATE player_data SET teleport_enabled=1 WHERE uuid='" + p.getUniqueId() + "';");
 
             p.sendMessage(Utils.success("Other players will be now be able to teleport to you."));
 

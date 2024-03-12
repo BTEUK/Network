@@ -31,8 +31,8 @@ public class Progression {
 
         //Add exp for the active season, if it exists. There can only be 1 active season at a time.
         //Don't use the default season, this is always active.
-        if (Network.getInstance().globalSQL.hasRow("SELECT id FROM seasons WHERE active=1 and id<>'default'")) {
-            addExp(Network.getInstance().globalSQL.getString("SELECT id FROM seasons WHERE active=1 and id<>'default'"), uuid, exp, ANNOUNCE_SEASONAL_LEVELUPS);
+        if (Network.getInstance().getGlobalSQL().hasRow("SELECT id FROM seasons WHERE active=1 and id<>'default'")) {
+            addExp(Network.getInstance().getGlobalSQL().getString("SELECT id FROM seasons WHERE active=1 and id<>'default'"), uuid, exp, ANNOUNCE_SEASONAL_LEVELUPS);
         }
 
     }

@@ -21,10 +21,10 @@ public class Statistics {
         u.active_time += time_diff;
 
         //Add time to database, if date doesn't exist, create it.
-        if (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM statistics WHERE uuid='" + u.player.getUniqueId() + "' AND on_date='" + date + "';")) {
-            Network.getInstance().globalSQL.update("UPDATE statistics SET playtime=playtime+" + time_diff + " WHERE uuid='" + u.player.getUniqueId() + "' AND on_date='" + date + "';");
+        if (Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM statistics WHERE uuid='" + u.player.getUniqueId() + "' AND on_date='" + date + "';")) {
+            Network.getInstance().getGlobalSQL().update("UPDATE statistics SET playtime=playtime+" + time_diff + " WHERE uuid='" + u.player.getUniqueId() + "' AND on_date='" + date + "';");
         } else {
-            Network.getInstance().globalSQL.update("INSERT INTO statistics(uuid,on_date,playtime) VALUES('" + u.player.getUniqueId() + "','" + date + "'," + time_diff + ");");
+            Network.getInstance().getGlobalSQL().update("INSERT INTO statistics(uuid,on_date,playtime) VALUES('" + u.player.getUniqueId() + "','" + date + "'," + time_diff + ");");
         }
 
     }
@@ -50,20 +50,20 @@ public class Statistics {
     //Add message to statistics.
     public static void addMessage(String uuid, String date) {
         //If date doesn't exist, create it.
-        if (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM statistics WHERE uuid='" + uuid + "' AND on_date='" + date + "';")) {
-            Network.getInstance().globalSQL.update("UPDATE statistics SET messages=messages+1 WHERE uuid='" + uuid + "' AND on_date='" + date + "';");
+        if (Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM statistics WHERE uuid='" + uuid + "' AND on_date='" + date + "';")) {
+            Network.getInstance().getGlobalSQL().update("UPDATE statistics SET messages=messages+1 WHERE uuid='" + uuid + "' AND on_date='" + date + "';");
         } else {
-            Network.getInstance().globalSQL.update("INSERT INTO statistics(uuid,on_date,messages) VALUES('" + uuid + "','" + date + "',1);");
+            Network.getInstance().getGlobalSQL().update("INSERT INTO statistics(uuid,on_date,messages) VALUES('" + uuid + "','" + date + "',1);");
         }
     }
 
     //Add tpll to statistics.
     public static void addTpll(String uuid, String date) {
         //If date doesn't exist, create it.
-        if (Network.getInstance().globalSQL.hasRow("SELECT uuid FROM statistics WHERE uuid='" + uuid + "' AND on_date='" + date + "';")) {
-            Network.getInstance().globalSQL.update("UPDATE statistics SET tpll=tpll+1 WHERE uuid='" + uuid + "' AND on_date='" + date + "';");
+        if (Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM statistics WHERE uuid='" + uuid + "' AND on_date='" + date + "';")) {
+            Network.getInstance().getGlobalSQL().update("UPDATE statistics SET tpll=tpll+1 WHERE uuid='" + uuid + "' AND on_date='" + date + "';");
         } else {
-            Network.getInstance().globalSQL.update("INSERT INTO statistics(uuid,on_date,tpll) VALUES('" + uuid + "','" + date + "',1);");
+            Network.getInstance().getGlobalSQL().update("INSERT INTO statistics(uuid,on_date,tpll) VALUES('" + uuid + "','" + date + "',1);");
         }
     }
 }

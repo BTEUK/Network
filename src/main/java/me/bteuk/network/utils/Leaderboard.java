@@ -17,7 +17,7 @@ public class Leaderboard {
 
     public void setLeaderboard(String uuid, PointsType pType, LeaderboardType lType) {
 
-        GlobalSQL globalSQL = Network.getInstance().globalSQL;
+        GlobalSQL globalSQL = Network.getInstance().getGlobalSQL();
 
         String type = null;
         int points;

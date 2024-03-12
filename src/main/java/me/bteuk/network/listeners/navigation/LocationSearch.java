@@ -5,6 +5,7 @@ import me.bteuk.network.Network;
 import me.bteuk.network.gui.navigation.LocationMenu;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.enums.Category;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -47,7 +48,7 @@ public class LocationSearch implements Listener {
                 e.getPlayer().sendMessage(Utils.error("The phrase can't be longer than 64 characters."));
             } else {
 
-                LocationMenu gui = new LocationMenu("Search: " + PlainTextComponentSerializer.plainText().serialize(e.message()), u, PlainTextComponentSerializer.plainText().serialize(e.message()), "Explore");
+                LocationMenu gui = new LocationMenu("Search: " + PlainTextComponentSerializer.plainText().serialize(e.message()), u, Category.SEARCH, Category.EXPLORE, PlainTextComponentSerializer.plainText().serialize(e.message()));
 
 
                 //If there are no locations notify the user.

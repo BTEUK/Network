@@ -1,6 +1,7 @@
 package me.bteuk.network.gui;
 
 import lombok.Getter;
+import lombok.Setter;
 import me.bteuk.network.utils.NetworkUser;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -23,13 +24,15 @@ public abstract class Gui implements GuiInterface {
     private final Inventory inv;
     private final Map<Integer, guiAction> actions;
 
+    @Setter
+    private boolean deleteOnClose = false;
+
     public Gui(int invSize, Component invName) {
 
         uuid = UUID.randomUUID();
         inv = Bukkit.createInventory(null, invSize, invName);
         actions = new HashMap<>();
         inventoriesByUUID.put(getUuid(), this);
-
     }
 
     public Gui(Inventory inv)

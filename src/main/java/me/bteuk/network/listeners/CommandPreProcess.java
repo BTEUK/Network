@@ -136,7 +136,7 @@ public class CommandPreProcess extends Moderation implements Listener {
     public void onServerClose(ArrayList<NetworkUser> users) {
 
         //Disable server in server table.
-        instance.globalSQL.update("UPDATE server_data SET online=0 WHERE name='" + SERVER_NAME + "';");
+        instance.getGlobalSQL().update("UPDATE server_data SET online=0 WHERE name='" + SERVER_NAME + "';");
 
         //Block the LeaveServer listener so it doesn't trigger since it causes an error.
         //It needs to be active to prevent the leave message to show in chat.
@@ -151,17 +151,17 @@ public class CommandPreProcess extends Moderation implements Listener {
         String server = null;
 
         //Try different servers.
-        if (instance.globalSQL.hasRow("SELECT name FROM server_data WHERE type='LOBBY' AND online=1;")) {
+        if (instance.getGlobalSQL().hasRow("SELECT name FROM server_data WHERE type='LOBBY' AND online=1;")) {
 
-            server = instance.globalSQL.getString("SELECT name FROM server_data WHERE type='LOBBY' AND online=1;");
+            server = instance.getGlobalSQL().getString("SELECT name FROM server_data WHERE type='LOBBY' AND online=1;");
 
-        } else if (instance.globalSQL.hasRow("SELECT name FROM server_data WHERE type='EARTH' AND online=1;")) {
+        } else if (instance.getGlobalSQL().hasRow("SELECT name FROM server_data WHERE type='EARTH' AND online=1;")) {
 
-            server = instance.globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH' AND online=1;");
+            server = instance.getGlobalSQL().getString("SELECT name FROM server_data WHERE type='EARTH' AND online=1;");
 
-        } else if (instance.globalSQL.hasRow("SELECT name FROM server_data WHERE online=1;")) {
+        } else if (instance.getGlobalSQL().hasRow("SELECT name FROM server_data WHERE online=1;")) {
 
-            server = instance.globalSQL.getString("SELECT name FROM server_data WHERE online=1;");
+            server = instance.getGlobalSQL().getString("SELECT name FROM server_data WHERE online=1;");
 
         }
 
@@ -207,22 +207,22 @@ public class CommandPreProcess extends Moderation implements Listener {
                 instance.getPlotSQL().update("DELETE FROM plot_invites WHERE uuid='" + uuid + "';");
 
                 //Set last_online time in playerdata.
-                instance.globalSQL.update("UPDATE player_data SET last_online=" + Time.currentTime() + " WHERE UUID='" + uuid + "';");
+                instance.getGlobalSQL().update("UPDATE player_data SET last_online=" + Time.currentTime() + " WHERE UUID='" + uuid + "';");
 
                 //Remove player from online_users.
                 //Since this closes the server tab does not need to be updated for these players.
-                instance.globalSQL.update("DELETE FROM online_users WHERE uuid='" + uuid + "';");
+                instance.getGlobalSQL().update("DELETE FROM online_users WHERE uuid='" + uuid + "';");
 
                 //Log playercount in database
-                instance.globalSQL.update("INSERT INTO player_count(log_time,players) VALUES(" + Time.currentTime() + "," +
-                        instance.globalSQL.getInt("SELECT count(uuid) FROM online_users;") + ");");
+                instance.getGlobalSQL().update("INSERT INTO player_count(log_time,players) VALUES(" + Time.currentTime() + "," +
+                        instance.getGlobalSQL().getInt("SELECT count(uuid) FROM online_users;") + ");");
 
                 //Kick the player.
                 u.player.kick(Component.text("The server is restarting!", NamedTextColor.RED));
 
                 //Send the disconnect messagein discord, since the standard leaveserver event has been blocked.
-                String name = Network.getInstance().globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
-                String player_skin = Network.getInstance().globalSQL.getString("SELECT player_skin FROM player_data WHERE uuid='" + uuid + "';");
+                String name = Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
+                String player_skin = Network.getInstance().getGlobalSQL().getString("SELECT player_skin FROM player_data WHERE uuid='" + uuid + "';");
 
                 //Run disconnect message.
                 if (DISCORD_CHAT) {

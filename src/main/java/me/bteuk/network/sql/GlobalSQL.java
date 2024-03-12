@@ -1,5 +1,6 @@
 package me.bteuk.network.sql;
 
+import me.bteuk.network.utils.Coordinate;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -221,6 +222,28 @@ public class GlobalSQL {
         return list;
     }
 
+    public ArrayList<Integer> getIntList(String sql) {
+
+        ArrayList<Integer> list = new ArrayList<>();
+
+        try (Connection conn = conn();
+             PreparedStatement statement = conn.prepareStatement(sql);
+             ResultSet results = statement.executeQuery()) {
+
+            while (results.next()) {
+
+                list.add(results.getInt(1));
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        return list;
+    }
+
     //Get a hashmap of all events for this server for the Network plugin.
     public ArrayList<String[]> getEvents(String serverName, ArrayList<String[]> list) {
 
@@ -338,7 +361,7 @@ public class GlobalSQL {
 
     //Get coordinate from database by id.
     //World must be on this server else this will throw a null pointer exception.
-    public Location getCoordinate(int coordinateID) {
+    public Location getLocation(int coordinateID) {
 
         try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
                 "SELECT * FROM coordinates WHERE id=" + coordinateID + ";"
@@ -358,6 +381,33 @@ public class GlobalSQL {
             return null;
 
         }
+    }
 
+    //Get coordinate from database by id.
+    //World must be on this server else this will throw a null pointer exception.
+    public Coordinate getCoordinate(int coordinateID) {
+
+        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
+                "SELECT * FROM coordinates WHERE id=" + coordinateID + ";"
+        ); ResultSet results = statement.executeQuery()) {
+
+            results.next();
+            return (new Coordinate(
+                    coordinateID,
+                    results.getString("server"),
+                    results.getString("world"),
+                    results.getDouble("x"),
+                    results.getDouble("y"),
+                    results.getDouble("z"),
+                    results.getFloat("yaw"),
+                    results.getFloat("pitch"))
+            );
+
+        } catch (SQLException sql) {
+
+            sql.printStackTrace();
+            return null;
+
+        }
     }
 }

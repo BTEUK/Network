@@ -28,12 +28,12 @@ public class PlotsystemLocations extends Gui {
 
     private int counter;
 
-    public PlotsystemLocations(NetworkUser user) {
+    public PlotsystemLocations() {
 
         super(45, Component.text("Plotsystem Locations", NamedTextColor.AQUA, TextDecoration.BOLD));
 
         plotSQL = Network.getInstance().getPlotSQL();
-        globalSQL = Network.getInstance().globalSQL;
+        globalSQL = Network.getInstance().getGlobalSQL();
 
         createGui();
 

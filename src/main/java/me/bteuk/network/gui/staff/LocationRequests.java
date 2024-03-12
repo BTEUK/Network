@@ -5,8 +5,7 @@ import me.bteuk.network.gui.Gui;
 import me.bteuk.network.gui.navigation.AddLocation;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.AddLocationType;
-import me.bteuk.network.utils.enums.Categories;
-import me.bteuk.network.utils.enums.Regions;
+import me.bteuk.network.utils.enums.Category;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -27,7 +26,7 @@ public class LocationRequests extends Gui {
     private void createGui() {
 
         //Get all locationRequests.
-        ArrayList<String> locations = Network.getInstance().globalSQL.getStringList("SELECT location FROM location_requests;");
+        ArrayList<String> locations = Network.getInstance().getGlobalSQL().getStringList("SELECT location FROM location_requests;");
 
         //This gui only supports 7 requests due to limited space allocated.
         //However since a large volume of requests is not expected at any point, this should be sufficient.
@@ -45,12 +44,13 @@ public class LocationRequests extends Gui {
                         this.delete();
                         u.staffGui = null;
 
-                        int coordinate_id = Network.getInstance().globalSQL.getInt("SELECT coordinate FROM location_requests WHERE location='" + location + "';");
-                        Categories category = Categories.valueOf(Network.getInstance().globalSQL.getString("SELECT category FROM location_requests WHERE location='" + location + "';"));
+                        int coordinate_id = Network.getInstance().getGlobalSQL().getInt("SELECT coordinate FROM location_requests WHERE location='" + location + "';");
+                        Category category = Category.valueOf(Network.getInstance().getGlobalSQL().getString("SELECT category FROM location_requests WHERE location='" + location + "';"));
 
-                        Regions subcategory = null;
-                        if (category == Categories.ENGLAND) {
-                            subcategory = Regions.valueOf(Network.getInstance().globalSQL.getString("SELECT subcategory FROM location_requests WHERE location='" + location + "';"));
+                        int subcategory_id = Network.getInstance().getGlobalSQL().getInt("SELECT subcategory FROM location_requests WHERE location='" + location + "';");
+                        String subcategory = null;
+                        if (subcategory_id != 0) {
+                            subcategory = Network.getInstance().getGlobalSQL().getString("SELECT name FROM location_subcategory WHERE id=" + subcategory_id + ";");
                         }
 
                         u.staffGui = new AddLocation(AddLocationType.REVIEW, location, coordinate_id, category, subcategory);

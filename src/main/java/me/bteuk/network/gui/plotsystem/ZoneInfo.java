@@ -47,7 +47,7 @@ public class ZoneInfo extends Gui {
 
 
         //Get global sql.
-        GlobalSQL globalSQL = Network.getInstance().globalSQL;
+        GlobalSQL globalSQL = Network.getInstance().getGlobalSQL();
 
         setItem(4, Utils.createItem(Material.BOOK, 1,
                 Utils.title("Zone " + zoneID),

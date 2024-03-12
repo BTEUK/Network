@@ -27,7 +27,7 @@ public class Exp extends AbstractCommand {
         }
 
         if (args[0].equals("give")) {
-            String uuid = Network.getInstance().globalSQL.getString("SELECT uuid FROM player_data WHERE name='" + args[1] + "';");
+            String uuid = Network.getInstance().getGlobalSQL().getString("SELECT uuid FROM player_data WHERE name='" + args[1] + "';");
             if (uuid == null) {
                 sender.sendMessage(Utils.error("Player " + args[1] + " could not be found."));
             } else {

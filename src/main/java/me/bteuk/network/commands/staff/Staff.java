@@ -67,7 +67,7 @@ public class Staff implements CommandExecutor {
                 }
                 //Invert enabled/disabled of staff chat.
                 u.staffChat = !u.staffChat;
-                Network.getInstance().globalSQL.update("UPDATE player_data SET staff_chat=1-staff_chat WHERE uuid='"+ p.getUniqueId() + "';");
+                Network.getInstance().getGlobalSQL().update("UPDATE player_data SET staff_chat=1-staff_chat WHERE uuid='"+ p.getUniqueId() + "';");
             } else {
                 //Send message in staff chat.
                 Network.getInstance().chat.broadcastPlayerMessage(p, Component.text(String.join(" ", args), NamedTextColor.WHITE), "uknet:staff");

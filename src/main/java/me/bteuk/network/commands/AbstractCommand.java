@@ -57,4 +57,22 @@ public abstract class AbstractCommand implements CommandExecutor {
 
         return p;
     }
+
+    /**
+     * Checks whether the sender has permission, if the sender is not a {@link Player} then this will always return true.
+     * If the player doesn't have the permission send a no permission message.
+     *
+     * @param sender the command sender
+     * @param permission the permission to check
+     * @return whether the sender has the permission
+     */
+    protected boolean hasPermission(CommandSender sender, String permission) {
+        if (sender instanceof Player p) {
+            if (!p.hasPermission(permission)) {
+                sender.sendMessage(NO_PERMISSION);
+                return false;
+            }
+        }
+        return true;
+    }
 }

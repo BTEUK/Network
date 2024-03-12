@@ -1,5 +1,5 @@
 # Config version, do not update this manually as it could break the config.
-version: 1.4.0
+version: 1.4.4
 
 #MySQL is mandatory for this plugin.
 #Login information
@@ -62,6 +62,18 @@ spawn:
   z: -129.5
   yaw: -90
   pitch: 0
+
+# Map info. Must be set to enabled to be available.
+map:
+  enabled: false
+  server: lobby
+  location:
+    world: Lobby
+    x: 100.5
+    y: 69.0
+    z: 100.5
+    yaw: 90
+    pitch: 0
 
 #Staff features
 staff:

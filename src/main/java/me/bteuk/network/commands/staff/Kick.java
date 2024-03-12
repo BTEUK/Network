@@ -53,16 +53,16 @@ public class Kick extends Moderation implements CommandExecutor {
 
         //Check player.
         //If uuid exists for name.
-        if (!Network.getInstance().globalSQL.hasRow("SELECT uuid FROM player_data WHERE name='" + args[0] + "';")) {
+        if (!Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM player_data WHERE name='" + args[0] + "';")) {
             sender.sendMessage(Component.text(args[0], NamedTextColor.DARK_RED)
                     .append(Utils.error(" is not a valid player.")));
             return true;
         }
 
-        String uuid = Network.getInstance().globalSQL.getString("SELECT uuid FROM player_data WHERE name='" + args[0] + "';");
+        String uuid = Network.getInstance().getGlobalSQL().getString("SELECT uuid FROM player_data WHERE name='" + args[0] + "';");
 
         //Check if player is online.
-        if (!Network.getInstance().globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "';")) {
+        if (!Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "';")) {
             sender.sendMessage(Component.text(args[0], NamedTextColor.DARK_RED)
                     .append(Utils.error(" is not online.")));
             return true;

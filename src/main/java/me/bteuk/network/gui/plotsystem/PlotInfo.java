@@ -46,7 +46,7 @@ public class PlotInfo extends Gui {
         PlotSQL plotSQL = Network.getInstance().getPlotSQL();
 
         //Get global sql.
-        GlobalSQL globalSQL = Network.getInstance().globalSQL;
+        GlobalSQL globalSQL = Network.getInstance().getGlobalSQL();
 
         setItem(4, Utils.createItem(Material.BOOK, 1,
                 Utils.title("Plot " + plotID),

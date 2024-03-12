@@ -31,13 +31,13 @@ public class EventManager extends AbstractEvent {
     }
 
     public static void createJoinEvent(String uuid, String type, String event) {
-        Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event) " +
+        Network.getInstance().getGlobalSQL().update("INSERT INTO join_events(uuid,type,event) " +
                 "VALUES('" + uuid + "','" + type + "','" + event + "') " +
                 "ON DUPLICATE KEY UPDATE type='" + type + "', event='" + event + "';");
     }
 
     public static void createJoinEvent(String uuid, String type, String event, String message) {
-        Network.getInstance().globalSQL.update("INSERT INTO join_events(uuid,type,event,message) " +
+        Network.getInstance().getGlobalSQL().update("INSERT INTO join_events(uuid,type,event,message) " +
                 "VALUES('" + uuid + "','" + type + "','" + event + "','" + message + "') " +
                 "ON DUPLICATE KEY UPDATE type='" + type + "', event='" + event + "', message='" + message + "';");
     }
@@ -59,10 +59,10 @@ public class EventManager extends AbstractEvent {
      */
     public static void createEvent(String uuid, String type, String server, String event) {
         if (uuid == null) {
-            Network.getInstance().globalSQL.update("INSERT INTO server_events(type,server,event) " +
+            Network.getInstance().getGlobalSQL().update("INSERT INTO server_events(type,server,event) " +
                     "VALUES('" + type + "','" + server + "','" + event + "');");
         } else {
-            Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event) " +
+            Network.getInstance().getGlobalSQL().update("INSERT INTO server_events(uuid,type,server,event) " +
                     "VALUES('" + uuid + "','" + type + "','" + server + "','" + event + "');");
         }
     }
@@ -87,10 +87,10 @@ public class EventManager extends AbstractEvent {
      */
     public static void createEvent(String uuid, String type, String server, String event, String message) {
         if (uuid == null) {
-            Network.getInstance().globalSQL.update("INSERT INTO server_events(type,server,event,message) " +
+            Network.getInstance().getGlobalSQL().update("INSERT INTO server_events(type,server,event,message) " +
                     "VALUES('" + type + "','" + server + "','" + event + "','" + message + "');");
         } else {
-            Network.getInstance().globalSQL.update("INSERT INTO server_events(uuid,type,server,event,message) " +
+            Network.getInstance().getGlobalSQL().update("INSERT INTO server_events(uuid,type,server,event,message) " +
                     "VALUES('" + uuid + "','" + type + "','" + server + "','" + event + "','" + message + "');");
         }
     }

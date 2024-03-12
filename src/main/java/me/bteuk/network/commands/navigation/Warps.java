@@ -41,7 +41,7 @@ public class Warps implements CommandExecutor {
         }
 
         //Get all locations in alphabetical order.
-        ArrayList<String> locations = Network.getInstance().globalSQL.getStringList("SELECT location FROM location_data ORDER BY location ASC;");
+        ArrayList<String> locations = Network.getInstance().getGlobalSQL().getStringList("SELECT location FROM location_data ORDER BY location ASC;");
 
         //If there are no locations notify the user.
         if (locations.isEmpty()) {
