@@ -100,15 +100,15 @@ public class Map extends AbstractReloadableComponent {
             // Set the world, the coordinates have already been set.
             map_location.setWorld(Bukkit.getWorld(world));
 
+            // Register the hologram click event.
+            hologramClickEvent = new HologramClickEvent(instance, this);
+
             // Load the map markers and linked location.
             try {
                 loadMarkers();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
-
-            // Register the hologram click event.
-            hologramClickEvent = new HologramClickEvent(instance, this);
         }
 
         // Enable the map command.
@@ -123,13 +123,13 @@ public class Map extends AbstractReloadableComponent {
     @Override
     public void unload() {
         if (isEnabled()) {
-            // Disable the hologram click event.
-            hologramClickEvent.unregister();
-            hologramClickEvent = null;
-
             // Remove all visible markers.
             holograms.forEach((hologram, clickAction) -> hologram.delete());
             holograms.clear();
+
+            // Disable the hologram click event.
+            hologramClickEvent.unregister();
+            hologramClickEvent = null;
             setEnabled(false);
         }
     }

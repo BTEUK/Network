@@ -7,6 +7,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
+import static me.bteuk.network.utils.Constants.LOGGER;
+
 public class HologramClickEvent implements Listener {
 
     private final Network instance;
