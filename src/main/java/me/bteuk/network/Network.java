@@ -6,7 +6,7 @@ import me.bteuk.network.commands.BuildingCompanionCommand;
 import me.bteuk.network.commands.Clear;
 import me.bteuk.network.commands.Discord;
 import me.bteuk.network.commands.Gamemode;
-import me.bteuk.network.commands.LobbyCommand;
+import me.bteuk.network.lobby.LobbyCommand;
 import me.bteuk.network.commands.Ptime;
 import me.bteuk.network.commands.Season;
 import me.bteuk.network.commands.give.GiveBarrier;
@@ -319,12 +319,12 @@ public final class Network extends JavaPlugin {
             //Setup the map.
             lobby.reloadMap();
 
-            //Create lobby command.
-            new LobbyCommand(this, lobby);
-
             //Set the rules lectern.
             lobby.setLectern();
         }
+
+        //Create lobby command, will run /spawn if not in the lobby server.
+        new LobbyCommand(this, lobby);
 
 
         //Setup tpll if enabled in config.
