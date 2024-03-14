@@ -115,7 +115,7 @@ public class Timers {
                     isBusy = true;
 
                     //Get events for this server.
-                    events = globalSQL.getEvents(SERVER_NAME, events);
+                    events = globalSQL.getEvents(SERVER_NAME, "network", events);
 
                     for (String[] event : events) {
 

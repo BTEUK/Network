@@ -6,171 +6,22 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
-public class PlotSQL {
-
-    private final BasicDataSource dataSource;
+public class PlotSQL extends AbstractSQL {
 
     public PlotSQL(BasicDataSource datasource) {
-
-        this.dataSource = datasource;
-
-    }
-
-    private Connection conn() throws SQLException {
-        return dataSource.getConnection();
-    }
-
-    public int getInt(String sql) {
-
-        try (
-                Connection conn = conn();
-                PreparedStatement statement = conn.prepareStatement(sql);
-                ResultSet results = statement.executeQuery()
-        ) {
-
-            if (results.next()) {
-
-                return results.getInt(1);
-
-            } else {
-
-                return 0;
-
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return 0;
-        }
-    }
-
-    public String getString(String sql) {
-
-        try (
-                Connection conn = conn();
-                PreparedStatement statement = conn.prepareStatement(sql);
-                ResultSet results = statement.executeQuery()
-        ) {
-
-            if (results.next()) {
-
-                return results.getString(1);
-
-            } else {
-
-                return null;
-
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public long getLong(String sql) {
-
-        try (Connection conn = conn();
-             PreparedStatement statement = conn.prepareStatement(sql);
-             ResultSet results = statement.executeQuery()) {
-
-            if (results.next()) {
-
-                return results.getLong(1);
-
-            } else {
-
-                return 0;
-
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return 0;
-        }
-    }
-
-    public ArrayList<Integer> getIntList(String sql) {
-
-        ArrayList<Integer> list = new ArrayList<>();
-
-        try (Connection conn = conn();
-             PreparedStatement statement = conn.prepareStatement(sql);
-             ResultSet results = statement.executeQuery()) {
-
-            while (results.next()) {
-
-                list.add(results.getInt(1));
-
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
-        }
-
-        return list;
-    }
-
-    public ArrayList<String> getStringList(String sql) {
-
-        ArrayList<String> list = new ArrayList<>();
-
-        try (Connection conn = conn();
-             PreparedStatement statement = conn.prepareStatement(sql);
-             ResultSet results = statement.executeQuery()) {
-
-            while (results.next()) {
-
-                list.add(results.getString(1));
-
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
-        }
-
-        return list;
-    }
-
-    public boolean hasRow(String sql) {
-
-        try (Connection conn = conn();
-             PreparedStatement statement = conn.prepareStatement(sql);
-             ResultSet results = statement.executeQuery()) {
-
-            return results.next();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    //Generic update statement, return true if successful.
-    public boolean update(String sql) {
-
-        try (Connection conn = conn();
-             PreparedStatement statement = conn.prepareStatement(sql)) {
-
-            statement.executeUpdate();
-
-            return true;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+        super(datasource);
     }
 
     public int[][] getPlotCorners(int plotID) {
 
-        try (Connection conn = conn();
-             PreparedStatement statement = conn.prepareStatement("SELECT COUNT(corner) FROM plot_corners WHERE id=" + plotID + ";");
-             ResultSet results = statement.executeQuery()) {
+        try (
+                Connection conn = conn();
+                PreparedStatement statement = conn.prepareStatement("SELECT COUNT(corner) FROM plot_corners WHERE id=" + plotID + ";");
+                ResultSet results = statement.executeQuery()
+        ) {
 
             results.next();
 
@@ -188,9 +39,11 @@ public class PlotSQL {
 
     private int[][] getPlotCorners(int[][] corners, int plotID) {
 
-        try (Connection conn = conn();
-             PreparedStatement statement = conn.prepareStatement("SELECT x,z FROM plot_corners WHERE id=" + plotID + ";");
-             ResultSet results = statement.executeQuery()) {
+        try (
+                Connection conn = conn();
+                PreparedStatement statement = conn.prepareStatement("SELECT x,z FROM plot_corners WHERE id=" + plotID + ";");
+                ResultSet results = statement.executeQuery()
+        ) {
 
             for (int i = 0; i < corners.length; i++) {
 
@@ -205,6 +58,76 @@ public class PlotSQL {
         } catch (SQLException e) {
             e.printStackTrace();
             return corners;
+        }
+    }
+
+    //Creates a new plot and returns the id of the plot.
+    public int createPlot(int size, int difficulty, String location) {
+
+        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
+                "INSERT INTO plot_data(status, size, difficulty, location) VALUES(?, ?, ?, ?);",
+                Statement.RETURN_GENERATED_KEYS
+        )) {
+
+            statement.setString(1, "unclaimed");
+            statement.setInt(2, size);
+            statement.setInt(3, difficulty);
+            statement.setString(4, location);
+            statement.executeUpdate();
+
+            //If the id does not exist return 0.
+            try (ResultSet results = statement.getGeneratedKeys()) {
+                if (results.next()) {
+
+                    return results.getInt(1);
+
+                } else {
+
+                    return 0;
+
+                }
+            }
+
+        } catch (SQLException sql) {
+
+            sql.printStackTrace();
+            return 0;
+
+        }
+
+    }
+
+    //Creates a new plot and returns the id of the plot.
+    public int createZone(String location, long expiration, boolean is_public) {
+
+        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
+                "INSERT INTO zones(location,expiration,is_public) VALUES(?, ?, ?);",
+                Statement.RETURN_GENERATED_KEYS
+        )) {
+
+            statement.setString(1, location);
+            statement.setLong(2, expiration);
+            statement.setBoolean(3, is_public);
+            statement.executeUpdate();
+
+            //If the id does not exist return 0.
+            try (ResultSet results = statement.getGeneratedKeys()) {
+                if (results.next()) {
+
+                    return results.getInt(1);
+
+                } else {
+
+                    return 0;
+
+                }
+            }
+
+        } catch (SQLException sql) {
+
+            sql.printStackTrace();
+            return 0;
+
         }
     }
 }
