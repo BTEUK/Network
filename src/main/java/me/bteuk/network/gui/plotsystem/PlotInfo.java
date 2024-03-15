@@ -219,7 +219,6 @@ public class PlotInfo extends Gui {
                             u.mainGui.open(u);
 
                         });
-
             }
 
             //If plot has members, edit plot members.
@@ -285,7 +284,19 @@ public class PlotInfo extends Gui {
 
         }
 
-        //Return
+        // Enable/disable outlines for the plot.
+        setItem(18, Utils.createItem(Material.ORANGE_STAINED_GLASS, 1,
+                        Utils.title("Toggle Outlines"),
+                        Utils.line("Enable/disable the outlines"),
+                        Utils.line("for this plot."),
+                        Utils.line("Rejoining the server"),
+                        Utils.line("will reset this to enabled.")),
+                u -> {
+                    EventManager.createEvent(u.player.getUniqueId().toString(), "plotsystem", SERVER_NAME, "outlines toggle " + plotID);
+                    u.player.closeInventory();
+                });
+
+        // Return
         setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
                         Utils.title("Return"),
                         Utils.line("Open the plot menu.")),
