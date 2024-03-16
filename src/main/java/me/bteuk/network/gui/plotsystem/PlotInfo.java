@@ -141,7 +141,8 @@ public class PlotInfo extends Gui {
                 });
 
         //If this plot has feedback, create button to go to plot feedback.
-        if (plotSQL.hasRow("SELECT id FROM deny_data WHERE id=" + plotID + ";")) {
+        String plot_owner = plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plotID + " AND is_owner=1;");
+        if (plotSQL.hasRow("SELECT id FROM deny_data WHERE id=" + plotID + " AND uuid='" + plot_owner + "';")) {
 
             setItem(22, Utils.createItem(Material.WRITABLE_BOOK, 1,
                             Utils.title("Plot Feedback"),
