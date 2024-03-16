@@ -2,13 +2,15 @@ package me.bteuk.network.gui.plotsystem;
 
 import me.bteuk.network.Network;
 import me.bteuk.network.events.EventManager;
-import me.bteuk.network.gui.*;
+import me.bteuk.network.gui.Gui;
+import me.bteuk.network.gui.InviteMembers;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.NetworkUser;
 import me.bteuk.network.utils.PlotValues;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
+import me.bteuk.network.utils.enums.PlotStatus;
 import me.bteuk.network.utils.enums.RegionType;
 import net.buildtheearth.terraminusminus.generator.EarthGeneratorSettings;
 import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
@@ -19,22 +21,33 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import static me.bteuk.network.utils.Constants.SERVER_NAME;
 
-public class PlotInfo extends Gui {
+public class PlotInfoNew extends Gui {
 
     private final int plotID;
-    private final String uuid;
-
     private final NetworkUser user;
 
-    public PlotInfo(NetworkUser user, int plotID, String uuid) {
+    private final PlotSQL plotSQL;
+    private final GlobalSQL globalSQL;
 
+    public PlotInfoNew(NetworkUser user, int plotID) {
+
+        // Create the menu.
         super(27, Component.text("Plot " + plotID, NamedTextColor.AQUA, TextDecoration.BOLD));
 
         this.user = user;
         this.plotID = plotID;
-        this.uuid = uuid;
+
+        // Get plot sql.
+        plotSQL = Network.getInstance().getPlotSQL();
+
+        // Get global sql.
+        globalSQL = Network.getInstance().getGlobalSQL();
 
         createGui();
 
@@ -42,30 +55,42 @@ public class PlotInfo extends Gui {
 
     public void createGui() {
 
-        //Get plot sql.
-        PlotSQL plotSQL = Network.getInstance().getPlotSQL();
+        // Return
+        setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
+                        Utils.title("Return"),
+                        Utils.line("Open the plot menu.")),
+                u -> {
+                    // Delete this gui.
+                    this.delete();
+                    u.mainGui = null;
 
-        //Get global sql.
-        GlobalSQL globalSQL = Network.getInstance().getGlobalSQL();
+                    // Switch back to plot menu.
+                    u.mainGui = new PlotMenu(u);
+                    u.mainGui.open(u);
+                });
 
+        // Determine the type of menu to create.
+        PlotStatus status = PlotStatus.fromDatabaseValue(plotSQL.getString("SELECT status FROM plot_data WHERE id=" + plotID + ";"));
+        if (status == null) {
+            user.player.sendMessage(Utils.error("This plot has an invalid status, can't open the info menu."));
+            return;
+        }
+        PLOT_INFO_TYPE plotInfoType = determineMenuType(status);
+        if (plotInfoType == null || plotInfoType == PLOT_INFO_TYPE.UNCLAIMED || plotInfoType == PLOT_INFO_TYPE.DELETED) {
+            user.player.sendMessage(Utils.error("This plot has an invalid status, can't open the info menu."));
+            return;
+        }
+
+        // Plot Info
         setItem(4, Utils.createItem(Material.BOOK, 1,
                 Utils.title("Plot " + plotID),
-                Utils.line("Plot Owner: ")
-                        .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
-                                plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plotID + " AND is_owner=1;") + "';"), NamedTextColor.GRAY)),
-                Utils.line("Plot Members: ")
-                        .append(Component.text(plotSQL.getInt("SELECT COUNT(uuid) FROM plot_members WHERE id=" + plotID + " AND is_owner=0;"), NamedTextColor.GRAY)),
-                Utils.line("Difficulty: ")
-                        .append(Component.text(PlotValues.difficultyName(plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plotID + ";")), NamedTextColor.GRAY)),
-                Utils.line("Size: ")
-                        .append(Component.text(PlotValues.sizeName(plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + plotID + ";")), NamedTextColor.GRAY))));
+                createPlotInfo(plotInfoType)));
 
+        // Plot Teleport (Always in slot 24).
         setItem(24, Utils.createItem(Material.ENDER_PEARL, 1,
                         Utils.title("Teleport to Plot"),
                         Utils.line("Click to teleport to this plot.")),
-
                 u -> {
-
                     u.player.closeInventory();
 
                     //Get the server of the plot.
@@ -76,32 +101,25 @@ public class PlotInfo extends Gui {
                     //If the plot is on the current server teleport them directly.
                     //Else teleport them to the correct server and them teleport them to the plot.
                     if (server.equals(SERVER_NAME)) {
-
                         EventManager.createTeleportEvent(false, u.player.getUniqueId().toString(), "plotsystem", "teleport plot " + plotID, u.player.getLocation());
-
                     } else {
-
                         //Set the server join event.
                         EventManager.createTeleportEvent(true, u.player.getUniqueId().toString(), "plotsystem", "teleport plot " + plotID, u.player.getLocation());
 
                         //Teleport them to another server.
                         SwitchServer.switchServer(u.player, server);
-
                     }
-
                 });
 
-        setItem(23, Utils.createItem(Material.ENDER_EYE, 1,
+        // Plot in Google Maps (In slot 20 or 23 depending on the situation).
+        setItem(getSlotForGoogleMapsLink(plotInfoType), Utils.createItem(Material.ENDER_EYE, 1,
                         Utils.title("View plot in Google Maps"),
                         Utils.line("Click to be linked to the plot in Google Maps.")),
-
                 u -> {
-
                     u.player.closeInventory();
 
                     //Get corners of the plot.
                     int[][] corners = plotSQL.getPlotCorners(plotID);
-
                     int sumX = 0;
                     int sumZ = 0;
 
@@ -112,7 +130,6 @@ public class PlotInfo extends Gui {
                         sumZ += corner[1];
 
                     }
-
                     double x = sumX / (double) corners.length;
                     double z = sumZ / (double) corners.length;
 
@@ -137,7 +154,6 @@ public class PlotInfo extends Gui {
                     } catch (OutOfProjectionBoundsException e) {
                         e.printStackTrace();
                     }
-
                 });
 
         //If this plot has feedback, create button to go to plot feedback.
@@ -297,39 +313,80 @@ public class PlotInfo extends Gui {
                     EventManager.createEvent(u.player.getUniqueId().toString(), "plotsystem", SERVER_NAME, "outlines toggle " + plotID);
                     u.player.closeInventory();
                 });
-
-        // Return
-        setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        Utils.title("Return"),
-                        Utils.line("Open the plot menu.")),
-                u -> {
-
-                    //Delete this gui.
-                    this.delete();
-                    u.mainGui = null;
-
-                    //Switch back to plot menu.
-                    u.mainGui = new PlotMenu(u);
-                    u.mainGui.open(u);
-
-                });
     }
 
     public void refresh() {
 
         this.clearGui();
+        createGui();
+    }
 
-        // If the plot no longer exists, return to the plot menu.
-        if (Network.getInstance().getPlotSQL().hasRow("SELECT id FROM plot_data WHERE id=" + plotID + ";")) {
-            createGui();
+    private PLOT_INFO_TYPE determineMenuType(PlotStatus status) {
+        return switch (status) {
+            case UNCLAIMED -> PLOT_INFO_TYPE.UNCLAIMED;
+            case CLAIMED -> claimedType();
+            case SUBMITTED -> {
+                if (user.hasPermission("group.reviewer")) {
+                    yield PLOT_INFO_TYPE.SUBMITTED_REVIEWER;
+                } else {
+                    yield claimedType();
+                }
+            }
+            case REVIEWING -> {
+                if (user.hasPermission("group.reviewer")) {
+                    yield PLOT_INFO_TYPE.REVIEWING_REVIEWER;
+                } else {
+                    yield claimedType();
+                }
+            }
+            case COMPLETED -> {
+                if (plotSQL.hasRow("SELECT id FROM accept_data WHERE id=" + plotID + " AND uuid='" + user.player.getUniqueId() + "';")) {
+                    yield PLOT_INFO_TYPE.ACCEPTED_OWNER;
+                } else {
+                    yield PLOT_INFO_TYPE.ACCEPTED;
+                }
+            }
+            case DELETED -> PLOT_INFO_TYPE.DELETED;
+        };
+    }
+
+    private PLOT_INFO_TYPE claimedType() {
+        if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plotID + " AND uuid='" + user.player.getUniqueId() + "' AND is_owner=1;")) {
+            return PLOT_INFO_TYPE.CLAIMED_OWNER;
+        } else if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plotID + " AND uuid='" + user.player.getUniqueId() + "' AND is_owner=0;")) {
+            return PLOT_INFO_TYPE.CLAIMED_MEMBER;
         } else {
-            //Delete this gui.
-            this.delete();
-            user.mainGui = null;
-
-            //Switch back to plot menu.
-            user.mainGui = new PlotMenu(user);
-            user.mainGui.open(user);
+            return PLOT_INFO_TYPE.CLAIMED;
         }
     }
+
+    private Component[] createPlotInfo(PLOT_INFO_TYPE plotInfoType) {
+        List<Component> info = new ArrayList<>();
+        return info.toArray(Component[]::new);
+    }
+
+    private int getSlotForGoogleMapsLink(PLOT_INFO_TYPE plotInfoType) {
+        if (plotInfoType == PLOT_INFO_TYPE.CLAIMED_OWNER || plotInfoType == PLOT_INFO_TYPE.SUBMITTED_REVIEWER) {
+            return 23;
+        } else {
+            return 20;
+        }
+    }
+
+    private enum PLOT_INFO_TYPE {
+        CLAIMED_OWNER,
+        CLAIMED_MEMBER,
+        CLAIMED,
+
+        SUBMITTED_REVIEWER,
+
+        REVIEWING_REVIEWER,
+
+        ACCEPTED_OWNER,
+        ACCEPTED,
+
+        UNCLAIMED,
+        DELETED
+    }
 }
+
