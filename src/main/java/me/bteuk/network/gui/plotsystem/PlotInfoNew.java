@@ -7,7 +7,6 @@ import me.bteuk.network.gui.InviteMembers;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.NetworkUser;
-import me.bteuk.network.utils.PlotValues;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.PlotStatus;
@@ -22,8 +21,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import static me.bteuk.network.utils.Constants.SERVER_NAME;
 
@@ -34,6 +33,8 @@ public class PlotInfoNew extends Gui {
 
     private final PlotSQL plotSQL;
     private final GlobalSQL globalSQL;
+
+    private String plot_owner;
 
     public PlotInfoNew(NetworkUser user, int plotID) {
 
@@ -69,12 +70,19 @@ public class PlotInfoNew extends Gui {
                     u.mainGui.open(u);
                 });
 
-        // Determine the type of menu to create.
+        // Get the plot status.
         PlotStatus status = PlotStatus.fromDatabaseValue(plotSQL.getString("SELECT status FROM plot_data WHERE id=" + plotID + ";"));
         if (status == null) {
             user.player.sendMessage(Utils.error("This plot has an invalid status, can't open the info menu."));
             return;
         }
+        // Get the plot owner.
+        if (status == PlotStatus.CLAIMED || status == PlotStatus.SUBMITTED || status == PlotStatus.REVIEWING) {
+            plot_owner = plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plotID + " AND is_owner=1;");
+        } else if (status == PlotStatus.COMPLETED) {
+            plot_owner = plotSQL.getString("SELECT uuid FROM accept_data WHERE id=" + plotID + ";");
+        }
+        // Determine the type of menu to create.
         PLOT_INFO_TYPE plotInfoType = determineMenuType(status);
         if (plotInfoType == null || plotInfoType == PLOT_INFO_TYPE.UNCLAIMED || plotInfoType == PLOT_INFO_TYPE.DELETED) {
             user.player.sendMessage(Utils.error("This plot has an invalid status, can't open the info menu."));
@@ -150,96 +158,32 @@ public class PlotInfoNew extends Gui {
                         message = message.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://www.google.com/maps/@?api=1&map_action=map&basemap=satellite&zoom=21&center=" + coords[1] + "," + coords[0]));
 
                         u.player.sendMessage(message);
+                        u.player.closeInventory();
 
                     } catch (OutOfProjectionBoundsException e) {
-                        e.printStackTrace();
+                        u.player.sendMessage(Utils.error("Can't find the location of this plot."));
+                        u.player.closeInventory();
                     }
                 });
 
-        //If this plot has feedback, create button to go to plot feedback.
-        //TODO: This does not check for the uuid of the plot owner, so if the plot was previously given feedback for someone else this wills still show!!!!
-        //TODO: Plot members should be able to view feedback???
-        if (plotSQL.hasRow("SELECT id FROM deny_data WHERE id=" + plotID + ";")) {
-
-            setItem(22, Utils.createItem(Material.WRITABLE_BOOK, 1,
-                            Utils.title("Plot Feedback"),
-                            Utils.line("Click to show feedback for this plot.")),
+        // Enable/disable outlines for the plot. (Slot 18 if owner or member)
+        if (plotInfoType == PLOT_INFO_TYPE.CLAIMED_OWNER || plotInfoType == PLOT_INFO_TYPE.CLAIMED_MEMBER) {
+            setItem(18, Utils.createItem(Material.ORANGE_STAINED_GLASS, 1,
+                            Utils.title("Toggle Outlines"),
+                            Utils.line("Enable/disable the outlines"),
+                            Utils.line("for this plot."),
+                            Utils.line("Rejoining the server"),
+                            Utils.line("will reset this to enabled.")),
                     u -> {
-
-                        //Delete this gui.
-                        this.delete();
-                        u.mainGui = null;
-
-                        //Switch back to plot menu.
-                        u.mainGui = new DeniedPlotFeedback(plotID);
-                        u.mainGui.open(u);
-
+                        EventManager.createEvent(u.player.getUniqueId().toString(), "plotsystem", SERVER_NAME, "outlines toggle " + plotID);
+                        u.player.closeInventory();
                     });
         }
 
-        //If you the owner of this plot.
-        if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plotID + " AND uuid='" + uuid + "' AND is_owner=1;")) {
-
-            //If plot is not submitted show submit button.
-            if (plotSQL.hasRow("SELECT id FROM plot_data WHERE id=" + plotID + " AND status='claimed';")) {
-
-                setItem(2, Utils.createItem(Material.LIGHT_BLUE_CONCRETE, 1,
-                                Utils.title("Submit Plot"),
-                                Utils.line("Submit your plot to be reviewed."),
-                                Utils.line("Reviewing may take over 24 hours.")),
-                        u -> {
-
-                            u.player.closeInventory();
-
-                            //Add server event to submit plot.
-                            globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + u.player.getUniqueId() + "','plotsystem','"
-                                    + plotSQL.getString("SELECT server FROM location_data WHERE name='" +
-                                    plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + "';")
-                                    + "','submit plot " + plotID + "');");
-
-                        });
-
-            }
-
-            //If plot is submitted show retract submission button.
-            if (plotSQL.hasRow("SELECT id FROM plot_data WHERE id=" + plotID + " AND status='submitted';")) {
-
-                setItem(2, Utils.createItem(Material.ORANGE_CONCRETE, 1,
-                                Utils.title("Retract Submission"),
-                                Utils.line("Your plot will no longer be submitted.")),
-                        u -> {
-
-                            u.player.closeInventory();
-
-                            //Add server event to retract plot submission.
-                            globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + u.player.getUniqueId() + "','plotsystem','"
-                                    + plotSQL.getString("SELECT server FROM location_data WHERE name='" +
-                                    plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + "';")
-                                    + "','retract plot " + plotID + "');");
-
-                        });
-            }
-
-            //If plot is not under review allow it to be removed.
-            if (plotSQL.hasRow("SELECT id FROM plot_data WHERE id=" + plotID + " AND (status='claimed' OR status='submitted');")) {
-
-                setItem(6, Utils.createItem(Material.RED_CONCRETE, 1,
-                                Utils.title("Delete Plot"),
-                                Utils.line("Delete the plot and all its contents.")),
-                        u -> {
-
-                            //Delete this gui.
-                            this.delete();
-                            u.mainGui = null;
-
-                            //Switch back to plot menu.
-                            u.mainGui = new DeleteConfirm(plotID, RegionType.PLOT);
-                            u.mainGui.open(u);
-
-                        });
-            }
-
-            //If plot has members, edit plot members.
+        // For the plot owner, add the manage and invite members options. (Slot 20 and 21)
+        // As well as the submit/retract button. (Slot 2)
+        // If the plot is not under review allow it to be removed. (Slot 6)
+        if (plotInfoType == PLOT_INFO_TYPE.CLAIMED_OWNER) {
             setItem(21, Utils.createItem(Material.PLAYER_HEAD, 1,
                             Utils.title("Plot Members"),
                             Utils.line("Manage the members of your plot.")),
@@ -255,7 +199,6 @@ public class PlotInfoNew extends Gui {
 
                     });
 
-            //Invite new members to your plot.
             setItem(20, Utils.createItem(Material.OAK_BOAT, 1,
                             Utils.title("Invite Members"),
                             Utils.line("Invite a new member to your plot."),
@@ -272,10 +215,61 @@ public class PlotInfoNew extends Gui {
 
                     });
 
-        } else {
-            //You are a member of this plot.
+            if (status == PlotStatus.CLAIMED) {
+                setItem(2, Utils.createItem(Material.LIGHT_BLUE_CONCRETE, 1,
+                                Utils.title("Submit Plot"),
+                                Utils.line("Submit your plot to be reviewed."),
+                                Utils.line("Reviewing may take over 24 hours.")),
+                        u -> {
 
-            //Leave plot.
+                            u.player.closeInventory();
+
+                            //Add server event to submit plot.
+                            globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + u.player.getUniqueId() + "','plotsystem','"
+                                    + plotSQL.getString("SELECT server FROM location_data WHERE name='" +
+                                    plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + "';")
+                                    + "','submit plot " + plotID + "');");
+
+                        });
+            }
+
+            if (status == PlotStatus.SUBMITTED) {
+                setItem(2, Utils.createItem(Material.ORANGE_CONCRETE, 1,
+                                Utils.title("Retract Submission"),
+                                Utils.line("Your plot will no longer be submitted.")),
+                        u -> {
+
+                            u.player.closeInventory();
+
+                            //Add server event to retract plot submission.
+                            globalSQL.update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + u.player.getUniqueId() + "','plotsystem','"
+                                    + plotSQL.getString("SELECT server FROM location_data WHERE name='" +
+                                    plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + "';")
+                                    + "','retract plot " + plotID + "');");
+
+                        });
+            }
+
+            if (status != PlotStatus.REVIEWING) {
+                setItem(6, Utils.createItem(Material.RED_CONCRETE, 1,
+                                Utils.title("Delete Plot"),
+                                Utils.line("Delete the plot and all its contents.")),
+                        u -> {
+
+                            //Delete this gui.
+                            this.delete();
+                            u.mainGui = null;
+
+                            //Switch back to plot menu.
+                            u.mainGui = new DeleteConfirm(plotID, RegionType.PLOT);
+                            u.mainGui.open(u);
+
+                        });
+            }
+        }
+
+        // Members have the option to leave the plot (Slot 20)
+        if (plotInfoType == PLOT_INFO_TYPE.CLAIMED_MEMBER) {
             setItem(20, Utils.createItem(Material.RED_CONCRETE, 1,
                             Utils.title("Leave Plot"),
                             Utils.line("You will not be able to build in the plot once you leave.")),
@@ -299,20 +293,35 @@ public class PlotInfoNew extends Gui {
                                 "','leave plot " + plotID + "');");
 
                     });
-
         }
 
-        // Enable/disable outlines for the plot.
-        setItem(18, Utils.createItem(Material.ORANGE_STAINED_GLASS, 1,
-                        Utils.title("Toggle Outlines"),
-                        Utils.line("Enable/disable the outlines"),
-                        Utils.line("for this plot."),
-                        Utils.line("Rejoining the server"),
-                        Utils.line("will reset this to enabled.")),
-                u -> {
-                    EventManager.createEvent(u.player.getUniqueId().toString(), "plotsystem", SERVER_NAME, "outlines toggle " + plotID);
-                    u.player.closeInventory();
-                });
+        // If this plot has feedback, add feedback for the plot owner and members (Slot 22)
+        // As well as for reviewers (Slot 22 while reviewing, slot 21 while submitted)
+        if ((plotInfoType == PLOT_INFO_TYPE.CLAIMED_OWNER || plotInfoType == PLOT_INFO_TYPE.CLAIMED_MEMBER || plotInfoType == PLOT_INFO_TYPE.REVIEWING_REVIEWER || plotInfoType == PLOT_INFO_TYPE.SUBMITTED_REVIEWER)
+                && plotSQL.hasRow("SELECT id FROM deny_data WHERE id=" + plotID + " AND uuid='" + plot_owner + "';")) {
+                setItem(getFeedbackSlot(plotInfoType), Utils.createItem(Material.WRITABLE_BOOK, 1,
+                                Utils.title("Plot Feedback"),
+                                Utils.line("Click to show feedback for this plot.")),
+                        u -> {
+
+                            //Delete this gui.
+                            this.delete();
+                            u.mainGui = null;
+
+                            //Switch back to plot menu.
+                            u.mainGui = new DeniedPlotFeedback(plotID);
+                            u.mainGui.open(u);
+
+                        });
+                // If the plot is accepted and has feedback show for the owner (Slot 22)
+        } else if (plotInfoType == PLOT_INFO_TYPE.ACCEPTED_OWNER && plotSQL.hasRow("SELECT id FROM accept_data WHERE id=" + plotID + ";")) {
+            // TODO: list accepted feedback.
+        }
+
+        // If the plot is submitted add the start review option for reviewers.
+        if (plotInfoType == PLOT_INFO_TYPE.SUBMITTED_REVIEWER) {
+            // TODO: Start review option
+        }
     }
 
     public void refresh() {
@@ -340,7 +349,7 @@ public class PlotInfoNew extends Gui {
                 }
             }
             case COMPLETED -> {
-                if (plotSQL.hasRow("SELECT id FROM accept_data WHERE id=" + plotID + " AND uuid='" + user.player.getUniqueId() + "';")) {
+                if (Objects.equals(plot_owner, user.player.getUniqueId().toString())) {
                     yield PLOT_INFO_TYPE.ACCEPTED_OWNER;
                 } else {
                     yield PLOT_INFO_TYPE.ACCEPTED;
@@ -351,7 +360,7 @@ public class PlotInfoNew extends Gui {
     }
 
     private PLOT_INFO_TYPE claimedType() {
-        if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plotID + " AND uuid='" + user.player.getUniqueId() + "' AND is_owner=1;")) {
+        if (Objects.equals(plot_owner, user.player.getUniqueId().toString())) {
             return PLOT_INFO_TYPE.CLAIMED_OWNER;
         } else if (plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plotID + " AND uuid='" + user.player.getUniqueId() + "' AND is_owner=0;")) {
             return PLOT_INFO_TYPE.CLAIMED_MEMBER;
@@ -366,10 +375,20 @@ public class PlotInfoNew extends Gui {
     }
 
     private int getSlotForGoogleMapsLink(PLOT_INFO_TYPE plotInfoType) {
-        if (plotInfoType == PLOT_INFO_TYPE.CLAIMED_OWNER || plotInfoType == PLOT_INFO_TYPE.SUBMITTED_REVIEWER) {
+        if (plotInfoType == PLOT_INFO_TYPE.CLAIMED_OWNER || plotInfoType == PLOT_INFO_TYPE.CLAIMED_MEMBER || plotInfoType == PLOT_INFO_TYPE.SUBMITTED_REVIEWER) {
             return 23;
         } else {
             return 20;
+        }
+    }
+
+    private int getFeedbackSlot(PLOT_INFO_TYPE plotInfoType) {
+        if (plotInfoType == PLOT_INFO_TYPE.CLAIMED_OWNER || plotInfoType == PLOT_INFO_TYPE.CLAIMED_MEMBER || plotInfoType == PLOT_INFO_TYPE.REVIEWING_REVIEWER) {
+            return 22;
+        } else if (plotInfoType == PLOT_INFO_TYPE.SUBMITTED_REVIEWER) {
+            return 21;
+        } else {
+            return -1;
         }
     }
 
