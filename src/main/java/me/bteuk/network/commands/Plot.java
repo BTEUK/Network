@@ -3,6 +3,7 @@ package me.bteuk.network.commands;
 import me.bteuk.network.Network;
 import me.bteuk.network.events.EventManager;
 import me.bteuk.network.gui.plotsystem.PlotInfo;
+import me.bteuk.network.gui.plotsystem.PlotMenu;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.tabcompleters.FixedArgSelector;
 import me.bteuk.network.utils.NetworkUser;
@@ -38,21 +39,24 @@ public class Plot extends AbstractCommand {
             return true;
         }
 
-        if (args.length < 2) {
+        if (args.length < 1) {
             error(p);
             return true;
         }
 
-        int plotID;
-        //Check if the plotID is an actual number.
-        try {
-            plotID = Integer.parseInt(args[1]);
-        } catch (NumberFormatException e) {
-            error(p);
-            return true;
+        int plotID = -1;
+        if (args.length > 1) {
+            //Check if the plotID is an actual number.
+            try {
+                plotID = Integer.parseInt(args[1]);
+            } catch (NumberFormatException e) {
+                error(p);
+                return true;
+            }
         }
 
         switch (args[0]) {
+            case "menu" -> menu(p);
             case "info" -> info(p, plotID);
             case "join" -> join(p, plotID);
             default -> error(p);
@@ -60,7 +64,27 @@ public class Plot extends AbstractCommand {
         return true;
     }
 
+    private void menu(Player p) {
+        // Get the user.
+        NetworkUser u = instance.getUser(p);
+        if (u == null) {
+            p.sendMessage(Utils.error("An error occurred, please rejoin!"));
+            LOGGER.severe("No user exists for player " + p.getName());
+            return;
+        }
+        // Open the plot menu.
+        if (u.mainGui != null) {
+            u.mainGui.delete();
+        }
+        u.mainGui = new PlotMenu(u);
+        u.mainGui.open(u);
+    }
+
     private void info(Player p, int plot) {
+        if (plot == -1) {
+            error(p);
+            return;
+        }
         // Check if the plot exists and is not deleted.
         PlotStatus status = PlotStatus.fromDatabaseValue(plotSQL.getString("SELECT status FROM plot_data WHERE id=" + plot + ";"));
         if (status == null || status == PlotStatus.DELETED) {
@@ -83,7 +107,10 @@ public class Plot extends AbstractCommand {
     }
 
     private void join(Player p, int plot) {
-
+        if (plot == -1) {
+            error(p);
+            return;
+        }
 
         //Check if they have an invite for this plot.
         if (plotSQL.hasRow("SELECT id FROM plot_invites WHERE id=" + plot + " AND uuid='" + p.getUniqueId() + "';")) {
@@ -100,6 +127,7 @@ public class Plot extends AbstractCommand {
     }
 
     private void error(Player p) {
+        p.sendMessage(Utils.error("/plot menu"));
         p.sendMessage(Utils.error("/plot info <plotID>"));
         p.sendMessage(Utils.error("/plot join <plotID>"));
     }
