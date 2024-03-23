@@ -335,7 +335,7 @@ public final class Network extends JavaPlugin {
         }
 
         //Enable commands.
-        getCommand("plot").setExecutor(new Plot());
+        new Plot(this);
         getCommand("zone").setExecutor(new Zone());
 
         getCommand("navigator").setExecutor(new Navigator());

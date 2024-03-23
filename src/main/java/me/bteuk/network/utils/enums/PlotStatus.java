@@ -1,5 +1,7 @@
 package me.bteuk.network.utils.enums;
 
+import java.util.Objects;
+
 public enum PlotStatus {
     UNCLAIMED("unclaimed"),
     CLAIMED("claimed"),
@@ -21,7 +23,7 @@ public enum PlotStatus {
      */
     public static PlotStatus fromDatabaseValue(String value) {
         for (PlotStatus status : PlotStatus.values()) {
-            if (status.database_value.equals(value)) {
+            if (Objects.equals(status.database_value, value)) {
                 return status;
             }
         }
