@@ -7,12 +7,14 @@ import me.bteuk.network.gui.InviteMembers;
 import me.bteuk.network.sql.GlobalSQL;
 import me.bteuk.network.sql.PlotSQL;
 import me.bteuk.network.utils.NetworkUser;
+import me.bteuk.network.utils.PlotValues;
 import me.bteuk.network.utils.SwitchServer;
 import me.bteuk.network.utils.Utils;
 import me.bteuk.network.utils.enums.PlotStatus;
 import me.bteuk.network.utils.enums.RegionType;
 import net.buildtheearth.terraminusminus.generator.EarthGeneratorSettings;
 import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
+import net.kyori.adventure.inventory.Book;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -92,7 +94,7 @@ public class PlotInfoNew extends Gui {
         // Plot Info
         setItem(4, Utils.createItem(Material.BOOK, 1,
                 Utils.title("Plot " + plotID),
-                createPlotInfo(plotInfoType)));
+                createPlotInfo(status, plotInfoType)));
 
         // Plot Teleport (Always in slot 24).
         setItem(24, Utils.createItem(Material.ENDER_PEARL, 1,
@@ -299,28 +301,80 @@ public class PlotInfoNew extends Gui {
         // As well as for reviewers (Slot 22 while reviewing, slot 21 while submitted)
         if ((plotInfoType == PLOT_INFO_TYPE.CLAIMED_OWNER || plotInfoType == PLOT_INFO_TYPE.CLAIMED_MEMBER || plotInfoType == PLOT_INFO_TYPE.REVIEWING_REVIEWER || plotInfoType == PLOT_INFO_TYPE.SUBMITTED_REVIEWER)
                 && plotSQL.hasRow("SELECT id FROM deny_data WHERE id=" + plotID + " AND uuid='" + plot_owner + "';")) {
-                setItem(getFeedbackSlot(plotInfoType), Utils.createItem(Material.WRITABLE_BOOK, 1,
-                                Utils.title("Plot Feedback"),
-                                Utils.line("Click to show feedback for this plot.")),
-                        u -> {
+            setItem(getFeedbackSlot(plotInfoType), Utils.createItem(Material.WRITABLE_BOOK, 1,
+                            Utils.title("Plot Feedback"),
+                            Utils.line("Click to show feedback for this plot.")),
+                    u -> {
 
-                            //Delete this gui.
-                            this.delete();
-                            u.mainGui = null;
+                        //Delete this gui.
+                        this.delete();
+                        u.mainGui = null;
 
-                            //Switch back to plot menu.
-                            u.mainGui = new DeniedPlotFeedback(plotID);
-                            u.mainGui.open(u);
+                        //Switch back to plot menu.
+                        u.mainGui = new DeniedPlotFeedback(plotID);
+                        u.mainGui.open(u);
 
-                        });
-                // If the plot is accepted and has feedback show for the owner (Slot 22)
+                    });
+            // If the plot is accepted and has feedback show for the owner (Slot 22)
         } else if (plotInfoType == PLOT_INFO_TYPE.ACCEPTED_OWNER && plotSQL.hasRow("SELECT id FROM accept_data WHERE id=" + plotID + ";")) {
-            // TODO: list accepted feedback.
+            setItem(getFeedbackSlot(plotInfoType), Utils.createItem(Material.WRITABLE_BOOK, 1,
+                            Utils.title("Plot Feedback"),
+                            Utils.line("Click to show feedback for this plot.")),
+                    u -> {
+                        //Create book.
+                        Component title = Component.text("Plot " + plotID, NamedTextColor.AQUA, TextDecoration.BOLD);
+                        Component author = Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
+                                plotSQL.getString("SELECT reviewer FROM accept_data WHERE id=" + plotID + ";") + "';"));
+
+                        //Get pages of the book.
+                        ArrayList<String> sPages = plotSQL.getStringList("SELECT contents FROM book_data WHERE id="
+                                + plotSQL.getInt("SELECT book_id FROM accept_data WHERE id=" + plotID + ";") + ";");
+
+                        //Create a list of components from the list of strings.
+                        ArrayList<Component> pages = new ArrayList<>();
+                        for (String page : sPages) {
+                            pages.add(Component.text(page));
+                        }
+
+                        Book book = Book.book(title, author, pages);
+
+                        //Open the book.
+                        u.player.openBook(book);
+                    });
         }
 
-        // If the plot is submitted add the start review option for reviewers.
+        // If the plot is submitted add the start review option for reviewers. (Slot 20)
         if (plotInfoType == PLOT_INFO_TYPE.SUBMITTED_REVIEWER) {
-            // TODO: Start review option
+            setItem(20, Utils.createItem(Material.EMERALD, 1,
+                            Utils.title("Review Plot"),
+                            Utils.line("Click to start reviewing this plot.")),
+                    u -> {
+                        // If you are not owner or member of the plot, start the review.
+                        if (!Network.getInstance().getPlotSQL().hasRow("SELECT id FROM plot_members WHERE uuid='" + u.player.getUniqueId() + "' AND id=" + plotID + ";")) {
+                            //Get server of plot.
+                            String server = Network.getInstance().getPlotSQL().getString("SELECT server FROM location_data WHERE name='" +
+                                    Network.getInstance().getPlotSQL().getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + "';");
+
+                            //If they are not in the same server as the plot teleport them to that server and start the reviewing process.
+                            if (server.equals(SERVER_NAME)) {
+                                u.player.closeInventory();
+                                Network.getInstance().getGlobalSQL().update("INSERT INTO server_events(uuid,type,server,event) VALUES('"
+                                        + u.player.getUniqueId() + "','plotsystem','" + SERVER_NAME + "','review plot " + plotID + "');");
+                            } else {
+                                // Player is not on the current server.
+                                // Set the server join event.
+                                Network.getInstance().getGlobalSQL().update("INSERT INTO join_events(uuid,type,event) VALUES('"
+                                        + u.player.getUniqueId() + "','plotsystem',"
+                                        + "'review plot " + plotID + "');");
+
+                                //Teleport them to the server.
+                                u.player.closeInventory();
+                                SwitchServer.switchServer(u.player, server);
+                            }
+                        } else {
+                            user.player.sendMessage(Utils.error("You are not allowed to review this plot since you have contributed to it."));
+                        }
+                    });
         }
     }
 
@@ -335,14 +389,14 @@ public class PlotInfoNew extends Gui {
             case UNCLAIMED -> PLOT_INFO_TYPE.UNCLAIMED;
             case CLAIMED -> claimedType();
             case SUBMITTED -> {
-                if (user.hasPermission("group.reviewer")) {
+                if (user.hasPermission("uknet.plots.review")) {
                     yield PLOT_INFO_TYPE.SUBMITTED_REVIEWER;
                 } else {
                     yield claimedType();
                 }
             }
             case REVIEWING -> {
-                if (user.hasPermission("group.reviewer")) {
+                if (user.hasPermission("uknet.plots.review")) {
                     yield PLOT_INFO_TYPE.REVIEWING_REVIEWER;
                 } else {
                     yield claimedType();
@@ -369,8 +423,44 @@ public class PlotInfoNew extends Gui {
         }
     }
 
-    private Component[] createPlotInfo(PLOT_INFO_TYPE plotInfoType) {
+    private Component[] createPlotInfo(PlotStatus status, PLOT_INFO_TYPE plotInfoType) {
         List<Component> info = new ArrayList<>();
+        if (status == PlotStatus.CLAIMED || status == PlotStatus.SUBMITTED || status == PlotStatus.REVIEWING) {
+            info.add(Utils.line("Plot Owner: ")
+                    .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
+                            plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plotID + " AND is_owner=1;") + "';"), NamedTextColor.GRAY)));
+            info.add(Utils.line("Plot Members: ")
+                    .append(Component.text(plotSQL.getInt("SELECT COUNT(uuid) FROM plot_members WHERE id=" + plotID + " AND is_owner=0;"), NamedTextColor.GRAY)));
+        } else if (status == PlotStatus.COMPLETED) {
+            info.add(Utils.line("Completed by: ").append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='"
+                    + plotSQL.getString("SELECT uuid FROM accept_data WHERE id=" + plotID + ";") + "';"), NamedTextColor.GRAY)));
+            info.add(Utils.line("Accepted by: ")
+                    .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='"
+                            + plotSQL.getString("SELECT reviewer FROM accept_data WHERE id=" + plotID + ";") + "';"), NamedTextColor.GRAY)));
+        }
+        // Add size and difficulty stats.
+        info.add(Utils.line("Difficulty: ")
+                .append(Component.text(PlotValues.difficultyName(plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plotID + ";")), NamedTextColor.GRAY)));
+        info.add(Utils.line("Size: ")
+                .append(Component.text(PlotValues.sizeName(plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + plotID + ";")), NamedTextColor.GRAY)));
+
+        // If accepted, and the builder opens de menu, show the accuracy and quality ratings.
+        if (plotInfoType == PLOT_INFO_TYPE.ACCEPTED_OWNER) {
+            info.add(Utils.line("Accuracy: ")
+                    .append(Component.text(plotSQL.getInt("SELECT accuracy FROM accept_data WHERE id=" + plotID + ";"), NamedTextColor.GRAY))
+                    .append(Utils.line("/5")));
+            info.add(Utils.line("Quality: ")
+                            .append(Component.text(plotSQL.getInt("SELECT quality FROM accept_data WHERE id=" + plotID + ";"), NamedTextColor.GRAY))
+                            .append(Utils.line("/5")));
+        }
+
+        // If accepted, add a disclaimer that the actual plot may have changed since it was accepted.
+        if (status == PlotStatus.COMPLETED) {
+            info.add(Component.text("Disclaimer: ", NamedTextColor.WHITE, TextDecoration.BOLD)
+                    .append(Utils.line("the content of the plot")));
+            info.add(Utils.line("may have changed since"));
+            info.add(Utils.line("it was completed!"));
+        }
         return info.toArray(Component[]::new);
     }
 
