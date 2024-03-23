@@ -121,7 +121,7 @@ public class DeniedPlotFeedback extends Gui {
                     u.mainGui = null;
 
                     //Switch back to plot menu.
-                    u.mainGui = new PlotInfo(u, plotID, u.player.getUniqueId().toString());
+                    u.mainGui = new PlotInfo(u, plotID);
                     u.mainGui.open(u);
 
                 });

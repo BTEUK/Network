@@ -80,7 +80,7 @@ public class DeleteConfirm extends Gui {
                     //Switch back to plot or zone info.
                     if (regionType == RegionType.PLOT) {
 
-                        u.mainGui = new PlotInfo(u, id, u.player.getUniqueId().toString());
+                        u.mainGui = new PlotInfo(u, id);
 
                     } else if (regionType == RegionType.ZONE) {
 

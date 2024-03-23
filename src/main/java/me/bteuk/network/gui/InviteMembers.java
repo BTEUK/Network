@@ -196,7 +196,7 @@ public class InviteMembers extends Gui {
                         u.mainGui = null;
 
                         //Switch back to plot info.
-                        u.mainGui = new PlotInfo(u, plotID, u.player.getUniqueId().toString());
+                        u.mainGui = new PlotInfo(u, plotID);
                         u.mainGui.open(u);
 
                     });
