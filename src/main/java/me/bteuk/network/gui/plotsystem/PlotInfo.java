@@ -72,8 +72,8 @@ public class PlotInfo extends Gui {
         }
         // Determine the type of menu to create.
         PLOT_INFO_TYPE plotInfoType = determineMenuType(status);
-        if (plotInfoType == null || plotInfoType == PLOT_INFO_TYPE.UNCLAIMED || plotInfoType == PLOT_INFO_TYPE.DELETED) {
-            user.player.sendMessage(Utils.error("This plot has an invalid status, can't open the info menu."));
+        if (plotInfoType == null || plotInfoType == PLOT_INFO_TYPE.DELETED) {
+            user.player.sendMessage(Utils.error("This plot not longer exists, can't open the info menu."));
             return;
         }
 
@@ -442,7 +442,10 @@ public class PlotInfo extends Gui {
             info.add(Utils.line("Accepted by: ")
                     .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='"
                             + plotSQL.getString("SELECT reviewer FROM accept_data WHERE id=" + plotID + ";") + "';"), NamedTextColor.GRAY)));
+        } else if (status == PlotStatus.UNCLAIMED) {
+            info.add(Utils.line("This plot is unclaimed!"));
         }
+
         // Add size and difficulty stats.
         info.add(Utils.line("Difficulty: ")
                 .append(Component.text(PlotValues.difficultyName(plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plotID + ";")), NamedTextColor.GRAY)));
