@@ -61,7 +61,7 @@ public class PlotSQL extends AbstractSQL {
         }
     }
 
-    //Creates a new plot and returns the id of the plot.
+    // Creates a new plot and returns the id of the plot.
     public int createPlot(int size, int difficulty, String location) {
 
         try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
@@ -97,7 +97,7 @@ public class PlotSQL extends AbstractSQL {
 
     }
 
-    //Creates a new plot and returns the id of the plot.
+    // Creates a new plot and returns the id of the plot.
     public int createZone(String location, long expiration, boolean is_public) {
 
         try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(

@@ -58,20 +58,6 @@ public class PlotInfo extends Gui {
 
     public void createGui() {
 
-        // Return
-        setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        Utils.title("Return"),
-                        Utils.line("Open the plot menu.")),
-                u -> {
-                    // Delete this gui.
-                    this.delete();
-                    u.mainGui = null;
-
-                    // Switch back to plot menu.
-                    u.mainGui = new PlotMenu(u);
-                    u.mainGui.open(u);
-                });
-
         // Get the plot status.
         PlotStatus status = PlotStatus.fromDatabaseValue(plotSQL.getString("SELECT status FROM plot_data WHERE id=" + plotID + ";"));
         if (status == null) {
@@ -90,6 +76,25 @@ public class PlotInfo extends Gui {
             user.player.sendMessage(Utils.error("This plot has an invalid status, can't open the info menu."));
             return;
         }
+
+        // Return
+        setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
+                        Utils.title("Return"),
+                        Utils.line("Open the plot menu.")),
+                u -> {
+                    // Delete this gui.
+                    this.delete();
+                    u.mainGui = null;
+
+                    // Switch back to plot menu, or accepted plot menu.
+                    if (status == PlotStatus.COMPLETED) {
+                        u.mainGui = new AcceptedPlotFeedback(u);
+                        u.mainGui.open(u);
+                    } else {
+                        u.mainGui = new PlotMenu(u);
+                        u.mainGui.open(u);
+                    }
+                });
 
         // Plot Info
         setItem(4, Utils.createItem(Material.BOOK, 1,

@@ -1,5 +1,6 @@
 package me.bteuk.network.sql;
 
+import it.unimi.dsi.fastutil.Hash;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 import java.sql.Connection;
@@ -7,6 +8,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+
+import static me.bteuk.network.utils.Constants.LOGGER;
 
 public abstract class AbstractSQL {
 
@@ -262,5 +266,23 @@ public abstract class AbstractSQL {
         }
 
         return list;
+    }
+
+    public HashMap<Integer, String> getIntStringMap(String sql) {
+
+        HashMap<Integer, String> map = new HashMap<>();
+
+        try (
+                Connection conn = conn();
+                PreparedStatement statement = conn.prepareStatement(sql);
+                ResultSet results = statement.executeQuery()
+        ) {
+            while (results.next()) {
+                map.put(results.getInt(1), results.getString(2));
+            }
+        } catch (SQLException e) {
+            LOGGER.severe("An invalid sql query was attempted, " + sql);
+        }
+        return map;
     }
 }
