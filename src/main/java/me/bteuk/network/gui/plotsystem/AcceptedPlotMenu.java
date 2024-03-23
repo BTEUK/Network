@@ -1,5 +1,6 @@
 package me.bteuk.network.gui.plotsystem;
 
+import lombok.Getter;
 import lombok.Setter;
 import me.bteuk.network.Network;
 import me.bteuk.network.gui.Gui;
@@ -11,6 +12,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
+import org.codehaus.plexus.util.StringUtils;
 
 import java.util.HashMap;
 
@@ -25,11 +27,14 @@ public class AcceptedPlotMenu extends Gui {
     private final PlotSQL plotSQL;
     private final GlobalSQL globalSQL;
 
+    private final FilterMenu filterMenu;
+
     /**
      * Filter that is applied when fetching all plots.
      * The uuid is the value.
-     * A filter of null implies all users.
+     * An empty string implies all users.
      */
+    @Getter
     @Setter
     private String filter;
 
@@ -38,6 +43,8 @@ public class AcceptedPlotMenu extends Gui {
     public AcceptedPlotMenu(NetworkUser user) {
 
         super(45, Component.text("Plot Menu", NamedTextColor.AQUA, TextDecoration.BOLD));
+
+        filterMenu = new FilterMenu(this, user);
 
         plotSQL = Network.getInstance().getPlotSQL();
         globalSQL = Network.getInstance().getGlobalSQL();
@@ -51,25 +58,21 @@ public class AcceptedPlotMenu extends Gui {
 
         // Fetch accepted plots.
         HashMap<Integer, String> plots;
-        if (filter == null) {
+        if (StringUtils.isEmpty(filter)) {
             plots = plotSQL.getIntStringMap("SELECT id,uuid FROM accept_data ORDER BY accept_time DESC;");
         } else {
             plots = plotSQL.getIntStringMap("SELECT id,uuid FROM accept_data WHERE uuid='" + filter + "' ORDER BY accept_time DESC;");
         }
 
         // Set the filter.
+        // Open the filter menu.
         setItem(4, Utils.createItem(
                         Material.SPRUCE_SIGN, 1, Utils.title("Alter filter"),
                         Utils.line("The current filter is set to: ").append(Component.text(
-                                filter == null ? "All Players" : globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + filter + "';"), NamedTextColor.GRAY
+                                StringUtils.isEmpty(filter) ? "All Players" : globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + filter + "';"), NamedTextColor.GRAY
                         )),
                         Utils.line("Click to select a different filter.")),
-                u -> {
-                    // Open the filter menu.
-                    this.delete();
-                    u.mainGui = new FilterMenu(u);
-                    u.mainGui.open(u);
-                });
+                filterMenu::open);
 
         // Slot count.
         int slot = 10;
@@ -165,5 +168,14 @@ public class AcceptedPlotMenu extends Gui {
         this.clearGui();
         createGui();
 
+    }
+
+
+    @Override
+    public void delete() {
+        if (filterMenu != null) {
+            filterMenu.deleteThis();
+        }
+        super.delete();
     }
 }

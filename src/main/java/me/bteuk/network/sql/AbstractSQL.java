@@ -285,4 +285,22 @@ public abstract class AbstractSQL {
         }
         return map;
     }
+
+    public HashMap<String, Integer> getStringIntMap(String sql) {
+
+        HashMap<String, Integer> map = new HashMap<>();
+
+        try (
+                Connection conn = conn();
+                PreparedStatement statement = conn.prepareStatement(sql);
+                ResultSet results = statement.executeQuery()
+        ) {
+            while (results.next()) {
+                map.put(results.getString(1), results.getInt(2));
+            }
+        } catch (SQLException e) {
+            LOGGER.severe("An invalid sql query was attempted, " + sql);
+        }
+        return map;
+    }
 }
