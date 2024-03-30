@@ -1,11 +1,11 @@
-package me.bteuk.network.utils.progression;
+package net.bteuk.network.utils.progression;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static me.bteuk.network.utils.progression.Level.getLeftoverExp;
-import static me.bteuk.network.utils.progression.Level.getThreshold;
-import static me.bteuk.network.utils.progression.Level.reachedNextLevel;
+import static net.bteuk.network.utils.progression.Level.getLeftoverExp;
+import static net.bteuk.network.utils.progression.Level.getThreshold;
+import static net.bteuk.network.utils.progression.Level.reachedNextLevel;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
