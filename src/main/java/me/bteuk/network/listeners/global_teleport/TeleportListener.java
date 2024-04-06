@@ -50,6 +50,9 @@ public class TeleportListener implements Listener {
 
         if (blocked || e.getCause() == PlayerTeleportEvent.TeleportCause.SPECTATE) {
             e.setCancelled(true);
+            if (e.getCause() == PlayerTeleportEvent.TeleportCause.SPECTATE) {
+                e.getPlayer().sendMessage(Utils.error("Teleporting via the spectator menu is disabled, please use /tp <player>"));
+            }
             return;
         }
 
