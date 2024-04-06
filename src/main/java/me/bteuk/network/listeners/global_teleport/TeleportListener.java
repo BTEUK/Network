@@ -48,7 +48,7 @@ public class TeleportListener implements Listener {
     @EventHandler
     public void onPlayerTeleport(PlayerTeleportEvent e) {
 
-        if (blocked) {
+        if (blocked || e.getCause() == PlayerTeleportEvent.TeleportCause.SPECTATE) {
             e.setCancelled(true);
             return;
         }
