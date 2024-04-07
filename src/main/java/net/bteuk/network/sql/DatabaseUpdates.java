@@ -15,7 +15,7 @@ public class DatabaseUpdates {
             version = Network.getInstance().getGlobalSQL().getString("SELECT data_value FROM unique_data WHERE data_key='version';");
         } else {
             //Insert the current database version as version.
-            Network.getInstance().getGlobalSQL().update("INSERT INTO unique_data(data_key, data_value) VALUES('version','1.4.4')");
+            Network.getInstance().getGlobalSQL().update("INSERT INTO unique_data(data_key, data_value) VALUES('version','1.5.0')");
         }
 
         //Check for specific table columns that could be missing,
@@ -46,11 +46,20 @@ public class DatabaseUpdates {
         if (oldVersionInt <= 4) {
             update4_5();
         }
+
+        if (oldVersionInt < 5) {
+            update5_6();
+        }
     }
 
     private int getVersionInt(String version) {
 
         switch(version) {
+
+            // 1.5.0 = 6
+            case "1.5.0" -> {
+                return 6;
+            }
 
             // 1.4.4 = 5
             case "1.4.4" ->  {
@@ -79,6 +88,17 @@ public class DatabaseUpdates {
 
         }
 
+    }
+
+    private void update5_6() {
+
+        LOGGER.info("Updating database from 1.4.4 to 1.5.0");
+
+        // Update column in plot_data to add a coordinate_id with foreign key.
+        Network.getInstance().getPlotSQL().update("ALTER TABLE plot_data ADD COLUMN coordinate_id INT NOT NULL DEFAULT 0;");
+
+        // Version 1.5.0
+        Network.getInstance().getGlobalSQL().update("UPDATE unique_data SET data_value='1.5.0' WHERE data_key='version';");
     }
 
     private void update4_5() {

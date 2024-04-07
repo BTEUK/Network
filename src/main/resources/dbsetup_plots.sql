@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS plot_data
 	size        INT         NOT NULL,
 	difficulty  INT         NOT NULL,
 	location    VARCHAR(64) NOT NULL,
+	coordinate_id   INT     NOT NULL DEFAULT 0,
 	PRIMARY KEY (id)
 );
 
