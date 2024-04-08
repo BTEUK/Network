@@ -47,7 +47,8 @@ public class DatabaseUpdates {
             update4_5();
         }
 
-        if (oldVersionInt < 5) {
+        // 1.4.4 -> 1.5.0
+        if (oldVersionInt <= 5) {
             update5_6();
         }
     }

@@ -61,10 +61,10 @@ public class PlotSQL extends AbstractSQL {
     }
 
     // Creates a new plot and returns the id of the plot.
-    public int createPlot(int size, int difficulty, String location) {
+    public int createPlot(int size, int difficulty, String location, int coordinate_id) {
 
         try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
-                "INSERT INTO plot_data(status, size, difficulty, location) VALUES(?, ?, ?, ?);",
+                "INSERT INTO plot_data(status, size, difficulty, location) VALUES(?, ?, ?, ?, ?);",
                 Statement.RETURN_GENERATED_KEYS
         )) {
 
@@ -72,6 +72,7 @@ public class PlotSQL extends AbstractSQL {
             statement.setInt(2, size);
             statement.setInt(3, difficulty);
             statement.setString(4, location);
+            statement.setInt(5, coordinate_id);
             statement.executeUpdate();
 
             //If the id does not exist return 0.

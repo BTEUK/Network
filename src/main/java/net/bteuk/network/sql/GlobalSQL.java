@@ -38,7 +38,7 @@ public class GlobalSQL extends AbstractSQL {
         //Try and delete all events for this server.
         try (
                 Connection conn = conn();
-                PreparedStatement statement = conn.prepareStatement("DELETE FROM server_events WHERE server='" + serverName + "' AND type='network';")
+                PreparedStatement statement = conn.prepareStatement("DELETE FROM server_events WHERE server='" + serverName + "' AND type='" + type + "';");
         ) {
 
             statement.executeUpdate();
