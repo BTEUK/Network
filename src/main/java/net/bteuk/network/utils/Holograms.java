@@ -13,7 +13,6 @@ public class Holograms {
         if (DHAPI.getHologram(name) == null) {
             return DHAPI.createHologram(name, location, text);
         }
-
         return null;
     }
 }

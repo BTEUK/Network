@@ -64,7 +64,7 @@ public class PlotSQL extends AbstractSQL {
     public int createPlot(int size, int difficulty, String location, int coordinate_id) {
 
         try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
-                "INSERT INTO plot_data(status, size, difficulty, location) VALUES(?, ?, ?, ?, ?);",
+                "INSERT INTO plot_data(status, size, difficulty, location, coordinate_id) VALUES(?, ?, ?, ?, ?);",
                 Statement.RETURN_GENERATED_KEYS
         )) {
 
