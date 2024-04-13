@@ -1,8 +1,8 @@
 package net.bteuk.network.utils;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
-import net.bteuk.network.Network;
 import me.clip.placeholderapi.PlaceholderAPI;
+import net.bteuk.network.Network;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -29,11 +29,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static net.bteuk.network.utils.Constants.MAX_Y;
 import static net.bteuk.network.utils.Constants.MIN_Y;
 
 public class Utils {
+
+    private static final Pattern PATTTERN = Pattern.compile("%s");
 
     public static String tabName(String displayName) {
         return tabName(displayName.split(" ")[0], displayName.split(" ")[1]);
@@ -49,15 +53,67 @@ public class Utils {
     }
 
     public static Component line(String message) {
-        return Component.text(message, NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false);
+        return colouredText(NamedTextColor.WHITE, message);
     }
 
     public static Component error(String message) {
         return Component.text(message, NamedTextColor.RED).decoration(TextDecoration.ITALIC, false);
     }
 
+    /**
+     * Create an error message with vars.
+     * The colour of the message is RED, with the vars highlighted with DARK_RED.
+     *
+     * @param message the message, using %s as placeholder for the vars.
+     * @param vars the vars to add to the placeholders, must equal the number of placeholder symbols.
+     * @return the {@link Component} with the message, or null if the number of vars is incorrect.
+     */
+    public static Component error(String message, String... vars) {
+        return varMessage(NamedTextColor.RED, NamedTextColor.DARK_RED, message, vars);
+    }
+
     public static Component success(String message) {
-        return Component.text(message, NamedTextColor.GREEN).decoration(TextDecoration.ITALIC, false);
+        return colouredText(NamedTextColor.GREEN, message);
+    }
+
+    /**
+     * Create a success message with vars.
+     * The colour of the message is GREEN, with the vars highlighted with DARK_AQUA.
+     *
+     * @param message the message, using %s as placeholder for the vars.
+     * @param vars the vars to add to the placeholders, must equal the number of placeholder symbols.
+     * @return the {@link Component} with the message, or null if the number of vars is incorrect.
+     */
+    public static Component success(String message, String... vars) {
+        return varMessage(NamedTextColor.GREEN, NamedTextColor.DARK_AQUA, message, vars);
+    }
+
+    private static Component varMessage(NamedTextColor textColour, NamedTextColor varColour, String message, String... vars) {
+        Component component = Component.empty();
+        // Find the number of vars needed.
+        int lastIdx = 0;
+        int count = 0;
+        Matcher matcher = PATTTERN.matcher(message);
+        while (matcher.find()) {
+            int idx = matcher.start();
+            if (idx != lastIdx) {
+                component = component.append(colouredText(textColour, message.substring(lastIdx, idx)));
+            }
+            if (count < vars.length) {
+                component = component.append(colouredText(varColour, vars[count]));
+                count++;
+            }
+            lastIdx = idx + 2;
+        }
+        // At the remaining text if exists.
+        if (lastIdx < message.length()) {
+            component = component.append(colouredText(textColour, message.substring(lastIdx)));
+        }
+        return component;
+    }
+
+    private static Component colouredText(NamedTextColor colour, String message) {
+        return Component.text(message, colour).decoration(TextDecoration.ITALIC, false);
     }
 
     /**

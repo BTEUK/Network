@@ -1,6 +1,5 @@
 package net.bteuk.network.commands;
 
-import net.bteuk.network.Network;
 import net.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.lang3.StringUtils;
@@ -8,6 +7,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import static net.bteuk.network.utils.Constants.LOGGER;
 
@@ -23,7 +23,7 @@ public abstract class AbstractCommand implements CommandExecutor {
     protected PluginCommand command;
 
     //Constructor to enable the command.
-    protected AbstractCommand(Network instance, String commandName) {
+    protected AbstractCommand(JavaPlugin instance, String commandName) {
 
         //Register command.
         command = instance.getCommand(commandName);
