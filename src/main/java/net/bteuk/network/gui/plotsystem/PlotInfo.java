@@ -1,5 +1,6 @@
 package net.bteuk.network.gui.plotsystem;
 
+import lombok.Setter;
 import net.bteuk.network.Network;
 import net.bteuk.network.eventing.events.EventManager;
 import net.bteuk.network.gui.Gui;
@@ -37,6 +38,9 @@ public class PlotInfo extends Gui {
     private final GlobalSQL globalSQL;
 
     private String plot_owner;
+
+    @Setter
+    private AcceptedPlotMenu acceptedPlotMenu;
 
     public PlotInfo(NetworkUser user, int plotID) {
 
@@ -82,15 +86,15 @@ public class PlotInfo extends Gui {
                         Utils.title("Return"),
                         Utils.line("Open the plot menu.")),
                 u -> {
-                    // Delete this gui.
-                    this.delete();
-                    u.mainGui = null;
 
                     // Switch back to plot menu, or accepted plot menu.
-                    if (status == PlotStatus.COMPLETED) {
-                        u.mainGui = new AcceptedPlotFeedback(u);
-                        u.mainGui.open(u);
+                    if (status == PlotStatus.COMPLETED && acceptedPlotMenu != null) {
+                        this.deleteThis();
+                        acceptedPlotMenu.setPlotInfo(null);
+                        acceptedPlotMenu.open(u);
                     } else {
+                        // Delete this gui.
+                        this.delete();
                         u.mainGui = new PlotMenu(u);
                         u.mainGui.open(u);
                     }
@@ -389,6 +393,19 @@ public class PlotInfo extends Gui {
         createGui();
     }
 
+    @Override
+    public void delete() {
+        if (acceptedPlotMenu != null) {
+            acceptedPlotMenu.delete();
+        } else {
+            deleteThis();
+        }
+    }
+
+    public void deleteThis() {
+        super.delete();
+    }
+
     private PLOT_INFO_TYPE determineMenuType(PlotStatus status) {
         return switch (status) {
             case UNCLAIMED -> PLOT_INFO_TYPE.UNCLAIMED;
@@ -485,7 +502,8 @@ public class PlotInfo extends Gui {
     }
 
     private int getFeedbackSlot(PLOT_INFO_TYPE plotInfoType) {
-        if (plotInfoType == PLOT_INFO_TYPE.CLAIMED_OWNER || plotInfoType == PLOT_INFO_TYPE.CLAIMED_MEMBER || plotInfoType == PLOT_INFO_TYPE.REVIEWING_REVIEWER) {
+        if (plotInfoType == PLOT_INFO_TYPE.CLAIMED_OWNER || plotInfoType == PLOT_INFO_TYPE.CLAIMED_MEMBER ||
+                plotInfoType == PLOT_INFO_TYPE.REVIEWING_REVIEWER || plotInfoType == PLOT_INFO_TYPE.ACCEPTED_OWNER) {
             return 22;
         } else if (plotInfoType == PLOT_INFO_TYPE.SUBMITTED_REVIEWER) {
             return 21;

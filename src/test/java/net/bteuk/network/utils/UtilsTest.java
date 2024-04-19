@@ -78,7 +78,9 @@ class UtilsTest {
     private Component createComponent(HashMap<String, NamedTextColor> segments) {
         Component component = Component.empty();
         for (Map.Entry<String, NamedTextColor> entry : segments.entrySet()) {
-            component = component.append(Component.text(entry.getKey(), entry.getValue()).decoration(TextDecoration.ITALIC, false));
+            component = component.append(Component.text(entry.getKey(), entry.getValue())
+                    .decoration(TextDecoration.ITALIC, false)
+                    .decoration(TextDecoration.BOLD, false));
         }
         return component;
     }

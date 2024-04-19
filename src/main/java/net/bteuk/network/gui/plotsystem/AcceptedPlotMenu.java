@@ -29,6 +29,9 @@ public class AcceptedPlotMenu extends Gui {
 
     private final FilterMenu filterMenu;
 
+    @Setter
+    private PlotInfo plotInfo;
+
     /**
      * Filter that is applied when fetching all plots.
      * The uuid is the value.
@@ -38,11 +41,12 @@ public class AcceptedPlotMenu extends Gui {
     @Setter
     private String filter;
 
+    @Setter
     private int page = 1;
 
     public AcceptedPlotMenu(NetworkUser user) {
 
-        super(45, Component.text("Plot Menu", NamedTextColor.AQUA, TextDecoration.BOLD));
+        super(45, Component.text("Accepted Plot Menu", NamedTextColor.AQUA, TextDecoration.BOLD));
 
         filterMenu = new FilterMenu(this, user);
 
@@ -67,7 +71,7 @@ public class AcceptedPlotMenu extends Gui {
         // Set the filter.
         // Open the filter menu.
         setItem(4, Utils.createItem(
-                        Material.SPRUCE_SIGN, 1, Utils.title("Alter filter"),
+                        Material.SPRUCE_SIGN, 1, Utils.title("Set filter"),
                         Utils.line("The current filter is set to: ").append(Component.text(
                                 StringUtils.isEmpty(filter) ? "All Players" : globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + filter + "';"), NamedTextColor.GRAY
                         )),
@@ -129,13 +133,10 @@ public class AcceptedPlotMenu extends Gui {
                             Utils.line("Completed by: ").append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + plots.get(plotID) + "';"), NamedTextColor.GRAY)),
                             Utils.line("Click to open the menu of this plot.")),
                     u -> {
-                        //Delete this gui.
-                        this.delete();
-                        u.mainGui = null;
-
                         //Switch to plot info.
-                        u.mainGui = new PlotInfo(u, plotID);
-                        u.mainGui.open(u);
+                        plotInfo = new PlotInfo(u, plotID);
+                        plotInfo.setAcceptedPlotMenu(this);
+                        plotInfo.open(u);
                     });
 
             //Increase slot accordingly.
@@ -175,6 +176,9 @@ public class AcceptedPlotMenu extends Gui {
     public void delete() {
         if (filterMenu != null) {
             filterMenu.deleteThis();
+        }
+        if (plotInfo != null) {
+            plotInfo.deleteThis();
         }
         super.delete();
     }

@@ -119,20 +119,19 @@ public class FilterMenu extends Gui {
             // If this is the current filter, make it enchanted.
             ItemStack item = StringUtils.isEmpty(uuid)
                     ? Utils.createItem(Material.ENDER_CHEST, newMap.get(uuid),
-                    Utils.title(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';")),
+                    Utils.title("All Plots"),
                     Utils.line("Click to set the filter"),
                     Utils.line("to all completed plots."))
                     : Utils.createPlayerSkull(uuid, newMap.get(uuid),
                     Utils.title(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';")),
                     Utils.line("Click to set the filter"),
                     Utils.line("to this player."));
-            if (acceptedPlotMenu.getFilter().equals(uuid)) {
-                Utils.enchantItem(item);
-            }
             setItem(slot, item,
                     u -> {
-                        // Set the filter.
+                        // Set the filter and refresh the accepted plots menu at page 1.
                         acceptedPlotMenu.setFilter(uuid);
+                        acceptedPlotMenu.setPage(1);
+                        acceptedPlotMenu.refresh();
 
                         // Return to the accepted plots menu.
                         acceptedPlotMenu.open(u);

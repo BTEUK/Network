@@ -85,7 +85,7 @@ public class PlotMenu extends Gui {
                         u.mainGui = null;
 
                         //Switch to plot info.
-                        u.mainGui = new AcceptedPlotFeedback(u);
+                        u.mainGui = new AcceptedPlotMenu(u);
                         u.mainGui.open(u);
 
                     });
