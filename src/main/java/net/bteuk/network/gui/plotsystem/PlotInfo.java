@@ -394,14 +394,16 @@ public class PlotInfo extends Gui {
             case UNCLAIMED -> PLOT_INFO_TYPE.UNCLAIMED;
             case CLAIMED -> claimedType();
             case SUBMITTED -> {
-                if (user.hasPermission("uknet.plots.review")) {
+                if (user.hasPermission("uknet.plots.review") &&
+                        !plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plotID + " AND uuid='" + user.player.getUniqueId() + "';")) {
                     yield PLOT_INFO_TYPE.SUBMITTED_REVIEWER;
                 } else {
                     yield claimedType();
                 }
             }
             case REVIEWING -> {
-                if (user.hasPermission("uknet.plots.review")) {
+                if (user.hasPermission("uknet.plots.review") &&
+                        !plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plotID + " AND uuid='" + user.player.getUniqueId() + "';")) {
                     yield PLOT_INFO_TYPE.REVIEWING_REVIEWER;
                 } else {
                     yield claimedType();
