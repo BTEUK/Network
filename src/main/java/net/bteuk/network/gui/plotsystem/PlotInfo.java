@@ -457,19 +457,21 @@ public class PlotInfo extends Gui {
         // If accepted, and the builder opens de menu, show the accuracy and quality ratings.
         if (plotInfoType == PLOT_INFO_TYPE.ACCEPTED_OWNER) {
             info.add(Utils.line("Accuracy: ")
-                    .append(Component.text(plotSQL.getInt("SELECT accuracy FROM accept_data WHERE id=" + plotID + ";"), NamedTextColor.GRAY))
-                    .append(Utils.line("/5")));
+                    .append(Utils.greyText(String.valueOf(plotSQL.getInt("SELECT accuracy FROM accept_data WHERE id=" + plotID + ";"))))
+                    .append(Utils.line("/"))
+                    .append(Utils.greyText("5")));
             info.add(Utils.line("Quality: ")
-                            .append(Component.text(plotSQL.getInt("SELECT quality FROM accept_data WHERE id=" + plotID + ";"), NamedTextColor.GRAY))
-                            .append(Utils.line("/5")));
+                    .append(Utils.greyText(String.valueOf(plotSQL.getInt("SELECT quality FROM accept_data WHERE id=" + plotID + ";"))))
+                    .append(Utils.line("/"))
+                    .append(Utils.greyText("5")));
         }
 
         // If accepted, add a disclaimer that the actual plot may have changed since it was accepted.
         if (status == PlotStatus.COMPLETED) {
             info.add(Component.text("Disclaimer: ", NamedTextColor.WHITE, TextDecoration.BOLD)
-                    .append(Utils.line("the content of the plot")));
-            info.add(Utils.line("may have changed since"));
-            info.add(Utils.line("it was completed!"));
+                    .append(Utils.line("the content of")));
+            info.add(Utils.line("the plot may have changed"));
+            info.add(Utils.line("since it was completed!"));
         }
         return info.toArray(Component[]::new);
     }

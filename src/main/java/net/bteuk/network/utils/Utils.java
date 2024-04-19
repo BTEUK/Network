@@ -56,6 +56,10 @@ public class Utils {
         return colouredText(NamedTextColor.WHITE, message);
     }
 
+    public static Component greyText(String message) {
+        return colouredText(NamedTextColor.GRAY, message);
+    }
+
     public static Component error(String message) {
         return Component.text(message, NamedTextColor.RED).decoration(TextDecoration.ITALIC, false);
     }
@@ -113,7 +117,9 @@ public class Utils {
     }
 
     private static Component colouredText(NamedTextColor colour, String message) {
-        return Component.text(message, colour).decoration(TextDecoration.ITALIC, false);
+        return Component.text(message, colour)
+                .decoration(TextDecoration.ITALIC, false)
+                .decoration(TextDecoration.BOLD, false);
     }
 
     /**
