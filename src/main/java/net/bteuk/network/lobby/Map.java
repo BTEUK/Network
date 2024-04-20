@@ -17,6 +17,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +34,10 @@ import static net.bteuk.network.utils.NetworkConfig.CONFIG;
  * Locations will be sorted by distance to the player.
  */
 public class Map extends AbstractReloadableComponent {
+
+    private static final String AQUA = "&b&l";
+
+    private static final String GOLD = "&6&l";
 
     private final Network instance;
 
@@ -246,7 +251,7 @@ public class Map extends AbstractReloadableComponent {
 
     private void loadLocationMarker(String name, int coordinate_id) {
 
-        Hologram hologram = createMarker(name, coordinate_id);
+        Hologram hologram = createMarker(name, coordinate_id, false);
 
         if (hologram == null) {
             LOGGER.warning(String.format("Hologram %s was not created due to an error, a hologram with this name probably already exists.", name));
@@ -268,7 +273,7 @@ public class Map extends AbstractReloadableComponent {
             return;
         }
 
-        Hologram hologram = createMarker(subcategory, coordinate_id);
+        Hologram hologram = createMarker(subcategory, coordinate_id, true);
 
         if (hologram == null) {
             LOGGER.warning(String.format("Hologram %s was not created due to an error, a hologram with this name probably already exists.", subcategory));
@@ -280,7 +285,7 @@ public class Map extends AbstractReloadableComponent {
         holograms.put(hologram, clickAction);
     }
 
-    private Hologram createMarker(String name, int coordinate_id) {
+    private Hologram createMarker(String name, int coordinate_id, boolean subcategory) {
         // Get location.
         Location l = instance.getGlobalSQL().getLocation(coordinate_id);
 
@@ -289,7 +294,19 @@ public class Map extends AbstractReloadableComponent {
             LOGGER.warning(String.format("Unable to create hologram %s, world can not be found.", name));
             return null;
         }
-        return Holograms.createHologram(name, l, Arrays.asList("&b&l" + name, "&b&l↓"));
+        return Holograms.createHologram(name, l, appendColour(Arrays.asList(name, "↓"), subcategory));
+    }
+
+    private static List<String> appendColour(List<String> lines, boolean subcategory) {
+        List<String> newList = new ArrayList<>();
+        lines.forEach(line -> {
+            if (subcategory) {
+                newList.add(GOLD + line);
+            } else {
+                newList.add(AQUA + line);
+            }
+        });
+        return newList;
     }
 
     private void teleportToLocation(NetworkUser u, String location) {
