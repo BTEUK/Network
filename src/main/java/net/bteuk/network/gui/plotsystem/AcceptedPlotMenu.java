@@ -134,6 +134,9 @@ public class AcceptedPlotMenu extends Gui {
                             Utils.line("Click to open the menu of this plot.")),
                     u -> {
                         //Switch to plot info.
+                        if (plotInfo != null) {
+                            plotInfo.deleteThis();
+                        }
                         plotInfo = new PlotInfo(u, plotID);
                         plotInfo.setAcceptedPlotMenu(this);
                         plotInfo.open(u);

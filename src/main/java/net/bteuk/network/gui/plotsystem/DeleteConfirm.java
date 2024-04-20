@@ -48,6 +48,8 @@ public class DeleteConfirm extends Gui {
                     if (regionType == RegionType.PLOT) {
 
                         u.mainGui = new PlotMenu(u);
+                        u.player.closeInventory();
+                        u.sendMessage(Utils.success("Deleting plot %s...", String.valueOf(id)));
 
                         //Add server event to delete plot or zone.
                         EventManager.createEvent(u.player.getUniqueId().toString(), "plotsystem", plotSQL.getString("SELECT server FROM location_data WHERE name='" +
@@ -56,6 +58,8 @@ public class DeleteConfirm extends Gui {
                     } else if (regionType == RegionType.ZONE) {
 
                         u.mainGui = new ZoneMenu(u);
+                        u.player.closeInventory();
+                        u.sendMessage(Utils.success("Deleting zone %s...", String.valueOf(id)));
 
                         //Add server event to delete plot or zone.
                         EventManager.createEvent(u.player.getUniqueId().toString(), "plotsystem", plotSQL.getString("SELECT server FROM location_data WHERE name='" +

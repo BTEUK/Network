@@ -325,7 +325,7 @@ public class PlotInfo extends Gui {
 
                     });
             // If the plot is accepted and has feedback show for the owner (Slot 22)
-        } else if (plotInfoType == PLOT_INFO_TYPE.ACCEPTED_OWNER && plotSQL.hasRow("SELECT id FROM accept_data WHERE id=" + plotID + ";")) {
+        } else if (plotInfoType == PLOT_INFO_TYPE.ACCEPTED_OWNER && plotSQL.hasRow("SELECT id FROM accept_data WHERE id=" + plotID + " AND book_id <> 0;")) {
             setItem(getFeedbackSlot(plotInfoType), Utils.createItem(Material.WRITABLE_BOOK, 1,
                             Utils.title("Plot Feedback"),
                             Utils.line("Click to show feedback for this plot.")),
