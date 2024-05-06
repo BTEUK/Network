@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Objects;
 
 /**
@@ -50,10 +51,10 @@ public class FilterMenu extends Gui {
 
         // Get a list of all users that have completed plots.
         HashMap<String, Integer> map = plotSQL.getStringIntMap("SELECT uuid,COUNT(id) FROM accept_data GROUP BY uuid ORDER BY COUNT(id) DESC;");
-        HashMap<String, Integer> newMap = new HashMap<>();
+        HashMap<String, Integer> newMap = new LinkedHashMap<>();
 
         // The first item is for all plots.
-        newMap.put("", plotSQL.getInt("SELECT COUNT(id) FROM accept_data"));
+        newMap.put("", plotSQL.getInt("SELECT COUNT(id) FROM accept_data;"));
         // Get the number for the current user and set it as the second item.
         Integer userPlots = map.get(user.player.getUniqueId().toString());
         newMap.put(user.player.getUniqueId().toString(), Objects.requireNonNullElse(userPlots, 0));

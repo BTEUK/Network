@@ -1,6 +1,5 @@
 package net.bteuk.network.sql;
 
-import it.unimi.dsi.fastutil.Hash;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 import java.sql.Connection;
@@ -9,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import static net.bteuk.network.utils.Constants.LOGGER;
 
@@ -288,7 +288,7 @@ public abstract class AbstractSQL {
 
     public HashMap<String, Integer> getStringIntMap(String sql) {
 
-        HashMap<String, Integer> map = new HashMap<>();
+        HashMap<String, Integer> map = new LinkedHashMap<>();
 
         try (
                 Connection conn = conn();

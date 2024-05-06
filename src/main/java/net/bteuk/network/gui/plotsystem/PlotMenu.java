@@ -71,25 +71,22 @@ public class PlotMenu extends Gui {
 
         }
 
-        //Accepted plots menu, if you have any.
-        if (plotSQL.hasRow("SELECT uuid FROM accept_data WHERE uuid='" + user.player.getUniqueId() + "';")) {
+        //Accepted plots menu.
+        setItem(40, Utils.createItem(Material.CLOCK, 1,
+                        Utils.title("Accepted Plots"),
+                        Utils.line("Click to view your accepted plots.")),
 
-            setItem(40, Utils.createItem(Material.CLOCK, 1,
-                            Utils.title("Accepted Plots"),
-                            Utils.line("Click to view your accepted plots.")),
+                u -> {
 
-                    u -> {
+                    //Delete this gui.
+                    this.delete();
+                    u.mainGui = null;
 
-                        //Delete this gui.
-                        this.delete();
-                        u.mainGui = null;
+                    //Switch to plot info.
+                    u.mainGui = new AcceptedPlotMenu(u);
+                    u.mainGui.open(u);
 
-                        //Switch to plot info.
-                        u.mainGui = new AcceptedPlotMenu(u);
-                        u.mainGui.open(u);
-
-                    });
-        }
+                });
 
         //Return
         setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
