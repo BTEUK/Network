@@ -98,10 +98,10 @@ tutorials:
 #Enable if you have a MapHub progress map
 ProgressMap:
   enabled: false
-  MapHubAPIKey:
-  ProgressMapID:
+  MapHubAPIKey: insert_api_key_here
+  ProgressMapID: insert_map_id_here
   #A web link to the progress map
-  Link:
+  Link: insert__to_maplink_here
 
 #Homes
 homes:
