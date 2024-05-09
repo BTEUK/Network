@@ -1,5 +1,5 @@
 # Config version, do not update this manually as it could break the config.
-version: 1.5.0
+version: 1.6.0
 
 #MySQL is mandatory for this plugin.
 #Login information
@@ -110,25 +110,13 @@ homes:
 #Chat Settings
 chat:
   #Global allows for cross-server implementation of chat.
-  #This is required to enable discord compatibility.
   #Requires the proxy-plugin which is built for Velocity.
   global_chat:
     enabled: true
     socket:
       IP: localhost
       port: 30589
-    discord:
-      chat:
-        enabled: true
-      linking:
-        enabled: true
-        role_id:
-          reviewer: 815686457838272512
-          architect: 1050426152700878871
-          builder: 696773933256671373
-          jrbuilder: 837045714562973754
-          apprentice: 728017845652553799
-          applicant: 955520858577850458
+
     #Custom tab menu
     tab:
       enabled: true

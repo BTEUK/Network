@@ -35,8 +35,11 @@ public class NetworkUser {
     //Staff gui.
     public Gui staffGui;
 
-    //Staff chat
-    public boolean staffChat;
+    // The current active chat channel.
+    // The default is global.
+    @Getter
+    @Setter
+    private String chatChannel = "global";
 
     //Region information.
     public boolean inRegion;
@@ -126,7 +129,8 @@ public class NetworkUser {
             }
         }
 
-        //Set staff chat value, if user is no longer staff, auto-disable.
+        // Get the previous chat channel the player was in.
+        // If the channel no longer exists, set it to default.
         if (instance.getGlobalSQL().hasRow("SELECT uuid FROM player_data WHERE uuid='" + player.getUniqueId() + "' AND staff_chat=1;")) {
             if (player.hasPermission("uknet.staff")) {
                 staffChat = true;

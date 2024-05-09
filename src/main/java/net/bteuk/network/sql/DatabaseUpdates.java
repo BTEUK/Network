@@ -15,7 +15,7 @@ public class DatabaseUpdates {
             version = Network.getInstance().getGlobalSQL().getString("SELECT data_value FROM unique_data WHERE data_key='version';");
         } else {
             //Insert the current database version as version.
-            Network.getInstance().getGlobalSQL().update("INSERT INTO unique_data(data_key, data_value) VALUES('version','1.5.0')");
+            Network.getInstance().getGlobalSQL().update("INSERT INTO unique_data(data_key, data_value) VALUES('version','1.6.0')");
         }
 
         //Check for specific table columns that could be missing,
@@ -51,11 +51,21 @@ public class DatabaseUpdates {
         if (oldVersionInt <= 5) {
             update5_6();
         }
+
+        // 1.5.0 -> 1.6.0
+        if (oldVersionInt <= 6) {
+            update6_7();
+        }
     }
 
     private int getVersionInt(String version) {
 
         switch(version) {
+
+            // 1.6.0 = 7
+            case "1.6.0" -> {
+                return 7;
+            }
 
             // 1.5.0 = 6
             case "1.5.0" -> {
@@ -88,6 +98,12 @@ public class DatabaseUpdates {
             }
 
         }
+
+    }
+
+    private void update6_7() {
+
+        LOGGER.info("Updating database from 1.5.0 to 1.6.0");
 
     }
 

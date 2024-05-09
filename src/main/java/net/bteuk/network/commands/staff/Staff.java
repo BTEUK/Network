@@ -1,11 +1,11 @@
 package net.bteuk.network.commands.staff;
 
+import net.bteuk.network.CustomChat;
 import net.bteuk.network.Network;
 import net.bteuk.network.gui.staff.StaffGui;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -13,7 +13,8 @@ import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import static net.bteuk.network.utils.Constants.*;
+import static net.bteuk.network.utils.Constants.LOGGER;
+import static net.bteuk.network.utils.Constants.STAFF_CHAT;
 
 public class Staff implements CommandExecutor {
 
@@ -60,21 +61,20 @@ public class Staff implements CommandExecutor {
         //If first arg is chat, switch the player to and from staff chat if enabled.
         if (args.length > 0 && STAFF_CHAT) {
             if (args[0].equalsIgnoreCase("chat")) {
-                if (u.staffChat) {
+                String channel = "global";
+                if (u.getChatChannel().equals("staff")) {
                     u.player.sendMessage(Utils.success("Disabled staff chat."));
                 } else {
+                    // Set the chat channel to staff.
+                    channel = "staff";
                     u.player.sendMessage(Utils.success("Enabled staff chat."));
                 }
-                //Invert enabled/disabled of staff chat.
-                u.staffChat = !u.staffChat;
-                Network.getInstance().getGlobalSQL().update("UPDATE player_data SET staff_chat=1-staff_chat WHERE uuid='"+ p.getUniqueId() + "';");
+                // Set channel.
+                u.setChatChannel(channel);
+                Network.getInstance().getGlobalSQL().update("UPDATE player_data SET chat_channel='" + channel + "' WHERE uuid='"+ p.getUniqueId() + "';");
             } else {
-                //Send message in staff chat.
-                Network.getInstance().chat.broadcastPlayerMessage(p, Component.text(String.join(" ", args), NamedTextColor.WHITE), "uknet:staff");
-
-                if (DISCORD_CHAT) {
-                    Network.getInstance().chat.broadcastPlayerMessage(p, Component.text(String.join(" ", args), NamedTextColor.WHITE), "uknet:discord_staff");
-                }
+                // Send message in staff chat.
+                Network.getInstance().chat.sendSocketMesage(CustomChat.getChatMessage(Component.text(String.join(" ", args)), u));
             }
             return true;
         }

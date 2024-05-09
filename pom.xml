@@ -169,11 +169,18 @@
             <artifactId>terraminusminus</artifactId>
             <version>master-e92dc85e64-1</version>
         </dependency>
+
         <dependency>
             <groupId>com.github.BTEUK</groupId>
             <artifactId>ProgressMapper</artifactId>
             <version>2f3fc96c3f</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.BTEUK</groupId>
+            <artifactId>NetworkLib</artifactId>
+            <version>37acfb1cd1</version>
+        </dependency>
+
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
