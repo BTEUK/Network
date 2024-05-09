@@ -101,7 +101,7 @@ ProgressMap:
   MapHubAPIKey: insert_api_key_here
   ProgressMapID: insert_map_id_here
   #A web link to the progress map
-  Link: insert__to_maplink_here
+  Link: insert_link_to_map_here
 
 #Homes
 homes:
