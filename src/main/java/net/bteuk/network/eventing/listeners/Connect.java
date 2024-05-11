@@ -91,7 +91,7 @@ public class Connect implements Listener {
 
                 //If discord chat is enabled send the join message to discord also.
                 if (DISCORD_CHAT) {
-                    instance.chat.broadcastDiscordAnnouncement(e.joinMessage(), "connect");
+                    instance.getChat().broadcastDiscordAnnouncement(e.joinMessage(), "connect");
                 }
             }
 
@@ -99,11 +99,12 @@ public class Connect implements Listener {
 
         }
 
-        //Add user to the list.
-        //This will also run the player-specific functions that need to be run for both network join and server switch.
-        NetworkUser u = new NetworkUser(e.getPlayer());
-        instance.addUser(u);
-
+        // Add user to the list.
+        // This will also run the player-specific functions that need to be run for both network join and server switch.
+        Bukkit.getScheduler().runTaskAsynchronously(Network.getInstance(), () -> {
+            NetworkUser u = new NetworkUser(e.getPlayer());
+            instance.addUser(u);
+        });
     }
 
     @EventHandler
@@ -172,7 +173,7 @@ public class Connect implements Listener {
 
                 //If discord chat is enabled send the join message to discord also.
                 if (DISCORD_CHAT) {
-                    instance.chat.broadcastDiscordAnnouncement(e.quitMessage(), "disconnect");
+                    instance.getChat().broadcastDiscordAnnouncement(e.quitMessage(), "disconnect");
                 }
             }
 
@@ -224,7 +225,7 @@ public class Connect implements Listener {
         Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
             if (CUSTOM_MESSAGES) {
 
-                instance.chat.broadcastMessage(join_messages[0], "uknet:connect");
+                instance.getChat().broadcastMessage(join_messages[0], "uknet:connect");
 
                 if (DISCORD_CHAT) {
                     Component message = Component.text(TextureUtils.getAvatarUrl(p.getPlayerProfile()) + " ").append(join_messages[0]);

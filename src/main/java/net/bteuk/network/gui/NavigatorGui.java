@@ -84,10 +84,10 @@ public class NavigatorGui extends Gui {
                                 .append(Component.text("/navigator", NamedTextColor.GRAY))),
                 u -> {
 
-                    if (u.navigator) {
+                    if (u.navigatorEnabled) {
 
                         //Set navigator to false and remove the navigator from the inventory.
-                        u.navigator = false;
+                        u.navigatorEnabled = false;
                         u.player.getInventory().setItem(8, null);
 
                         //Disable navigator in database.
@@ -98,7 +98,7 @@ public class NavigatorGui extends Gui {
                     } else {
 
                         //Set navigator to true.
-                        u.navigator = true;
+                        u.navigatorEnabled = true;
 
                         //Enable navigator in database.
                         Network.getInstance().getGlobalSQL().update("UPDATE player_data SET navigator=1 WHERE uuid='" + u.player.getUniqueId() + "';");

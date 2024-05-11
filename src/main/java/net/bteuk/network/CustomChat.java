@@ -131,8 +131,8 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
         }
     }
 
-    public void sendSocketMesage(AbstractTransferObject chatMessage) {
-        outputSocket.sendSocketMessage(chatMessage);
+    public AbstractTransferObject sendSocketMesage(AbstractTransferObject chatMessage) {
+        return outputSocket.sendSocketMessage(chatMessage);
     }
 
     public static ChatMessage getChatMessage(Component component, NetworkUser u) {
@@ -360,23 +360,6 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
         // Send message
         sendSocketMesage(chatMessage);
 
-    }
-
-    /**
-     * Broadcasts a message to chat and discord (if enabled).
-     *
-     * @param message the message to broadcast
-     */
-    public void broadcastToChatAndDiscord(Component message) {
-
-        //Send message
-        broadcastMessage(message, "uknet:globalchat");
-
-        if (DISCORD_CHAT) {
-
-            broadcastMessage(message, "uknet:discord_chat");
-
-        }
     }
 
     /**

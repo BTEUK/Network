@@ -35,7 +35,7 @@ import static net.bteuk.network.utils.Constants.MIN_Y;
 
 public class Utils {
 
-    private static final Pattern PATTTERN = Pattern.compile("%s");
+    private static final Pattern PATTERN = Pattern.compile("%s");
 
     public static String tabName(String displayName) {
         return tabName(displayName.split(" ")[0], displayName.split(" ")[1]);
@@ -95,7 +95,7 @@ public class Utils {
         // Find the number of vars needed.
         int lastIdx = 0;
         int count = 0;
-        Matcher matcher = PATTTERN.matcher(message);
+        Matcher matcher = PATTERN.matcher(message);
         while (matcher.find()) {
             int idx = matcher.start();
             if (idx != lastIdx) {

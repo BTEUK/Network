@@ -173,13 +173,13 @@ public class Timers {
                     if (TAB) {
                         //Update tab for all players to update display name.
                         //This is done with the tab chat channel.
-                        instance.chat.broadcastMessage(Component.text("update " + user.player.getUniqueId()), "uknet:tab");
+                        instance.getChat().broadcastMessage(Component.text("update " + user.player.getUniqueId()), "uknet:tab");
                     }
 
                 }
 
                 //If navigator is enabled check if they have it in slot 9.
-                if (user.navigator) {
+                if (user.navigatorEnabled) {
                     slot9 = user.player.getInventory().getItem(8);
 
                     if (slot9 == null) {
@@ -215,7 +215,7 @@ public class Timers {
                     Statistics.save(user, Time.getDate(time), time);
 
                     //Send message to chat and discord.
-                    Network.getInstance().chat.broadcastAFK(user.player, true);
+                    Network.getInstance().getChat().broadcastAFK(user.player, true);
 
                 }
             }
@@ -310,9 +310,9 @@ public class Timers {
         for (Map.Entry<String, Long> entry : Network.getInstance().getTimers().getRoles().entrySet()) {
 
             if (role.equals(entry.getKey())) {
-                instance.chat.broadcastMessage(Component.text("addrole " + discord_id + " " + entry.getValue()), "uknet:discord_linking");
+                instance.getChat().broadcastMessage(Component.text("addrole " + discord_id + " " + entry.getValue()), "uknet:discord_linking");
             } else {
-                instance.chat.broadcastMessage(Component.text("removerole " + discord_id + " " + entry.getValue()), "uknet:discord_linking");
+                instance.getChat().broadcastMessage(Component.text("removerole " + discord_id + " " + entry.getValue()), "uknet:discord_linking");
             }
         }
     }

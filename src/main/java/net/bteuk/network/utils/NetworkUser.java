@@ -6,6 +6,9 @@ import net.bteuk.network.Network;
 import net.bteuk.network.building_companion.BuildingCompanion;
 import net.bteuk.network.commands.Nightvision;
 import net.bteuk.network.gui.Gui;
+import net.bteuk.network.lib.dto.AbstractTransferObject;
+import net.bteuk.network.lib.dto.UserConnectReply;
+import net.bteuk.network.lib.dto.UserConnectRequest;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.regions.Region;
 import net.kyori.adventure.text.Component;
@@ -14,7 +17,14 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import static net.bteuk.network.utils.Constants.*;
+import java.util.HashSet;
+import java.util.Set;
+
+import static net.bteuk.network.utils.Constants.EARTH_WORLD;
+import static net.bteuk.network.utils.Constants.REGIONS_ENABLED;
+import static net.bteuk.network.utils.Constants.SERVER_NAME;
+import static net.bteuk.network.utils.Constants.SERVER_TYPE;
+import static net.bteuk.network.utils.Constants.TAB;
 import static net.bteuk.network.utils.enums.ServerType.EARTH;
 import static net.bteuk.network.utils.enums.ServerType.PLOT;
 
@@ -48,7 +58,13 @@ public class NetworkUser {
     public int dz;
 
     //Navigator in hotbar.
-    public boolean navigator;
+    public boolean navigatorEnabled;
+
+    @Getter
+    private boolean teleportEnabled;
+
+    @Getter
+    private boolean nightvisionEnabled;
 
     //If the player is switching server.
     public boolean switching;
@@ -87,20 +103,34 @@ public class NetworkUser {
     @Setter
     private boolean hasMapItem;
 
+    @Getter
+    @Setter
+    private Role role;
+
     public NetworkUser(Player player) {
 
         this.instance = Network.getInstance();
 
         this.player = player;
 
+        // Fetch the user info from the proxy.
+        UserConnectRequest request = new UserConnectRequest(player.getUniqueId().toString(), player.getName(),
+                TextureUtils.getTexture(player.getPlayerProfile()), getChatChannels());
+        AbstractTransferObject reply = Network.getInstance().getChat().sendSocketMesage(request);
+
+        if (reply instanceof UserConnectReply userReply) {
+            navigatorEnabled = userReply.isNavigatorEnabled();
+            teleportEnabled = userReply.isTeleportEnabled();
+            nightvisionEnabled = userReply.isNightvisionEnabled();
+            chatChannel = userReply.getChatChannel();
+            tips_enabled = userReply.isTipsEnabled();
+        }
+
         switching = false;
         inPortal = false;
         wasInPortal = false;
         afk = false;
         last_movement = Time.currentTime();
-
-        //Set tips based on database value.
-        tips_enabled = instance.getGlobalSQL().hasRow("SELECT tips_enabled FROM player_data WHERE uuid='" + player.getUniqueId() + "' AND tips_enabled=1;");
 
         //Update builder role in database.
         instance.getGlobalSQL().update("UPDATE player_data SET builder_role='" + Roles.builderRole(player) + "' WHERE uuid='" + player.getUniqueId() + "';");
@@ -115,10 +145,8 @@ public class NetworkUser {
             discord_id = instance.getGlobalSQL().getLong("SELECT discord_id FROM discord WHERE uuid='" + player.getUniqueId() + "';");
         }
 
-        //Set navigator enabled/disabled.
-        navigator = instance.getGlobalSQL().hasRow("SELECT navigator FROM player_data WHERE uuid='" + player.getUniqueId() + "' AND navigator=1;");
         //If navigator is disabled, remove the navigator if in the inventory.
-        if (!navigator) {
+        if (!navigatorEnabled) {
 
             ItemStack slot8 = player.getInventory().getItem(8);
 
@@ -127,20 +155,6 @@ public class NetworkUser {
                     player.getInventory().setItem(8, null);
                 }
             }
-        }
-
-        // Get the previous chat channel the player was in.
-        // If the channel no longer exists, set it to default.
-        if (instance.getGlobalSQL().hasRow("SELECT uuid FROM player_data WHERE uuid='" + player.getUniqueId() + "' AND staff_chat=1;")) {
-            if (player.hasPermission("uknet.staff")) {
-                staffChat = true;
-            } else {
-                staffChat = false;
-                //And remove staff from database.
-                instance.getGlobalSQL().update("UPDATE player_data SET staff_chat=0 WHERE uuid='" + player.getUniqueId() + "';");
-            }
-        } else {
-            staffChat = false;
         }
 
         //Check if the player is in a region.
@@ -193,7 +207,7 @@ public class NetworkUser {
 
         if (TAB) {
             //Add the player to the fake players list for other servers.
-            instance.chat.broadcastMessage(Component.text("add " + player.getUniqueId()), "uknet:tab");
+            instance.getChat().broadcastMessage(Component.text("add " + player.getUniqueId()), "uknet:tab");
 
             //Remove the player from the fake players list, if they are currently in it.
             instance.tab.removeFakePlayer(player.getUniqueId().toString());
@@ -311,5 +325,17 @@ public class NetworkUser {
                 player.getLocation().getYaw(),
                 player.getLocation().getPitch()
         );
+    }
+
+    private Set<String> getChatChannels() {
+        Set<String> channels = new HashSet<>();
+        channels.add("global");
+        if (hasPermission("uknet.staff")) {
+            channels.add("staff");
+        }
+        if (hasPermission("group.reviewer")) {
+            channels.add("reviewer");
+        }
+        return channels;
     }
 }

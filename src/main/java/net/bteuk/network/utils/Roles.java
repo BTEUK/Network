@@ -5,7 +5,14 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+
+import java.io.File;
+import java.util.Set;
+import java.util.TreeSet;
 
 import static net.bteuk.network.utils.Constants.DISCORD_CHAT;
 import static net.bteuk.network.utils.Constants.DISCORD_LINKING;
@@ -15,6 +22,8 @@ public final class Roles {
 
     private static final Component PROMOTION_TEMPLATE = Component.text(" has been promoted to ");
     private static final String PROMOTION_SELF = "You have been promoted to ";
+
+    private static Set<Role> ROLES;
 
     /*
 
@@ -48,35 +57,49 @@ public final class Roles {
         }
     }
 
-    public static String getPrimaryRole(Player p) {
-        if (p.hasPermission("group.administrator")) {
-            return "Admin";
-        } else if (p.hasPermission("group.moderator")) {
-            return "Mod";
-        } else if (p.hasPermission("group.support")) {
-            return "Support";
-        } else if (p.hasPermission("group.developer")) {
-            return "Dev";
-        } else if (p.hasPermission("group.eventsteam")) {
-            return "Events";
-        } else if (p.hasPermission("group.publicrelations")) {
-            return "PR";
-        } else if (p.hasPermission("group.reviewer")) {
-            return "Reviewer";
-        } else if (p.hasPermission("group.architect")) {
-            return "Architect";
-        } else if (p.hasPermission("group.builder")) {
-            return "Builder";
-        } else if (p.hasPermission("group.jrbuilder")) {
-            return "Jr.Builder";
-        } else if (p.hasPermission("group.apprentice")) {
-            return "Apprentice";
-        } else if (p.hasPermission("group.applicant")) {
-            return "Applicant";
-        } else {
-            return "Default";
+    public static Role getPrimaryRole(Player p) {
+        // Get the configuration if not yet fetches.
+        if (ROLES == null) {
+            loadRoles();
         }
+        for (Role role : ROLES) {
+            if (p.hasPermission(String.format("group.%s", role.getId()))) {
+                return role;
+            }
+        }
+        return null;
     }
+
+    private static void loadRoles() {
+        // Create roles.yml if not exists.
+        // The data folder should already exist since the plugin will always create config.yml first.
+        File rolesFile = new File(Network.getInstance().getDataFolder(), "roles.yml");
+        if (!rolesFile.exists()) {
+            Network.getInstance().saveResource("roles.yml", false);
+        }
+
+        FileConfiguration rolesConfig = YamlConfiguration.loadConfiguration(rolesFile);
+
+        // Gets all the roles from the config.
+        ConfigurationSection roles = rolesConfig.getConfigurationSection("roles");
+
+        if (roles == null) {
+            return;
+        }
+
+        Set<String> keys = roles.getKeys(false);
+
+        ROLES = new TreeSet<>();
+        // Add the roles.
+        keys.forEach(key -> ROLES.add(new Role(
+                key,
+                roles.getString(key + "name", null),
+                roles.getString(key + "prefix", null),
+                roles.getString(key + "colour", null),
+                roles.getInt(key + "weight", 0)))
+        );
+    }
+
 
     public static char tabSorting(String role) {
         return switch (role) {
@@ -131,10 +154,10 @@ public final class Roles {
                     .append(PROMOTION_TEMPLATE)
                     .append(LegacyComponentSerializer.legacyAmpersand().deserialize(colouredRole));
 
-            Network.getInstance().chat.broadcastMessage(promotation_message, "uknet:globalchat");
+            Network.getInstance().getChat().broadcastMessage(promotation_message, "uknet:globalchat");
             //Add discord formatting to make the message bold.
             if (DISCORD_CHAT) {
-                Network.getInstance().chat.broadcastDiscordAnnouncement(promotation_message, "promotion");
+                Network.getInstance().getChat().broadcastDiscordAnnouncement(promotation_message, "promotion");
             }
         }
 

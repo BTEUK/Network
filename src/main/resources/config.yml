@@ -8,39 +8,43 @@ port: 3306
 username: root
 password: password
 
-#Promotion track for roles.
-#Assign custom names and colours.
-#Colours must be of &#000000 format, where the #000000 is the hex colour.
-#Prefix is for tab and chat before the player name.
+# Promotion track for roles.
 roles:
   default:
     name: 'Guest'
     prefix: '[Guest]'
     colour: '&#fffdf9'
+    weight: 1
   applicant:
     name: 'Applicant'
     prefix: '[Applicant]'
     colour: '&#ffe599'
+    weight: 2
   apprentice:
     name: 'Apprentice'
     prefix: '[Apprentice]'
     colour: '&#efb70c'
+    weight: 3
   jrbuilder:
     name: 'Jr.Builder'
     prefix: '[Jr.Builder]'
     colour: '&#d78426'
+    weight: 4
   builder:
     name: 'Builder'
     prefix: '[Builder]'
     colour: '&#f26868'
+    weight: 5
   architect:
     name: 'Architect'
     prefix: '[Architect]'
     colour: '&#ec2a2a'
+    weight: 6
   reviewer:
     name: 'Reviewer'
     prefix: '[Reviewer]'
     colour: '&#8be565'
+    weight: 7
 
 #Database names (doesn't require adjusting)
 database:

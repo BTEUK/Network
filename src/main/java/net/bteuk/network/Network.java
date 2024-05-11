@@ -120,7 +120,8 @@ public final class Network extends JavaPlugin {
     public RegionSQL regionSQL;
 
     //Chat
-    public CustomChat chat;
+    @Getter
+    private CustomChat chat;
 
     //Timers
     @Getter

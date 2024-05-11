@@ -371,7 +371,7 @@ public record Region(String regionName, int x, int z) {
                     .append(Component.text(regionName, NamedTextColor.DARK_AQUA))
                     .append(Utils.success(", awaiting staff review.")));
 
-            Network.getInstance().chat.broadcastMessage(
+            Network.getInstance().getChat().broadcastMessage(
                     Utils.success("A region join request has been submitted by ")
                             .append(Component.text(u.player.getName(), NamedTextColor.DARK_AQUA))
                             .append(Utils.success(" for region "))
