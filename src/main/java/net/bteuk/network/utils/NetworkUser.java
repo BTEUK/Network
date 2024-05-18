@@ -6,9 +6,7 @@ import net.bteuk.network.Network;
 import net.bteuk.network.building_companion.BuildingCompanion;
 import net.bteuk.network.commands.Nightvision;
 import net.bteuk.network.gui.Gui;
-import net.bteuk.network.lib.dto.AbstractTransferObject;
 import net.bteuk.network.lib.dto.UserConnectReply;
-import net.bteuk.network.lib.dto.UserConnectRequest;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.regions.Region;
 import net.kyori.adventure.text.Component;
@@ -21,9 +19,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static net.bteuk.network.utils.Constants.EARTH_WORLD;
+import static net.bteuk.network.utils.Constants.GLOBAL_CHANNEL;
 import static net.bteuk.network.utils.Constants.REGIONS_ENABLED;
+import static net.bteuk.network.utils.Constants.REVIEWER_CHANNEL;
 import static net.bteuk.network.utils.Constants.SERVER_NAME;
 import static net.bteuk.network.utils.Constants.SERVER_TYPE;
+import static net.bteuk.network.utils.Constants.STAFF_CHANNEL;
 import static net.bteuk.network.utils.Constants.TAB;
 import static net.bteuk.network.utils.enums.ServerType.EARTH;
 import static net.bteuk.network.utils.enums.ServerType.PLOT;
@@ -58,7 +59,8 @@ public class NetworkUser {
     public int dz;
 
     //Navigator in hotbar.
-    public boolean navigatorEnabled;
+    @Getter
+    private boolean navigatorEnabled;
 
     @Getter
     private boolean teleportEnabled;
@@ -107,24 +109,17 @@ public class NetworkUser {
     @Setter
     private Role role;
 
-    public NetworkUser(Player player) {
+    public NetworkUser(Player player, UserConnectReply reply) {
 
         this.instance = Network.getInstance();
 
         this.player = player;
 
-        // Fetch the user info from the proxy.
-        UserConnectRequest request = new UserConnectRequest(player.getUniqueId().toString(), player.getName(),
-                TextureUtils.getTexture(player.getPlayerProfile()), getChatChannels());
-        AbstractTransferObject reply = Network.getInstance().getChat().sendSocketMesage(request);
-
-        if (reply instanceof UserConnectReply userReply) {
-            navigatorEnabled = userReply.isNavigatorEnabled();
-            teleportEnabled = userReply.isTeleportEnabled();
-            nightvisionEnabled = userReply.isNightvisionEnabled();
-            chatChannel = userReply.getChatChannel();
-            tips_enabled = userReply.isTipsEnabled();
-        }
+        navigatorEnabled = reply.isNavigatorEnabled();
+        teleportEnabled = reply.isTeleportEnabled();
+        nightvisionEnabled = reply.isNightvisionEnabled();
+        chatChannel = reply.getChatChannel();
+        tips_enabled = reply.isTipsEnabled();
 
         switching = false;
         inPortal = false;
@@ -291,6 +286,28 @@ public class NetworkUser {
      */
     public static String getName(String uuid) {
         return Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
+    }
+
+    /**
+     * Get the chat channels to which this user has access.
+     *
+     * @param player the players to get the chat channels for
+     * @return {@link Set} set of {@link String} channels
+     */
+    public static Set<String> getChannels(Player player) {
+
+        Set<String> channels = new HashSet<>();
+        channels.add(GLOBAL_CHANNEL);
+
+        if (player.hasPermission("uknet.staff")) {
+            channels.add(STAFF_CHANNEL);
+        }
+
+        if (player.hasPermission("group.reviewer")) {
+            channels.add(REVIEWER_CHANNEL);
+        }
+
+        return channels;
     }
 
     /**

@@ -127,14 +127,6 @@ chat:
   #Whether to announce role promotions in chat.
   announce_promotions: true
 
-  #Network messages
-  #%player% is a placeholder for the player name.
-  custom_messages:
-    enabled: true
-    join: '&e%player% has joined UKnet'
-    firstjoin: '&eWelcome to UKnet, %player%'
-    leave: '&e%player% has left UKnet'
-
   #Tips in chat
   #Whether to enable tips in chat and at what frequency they should display.
   #Adding messages can be done in files in the 'tips' folder. One file for each builder role you want to display it to.
