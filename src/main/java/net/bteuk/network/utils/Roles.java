@@ -25,6 +25,13 @@ public final class Roles {
 
     private static Set<Role> ROLES;
 
+    public static Set<Role> getRoles() {
+        if (ROLES == null) {
+            loadRoles();
+        }
+        return ROLES;
+    }
+
     /*
 
         Get the builder role of the player.
@@ -38,7 +45,6 @@ public final class Roles {
             Architect
 
      */
-
     public static String builderRole(Player p) {
         if (p.hasPermission("group.reviewer")) {
             return "reviewer";
@@ -100,25 +106,6 @@ public final class Roles {
         );
     }
 
-
-    public static char tabSorting(String role) {
-        return switch (role) {
-            case "Admin" -> 'a';
-            case "Mod" -> 'b';
-            case "Support" -> 'c';
-            case "Dev" -> 'd';
-            case "Events" -> 'e';
-            case "PR" -> 'f';
-            case "Reviewer" -> 'g';
-            case "Architect" -> 'h';
-            case "Builder" -> 'i';
-            case "Jr.Builder" -> 'j';
-            case "Apprentice" -> 'k';
-            case "Applicant" -> 'l';
-            default -> 'm';
-        };
-    }
-
     public static void promoteBuilder(String uuid, String pRole, String nRole) {
 
         //Get console sender.
@@ -169,46 +156,6 @@ public final class Roles {
                     PROMOTION_SELF + colouredRole
                     + "');");
 
-        }
-    }
-
-    /**
-     * Maps a technical role name to a display role name.
-     *
-     * @param role the role to map
-     * @return the display name of that role
-     */
-    public static String roleMapping(String role) {
-
-        switch (role) {
-
-            case "applicant" -> {
-                return ("Applicant");
-            }
-
-            case "apprentice" -> {
-                return ("Apprentice");
-            }
-
-            case "jrbuilder" -> {
-                return ("Jr.Builder");
-            }
-
-            case "builder" -> {
-                return ("Builder");
-            }
-
-            case "architect" -> {
-                return ("Architect");
-            }
-
-            case "reviewer" -> {
-                return ("Reviewer");
-            }
-
-            default -> {
-                return ("Default");
-            }
         }
     }
 }

@@ -4,10 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.bteuk.network.exceptions.NotMutedException;
 import net.bteuk.network.lib.dto.AbstractTransferObject;
+import net.bteuk.network.lib.dto.AddTeamEvent;
 import net.bteuk.network.lib.dto.ChatMessage;
 import net.bteuk.network.lib.dto.DirectMessage;
 import net.bteuk.network.lib.dto.DiscordLinking;
 import net.bteuk.network.lib.dto.DiscordRole;
+import net.bteuk.network.lib.dto.TabEvent;
 import net.bteuk.network.lib.socket.OutputSocket;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.Roles;
@@ -18,7 +20,6 @@ import net.bteuk.network.utils.staff.Moderation;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -26,11 +27,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.messaging.PluginMessageListener;
-import org.checkerframework.checker.units.qual.C;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
@@ -38,12 +36,9 @@ import java.net.Socket;
 import java.util.Map;
 import java.util.UUID;
 
-import static net.bteuk.network.utils.Constants.DISCORD_CHAT;
-import static net.bteuk.network.utils.Constants.DISCORD_LINKING;
 import static net.bteuk.network.utils.Constants.GLOBAL_CHAT;
 import static net.bteuk.network.utils.Constants.LOGGER;
 import static net.bteuk.network.utils.Constants.STAFF_CHAT;
-import static net.bteuk.network.utils.Constants.TAB;
 import static net.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public class CustomChat extends Moderation implements Listener, PluginMessageListener {
@@ -170,6 +165,8 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
                 handleDirectMessage(directMessage);
             } else if (object instanceof DiscordLinking discordLinking) {
                 handleDiscordLinking(discordLinking);
+            } else if (object instanceof AddTeamEvent addTeamEvent) {
+                instance.getTab().handle(addTeamEvent);
             }
 
         } catch (IOException e) {

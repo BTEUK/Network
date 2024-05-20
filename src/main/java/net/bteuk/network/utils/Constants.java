@@ -65,13 +65,6 @@ public class Constants {
     public static final boolean ANNOUNCE_OVERALL_LEVELUPS;
     public static final boolean ANNOUNCE_SEASONAL_LEVELUPS;
 
-    // Chat channels.
-    public static final String GLOBAL_CHANNEL = "global";
-
-    public static final String STAFF_CHANNEL = "staff";
-
-    public static final String REVIEWER_CHANNEL = "reviewer";
-
     static {
 
         LOGGER = Network.getInstance().getLogger();

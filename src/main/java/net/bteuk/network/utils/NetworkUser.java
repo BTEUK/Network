@@ -18,13 +18,13 @@ import org.bukkit.inventory.ItemStack;
 import java.util.HashSet;
 import java.util.Set;
 
+import static net.bteuk.network.lib.enums.ChatChannels.GLOBAL;
+import static net.bteuk.network.lib.enums.ChatChannels.REVIEWER;
+import static net.bteuk.network.lib.enums.ChatChannels.STAFF;
 import static net.bteuk.network.utils.Constants.EARTH_WORLD;
-import static net.bteuk.network.utils.Constants.GLOBAL_CHANNEL;
 import static net.bteuk.network.utils.Constants.REGIONS_ENABLED;
-import static net.bteuk.network.utils.Constants.REVIEWER_CHANNEL;
 import static net.bteuk.network.utils.Constants.SERVER_NAME;
 import static net.bteuk.network.utils.Constants.SERVER_TYPE;
-import static net.bteuk.network.utils.Constants.STAFF_CHANNEL;
 import static net.bteuk.network.utils.Constants.TAB;
 import static net.bteuk.network.utils.enums.ServerType.EARTH;
 import static net.bteuk.network.utils.enums.ServerType.PLOT;
@@ -297,14 +297,14 @@ public class NetworkUser {
     public static Set<String> getChannels(Player player) {
 
         Set<String> channels = new HashSet<>();
-        channels.add(GLOBAL_CHANNEL);
+        channels.add(GLOBAL.getChannelName());
 
         if (player.hasPermission("uknet.staff")) {
-            channels.add(STAFF_CHANNEL);
+            channels.add(STAFF.getChannelName());
         }
 
         if (player.hasPermission("group.reviewer")) {
-            channels.add(REVIEWER_CHANNEL);
+            channels.add(REVIEWER.getChannelName());
         }
 
         return channels;

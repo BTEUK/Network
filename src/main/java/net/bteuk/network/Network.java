@@ -141,7 +141,8 @@ public final class Network extends JavaPlugin {
     public TeleportListener teleportListener;
 
     //Tab
-    public TabManager tab;
+    @Getter
+    private TabManager tab;
 
     //Kick Command
     @Getter

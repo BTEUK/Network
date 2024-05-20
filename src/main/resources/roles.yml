@@ -1,42 +1,42 @@
 # Assign custom names and colours.
-# Colours must be of &#000000 format, where the #000000 is the hex colour.
+# Colours must be in the hex format such as #123456.
 # Prefix is for tab and chat before the player name.
 # Weight is the priority when determining the primary role, the higher the number the higher the priority.
 roles:
   default:
     name: 'Guest'
     prefix: '[Guest]'
-    colour: '&#fffdf9'
+    colour: '#fffdf9'
     weight: 1
   applicant:
     name: 'Applicant'
     prefix: '[Applicant]'
-    colour: '&#ffe599'
+    colour: '#ffe599'
     weight: 2
   apprentice:
     name: 'Apprentice'
     prefix: '[Apprentice]'
-    colour: '&#efb70c'
+    colour: '#efb70c'
     weight: 3
   jrbuilder:
     name: 'Jr.Builder'
     prefix: '[Jr.Builder]'
-    colour: '&#d78426'
+    colour: '#d78426'
     weight: 4
   builder:
     name: 'Builder'
     prefix: '[Builder]'
-    colour: '&#f26868'
+    colour: '#f26868'
     weight: 5
   architect:
     name: 'Architect'
     prefix: '[Architect]'
-    colour: '&#ec2a2a'
+    colour: '#ec2a2a'
     weight: 6
   reviewer:
     name: 'Reviewer'
     prefix: '[Reviewer]'
-    colour: '&#8be565'
+    colour: '#8be565'
     weight: 7
   publicrelations:
     name: 'PR'
