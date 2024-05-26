@@ -3,7 +3,7 @@ package net.bteuk.network.lobby;
 import net.bteuk.network.Network;
 import net.bteuk.network.commands.AbstractCommand;
 import net.bteuk.network.commands.tabcompleters.LocationAndSubcategorySelector;
-import net.bteuk.network.utils.Utils;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -20,7 +20,7 @@ public class MapCommand extends AbstractCommand {
 
     private final Map map;
 
-    private static final Component INVALID_USAGE = Utils.error("/map [add/remove] [warp/subcategory]");
+    private static final Component INVALID_USAGE = ChatUtils.error("/map [add/remove] [warp/subcategory]");
 
     protected MapCommand(Network instance, Map map, String commandName) {
         super(instance, commandName);
@@ -32,7 +32,7 @@ public class MapCommand extends AbstractCommand {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
 
         if (!map.isEnabled())  {
-            sender.sendMessage(Utils.error("The map is not enabled."));
+            sender.sendMessage(ChatUtils.error("The map is not enabled."));
             return true;
         }
 

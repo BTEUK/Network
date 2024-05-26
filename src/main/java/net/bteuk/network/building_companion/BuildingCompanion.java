@@ -5,9 +5,9 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import net.bteuk.network.Network;
 import net.bteuk.network.exceptions.NoBuildPermissionException;
 import net.bteuk.network.exceptions.RegionNotFoundException;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.Blocks;
 import net.bteuk.network.utils.NetworkUser;
-import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.enums.ServerType;
 import net.bteuk.network.utils.regions.Region;
 import net.bteuk.network.utils.regions.RegionManager;
@@ -104,7 +104,7 @@ public class BuildingCompanion {
         UUID uuid = UUID.fromString(sUuid);
         SavedOutline outline = saved_outlines.get(uuid);
         if (outline == null) {
-            sendFeedback(Utils.error("The outlines are not longer available."));
+            sendFeedback(ChatUtils.error("The outlines are not longer available."));
             return false;
         } else {
             saved_outlines.remove(uuid);
@@ -131,10 +131,10 @@ public class BuildingCompanion {
         for (Set<double[]> corner : input_corners) {
             if (isNearCorner(input, getAverage(corner))) {
                 if (contains(corner, input)) {
-                    sendFeedback(Utils.success("This location has already been recorded."));
+                    sendFeedback(ChatUtils.success("This location has already been recorded."));
                 } else {
                     corner.add(input);
-                    sendFeedback(Utils.success("Updated existing corner with new location"));
+                    sendFeedback(ChatUtils.success("Updated existing corner with new location"));
                 }
                 done = true;
             }
@@ -145,16 +145,16 @@ public class BuildingCompanion {
                 Set<double[]> new_corner = new HashSet<>();
                 new_corner.add(input);
                 input_corners.add(new_corner);
-                sendFeedback(Utils.success("New corner recorded."));
+                sendFeedback(ChatUtils.success("New corner recorded."));
             } else {
-                sendFeedback(Utils.error("You have already recorded 4 corners, and it is not close enough to an existing one."));
+                sendFeedback(ChatUtils.error("You have already recorded 4 corners, and it is not close enough to an existing one."));
             }
         }
 
         // Notify the player if they have 4 corners selected.
         if (input_corners.size() == 4) {
             //addDrawOutlinesEvent();
-            sendFeedback(Utils.success("You have 4 corners selected, click here to draw the outlines.")
+            sendFeedback(ChatUtils.success("You have 4 corners selected, click here to draw the outlines.")
                     .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/buildingcompanion drawoutlines")));
         }
     }
@@ -189,16 +189,16 @@ public class BuildingCompanion {
             // Run a task later to cancel the task if it has not yet been completed.
             Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
                 if (asyncActive && Bukkit.getScheduler().isCurrentlyRunning(taskId)) {
-                    sendFeedback(Utils.error("Drawing outlines task timed out, the selection was too difficult to process."));
+                    sendFeedback(ChatUtils.error("Drawing outlines task timed out, the selection was too difficult to process."));
                     clearSelection();
                 }
             }, TIMEOUT);
         } else if (asyncActive) {
-            sendFeedback(Utils.error("The outlines are already being drawn."));
+            sendFeedback(ChatUtils.error("The outlines are already being drawn."));
         } else if (!world.equals(user.player.getWorld())) {
-            sendFeedback(Utils.error("You have switched worlds, unable to draw outlines."));
+            sendFeedback(ChatUtils.error("You have switched worlds, unable to draw outlines."));
         } else {
-            sendFeedback(Utils.error("You must select at least 4 corners to draw outlines."));
+            sendFeedback(ChatUtils.error("You must select at least 4 corners to draw outlines."));
         }
     }
 
@@ -222,7 +222,7 @@ public class BuildingCompanion {
                 // Draw the lines with fake blocks.
                 drawTempOutlinesTaskWithFeedback(finalOutput);
             } else {
-                sendFeedback(Utils.error("Unable to generate a rectangle using the given corners, clearing selection."));
+                sendFeedback(ChatUtils.error("Unable to generate a rectangle using the given corners, clearing selection."));
                 clearSelection();
             }
             asyncActive = false;
@@ -234,7 +234,7 @@ public class BuildingCompanion {
         Bukkit.getScheduler().runTask(Network.getInstance(), () -> {
             SavedOutline outline = new SavedOutline(UUID.randomUUID(), corners, world);
             if (drawOutlines(outline, Material.ORANGE_CONCRETE.createBlockData(), false)) {
-                sendFeedback(Utils.success("The outlines have been drawn."));
+                sendFeedback(ChatUtils.success("The outlines have been drawn."));
                 saved_outlines.put(outline.uuid(), outline);
                 sendFeedback(Component.text("Save outlines: ", NamedTextColor.YELLOW)
                         .append(Component.text("[Yes]", NamedTextColor.GREEN)
@@ -269,7 +269,7 @@ public class BuildingCompanion {
                     }
                 }
             } catch (Exception e) {
-                sendFeedback(Utils.error("All or part of your selection is not in a plot you can build in, cancelled drawing outlines."));
+                sendFeedback(ChatUtils.error("All or part of your selection is not in a plot you can build in, cancelled drawing outlines."));
                 return false;
             }
         } else if (REGIONS_ENABLED && SERVER_TYPE == ServerType.EARTH) {
@@ -277,12 +277,12 @@ public class BuildingCompanion {
             for (int[] point : outline.corners()) {
                 Region region = manager.getRegion(new Location(world, point[0], 1, point[1]), user.dx, user.dz);
                 if (!region.canBuild(user.player)) {
-                    sendFeedback(Utils.error("All or part of your selection is not in a region you can build in, cancelled drawing outlines."));
+                    sendFeedback(ChatUtils.error("All or part of your selection is not in a region you can build in, cancelled drawing outlines."));
                     return false;
                 }
             }
         } else if (SERVER_TYPE != ServerType.EARTH) {
-            sendFeedback(Utils.error("You are not able to generate outlines on this server."));
+            sendFeedback(ChatUtils.error("You are not able to generate outlines on this server."));
             return false;
         }
         try {
@@ -292,7 +292,7 @@ public class BuildingCompanion {
             Blocks.drawLine(user.player, world, outline.corners()[2], outline.corners()[0], block, permanent, true, wgRegion);
             return true;
         } catch (Exception e) {
-            sendFeedback(Utils.error(e.getMessage()));
+            sendFeedback(ChatUtils.error(e.getMessage()));
             return false;
         }
     }

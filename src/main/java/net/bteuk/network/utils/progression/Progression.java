@@ -2,8 +2,8 @@ package net.bteuk.network.utils.progression;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.lib.dto.ChatMessage;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
-import net.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -73,19 +73,19 @@ public class Progression {
 
         Level.setLevel(season, uuid, level);
 
-        Component playerMessage = Utils.success("You have reached level ")
+        Component playerMessage = ChatUtils.success("You have reached level ")
                 .append(Component.text(level, NamedTextColor.DARK_AQUA));
 
         Component globalMessage = Component.text(NetworkUser.getName(uuid), NamedTextColor.DARK_AQUA)
-                .append(Utils.success(" has reached level ")
+                .append(ChatUtils.success(" has reached level ")
                         .append(Component.text(level, NamedTextColor.DARK_AQUA)));
 
         if (!season.equals("default")) {
 
-            playerMessage = playerMessage.append(Utils.success(" in season ")
+            playerMessage = playerMessage.append(ChatUtils.success(" in season ")
                     .append(Component.text(season, NamedTextColor.DARK_AQUA)));
 
-            globalMessage = globalMessage.append(Utils.success(" in season ")
+            globalMessage = globalMessage.append(ChatUtils.success(" in season ")
                     .append(Component.text(season, NamedTextColor.DARK_AQUA)));
 
         }

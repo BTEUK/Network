@@ -1,28 +1,24 @@
 package net.bteuk.network.eventing.listeners;
 
 import lombok.Setter;
-import me.clip.placeholderapi.PlaceholderAPI;
 import net.bteuk.network.Network;
 import net.bteuk.network.building_companion.BuildingCompanion;
 import net.bteuk.network.gui.Gui;
-import net.bteuk.network.lib.dto.AbstractTransferObject;
+import net.bteuk.network.lib.dto.TabPlayer;
 import net.bteuk.network.lib.dto.UserConnectReply;
 import net.bteuk.network.lib.dto.UserConnectRequest;
 import net.bteuk.network.lib.dto.UserDisconnect;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.sql.RegionSQL;
 import net.bteuk.network.utils.NetworkUser;
+import net.bteuk.network.utils.Role;
 import net.bteuk.network.utils.Roles;
 import net.bteuk.network.utils.Statistics;
 import net.bteuk.network.utils.TextureUtils;
 import net.bteuk.network.utils.Time;
-import net.bteuk.network.utils.Utils;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -33,12 +29,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import java.util.Set;
 import java.util.UUID;
 
-import static net.bteuk.network.utils.Constants.CUSTOM_MESSAGES;
-import static net.bteuk.network.utils.Constants.DISCORD_CHAT;
 import static net.bteuk.network.utils.Constants.LOGGER;
 import static net.bteuk.network.utils.Constants.SERVER_NAME;
-import static net.bteuk.network.utils.Constants.TAB;
-import static net.bteuk.network.utils.NetworkConfig.CONFIG;
 
 //This class deals with players joining and leaving the network.
 public class Connect implements Listener {
@@ -72,30 +64,20 @@ public class Connect implements Listener {
         // Determine the chat channels to which this user has access.
         Set<String> channels = NetworkUser.getChannels(e.getPlayer());
 
-        // Fetch the user instance from the proxy.
-        UserConnectRequest userConnectRequest = new UserConnectRequest(SERVER_NAME, e.getPlayer().getUniqueId().toString(), e.getPlayer().getName(), TextureUtils.getTexture(e.getPlayer().getPlayerProfile()), channels);
+        // Get the TabPlayer instance for this player.
+        TabPlayer tabPlayer = new TabPlayer();
+        tabPlayer.setUuid(e.getPlayer().getUniqueId().toString());
+        tabPlayer.setName(e.getPlayer().getName());
+        Role primaryRole = Roles.getPrimaryRole(e.getPlayer());
 
-        // Run the call to the proxy async as to not freeze the server while waiting for a reply.
-        Bukkit.getScheduler().runTaskAsynchronously(Network.getInstance(), () -> {
+        if (primaryRole != null) {
+            tabPlayer.setPrimaryGroup(primaryRole.getId());
+        }
 
-            AbstractTransferObject reply = Network.getInstance().getChat().sendSocketMesage(userConnectRequest);
-
-            if (reply instanceof UserConnectReply userConnectReply) {
-                Bukkit.getScheduler().runTask(Network.getInstance(), () -> handleUserConnectReply(e.getPlayer(), userConnectReply));
-            } else {
-                // This should not be possible.
-                LOGGER.severe(String.format("Reply from user connect was of type %s, this should not be possible!", reply.getClass().getTypeName()));
-            }
-        });
-    }
-
-    private void handleUserConnectReply(Player player, UserConnectReply reply) {
-
-        // Create the user instance.
-        NetworkUser user = new NetworkUser(player, reply);
-
-        // Add the user instance to the list.
-        Network.getInstance().addUser(user);
+        // Send a user connect request to the proxy, this will handle the rest.
+        // When the proxy has received the request it'll send a response which will then create the user object on the server.
+        UserConnectRequest userConnectRequest = new UserConnectRequest(SERVER_NAME, e.getPlayer().getUniqueId().toString(), e.getPlayer().getName(), TextureUtils.getTexture(e.getPlayer().getPlayerProfile()), channels, tabPlayer);
+        Bukkit.getScheduler().runTaskAsynchronously(Network.getInstance(), () -> Network.getInstance().getChat().sendSocketMesage(userConnectRequest));
 
     }
 
@@ -113,7 +95,7 @@ public class Connect implements Listener {
         //If u is null, cancel.
         if (u == null) {
             LOGGER.severe("User " + e.getPlayer().getName() + " can not be found!");
-            e.getPlayer().sendMessage(Utils.error("User can not be found, please relog!"));
+            e.getPlayer().sendMessage(ChatUtils.error("User can not be found, please relog!"));
             return;
         }
 
@@ -156,6 +138,31 @@ public class Connect implements Listener {
         // Send a disconnect event to the proxy to handle potential messages.
         UserDisconnect userDisconnect = new UserDisconnect(u.player.getUniqueId().toString(), u.isNavigatorEnabled(), u.isTeleportEnabled(), u.isNightvisionEnabled(), u.getChatChannel(), u.isTips_enabled());
         Bukkit.getScheduler().runTaskAsynchronously(Network.getInstance(), () -> Network.getInstance().getChat().sendSocketMesage(userDisconnect));
+    }
+
+    /**
+     * When a user connects a request is sent to the proxy.
+     * If successful the server receives this reply object.
+     * Using the object a {@link NetworkUser} instance is created.
+     *
+     * @param reply the {@link UserConnectReply}
+     */
+    public static void handleUserConnectReply(UserConnectReply reply) {
+
+        // Find the player associated with the uuid.
+        Player player = Network.getInstance().getServer().getOnlinePlayers().stream().filter(p -> p.getUniqueId().toString().equals(reply.getUuid())).findFirst().orElse(null);
+
+        if (player == null) {
+            LOGGER.warning("A UserConnectReply was received but no Player exists with their uuid, maybe they have already left?");
+            return;
+        }
+
+        NetworkUser user = new NetworkUser(player, reply);
+        Network.getInstance().addUser(user);
+
+        // Play a short sound to the player, this will imply that the connection is complete.
+
+    }
 
 
         //If the player is not in the server_switch table they have disconnected from the network.
@@ -187,7 +194,7 @@ public class Connect implements Listener {
 //                instance.tab.removeFakePlayer(uuid);
 //            }
 //        }
-    }
+}
 
     /*
     A player has officially connected to the network if they have
@@ -244,13 +251,13 @@ public class Connect implements Listener {
 //
 //            if (plots != 0) {
 //                if (plots == 1) {
-//                    p.sendMessage(Utils.success("There is ")
+//                    p.sendMessage(ChatUtils.success("There is ")
 //                            .append(Component.text(1, NamedTextColor.DARK_AQUA))
-//                            .append(Utils.success(" plot available for review.")));
+//                            .append(ChatUtils.success(" plot available for review.")));
 //                } else {
-//                    p.sendMessage(Utils.success("There are ")
+//                    p.sendMessage(ChatUtils.success("There are ")
 //                            .append(Component.text(plots, NamedTextColor.DARK_AQUA))
-//                            .append(Utils.success(" plots available for review.")));
+//                            .append(ChatUtils.success(" plots available for review.")));
 //                }
 //            }
 //
@@ -259,13 +266,13 @@ public class Connect implements Listener {
 //
 //            if (regions != 0) {
 //                if (regions == 1) {
-//                    p.sendMessage(Utils.success("There is ")
+//                    p.sendMessage(ChatUtils.success("There is ")
 //                            .append(Component.text(1, NamedTextColor.DARK_AQUA))
-//                            .append(Utils.success(" region request to review.")));
+//                            .append(ChatUtils.success(" region request to review.")));
 //                } else {
-//                    p.sendMessage(Utils.success("There are ")
+//                    p.sendMessage(ChatUtils.success("There are ")
 //                            .append(Component.text(regions, NamedTextColor.DARK_AQUA))
-//                            .append(Utils.success(" region requests to review.")));
+//                            .append(ChatUtils.success(" region requests to review.")));
 //                }
 //            }
 //
@@ -274,35 +281,18 @@ public class Connect implements Listener {
 //
 //            if (navigation != 0) {
 //                if (navigation == 1) {
-//                    p.sendMessage(Utils.success("There is ")
+//                    p.sendMessage(ChatUtils.success("There is ")
 //                            .append(Component.text(1, NamedTextColor.DARK_AQUA))
-//                            .append(Utils.success(" navigation request to review.")));
+//                            .append(ChatUtils.success(" navigation request to review.")));
 //                } else {
-//                    p.sendMessage(Utils.success("There are ")
+//                    p.sendMessage(ChatUtils.success("There are ")
 //                            .append(Component.text(navigation, NamedTextColor.DARK_AQUA))
-//                            .append(Utils.success(" navigation requests to review.")));
+//                            .append(ChatUtils.success(" navigation requests to review.")));
 //                }
 //            }
 //        }
 //
-//        //Log playercount in database
-//        globalSQL.update("INSERT INTO player_count(log_time,players) VALUES(" + Time.currentTime() + "," +
-//                globalSQL.getInt("SELECT count(uuid) FROM online_users;") + ");");
-//
 //    }
-
-    private void serverSwitchEvent(Player p) {
-
-        //Update server.
-        globalSQL.update("UPDATE online_users SET server='" + SERVER_NAME + "' WHERE uuid='" + p.getUniqueId() + "';");
-
-        //Remove their server_switch entry. Delayed by 1 second to make sure the previous server has run their PlayerQuitEvent.
-        Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> globalSQL.update("DELETE FROM server_switch WHERE uuid='" + p.getUniqueId() + "';"), 20L);
-
-        //Update the last_ping.
-        globalSQL.update("UPDATE online_users SET last_ping=" + Time.currentTime() + " WHERE uuid='" + p.getUniqueId() + "' AND server='" + SERVER_NAME + "';");
-
-    }
 
     /*
     A player has officially disconnected from the network after two
@@ -357,5 +347,3 @@ public class Connect implements Listener {
 //                globalSQL.getInt("SELECT count(uuid) FROM online_users;") + ");");
 //
 //    }
-
-}

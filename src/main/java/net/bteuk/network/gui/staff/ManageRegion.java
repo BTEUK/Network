@@ -1,6 +1,7 @@
 package net.bteuk.network.gui.staff;
 
 import net.bteuk.network.gui.Gui;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.enums.RegionStatus;
@@ -52,9 +53,9 @@ public class ManageRegion extends Gui {
                         u -> {
 
                             region.setPublic();
-                            u.player.sendMessage(Utils.success("Set region ")
+                            u.player.sendMessage(ChatUtils.success("Set region ")
                                     .append(Component.text(region.regionName(), NamedTextColor.DARK_AQUA))
-                                    .append(Utils.success(" to public.")));
+                                    .append(ChatUtils.success(" to public.")));
                             this.refresh();
 
                         });
@@ -70,9 +71,9 @@ public class ManageRegion extends Gui {
                         u -> {
 
                             region.setDefault();
-                            u.player.sendMessage(Utils.success("Set region ")
+                            u.player.sendMessage(ChatUtils.success("Set region ")
                                     .append(Component.text(region.regionName(), NamedTextColor.DARK_AQUA))
-                                    .append(Utils.success(" to default.")));
+                                    .append(ChatUtils.success(" to default.")));
                             this.refresh();
 
                         });
@@ -150,9 +151,9 @@ public class ManageRegion extends Gui {
                             }
 
                             region.setLocked();
-                            u.player.sendMessage(Utils.success("Set Region ")
+                            u.player.sendMessage(ChatUtils.success("Set Region ")
                                     .append(Component.text(region.regionName(), NamedTextColor.DARK_AQUA))
-                                    .append(Utils.success(" to locked.")));
+                                    .append(ChatUtils.success(" to locked.")));
 
                             this.refresh();
 
@@ -169,9 +170,9 @@ public class ManageRegion extends Gui {
                         u -> {
 
                             region.setDefault();
-                            u.player.sendMessage(Utils.success("Set region ")
+                            u.player.sendMessage(ChatUtils.success("Set region ")
                                     .append(Component.text(region.regionName(), NamedTextColor.DARK_AQUA))
-                                    .append(Utils.success(" to default.")));
+                                    .append(ChatUtils.success(" to default.")));
                             this.refresh();
 
                         });
@@ -192,9 +193,9 @@ public class ManageRegion extends Gui {
 
                         u -> {
                             region.setOpen();
-                            u.player.sendMessage(Utils.success("Set region ")
+                            u.player.sendMessage(ChatUtils.success("Set region ")
                                     .append(Component.text(region.regionName(), NamedTextColor.DARK_AQUA))
-                                    .append(Utils.success(" to open.")));
+                                    .append(ChatUtils.success(" to open.")));
                             this.refresh();
                         });
 
@@ -208,9 +209,9 @@ public class ManageRegion extends Gui {
 
                         u -> {
                             region.setDefault("jrbuilder");
-                            u.player.sendMessage(Utils.success("Set region ")
+                            u.player.sendMessage(ChatUtils.success("Set region ")
                                     .append(Component.text(region.regionName(), NamedTextColor.DARK_AQUA))
-                                    .append(Utils.success(" to default.")));
+                                    .append(ChatUtils.success(" to default.")));
                             this.refresh();
                         });
 

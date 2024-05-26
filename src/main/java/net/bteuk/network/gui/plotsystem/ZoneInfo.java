@@ -4,6 +4,7 @@ import net.bteuk.network.Network;
 import net.bteuk.network.eventing.events.EventManager;
 import net.bteuk.network.gui.Gui;
 import net.bteuk.network.gui.InviteMembers;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.NetworkUser;
@@ -173,7 +174,7 @@ public class ZoneInfo extends Gui {
 
                             //Set zone to private and refresh this gui.
                             plotSQL.update("UPDATE zones SET is_public=0 WHERE id=" + zoneID + ";");
-                            u.player.sendMessage(Utils.success("Set zone to private."));
+                            u.player.sendMessage(ChatUtils.success("Set zone to private."));
 
                             this.refresh();
                             u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
@@ -190,7 +191,7 @@ public class ZoneInfo extends Gui {
 
                             //Set zone to private and refresh this gui.
                             plotSQL.update("UPDATE zones SET is_public=1 WHERE id=" + zoneID + ";");
-                            u.player.sendMessage(Utils.success("Set zone to public."));
+                            u.player.sendMessage(ChatUtils.success("Set zone to public."));
 
                             this.refresh();
                             u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
@@ -282,7 +283,7 @@ public class ZoneInfo extends Gui {
                     long max_time = Time.currentTime() + ZoneExtensionTime.HOUR_48.time;
 
                     plotSQL.update("UPDATE zones SET expiration=" + Math.min(expiration, max_time) + " WHERE id=" + zoneID);
-                    u.player.sendMessage(Utils.success("Set Zone expiration time to ")
+                    u.player.sendMessage(ChatUtils.success("Set Zone expiration time to ")
                             .append(Component.text(Time.getDateTime(Math.min(expiration, max_time)), NamedTextColor.DARK_AQUA)));
 
                     u.player.closeInventory();

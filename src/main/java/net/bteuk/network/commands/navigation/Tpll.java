@@ -4,6 +4,7 @@ import io.papermc.lib.PaperLib;
 import net.bteuk.network.Network;
 import net.bteuk.network.commands.AbstractCommand;
 import net.bteuk.network.eventing.events.EventManager;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.Statistics;
 import net.bteuk.network.utils.SwitchServer;
@@ -49,7 +50,7 @@ public class Tpll extends AbstractCommand {
     private final PlotSQL plotSQL;
     private static final boolean regionsEnabled = CONFIG.getBoolean("regions_enabled");
 
-    private static final Component USAGE = Utils.error("/tpll <latitude> <longitude> [altitude]");
+    private static final Component USAGE = ChatUtils.error("/tpll <latitude> <longitude> [altitude]");
 
     public Tpll(Network instance, boolean requires_permission) {
         super(instance, "tpll");
@@ -116,13 +117,13 @@ public class Tpll extends AbstractCommand {
 
         //Check if the player is allowed to teleport here.
         if (!canTeleportHere(p, region)) {
-            p.sendMessage(Utils.error("The terrain for this region has not been generated, you must be at least Jr.Builder to load new terrain."));
+            p.sendMessage(ChatUtils.error("The terrain for this region has not been generated, you must be at least Jr.Builder to load new terrain."));
         }
 
         //Check the server of the location.
         //Switch if necessary.
         if (switchServerIfNecessary(p, region, args)) {
-            p.sendMessage(Utils.success("The location is on another server, switching servers..."));
+            p.sendMessage(ChatUtils.success("The location is on another server, switching servers..."));
             return;
         }
 
@@ -279,7 +280,7 @@ public class Tpll extends AbstractCommand {
     private CompletableFuture<Double> getAltitude(Player p, TpllFormat format, Location l) {
         CompletableFuture<Double> altFuture;
         if (!PaperLib.isChunkGenerated(l)) {
-            p.sendMessage(Utils.success("Location is generating, please wait a moment..."));
+            p.sendMessage(ChatUtils.success("Location is generating, please wait a moment..."));
 
             //If the altitude was not specified, get it from the data.
             if (Double.isNaN(format.getAltitude())) {
@@ -289,7 +290,7 @@ public class Tpll extends AbstractCommand {
                             .getAsync(format.getCoordinates().getLng(), format.getCoordinates().getLat())
                             .thenApply(a -> a + 1.0d);
                 } catch (OutOfProjectionBoundsException e) { //out of bounds, notify user
-                    p.sendMessage(Utils.error("These coordinates are out of the projection bounds."));
+                    p.sendMessage(ChatUtils.error("These coordinates are out of the projection bounds."));
                     return null;
                 }
             } else {
@@ -336,9 +337,9 @@ public class Tpll extends AbstractCommand {
             PaperLib.teleportAsync(p, l);
 
             p.sendMessage(
-                    Utils.success("Teleported to ")
+                    ChatUtils.success("Teleported to ")
                             .append(Component.text(DECIMAL_FORMATTER.format(format.getCoordinates().getLat()), NamedTextColor.DARK_AQUA))
-                            .append(Utils.success(", "))
+                            .append(ChatUtils.success(", "))
                             .append(Component.text(DECIMAL_FORMATTER.format(format.getCoordinates().getLng()), NamedTextColor.DARK_AQUA)));
 
         }));

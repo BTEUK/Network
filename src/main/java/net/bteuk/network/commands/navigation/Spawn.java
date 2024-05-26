@@ -2,8 +2,8 @@ package net.bteuk.network.commands.navigation;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.eventing.events.EventManager;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.SwitchServer;
-import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.enums.ServerType;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -21,7 +21,7 @@ public class Spawn implements CommandExecutor {
         //Check if the sender is a player.
         if (!(sender instanceof Player p)) {
 
-            sender.sendMessage(Utils.error("This command can only be run by a player."));
+            sender.sendMessage(ChatUtils.error("This command can only be run by a player."));
             return true;
 
         }
@@ -29,7 +29,7 @@ public class Spawn implements CommandExecutor {
         //Check permission.
         if (!p.hasPermission("uknet.navigation.spawn")) {
 
-            p.sendMessage(Utils.error("You do not have permission to use this command."));
+            p.sendMessage(ChatUtils.error("You do not have permission to use this command."));
             return true;
 
         }
@@ -39,7 +39,7 @@ public class Spawn implements CommandExecutor {
 
             Back.setPreviousCoordinate(p.getUniqueId().toString(), p.getLocation());
             p.teleport(Network.getInstance().getLobby().spawn);
-            p.sendMessage(Utils.success("Teleported to spawn."));
+            p.sendMessage(ChatUtils.success("Teleported to spawn."));
 
         } else {
 

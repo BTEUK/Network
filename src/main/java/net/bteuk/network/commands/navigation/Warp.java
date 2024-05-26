@@ -2,8 +2,8 @@ package net.bteuk.network.commands.navigation;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.eventing.events.EventManager;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.SwitchServer;
-import net.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -25,7 +25,7 @@ public class Warp implements CommandExecutor {
 
         //Check if sender is player.
         if (!(sender instanceof Player p)) {
-            sender.sendMessage(Utils.error("You must be a player to use this command."));
+            sender.sendMessage(ChatUtils.error("You must be a player to use this command."));
             return true;
         }
 
@@ -74,7 +74,7 @@ public class Warp implements CommandExecutor {
 
                 //Teleport to location.
                 p.teleport(l);
-                p.sendMessage(Utils.success("Teleported to ")
+                p.sendMessage(ChatUtils.success("Teleported to ")
                         .append(Component.text(location, NamedTextColor.DARK_AQUA)));
 
             } else {
@@ -87,15 +87,15 @@ public class Warp implements CommandExecutor {
             }
 
         } else {
-            p.sendMessage(Utils.error("The location ")
+            p.sendMessage(ChatUtils.error("The location ")
                     .append(Component.text(location, NamedTextColor.DARK_RED))
-                    .append(Utils.error(" does not exist.")));
+                    .append(ChatUtils.error(" does not exist.")));
         }
 
         return true;
     }
 
     private void help(Player p) {
-        p.sendMessage(Utils.error("/warp <location>"));
+        p.sendMessage(ChatUtils.error("/warp <location>"));
     }
 }

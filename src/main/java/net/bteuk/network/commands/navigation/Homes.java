@@ -1,13 +1,17 @@
 package net.bteuk.network.commands.navigation;
 
 import net.bteuk.network.Network;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
-import org.bukkit.command.*;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,7 +43,7 @@ public class Homes implements CommandExecutor {
         //Check if sender is a player and that they have permission.
         if (!(sender instanceof Player p)) {
 
-            sender.sendMessage(Utils.error("This command can only be used by a player."));
+            sender.sendMessage(ChatUtils.error("This command can only be used by a player."));
             return true;
 
         }
@@ -47,7 +51,7 @@ public class Homes implements CommandExecutor {
         //Check if the player has permission.
         if (!p.hasPermission("uknet.navigation.homes")) {
 
-            p.sendMessage(Utils.error("You do not have permission to use this command."));
+            p.sendMessage(ChatUtils.error("You do not have permission to use this command."));
             return true;
 
         }
@@ -71,7 +75,7 @@ public class Homes implements CommandExecutor {
 
         //If there are no locations notify the user.
         if (homes.isEmpty()) {
-            p.sendMessage(Utils.error("You don't have any homes set."));
+            p.sendMessage(ChatUtils.error("You don't have any homes set."));
             return true;
         }
 
@@ -83,13 +87,13 @@ public class Homes implements CommandExecutor {
         if (((page - 1) * 16) >= homes.size()){
 
             if (homes.size() <= 16) {
-                p.sendMessage(Utils.error("There is only ")
+                p.sendMessage(ChatUtils.error("There is only ")
                         .append(Component.text("1", NamedTextColor.DARK_RED))
-                        .append(Utils.error(" page of homes.")));
+                        .append(ChatUtils.error(" page of homes.")));
             } else {
-                p.sendMessage(Utils.error("There are only ")
+                p.sendMessage(ChatUtils.error("There are only ")
                         .append(Component.text(pages, NamedTextColor.DARK_RED))
-                        .append(Utils.error(" pages of homes.")));
+                        .append(ChatUtils.error(" pages of homes.")));
             }
 
             return true;

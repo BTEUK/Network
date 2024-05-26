@@ -3,8 +3,9 @@ package net.bteuk.network.gui.staff;
 import lombok.Getter;
 import lombok.Setter;
 import net.bteuk.network.Network;
-import net.bteuk.network.gui.Gui;
 import net.bteuk.network.eventing.listeners.staff.ModerationReasonListener;
+import net.bteuk.network.gui.Gui;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.Time;
 import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.enums.ModerationType;
@@ -82,13 +83,13 @@ public class ModerationActionGui extends Gui {
 
                                     } else {
 
-                                        u.player.sendMessage(Utils.error("You must provide a reason to kick someone."));
+                                        u.player.sendMessage(ChatUtils.error("You must provide a reason to kick someone."));
                                         u.player.closeInventory();
 
                                     }
                                 } else {
 
-                                    u.player.sendMessage(Component.text(name, NamedTextColor.DARK_RED).append(Utils.error(" is no longer online.")));
+                                    u.player.sendMessage(Component.text(name, NamedTextColor.DARK_RED).append(ChatUtils.error(" is no longer online.")));
 
                                     //Close inventory and clear gui (this means it'll open as a staff menu next time).
                                     this.delete();
@@ -181,14 +182,14 @@ public class ModerationActionGui extends Gui {
 
                                 } else {
 
-                                    u.player.sendMessage(Utils.error("You must provide a duration to " + type.label.toLowerCase(Locale.ROOT) + " someone."));
+                                    u.player.sendMessage(ChatUtils.error("You must provide a duration to " + type.label.toLowerCase(Locale.ROOT) + " someone."));
                                     u.player.closeInventory();
 
                                 }
 
                             } else {
 
-                                u.player.sendMessage(Utils.error("You must provide a reason to " + type.label.toLowerCase(Locale.ROOT) + " someone."));
+                                u.player.sendMessage(ChatUtils.error("You must provide a reason to " + type.label.toLowerCase(Locale.ROOT) + " someone."));
                                 u.player.closeInventory();
 
                             }
@@ -213,7 +214,7 @@ public class ModerationActionGui extends Gui {
                     reasonListener = new ModerationReasonListener(u, this);
 
                     u.player.closeInventory();
-                    u.player.sendMessage(Utils.success("Please write the reason in chat, the first message counts."));
+                    u.player.sendMessage(ChatUtils.success("Please write the reason in chat, the first message counts."));
 
                 });
 

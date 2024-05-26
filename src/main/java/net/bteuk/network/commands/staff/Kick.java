@@ -1,8 +1,8 @@
 package net.bteuk.network.commands.staff;
 
 import net.bteuk.network.Network;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.staff.Moderation;
-import net.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
@@ -40,14 +40,14 @@ public class Kick extends Moderation implements CommandExecutor {
         //Check if sender is player, then check permissions
         if (sender instanceof Player p) {
             if (!p.hasPermission("uknet.kick")) {
-                p.sendMessage(Utils.error("You do not have permission to use this command."));
+                p.sendMessage(ChatUtils.error("You do not have permission to use this command."));
                 return true;
             }
         }
 
         //Check args.
         if (args.length < 2) {
-            sender.sendMessage(Utils.error("/kick <player> <reason>"));
+            sender.sendMessage(ChatUtils.error("/kick <player> <reason>"));
             return true;
         }
 
@@ -55,7 +55,7 @@ public class Kick extends Moderation implements CommandExecutor {
         //If uuid exists for name.
         if (!Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM player_data WHERE name='" + args[0] + "';")) {
             sender.sendMessage(Component.text(args[0], NamedTextColor.DARK_RED)
-                    .append(Utils.error(" is not a valid player.")));
+                    .append(ChatUtils.error(" is not a valid player.")));
             return true;
         }
 
@@ -64,7 +64,7 @@ public class Kick extends Moderation implements CommandExecutor {
         //Check if player is online.
         if (!Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "';")) {
             sender.sendMessage(Component.text(args[0], NamedTextColor.DARK_RED)
-                    .append(Utils.error(" is not online.")));
+                    .append(ChatUtils.error(" is not online.")));
             return true;
         }
 
@@ -80,9 +80,9 @@ public class Kick extends Moderation implements CommandExecutor {
 
         kick(uuid, reason);
 
-        return (Utils.success("Kicked ")
+        return (ChatUtils.success("Kicked ")
                 .append(Component.text(name, NamedTextColor.DARK_AQUA))
-                .append(Utils.success(" for reason: "))
+                .append(ChatUtils.success(" for reason: "))
                 .append(Component.text(reason, NamedTextColor.DARK_AQUA)));
 
     }

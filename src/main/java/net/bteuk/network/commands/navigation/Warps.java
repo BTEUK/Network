@@ -1,6 +1,7 @@
 package net.bteuk.network.commands.navigation;
 
 import net.bteuk.network.Network;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -22,7 +23,7 @@ public class Warps implements CommandExecutor {
 
         //Check if sender is player.
         if (!(sender instanceof Player p)) {
-            sender.sendMessage(Utils.error("You must be a player to use this command."));
+            sender.sendMessage(ChatUtils.error("You must be a player to use this command."));
             return true;
         }
 
@@ -45,7 +46,7 @@ public class Warps implements CommandExecutor {
 
         //If there are no locations notify the user.
         if (locations.isEmpty()) {
-            p.sendMessage(Utils.error("There are currently no warps available."));
+            p.sendMessage(ChatUtils.error("There are currently no warps available."));
             return true;
         }
 
@@ -57,13 +58,13 @@ public class Warps implements CommandExecutor {
         if (((page - 1) * 16) >= locations.size()){
 
             if (locations.size() <= 16) {
-                p.sendMessage(Utils.error("There is only ")
+                p.sendMessage(ChatUtils.error("There is only ")
                         .append(Component.text("1", NamedTextColor.DARK_RED))
-                        .append(Utils.error(" page of warps.")));
+                        .append(ChatUtils.error(" page of warps.")));
             } else {
-                p.sendMessage(Utils.error("There are only ")
+                p.sendMessage(ChatUtils.error("There are only ")
                         .append(Component.text(pages, NamedTextColor.DARK_RED))
-                        .append(Utils.error(" pages of warps.")));
+                        .append(ChatUtils.error(" pages of warps.")));
             }
 
             return true;

@@ -23,9 +23,7 @@ import static net.bteuk.network.lib.enums.ChatChannels.REVIEWER;
 import static net.bteuk.network.lib.enums.ChatChannels.STAFF;
 import static net.bteuk.network.utils.Constants.EARTH_WORLD;
 import static net.bteuk.network.utils.Constants.REGIONS_ENABLED;
-import static net.bteuk.network.utils.Constants.SERVER_NAME;
 import static net.bteuk.network.utils.Constants.SERVER_TYPE;
-import static net.bteuk.network.utils.Constants.TAB;
 import static net.bteuk.network.utils.enums.ServerType.EARTH;
 import static net.bteuk.network.utils.enums.ServerType.PLOT;
 
@@ -60,6 +58,7 @@ public class NetworkUser {
 
     //Navigator in hotbar.
     @Getter
+    @Setter
     private boolean navigatorEnabled;
 
     @Getter
@@ -83,7 +82,9 @@ public class NetworkUser {
 
     //If linked to discord.
     public boolean isLinked;
-    public long discord_id;
+
+    @Getter
+    private long discordId;
 
     //If the player is currently in a portal,
     //This is to prevent continuous execution of portal events.
@@ -127,17 +128,11 @@ public class NetworkUser {
         afk = false;
         last_movement = Time.currentTime();
 
-        //Update builder role in database.
-        instance.getGlobalSQL().update("UPDATE player_data SET builder_role='" + Roles.builderRole(player) + "' WHERE uuid='" + player.getUniqueId() + "';");
-
-        //Load tab for the user.
-        loadTab();
-
         //Get discord linked status.
         //If they're linked get discord id.
         isLinked = instance.getGlobalSQL().hasRow("SELECT uuid FROM discord WHERE uuid='" + player.getUniqueId() + "';");
         if (isLinked) {
-            discord_id = instance.getGlobalSQL().getLong("SELECT discord_id FROM discord WHERE uuid='" + player.getUniqueId() + "';");
+            discordId = instance.getGlobalSQL().getLong("SELECT discord_id FROM discord WHERE uuid='" + player.getUniqueId() + "';");
         }
 
         //If navigator is disabled, remove the navigator if in the inventory.
@@ -163,7 +158,7 @@ public class NetworkUser {
                     inRegion = true;
                 }
             } else if (SERVER_TYPE == PLOT) {
-                //Check if the player is in a buildable plot world and apply coordinate transform if true.
+                // Check if the player is in a buildable plot world and apply coordinate transform if true.
                 if (instance.getPlotSQL().hasRow("SELECT name FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';")) {
                     updateCoordinateTransform(instance.getPlotSQL(), player.getLocation());
 
@@ -179,7 +174,7 @@ public class NetworkUser {
         active_time = 0;
 
         //Give the player nightvision if enabled or remove it if disabled.
-        if (instance.getGlobalSQL().hasRow("SELECT nightvision_enabled FROM player_data WHERE nightvision_enabled=1 AND uuid='" + player.getUniqueId() + "';")) {
+        if (nightvisionEnabled) {
 
             Nightvision.giveNightvision(player);
 
@@ -188,29 +183,6 @@ public class NetworkUser {
             Nightvision.removeNightvision(player);
 
         }
-    }
-
-    private void loadTab() {
-
-        //If this is the first player on the server, add all players from other servers to tab.
-        if (instance.getServer().getOnlinePlayers().size() == 1 && TAB) {
-            //Add all players from other servers to the fake players list, so they will show in tab when players connect.
-            for (String uuid : instance.getGlobalSQL().getStringList("SELECT uuid FROM online_users WHERE server<>'" + SERVER_NAME + "';")) {
-                instance.tab.addFakePlayer(uuid);
-            }
-        }
-
-        if (TAB) {
-            //Add the player to the fake players list for other servers.
-            instance.getChat().broadcastMessage(Component.text("add " + player.getUniqueId()), "uknet:tab");
-
-            //Remove the player from the fake players list, if they are currently in it.
-            instance.tab.removeFakePlayer(player.getUniqueId().toString());
-
-            //Load tab for the player, this will add the fake players.
-            Bukkit.getScheduler().runTask(instance, () -> instance.tab.loadTab(player));
-        }
-
     }
 
     private void runEvents() {
@@ -266,16 +238,6 @@ public class NetworkUser {
 
         return false;
 
-    }
-
-    /**
-     * Check if a user is online.
-     *
-     * @param uuid uuid of the user
-     * @return true if the user is online
-     */
-    public static boolean isOnline(String uuid) {
-        return Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "';");
     }
 
     /**
@@ -342,17 +304,5 @@ public class NetworkUser {
                 player.getLocation().getYaw(),
                 player.getLocation().getPitch()
         );
-    }
-
-    private Set<String> getChatChannels() {
-        Set<String> channels = new HashSet<>();
-        channels.add("global");
-        if (hasPermission("uknet.staff")) {
-            channels.add("staff");
-        }
-        if (hasPermission("group.reviewer")) {
-            channels.add("reviewer");
-        }
-        return channels;
     }
 }

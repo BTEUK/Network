@@ -2,6 +2,7 @@ package net.bteuk.network;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.papermc.paper.event.player.AsyncChatEvent;
+import net.bteuk.network.eventing.listeners.Connect;
 import net.bteuk.network.exceptions.NotMutedException;
 import net.bteuk.network.lib.dto.AbstractTransferObject;
 import net.bteuk.network.lib.dto.AddTeamEvent;
@@ -9,18 +10,17 @@ import net.bteuk.network.lib.dto.ChatMessage;
 import net.bteuk.network.lib.dto.DirectMessage;
 import net.bteuk.network.lib.dto.DiscordLinking;
 import net.bteuk.network.lib.dto.DiscordRole;
-import net.bteuk.network.lib.dto.TabEvent;
+import net.bteuk.network.lib.dto.UserConnectReply;
 import net.bteuk.network.lib.socket.OutputSocket;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.Roles;
 import net.bteuk.network.utils.Statistics;
 import net.bteuk.network.utils.Time;
-import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.staff.Moderation;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -30,11 +30,6 @@ import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.net.Socket;
-import java.util.Map;
-import java.util.UUID;
 
 import static net.bteuk.network.utils.Constants.GLOBAL_CHAT;
 import static net.bteuk.network.utils.Constants.LOGGER;
@@ -106,7 +101,7 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
             //If u is null, cancel.
             if (u == null) {
                 LOGGER.severe("User " + e.getPlayer().getName() + " can not be found!");
-                e.getPlayer().sendMessage(Utils.error("User can not be found, please relog!"));
+                e.getPlayer().sendMessage(ChatUtils.error("User can not be found, please relog!"));
                 return;
             }
 
@@ -126,8 +121,8 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
         }
     }
 
-    public AbstractTransferObject sendSocketMesage(AbstractTransferObject chatMessage) {
-        return outputSocket.sendSocketMessage(chatMessage);
+    public void sendSocketMesage(AbstractTransferObject chatMessage) {
+        outputSocket.sendSocketMessage(chatMessage);
     }
 
     public static ChatMessage getChatMessage(Component component, NetworkUser u) {
@@ -167,6 +162,8 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
                 handleDiscordLinking(discordLinking);
             } else if (object instanceof AddTeamEvent addTeamEvent) {
                 instance.getTab().handle(addTeamEvent);
+            } else if (object instanceof UserConnectReply userConnectReply) {
+                Connect.handleUserConnectReply(userConnectReply);
             }
 
         } catch (IOException e) {
@@ -247,99 +244,99 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
                     DiscordRole discordRole = new DiscordRole(user.player.getUniqueId().toString(), role, true);
                     outputSocket.sendSocketMessage(discordRole);
 
-                    user.sendMessage(Utils.success("Your discord has been linked!"));
+                    user.sendMessage(ChatUtils.success("Your discord has been linked!"));
 
                 });
     }
 
-    private void sendReceivedMessage(Component component, String channel) {
-        switch (channel) {
-            case "uknet:discord_linking" -> {
+//    private void sendReceivedMessage(Component component, String channel) {
+//        switch (channel) {
+//            case "uknet:discord_linking" -> {
+//
+//                //This is for account linking.
+//                String plainMessage = PlainTextComponentSerializer.plainText().serialize(component);
+//                String[] args = plainMessage.split(" ");
+//                if (args[0].equalsIgnoreCase("link")) {
+//
+//                    //Check if player is online.
+//                    Player p = Bukkit.getPlayer(UUID.fromString(args[1]));
+//                    if (!(p == null)) {
+//                        if (p.isOnline()) {
+//
+//                            //Link account.
+//                            instance.getGlobalSQL().update("INSERT INTO discord(uuid,discord_id) VALUES('" + args[1] + "','" + args[2] + "');");
+//                            NetworkUser u = Network.getInstance().getUser(p);
+//
+//                            //If u is null, cancel.
+//                            if (u == null) {
+//                                LOGGER.severe("User " + p.getName() + " can not be found!");
+//                                p.sendMessage(ChatUtils.error("User can not be found, please relog!"));
+//                                return;
+//                            }
+//
+//                            u.isLinked = true;
+//                            u.discord_id = Long.parseLong(args[2]);
+//
+//                            //Get the highest role for syncing and sync it, except for guest.
+//                            String role = Roles.builderRole(p);
+//
+//                            //Remove all roles except current role.
+//                            for (Map.Entry<String, Long> entry : Network.getInstance().getTimers().getRoles().entrySet()) {
+//
+//                                if (role.equals(entry.getKey())) {
+//                                    broadcastMessage(Component.text("addrole " + args[2] + " " + entry.getValue()), "uknet:discord_linking");
+//                                } else {
+//                                    broadcastMessage(Component.text("removerole " + args[2] + " " + entry.getValue()), "uknet:discord_linking");
+//                                }
+//
+//                            }
+//
+//                            p.sendMessage(ChatUtils.success("Your discord has been linked!"));
+//
+//                        }
+//                    }
+//                }
+//            }
+//            case "uknet:tab" ->
+//
+//                //Run a tab update, the structure is the following.
+//                //'update/add/remove <uuid>'
+//                //This allows us to only update what is necessary.
+//                //Make sure it runs after all other scheduled tasks, so it does not front-run the disconnect event if the player just left this server.
+//                    Bukkit.getScheduler().runTask(instance, () -> Network.getInstance().tab.updateAll(PlainTextComponentSerializer.plainText().serialize(component)));
+//        }
+//    }
 
-                //This is for account linking.
-                String plainMessage = PlainTextComponentSerializer.plainText().serialize(component);
-                String[] args = plainMessage.split(" ");
-                if (args[0].equalsIgnoreCase("link")) {
-
-                    //Check if player is online.
-                    Player p = Bukkit.getPlayer(UUID.fromString(args[1]));
-                    if (!(p == null)) {
-                        if (p.isOnline()) {
-
-                            //Link account.
-                            instance.getGlobalSQL().update("INSERT INTO discord(uuid,discord_id) VALUES('" + args[1] + "','" + args[2] + "');");
-                            NetworkUser u = Network.getInstance().getUser(p);
-
-                            //If u is null, cancel.
-                            if (u == null) {
-                                LOGGER.severe("User " + p.getName() + " can not be found!");
-                                p.sendMessage(Utils.error("User can not be found, please relog!"));
-                                return;
-                            }
-
-                            u.isLinked = true;
-                            u.discord_id = Long.parseLong(args[2]);
-
-                            //Get the highest role for syncing and sync it, except for guest.
-                            String role = Roles.builderRole(p);
-
-                            //Remove all roles except current role.
-                            for (Map.Entry<String, Long> entry : Network.getInstance().getTimers().getRoles().entrySet()) {
-
-                                if (role.equals(entry.getKey())) {
-                                    broadcastMessage(Component.text("addrole " + args[2] + " " + entry.getValue()), "uknet:discord_linking");
-                                } else {
-                                    broadcastMessage(Component.text("removerole " + args[2] + " " + entry.getValue()), "uknet:discord_linking");
-                                }
-
-                            }
-
-                            p.sendMessage(Utils.success("Your discord has been linked!"));
-
-                        }
-                    }
-                }
-            }
-            case "uknet:tab" ->
-
-                //Run a tab update, the structure is the following.
-                //'update/add/remove <uuid>'
-                //This allows us to only update what is necessary.
-                //Make sure it runs after all other scheduled tasks, so it does not front-run the disconnect event if the player just left this server.
-                    Bukkit.getScheduler().runTask(instance, () -> Network.getInstance().tab.updateAll(PlainTextComponentSerializer.plainText().serialize(component)));
-        }
-    }
-
-    public void broadcastMessage(Component message, String channel) {
-
-        //If global chat is enabled send the message to the proxy using the chat socket.
-        if (GLOBAL_CHAT) {
-
-            Bukkit.getScheduler().runTaskAsynchronously(instance, () -> {
-                try (Socket socket = new Socket(IP, port)) {
-
-                    //Convert component to json and write to output.
-                    OutputStream output = socket.getOutputStream();
-                    ObjectOutputStream objectOutput = new ObjectOutputStream(output);
-
-                    // Send player message
-                    objectOutput.writeObject(Utils.toJson(message));
-                    objectOutput.writeObject(channel);
-                    objectOutput.flush();
-
-                    objectOutput.close();
-                } catch (IOException ex) {
-                    LOGGER.severe("Could not broadcast message to server socket!");
-                }
-            });
-        } else {
-
-            //Send locally.
-            //Check for valid channels.
-            sendReceivedMessage(message, channel);
-
-        }
-    }
+//    public void broadcastMessage(Component message, String channel) {
+//
+//        //If global chat is enabled send the message to the proxy using the chat socket.
+//        if (GLOBAL_CHAT) {
+//
+//            Bukkit.getScheduler().runTaskAsynchronously(instance, () -> {
+//                try (Socket socket = new Socket(IP, port)) {
+//
+//                    //Convert component to json and write to output.
+//                    OutputStream output = socket.getOutputStream();
+//                    ObjectOutputStream objectOutput = new ObjectOutputStream(output);
+//
+//                    // Send player message
+//                    objectOutput.writeObject(Utils.toJson(message));
+//                    objectOutput.writeObject(channel);
+//                    objectOutput.flush();
+//
+//                    objectOutput.close();
+//                } catch (IOException ex) {
+//                    LOGGER.severe("Could not broadcast message to server socket!");
+//                }
+//            });
+//        } else {
+//
+//            //Send locally.
+//            //Check for valid channels.
+//            sendReceivedMessage(message, channel);
+//
+//        }
+//    }
 
     // Send afk or no longer afk message to players ingame and discord.
     public void broadcastAFK(Player p, boolean afk) {
@@ -359,13 +356,13 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
 
     }
 
-    /**
-     * Broadcasts a discord announcement. The announcement type is used to decide how to use/format the message.
-     *
-     * @param message           the message to announce
-     * @param announcement_type the type of announcement
-     */
-    public void broadcastDiscordAnnouncement(Component message, String announcement_type) {
-        broadcastMessage(Component.text(announcement_type).append(Component.text(" ").append(message)), "uknet:discord_announcements");
-    }
+//    /**
+//     * Broadcasts a discord announcement. The announcement type is used to decide how to use/format the message.
+//     *
+//     * @param message           the message to announce
+//     * @param announcement_type the type of announcement
+//     */
+//    public void broadcastDiscordAnnouncement(Component message, String announcement_type) {
+//        broadcastMessage(Component.text(announcement_type).append(Component.text(" ").append(message)), "uknet:discord_announcements");
+//    }
 }

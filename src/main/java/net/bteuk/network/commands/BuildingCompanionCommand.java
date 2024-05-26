@@ -2,8 +2,8 @@ package net.bteuk.network.commands;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.building_companion.BuildingCompanion;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
-import net.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -18,7 +18,7 @@ public class BuildingCompanionCommand extends AbstractCommand {
 
     private final Network instance;
 
-    private static final Component ERROR = Utils.error("/buildingcompanion <clear>");
+    private static final Component ERROR = ChatUtils.error("/buildingcompanion <clear>");
 
     public BuildingCompanionCommand(Network instance) {
         super(instance, "companion");
@@ -47,7 +47,7 @@ public class BuildingCompanionCommand extends AbstractCommand {
         // If u is null, cancel.
         if (user == null) {
             LOGGER.severe("User " + p.getName() + " can not be found!");
-            p.sendMessage(Utils.error("User can not be found, please relog!"));
+            p.sendMessage(ChatUtils.error("User can not be found, please relog!"));
             return true;
         }
 
@@ -72,12 +72,12 @@ public class BuildingCompanionCommand extends AbstractCommand {
         BuildingCompanion companion = user.getCompanion();
         if (companion == null) {
             user.setCompanion(new BuildingCompanion(user));
-            user.player.sendMessage(Utils.success("Building Companion enabled"));
+            user.player.sendMessage(ChatUtils.success("Building Companion enabled"));
         } else {
             // Disable the building companion.
             companion.disable();
             user.setCompanion(null);
-            user.player.sendMessage(Utils.success("Building Companion disabled"));
+            user.player.sendMessage(ChatUtils.success("Building Companion disabled"));
         }
     }
 
@@ -92,14 +92,14 @@ public class BuildingCompanionCommand extends AbstractCommand {
         if (user.getCompanion() != null) {
             user.getCompanion().clearSelection();
         } else {
-            user.player.sendMessage(Utils.error("Your building companion is not enabled"));
+            user.player.sendMessage(ChatUtils.error("Your building companion is not enabled"));
         }
     }
 
     private void saveOutlines(NetworkUser user, String[] args) {
         if (args.length > 1 && user.getCompanion() != null) {
             if (user.getCompanion().saveOutlines(args[1], Material.ORANGE_CONCRETE.createBlockData(), true)) {
-                user.player.sendMessage(Utils.success("Saved outlines"));
+                user.player.sendMessage(ChatUtils.success("Saved outlines"));
                 // Also clear the outlines.
                 user.getCompanion().clearSelection();
             }
@@ -109,7 +109,7 @@ public class BuildingCompanionCommand extends AbstractCommand {
     private void removeOutlines(NetworkUser user, String[] args) {
         if (args.length > 1 && user.getCompanion() != null) {
             if (user.getCompanion().saveOutlines(args[1], Material.AIR.createBlockData(), false)) {
-                user.player.sendMessage(Utils.success("Removed outlines"));
+                user.player.sendMessage(ChatUtils.success("Removed outlines"));
             }
         }
     }

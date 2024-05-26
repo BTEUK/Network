@@ -1,6 +1,6 @@
 package net.bteuk.network.commands;
 
-import net.bteuk.network.utils.Utils;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
@@ -17,7 +17,7 @@ public class Speed implements CommandExecutor {
         //Check if the sender is a player.
         if (!(sender instanceof Player p)) {
 
-            sender.sendMessage(Utils.error("This command can only be run by a player."));
+            sender.sendMessage(ChatUtils.error("This command can only be run by a player."));
             return true;
 
         }
@@ -43,13 +43,13 @@ public class Speed implements CommandExecutor {
         if (isFly) {
 
             p.setFlySpeed(speed);
-            p.sendMessage(Utils.success("Set flying speed to ")
+            p.sendMessage(ChatUtils.success("Set flying speed to ")
                     .append(Component.text(args[0], NamedTextColor.DARK_AQUA)));
 
         } else {
 
             p.setWalkSpeed(speed);
-            p.sendMessage(Utils.success("Set walking speed to ")
+            p.sendMessage(ChatUtils.success("Set walking speed to ")
                     .append(Component.text(args[0], NamedTextColor.DARK_AQUA)));
 
         }
@@ -84,6 +84,6 @@ public class Speed implements CommandExecutor {
 
     //Error message.
     private void error(Player p) {
-        p.sendMessage(Utils.error("/speed [0-10]"));
+        p.sendMessage(ChatUtils.error("/speed [0-10]"));
     }
 }

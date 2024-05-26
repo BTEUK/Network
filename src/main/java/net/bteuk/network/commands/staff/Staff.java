@@ -3,8 +3,8 @@ package net.bteuk.network.commands.staff;
 import net.bteuk.network.CustomChat;
 import net.bteuk.network.Network;
 import net.bteuk.network.gui.staff.StaffGui;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
-import net.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -40,7 +40,7 @@ public class Staff implements CommandExecutor {
         //Check if the sender is a player.
         if (!(sender instanceof Player p)) {
 
-            sender.sendMessage(Utils.error("This command can only be used by a player."));
+            sender.sendMessage(ChatUtils.error("This command can only be used by a player."));
             return true;
 
         }
@@ -48,7 +48,7 @@ public class Staff implements CommandExecutor {
         //Check if user is member of staff.
         if (!(p.hasPermission("uknet.staff"))) {
 
-            p.sendMessage(Utils.error("You do not have permission to use this command."));
+            p.sendMessage(ChatUtils.error("You do not have permission to use this command."));
             return true;
 
         }
@@ -63,11 +63,11 @@ public class Staff implements CommandExecutor {
             if (args[0].equalsIgnoreCase("chat")) {
                 String channel = "global";
                 if (u.getChatChannel().equals("staff")) {
-                    u.player.sendMessage(Utils.success("Disabled staff chat."));
+                    u.player.sendMessage(ChatUtils.success("Disabled staff chat."));
                 } else {
                     // Set the chat channel to staff.
                     channel = "staff";
-                    u.player.sendMessage(Utils.success("Enabled staff chat."));
+                    u.player.sendMessage(ChatUtils.success("Enabled staff chat."));
                 }
                 // Set channel.
                 u.setChatChannel(channel);

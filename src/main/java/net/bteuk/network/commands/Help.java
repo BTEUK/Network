@@ -1,8 +1,9 @@
 package net.bteuk.network.commands;
 
+import me.clip.placeholderapi.PlaceholderAPI;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.Roles;
 import net.bteuk.network.utils.Utils;
-import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -20,7 +21,7 @@ public class Help implements CommandExecutor {
         //Check if the sender is a player.
         if (!(sender instanceof Player p)) {
 
-            sender.sendMessage(Utils.error("This command can only be run by a player."));
+            sender.sendMessage(ChatUtils.error("This command can only be run by a player."));
             return true;
 
         }

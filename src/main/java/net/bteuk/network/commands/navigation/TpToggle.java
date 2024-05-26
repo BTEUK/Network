@@ -1,7 +1,7 @@
 package net.bteuk.network.commands.navigation;
 
 import net.bteuk.network.Network;
-import net.bteuk.network.utils.Utils;
+import net.bteuk.network.lib.utils.ChatUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -16,7 +16,7 @@ public class TpToggle implements CommandExecutor {
         //Check for player
         if (!(sender instanceof Player p)) {
 
-            sender.sendMessage(Utils.error("This command can only be run by a player!"));
+            sender.sendMessage(ChatUtils.error("This command can only be run by a player!"));
             return true;
 
         }
@@ -27,14 +27,14 @@ public class TpToggle implements CommandExecutor {
             //Disable teleport.
             Network.getInstance().getGlobalSQL().update("UPDATE player_data SET teleport_enabled=0 WHERE uuid='" + p.getUniqueId() + "';");
 
-            p.sendMessage(Utils.success("Other players will now no longer be able to teleport to you."));
+            p.sendMessage(ChatUtils.success("Other players will now no longer be able to teleport to you."));
 
         } else {
 
             //Enable teleport.
             Network.getInstance().getGlobalSQL().update("UPDATE player_data SET teleport_enabled=1 WHERE uuid='" + p.getUniqueId() + "';");
 
-            p.sendMessage(Utils.success("Other players will be now be able to teleport to you."));
+            p.sendMessage(ChatUtils.success("Other players will be now be able to teleport to you."));
 
         }
 

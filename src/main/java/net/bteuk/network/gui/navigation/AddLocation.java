@@ -5,14 +5,15 @@ import lombok.Setter;
 import net.bteuk.network.Network;
 import net.bteuk.network.commands.navigation.Back;
 import net.bteuk.network.eventing.events.EventManager;
+import net.bteuk.network.eventing.listeners.navigation.LocationNameListener;
 import net.bteuk.network.gui.Gui;
-import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.gui.staff.LocationRequests;
 import net.bteuk.network.gui.staff.StaffGui;
+import net.bteuk.network.lib.utils.ChatUtils;
+import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.SwitchServer;
 import net.bteuk.network.utils.Utils;
-import net.bteuk.network.eventing.listeners.navigation.LocationNameListener;
 import net.bteuk.network.utils.enums.AddLocationType;
 import net.bteuk.network.utils.enums.Category;
 import net.bteuk.network.utils.enums.ServerType;
@@ -105,7 +106,7 @@ public class AddLocation extends Gui {
                         }
 
                         locationNameListener = new LocationNameListener(u.player, this);
-                        u.player.sendMessage(Utils.success("Write the location name in chat, the first message counts. You can include spaces in the name."));
+                        u.player.sendMessage(ChatUtils.success("Write the location name in chat, the first message counts. You can include spaces in the name."));
                         u.player.closeInventory();
 
                     });
@@ -122,7 +123,7 @@ public class AddLocation extends Gui {
                         }
 
                         locationNameListener = new LocationNameListener(u.player, this);
-                        u.player.sendMessage(Utils.success("Write the location name in chat, the first message counts. You can include spaces in the name."));
+                        u.player.sendMessage(ChatUtils.success("Write the location name in chat, the first message counts. You can include spaces in the name."));
                         u.player.closeInventory();
 
                     });
@@ -242,7 +243,7 @@ public class AddLocation extends Gui {
 
 
                         globalSQL.updateCoordinate(coordinate_id, l);
-                        u.player.sendMessage(Utils.success("Updated location to your current position."));
+                        u.player.sendMessage(ChatUtils.success("Updated location to your current position."));
 
                     });
         }
@@ -266,18 +267,18 @@ public class AddLocation extends Gui {
                         //Name has been set
                         if (name == null) {
 
-                            u.player.sendMessage(Utils.error("You have not set a name for the location."));
+                            u.player.sendMessage(ChatUtils.error("You have not set a name for the location."));
                             u.player.closeInventory();
 
                             //Name isn't duplicate (location or subcategory.
                         } else if (globalSQL.hasRow("SELECT location FROM location_data WHERE location='" + name + "';") || globalSQL.hasRow("SELECT name FROM location_subcategory WHERE name='" + name + "';")) {
 
-                            u.player.sendMessage(Utils.error("A location or subcategory with this name already exists."));
+                            u.player.sendMessage(ChatUtils.error("A location or subcategory with this name already exists."));
                             u.player.closeInventory();
 
                         } else if (globalSQL.hasRow("SELECT location FROM location_requests WHERE location = '" + name + "';")) {
 
-                            u.player.sendMessage(Utils.error("A location with this name has already been requested."));
+                            u.player.sendMessage(ChatUtils.error("A location with this name has already been requested."));
                             u.player.closeInventory();
 
                         } else {
@@ -332,12 +333,12 @@ public class AddLocation extends Gui {
                         //Name isn't duplicate
                         if (globalSQL.hasRow("SELECT location FROM location_data WHERE location='" + name + " AND coordinate<>" + coordinate_id + "';") || globalSQL.hasRow("SELECT name FROM location_subcategory WHERE name='" + name + "';")) {
 
-                            u.player.sendMessage(Utils.error("Another location or subcategory with this name already exists."));
+                            u.player.sendMessage(ChatUtils.error("Another location or subcategory with this name already exists."));
                             u.player.closeInventory();
 
                         } else if (globalSQL.hasRow("SELECT location FROM location_requests WHERE location = '" + name + " AND coordinate<>" + coordinate_id + "';")) {
 
-                            u.player.sendMessage(Utils.error("A location with this name has already been requested."));
+                            u.player.sendMessage(ChatUtils.error("A location with this name has already been requested."));
                             u.player.closeInventory();
 
                         } else {
@@ -376,7 +377,7 @@ public class AddLocation extends Gui {
                         globalSQL.update("DELETE FROM location_requests WHERE location='" + name + "';");
 
                         //Notify player.
-                        u.player.sendMessage(Utils.error("Denied location request ")
+                        u.player.sendMessage(ChatUtils.error("Denied location request ")
                                 .append(Component.text(name, NamedTextColor.DARK_RED)));
 
                         //Delete gui and return to previous menu.
@@ -442,7 +443,7 @@ public class AddLocation extends Gui {
         if (!subcategory.equals("None")) {
             subcategory_id = globalSQL.getInt("SELECT id FROM location_subcategory WHERE name='" + subcategory + "';");
             if (subcategory_id == 0) {
-                u.player.sendMessage(Utils.error("The subcategory no longer exists, adding location without subcategory."));
+                u.player.sendMessage(ChatUtils.error("The subcategory no longer exists, adding location without subcategory."));
             }
         }
 
@@ -454,9 +455,9 @@ public class AddLocation extends Gui {
                     "VALUES('" + name + "','" + category + "'," + subcategory_id + "," + coordinate_id + ");");
         }
 
-        u.player.sendMessage(Utils.success("Location ")
+        u.player.sendMessage(ChatUtils.success("Location ")
                 .append(Component.text(name, NamedTextColor.DARK_AQUA))
-                .append(Utils.success(" added to exploration menu.")));
+                .append(ChatUtils.success(" added to exploration menu.")));
 
         //Delete gui.
         this.delete();
@@ -473,7 +474,7 @@ public class AddLocation extends Gui {
         if (!subcategory.equals("None")) {
             subcategory_id = globalSQL.getInt("SELECT id FROM location_subcategory WHERE name='" + subcategory + "';");
             if (subcategory_id == 0) {
-                u.player.sendMessage(Utils.error("The subcategory no longer exists, adding location without subcategory."));
+                u.player.sendMessage(ChatUtils.error("The subcategory no longer exists, adding location without subcategory."));
             }
         }
 
@@ -483,7 +484,7 @@ public class AddLocation extends Gui {
             globalSQL.update("UPDATE location_data SET location='" + name + "',category='" + category + "',subcategory=" + subcategory_id + " WHERE location='" + old_name + "';");
         }
 
-        u.player.sendMessage(Utils.success("Updated location ")
+        u.player.sendMessage(ChatUtils.success("Updated location ")
                 .append(Component.text(name, NamedTextColor.DARK_AQUA)));
 
         //Delete gui.
@@ -504,7 +505,7 @@ public class AddLocation extends Gui {
         if (!subcategory.equals("None")) {
             subcategory_id = globalSQL.getInt("SELECT id FROM location_subcategory WHERE name='" + subcategory + "';");
             if (subcategory_id == 0) {
-                u.player.sendMessage(Utils.error("The subcategory no longer exists, adding location without subcategory."));
+                u.player.sendMessage(ChatUtils.error("The subcategory no longer exists, adding location without subcategory."));
             }
         }
 
@@ -518,7 +519,7 @@ public class AddLocation extends Gui {
         }
 
         //Notify player.
-        u.player.sendMessage(Utils.success("Accepted location request ")
+        u.player.sendMessage(ChatUtils.success("Accepted location request ")
                 .append(Component.text(name, NamedTextColor.DARK_AQUA)));
 
     }
@@ -530,7 +531,7 @@ public class AddLocation extends Gui {
         if (!subcategory.equals("None")) {
             subcategory_id = globalSQL.getInt("SELECT id FROM location_subcategory WHERE name='" + subcategory + "';");
             if (subcategory_id == 0) {
-                u.player.sendMessage(Utils.error("The subcategory no longer exists, adding location without subcategory."));
+                u.player.sendMessage(ChatUtils.error("The subcategory no longer exists, adding location without subcategory."));
             }
         }
 
@@ -543,11 +544,11 @@ public class AddLocation extends Gui {
         }
 
         //Notify reviewers.
-        Network.getInstance().chat.broadcastMessage(Utils.success("A new location has been requested."), "uknet:reviewer");
+        Network.getInstance().chat.broadcastMessage(ChatUtils.success("A new location has been requested."), "uknet:reviewer");
 
-        u.player.sendMessage(Utils.success("Location ")
+        u.player.sendMessage(ChatUtils.success("Location ")
                 .append(Component.text(name, NamedTextColor.DARK_AQUA))
-                .append(Utils.success(" requested.")));
+                .append(ChatUtils.success(" requested.")));
 
         //Delete gui.
         this.delete();

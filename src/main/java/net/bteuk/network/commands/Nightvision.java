@@ -1,7 +1,7 @@
 package net.bteuk.network.commands;
 
 import net.bteuk.network.Network;
-import net.bteuk.network.utils.Utils;
+import net.bteuk.network.lib.utils.ChatUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -18,7 +18,7 @@ public class Nightvision implements CommandExecutor {
         //Check if the sender is a player.
         if (!(sender instanceof Player p)) {
 
-            sender.sendMessage(Utils.error("This command can only be run by a player."));
+            sender.sendMessage(ChatUtils.error("This command can only be run by a player."));
             return true;
 
         }
@@ -39,7 +39,7 @@ public class Nightvision implements CommandExecutor {
             //Disable nightvision in database.
             Network.getInstance().getGlobalSQL().update("UPDATE player_data SET nightvision_enabled=0 WHERE uuid='" + p.getUniqueId() + "';");
 
-            p.sendMessage(Utils.success("Disabled nightvision."));
+            p.sendMessage(ChatUtils.success("Disabled nightvision."));
 
         } else {
 
@@ -49,7 +49,7 @@ public class Nightvision implements CommandExecutor {
             //Enable nightvision in database.
             Network.getInstance().getGlobalSQL().update("UPDATE player_data SET nightvision_enabled=1 WHERE uuid='" + p.getUniqueId() + "';");
 
-            p.sendMessage(Utils.success("Enabled nightvision."));
+            p.sendMessage(ChatUtils.success("Enabled nightvision."));
         }
     }
 

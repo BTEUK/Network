@@ -1,11 +1,12 @@
 package net.bteuk.network.gui.navigation;
 
 import net.bteuk.network.Network;
+import net.bteuk.network.eventing.listeners.navigation.LocationSearch;
 import net.bteuk.network.gui.Gui;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.enums.AddLocationType;
-import net.bteuk.network.eventing.listeners.navigation.LocationSearch;
 import net.bteuk.network.utils.enums.Category;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -129,7 +130,7 @@ public class ExploreGui extends Gui {
                         Utils.line("Click to search for locations"),
                         Utils.line("based on chat input.")),
                 u -> {
-                    u.player.sendMessage(Utils.success("Type a word or phrase in chat to search for locations."));
+                    u.player.sendMessage(ChatUtils.success("Type a word or phrase in chat to search for locations."));
                     new LocationSearch(u);
                     u.player.closeInventory();
                 });
@@ -166,7 +167,7 @@ public class ExploreGui extends Gui {
         if (gui.isEmpty()) {
 
             gui.delete();
-            u.player.sendMessage(Utils.error("No locations added to the menu in ")
+            u.player.sendMessage(ChatUtils.error("No locations added to the menu in ")
                     .append(Component.text(name, NamedTextColor.DARK_RED)));
 
         } else {

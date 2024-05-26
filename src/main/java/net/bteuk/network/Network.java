@@ -6,25 +6,24 @@ import net.bteuk.network.commands.BuildingCompanionCommand;
 import net.bteuk.network.commands.Clear;
 import net.bteuk.network.commands.Discord;
 import net.bteuk.network.commands.Gamemode;
-import net.bteuk.network.lobby.LobbyCommand;
-import net.bteuk.network.commands.Ptime;
-import net.bteuk.network.commands.Season;
-import net.bteuk.network.commands.give.GiveBarrier;
-import net.bteuk.network.commands.give.GiveDebugStick;
-import net.bteuk.network.commands.give.GiveLight;
 import net.bteuk.network.commands.Hdb;
 import net.bteuk.network.commands.Help;
 import net.bteuk.network.commands.Navigator;
 import net.bteuk.network.commands.Nightvision;
 import net.bteuk.network.commands.Phead;
 import net.bteuk.network.commands.Plot;
+import net.bteuk.network.commands.ProgressMap;
+import net.bteuk.network.commands.Ptime;
 import net.bteuk.network.commands.RegionCommand;
 import net.bteuk.network.commands.Rules;
+import net.bteuk.network.commands.Season;
 import net.bteuk.network.commands.Speed;
 import net.bteuk.network.commands.TipsToggle;
 import net.bteuk.network.commands.Zone;
+import net.bteuk.network.commands.give.GiveBarrier;
+import net.bteuk.network.commands.give.GiveDebugStick;
+import net.bteuk.network.commands.give.GiveLight;
 import net.bteuk.network.commands.ll;
-import net.bteuk.network.commands.ProgressMap;
 import net.bteuk.network.commands.navigation.Back;
 import net.bteuk.network.commands.navigation.Delhome;
 import net.bteuk.network.commands.navigation.Home;
@@ -45,33 +44,33 @@ import net.bteuk.network.commands.staff.Mute;
 import net.bteuk.network.commands.staff.Staff;
 import net.bteuk.network.commands.staff.Unban;
 import net.bteuk.network.commands.staff.Unmute;
+import net.bteuk.network.commands.tabcompleters.LocationSelector;
+import net.bteuk.network.commands.tabcompleters.PlayerSelector;
+import net.bteuk.network.commands.tabcompleters.ServerSelector;
 import net.bteuk.network.eventing.listeners.CommandPreProcess;
 import net.bteuk.network.eventing.listeners.Connect;
 import net.bteuk.network.eventing.listeners.GuiListener;
 import net.bteuk.network.eventing.listeners.PlayerInteract;
 import net.bteuk.network.eventing.listeners.PreJoinServer;
-import net.bteuk.network.sql.DatabaseInit;
-import net.bteuk.network.commands.tabcompleters.LocationSelector;
-import net.bteuk.network.commands.tabcompleters.PlayerSelector;
-import net.bteuk.network.commands.tabcompleters.ServerSelector;
-import net.bteuk.network.gui.NavigatorGui;
 import net.bteuk.network.eventing.listeners.global_teleport.MoveListener;
 import net.bteuk.network.eventing.listeners.global_teleport.TeleportListener;
+import net.bteuk.network.gui.NavigatorGui;
 import net.bteuk.network.lobby.Lobby;
+import net.bteuk.network.lobby.LobbyCommand;
+import net.bteuk.network.sql.DatabaseInit;
 import net.bteuk.network.sql.DatabaseUpdates;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.sql.RegionSQL;
+import net.bteuk.network.sql.Tutorials;
 import net.bteuk.network.utils.NetworkConfig;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.Statistics;
 import net.bteuk.network.utils.Time;
 import net.bteuk.network.utils.Tips;
 import net.bteuk.network.utils.Utils;
-import net.bteuk.network.sql.Tutorials;
 import net.bteuk.network.utils.enums.ServerType;
 import net.bteuk.network.utils.regions.RegionManager;
-import net.kyori.adventure.text.Component;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -81,6 +80,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import static net.bteuk.network.utils.Constants.PROGRESS_MAP;
 import static net.bteuk.network.utils.Constants.REGIONS_ENABLED;
 import static net.bteuk.network.utils.Constants.SERVER_NAME;
 import static net.bteuk.network.utils.Constants.SERVER_TYPE;
@@ -88,7 +88,6 @@ import static net.bteuk.network.utils.Constants.TAB;
 import static net.bteuk.network.utils.Constants.TIPS;
 import static net.bteuk.network.utils.Constants.TPLL_ENABLED;
 import static net.bteuk.network.utils.Constants.TUTORIALS;
-import static net.bteuk.network.utils.Constants.PROGRESS_MAP;
 import static net.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public final class Network extends JavaPlugin {
@@ -488,17 +487,17 @@ public final class Network extends JavaPlugin {
                 instance.globalSQL.update("UPDATE player_data SET last_online=" + Time.currentTime() + " WHERE UUID='" + uuid + "';");
 
                 //Remove player from online_users.
-                instance.globalSQL.update("DELETE FROM online_users WHERE uuid='" + uuid + "';");
+//                instance.globalSQL.update("DELETE FROM online_users WHERE uuid='" + uuid + "';");
 
-                if (TAB) {
-                    //Update tab for all players.
-                    //This is done with the tab chat channel.
-                    instance.chat.broadcastMessage(Component.text("remove " + uuid), "uknet:tab");
-                }
+//                if (TAB) {
+//                    //Update tab for all players.
+//                    //This is done with the tab chat channel.
+//                    instance.chat.broadcastMessage(Component.text("remove " + uuid), "uknet:tab");
+//                }
 
                 //Log playercount in database
-                instance.globalSQL.update("INSERT INTO player_count(log_time,players) VALUES(" + Time.currentTime() + "," +
-                        instance.globalSQL.getInt("SELECT count(uuid) FROM online_users;") + ");");
+//                instance.globalSQL.update("INSERT INTO player_count(log_time,players) VALUES(" + Time.currentTime() + "," +
+//                        instance.globalSQL.getInt("SELECT count(uuid) FROM online_users;") + ");");
 
                 //Reset last logged time.
                 if (u.afk) {

@@ -3,6 +3,7 @@ package net.bteuk.network.gui.staff;
 import net.bteuk.network.Network;
 import net.bteuk.network.gui.Gui;
 import net.bteuk.network.gui.regions.ReviewRegionRequests;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.SwitchServer;
 import net.bteuk.network.utils.Utils;
@@ -64,10 +65,10 @@ public class StaffGui extends Gui {
                             u.staffGui.open(u);
 
                         } else {
-                            u.player.sendMessage(Utils.error("You must be a reviewer to review location requests."));
+                            u.player.sendMessage(ChatUtils.error("You must be a reviewer to review location requests."));
                         }
                     } else {
-                        u.player.sendMessage(Utils.error("There are currently no location requests."));
+                        u.player.sendMessage(ChatUtils.error("There are currently no location requests."));
                     }
                 });
 
@@ -152,10 +153,10 @@ public class StaffGui extends Gui {
                             u.staffGui.open(u);
 
                         } else {
-                            u.player.sendMessage(Utils.error("You must be a reviewer to review region requests."));
+                            u.player.sendMessage(ChatUtils.error("You must be a reviewer to review region requests."));
                         }
                     } else {
-                        u.player.sendMessage(Utils.error("There are currently no region requests."));
+                        u.player.sendMessage(ChatUtils.error("There are currently no region requests."));
                     }
 
                 });
@@ -228,7 +229,7 @@ public class StaffGui extends Gui {
 
                                     }
                                 } else {
-                                    u.player.sendMessage(Utils.error("You must be a reviewer to review plots."));
+                                    u.player.sendMessage(ChatUtils.error("You must be a reviewer to review plots."));
                                 }
 
                                 //Stop iterating.
@@ -237,11 +238,11 @@ public class StaffGui extends Gui {
 
                             //If counter is equal to the size of the array then all plots have been cycled through without result.
                             if (counter == nPlots.size()) {
-                                u.player.sendMessage(Utils.error("You are the owner or a member of all remaining submitted plots."));
+                                u.player.sendMessage(ChatUtils.error("You are the owner or a member of all remaining submitted plots."));
                             }
                         }
                     } else {
-                        u.player.sendMessage(Utils.error("There are currently no submitted plots."));
+                        u.player.sendMessage(ChatUtils.error("There are currently no submitted plots."));
                     }
                 });
 
@@ -263,7 +264,7 @@ public class StaffGui extends Gui {
 
                     } else {
 
-                        u.player.sendMessage(Utils.error("You do not have permission to access the Moderation Menu."));
+                        u.player.sendMessage(ChatUtils.error("You do not have permission to access the Moderation Menu."));
                         //Don't close the inventory as the player could have just miss-clicked, the chat should still be visible either way.
                         //Staff users should also be aware if they have this permission beforehand.
 

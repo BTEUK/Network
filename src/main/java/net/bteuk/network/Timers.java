@@ -1,30 +1,24 @@
 package net.bteuk.network;
 
 import lombok.Getter;
-import me.clip.placeholderapi.PlaceholderAPI;
 import net.bteuk.network.eventing.events.EventManager;
 import net.bteuk.network.eventing.listeners.Connect;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.utils.NetworkUser;
-import net.bteuk.network.utils.Roles;
 import net.bteuk.network.utils.Statistics;
 import net.bteuk.network.utils.Time;
 import net.bteuk.network.utils.regions.Inactivity;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 import static net.bteuk.network.utils.Constants.DISCORD_LINKING;
 import static net.bteuk.network.utils.Constants.LOGGER;
 import static net.bteuk.network.utils.Constants.REGIONS_ENABLED;
 import static net.bteuk.network.utils.Constants.SERVER_NAME;
-import static net.bteuk.network.utils.Constants.TAB;
 import static net.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public class Timers {
@@ -154,32 +148,32 @@ public class Timers {
             //Ping all players on this server to check their online status.
             for (NetworkUser user : users) {
 
-                //Update the last_ping and display name.
-                //Check if display name has actually changed.
-                if ((PlaceholderAPI.setPlaceholders(user.player, "%luckperms_prefix%") + " " + user.player.getName()).equals(
-                        globalSQL.getString("SELECT display_name FROM online_users WHERE uuid='" + user.player.getUniqueId() + "' AND server='" + SERVER_NAME + "';")
-                )) {
-
-                    //Update last ping
-                    globalSQL.update("UPDATE online_users SET last_ping=" + time + " WHERE uuid='" + user.player.getUniqueId() + "' AND server='" + SERVER_NAME + "';");
-
-                } else {
-
-                    //Update display name, primary role and last ping
-                    globalSQL.update("UPDATE online_users SET last_ping=" + time + ",display_name='" +
-                            PlaceholderAPI.setPlaceholders(user.player, "%luckperms_prefix%") + " " + user.player.getName() +
-                            "',primary_role='" + Roles.getPrimaryRole(user.player) + "' WHERE uuid='" + user.player.getUniqueId() + "' AND server='" + SERVER_NAME + "';");
-
-                    if (TAB) {
-                        //Update tab for all players to update display name.
-                        //This is done with the tab chat channel.
-                        instance.getChat().broadcastMessage(Component.text("update " + user.player.getUniqueId()), "uknet:tab");
-                    }
-
-                }
+//                //Update the last_ping and display name.
+//                //Check if display name has actually changed.
+//                if ((PlaceholderAPI.setPlaceholders(user.player, "%luckperms_prefix%") + " " + user.player.getName()).equals(
+//                        globalSQL.getString("SELECT display_name FROM online_users WHERE uuid='" + user.player.getUniqueId() + "' AND server='" + SERVER_NAME + "';")
+//                )) {
+//
+//                    //Update last ping
+//                    globalSQL.update("UPDATE online_users SET last_ping=" + time + " WHERE uuid='" + user.player.getUniqueId() + "' AND server='" + SERVER_NAME + "';");
+//
+//                } else {
+//
+//                    //Update display name, primary role and last ping
+//                    globalSQL.update("UPDATE online_users SET last_ping=" + time + ",display_name='" +
+//                            PlaceholderAPI.setPlaceholders(user.player, "%luckperms_prefix%") + " " + user.player.getName() +
+//                            "',primary_role='" + Roles.getPrimaryRole(user.player) + "' WHERE uuid='" + user.player.getUniqueId() + "' AND server='" + SERVER_NAME + "';");
+//
+//                    if (TAB) {
+//                        //Update tab for all players to update display name.
+//                        //This is done with the tab chat channel.
+//                        instance.getChat().broadcastMessage(Component.text("update " + user.player.getUniqueId()), "uknet:tab");
+//                    }
+//
+//                }
 
                 //If navigator is enabled check if they have it in slot 9.
-                if (user.navigatorEnabled) {
+                if (user.isNavigatorEnabled()) {
                     slot9 = user.player.getInventory().getItem(8);
 
                     if (slot9 == null) {
@@ -220,23 +214,23 @@ public class Timers {
                 }
             }
 
-            //Check for users switching to this server.
-            //If their switch time was greater than 10 seconds ago, disconnect them from the network, if not already.
-            uuids = globalSQL.getStringList("SELECT uuid FROM server_switch WHERE to_server='" + SERVER_NAME + "';");
-
-            //Iterate through uuids and check time.
-            for (String uuid : uuids) {
-
-                //If it's more than 10 seconds ago.
-                if (globalSQL.getLong("SELECT switch_time FROM server_switch WHERE uuid='" + uuid + "';") < time - (1000 * 10)) {
-
-                    //Run network disconnect and remove their entry.
-                    globalSQL.update("DELETE FROM server_switch WHERE uuid='" + uuid + "';");
-
-                    connect.networkLeaveEvent(Bukkit.getOfflinePlayer(UUID.fromString(uuid)));
-
-                }
-            }
+//            //Check for users switching to this server.
+//            //If their switch time was greater than 10 seconds ago, disconnect them from the network, if not already.
+//            uuids = globalSQL.getStringList("SELECT uuid FROM server_switch WHERE to_server='" + SERVER_NAME + "';");
+//
+//            //Iterate through uuids and check time.
+//            for (String uuid : uuids) {
+//
+//                //If it's more than 10 seconds ago.
+//                if (globalSQL.getLong("SELECT switch_time FROM server_switch WHERE uuid='" + uuid + "';") < time - (1000 * 10)) {
+//
+//                    //Run network disconnect and remove their entry.
+//                    globalSQL.update("DELETE FROM server_switch WHERE uuid='" + uuid + "';");
+//
+//                    connect.networkLeaveEvent(Bukkit.getOfflinePlayer(UUID.fromString(uuid)));
+//
+//                }
+//            }
 
         }, 0L, 20L));
 
@@ -276,18 +270,18 @@ public class Timers {
                 }
             }
 
-            //For all online players sync the roles.
-            for (NetworkUser u : instance.getUsers()) {
-
-                if (u.isLinked && DISCORD_LINKING) {
-                    //Get the highest role for syncing and sync it, except for guest.
-                    String role = Roles.builderRole(u.player);
-                    discordSync(u.discord_id, role);
-                }
-
-                //Update role in online_players table.
-                globalSQL.update("UPDATE online_users SET primary_role='" + Roles.getPrimaryRole(u.player) + "' WHERE uuid='" + u.player.getUniqueId() + "';");
-            }
+//            //For all online players sync the roles.
+//            for (NetworkUser u : instance.getUsers()) {
+//
+//                if (u.isLinked && DISCORD_LINKING) {
+//                    //Get the highest role for syncing and sync it, except for guest.
+//                    String role = Roles.builderRole(u.player);
+//                    discordSync(u.discord_id, role);
+//                }
+//
+//                //Update role in online_players table.
+//                globalSQL.update("UPDATE online_users SET primary_role='" + Roles.getPrimaryRole(u.player) + "' WHERE uuid='" + u.player.getUniqueId() + "';");
+//            }
 
             //Update online time of all players.
             Statistics.saveAll();
@@ -304,16 +298,16 @@ public class Timers {
 
     }
 
-    //TODO: Only run this on role add/remove as well as discord link/unlink.
-    public void discordSync(long discord_id, String role) {
-        //Remove all roles except current role.
-        for (Map.Entry<String, Long> entry : Network.getInstance().getTimers().getRoles().entrySet()) {
-
-            if (role.equals(entry.getKey())) {
-                instance.getChat().broadcastMessage(Component.text("addrole " + discord_id + " " + entry.getValue()), "uknet:discord_linking");
-            } else {
-                instance.getChat().broadcastMessage(Component.text("removerole " + discord_id + " " + entry.getValue()), "uknet:discord_linking");
-            }
-        }
-    }
+//    //TODO: Only run this on role add/remove as well as discord link/unlink.
+//    public void discordSync(long discord_id, String role) {
+//        //Remove all roles except current role.
+//        for (Map.Entry<String, Long> entry : Network.getInstance().getTimers().getRoles().entrySet()) {
+//
+//            if (role.equals(entry.getKey())) {
+//                instance.getChat().broadcastMessage(Component.text("addrole " + discord_id + " " + entry.getValue()), "uknet:discord_linking");
+//            } else {
+//                instance.getChat().broadcastMessage(Component.text("removerole " + discord_id + " " + entry.getValue()), "uknet:discord_linking");
+//            }
+//        }
+//    }
 }

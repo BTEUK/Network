@@ -2,11 +2,11 @@ package net.bteuk.network.eventing.listeners;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.exceptions.NotMutedException;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.Statistics;
 import net.bteuk.network.utils.TextureUtils;
 import net.bteuk.network.utils.Time;
-import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.staff.Moderation;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -53,7 +53,7 @@ public class CommandPreProcess extends Moderation implements Listener {
             //If u is null, cancel.
             if (u == null) {
                 LOGGER.severe("User " + e.getPlayer().getName() + " can not be found!");
-                e.getPlayer().sendMessage(Utils.error("User can not be found, please relog!"));
+                e.getPlayer().sendMessage(ChatUtils.error("User can not be found, please relog!"));
                 e.setCancelled(true);
                 return;
             }

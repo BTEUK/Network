@@ -2,8 +2,8 @@ package net.bteuk.network.commands.navigation;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.eventing.events.EventManager;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.SwitchServer;
-import net.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -25,7 +25,7 @@ public class Tp implements CommandExecutor {
         //Sender must be a player.
         if (!(sender instanceof Player p)) {
 
-            sender.sendMessage(Utils.error("You must be a player to use this command."));
+            sender.sendMessage(ChatUtils.error("You must be a player to use this command."));
             return true;
 
         }
@@ -33,7 +33,7 @@ public class Tp implements CommandExecutor {
         //Check if args exist.
         if (args.length == 0) {
 
-            p.sendMessage(Utils.error("You must specify a player to teleport to."));
+            p.sendMessage(ChatUtils.error("You must specify a player to teleport to."));
             return true;
 
         }
@@ -64,12 +64,12 @@ public class Tp implements CommandExecutor {
                             Back.setPreviousCoordinate(p.getUniqueId().toString(), p.getLocation());
 
                             p.teleport(player.getLocation());
-                            p.sendMessage(Utils.success("Teleported to ")
+                            p.sendMessage(ChatUtils.success("Teleported to ")
                                     .append(Component.text(args[0], NamedTextColor.DARK_AQUA)));
 
                         } else {
                             p.sendMessage(Component.text(args[0], NamedTextColor.DARK_RED)
-                                    .append(Utils.error(" is no longer online.")));
+                                    .append(ChatUtils.error(" is no longer online.")));
                         }
 
                     } else {
@@ -82,17 +82,17 @@ public class Tp implements CommandExecutor {
 
                 } else {
                     p.sendMessage(Component.text(args[0], NamedTextColor.DARK_RED)
-                            .append(Utils.error(" has teleport disabled.")));
+                            .append(ChatUtils.error(" has teleport disabled.")));
                 }
 
             } else {
                 p.sendMessage(Component.text(args[0], NamedTextColor.DARK_RED)
-                        .append(Utils.error(" is not online.")));
+                        .append(ChatUtils.error(" is not online.")));
             }
 
         } else {
             p.sendMessage(Component.text(args[0], NamedTextColor.DARK_RED)
-                    .append(Utils.error(" does not exist.")));
+                    .append(ChatUtils.error(" does not exist.")));
         }
         return true;
     }

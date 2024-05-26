@@ -1,8 +1,8 @@
 package net.bteuk.network.commands;
 
 import net.bteuk.network.Network;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
-import net.bteuk.network.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -36,7 +36,7 @@ public class TipsToggle implements CommandExecutor {
         //Check if the sender is a player.
         if (!(sender instanceof Player p)) {
 
-            sender.sendMessage(Utils.error("This command can only be run by a player."));
+            sender.sendMessage(ChatUtils.error("This command can only be run by a player."));
             return true;
 
         }
@@ -65,7 +65,7 @@ public class TipsToggle implements CommandExecutor {
             //Update the database value.
             Network.getInstance().getGlobalSQL().update("UPDATE player_data SET tips_enabled=0 WHERE uuid='" + p.getUniqueId() + "';");
 
-            p.sendMessage(Utils.success("Disabled tips in chat."));
+            p.sendMessage(ChatUtils.success("Disabled tips in chat."));
 
         } else {
 
@@ -75,7 +75,7 @@ public class TipsToggle implements CommandExecutor {
             //Update the database value.
             Network.getInstance().getGlobalSQL().update("UPDATE player_data SET tips_enabled=1 WHERE uuid='" + p.getUniqueId() + "';");
 
-            p.sendMessage(Utils.success("Enabled tips in chat."));
+            p.sendMessage(ChatUtils.success("Enabled tips in chat."));
 
         }
     }

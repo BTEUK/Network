@@ -12,8 +12,8 @@ import net.bteuk.network.eventing.events.EventManager;
 import net.bteuk.network.exceptions.DurationFormatException;
 import net.bteuk.network.exceptions.NotBannedException;
 import net.bteuk.network.exceptions.NotMutedException;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.Time;
-import net.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -150,9 +150,9 @@ public abstract class Moderation {
      */
     public Component getMutedComponent(String uuid) throws NotMutedException {
         if (isMuted(uuid)) {
-            return Utils.error("You have been muted for ")
+            return ChatUtils.error("You have been muted for ")
                     .append(Component.text(getMutedReason(uuid), NamedTextColor.DARK_RED))
-                    .append(Utils.error(" until "))
+                    .append(ChatUtils.error(" until "))
                     .append(Component.text(getMuteDuration(uuid), NamedTextColor.DARK_RED));
         } else {
             throw new NotMutedException("The user with uuid " + uuid + " is not muted.");

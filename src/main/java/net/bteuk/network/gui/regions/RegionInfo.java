@@ -3,15 +3,16 @@ package net.bteuk.network.gui.regions;
 import net.bteuk.network.Network;
 import net.bteuk.network.commands.navigation.Back;
 import net.bteuk.network.eventing.events.EventManager;
+import net.bteuk.network.eventing.listeners.regions.RegionTagListener;
 import net.bteuk.network.gui.Gui;
 import net.bteuk.network.gui.InviteMembers;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.utils.SwitchServer;
 import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.enums.RegionStatus;
 import net.bteuk.network.utils.enums.RegionType;
 import net.bteuk.network.utils.regions.Region;
-import net.bteuk.network.eventing.listeners.regions.RegionTagListener;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -99,7 +100,7 @@ public class RegionInfo extends Gui {
                     //Create chat listener and send message telling the player.
                     //Listener will automatically close after 1 minute or if a message is sent.
                     regionTagListener = new RegionTagListener(u.player, region);
-                    u.player.sendMessage(Utils.success("Write your region tag in chat, the first message counts."));
+                    u.player.sendMessage(ChatUtils.success("Write your region tag in chat, the first message counts."));
                     u.player.closeInventory();
 
                 });
@@ -124,7 +125,7 @@ public class RegionInfo extends Gui {
 
                         Location l = globalSQL.getLocation(region.getCoordinateID(uuid));
                         u.player.teleport(l);
-                        u.player.sendMessage(Utils.success("Teleported to region ")
+                        u.player.sendMessage(ChatUtils.success("Teleported to region ")
                                 .append(Component.text(region.getTag(uuid), NamedTextColor.DARK_AQUA)));
 
                     } else {
@@ -159,15 +160,15 @@ public class RegionInfo extends Gui {
 
                             //Create coordinate id for location of player and set that as the new coordinate id.
                             region.setCoordinateID(uuid, coordinateID);
-                            u.player.sendMessage(Utils.success("Set teleport location for region ")
+                            u.player.sendMessage(ChatUtils.success("Set teleport location for region ")
                                     .append(Component.text(region.getTag(uuid), NamedTextColor.DARK_AQUA))
-                                    .append(Utils.success(" at your current location.")));
+                                    .append(ChatUtils.success(" at your current location.")));
 
                         } else {
-                            u.player.sendMessage(Utils.error("You are not standing in the correct region."));
+                            u.player.sendMessage(ChatUtils.error("You are not standing in the correct region."));
                         }
                     } else {
-                        u.player.sendMessage(Utils.error("You are not standing in a region."));
+                        u.player.sendMessage(ChatUtils.error("You are not standing in a region."));
                     }
                 });
 
@@ -184,9 +185,9 @@ public class RegionInfo extends Gui {
                             //Set the region as private and refresh gui.
                             region.setDefault();
 
-                            u.player.sendMessage(Utils.success("Region ")
+                            u.player.sendMessage(ChatUtils.success("Region ")
                                     .append(Component.text(region.getTag(uuid), NamedTextColor.DARK_AQUA))
-                                    .append(Utils.success(" is now private.")));
+                                    .append(ChatUtils.success(" is now private.")));
                             this.refresh();
 
                         });
@@ -208,9 +209,9 @@ public class RegionInfo extends Gui {
                                         + region + "');");
                             }
 
-                            u.player.sendMessage(Utils.success("Region ")
+                            u.player.sendMessage(ChatUtils.success("Region ")
                                     .append(Component.text(region.getTag(uuid), NamedTextColor.DARK_AQUA))
-                                    .append(Utils.success(" is now public.")));
+                                    .append(ChatUtils.success(" is now public.")));
                             this.refresh();
 
                         });

@@ -1,10 +1,11 @@
 package net.bteuk.network.gui;
 
 import net.bteuk.network.Network;
-import net.bteuk.network.commands.navigation.Back;
 import net.bteuk.network.commands.Nightvision;
+import net.bteuk.network.commands.navigation.Back;
 import net.bteuk.network.eventing.events.EventManager;
 import net.bteuk.network.gui.navigation.ExploreGui;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.LightsOut;
 import net.bteuk.network.utils.SwitchServer;
 import net.bteuk.network.utils.Utils;
@@ -56,7 +57,7 @@ public class NavigatorGui extends Gui {
                     if (SERVER_TYPE == ServerType.TUTORIAL) {
 
                         u.player.closeInventory();
-                        u.player.sendMessage(Utils.error("You are already in the tutorials server, please use the menu in slot 8."));
+                        u.player.sendMessage(ChatUtils.error("You are already in the tutorials server, please use the menu in slot 8."));
 
                     } else {
                         if (TUTORIALS) {
@@ -67,11 +68,11 @@ public class NavigatorGui extends Gui {
 
                             } else {
                                 u.player.closeInventory();
-                                u.player.sendMessage(Utils.error("The tutorials server is offline!"));
+                                u.player.sendMessage(ChatUtils.error("The tutorials server is offline!"));
                             }
                         } else {
                             u.player.closeInventory();
-                            u.player.sendMessage(Utils.error("Tutorials are currently not enabled!"));
+                            u.player.sendMessage(ChatUtils.error("Tutorials are currently not enabled!"));
                         }
                     }
 
@@ -84,26 +85,26 @@ public class NavigatorGui extends Gui {
                                 .append(Component.text("/navigator", NamedTextColor.GRAY))),
                 u -> {
 
-                    if (u.navigatorEnabled) {
+                    if (u.isNavigatorEnabled()) {
 
                         //Set navigator to false and remove the navigator from the inventory.
-                        u.navigatorEnabled = false;
+                        u.setNavigatorEnabled(false);
                         u.player.getInventory().setItem(8, null);
 
                         //Disable navigator in database.
                         Network.getInstance().getGlobalSQL().update("UPDATE player_data SET navigator=0 WHERE uuid='" + u.player.getUniqueId() + "';");
 
-                        u.player.sendMessage(Utils.success("Disabled navigator in inventory."));
+                        u.player.sendMessage(ChatUtils.success("Disabled navigator in inventory."));
 
                     } else {
 
                         //Set navigator to true.
-                        u.navigatorEnabled = true;
+                        u.setNavigatorEnabled(true);
 
                         //Enable navigator in database.
                         Network.getInstance().getGlobalSQL().update("UPDATE player_data SET navigator=1 WHERE uuid='" + u.player.getUniqueId() + "';");
 
-                        u.player.sendMessage(Utils.success("Enabled navigator in inventory."));
+                        u.player.sendMessage(ChatUtils.success("Enabled navigator in inventory."));
                     }
 
                 });
@@ -160,7 +161,7 @@ public class NavigatorGui extends Gui {
 
                         Back.setPreviousCoordinate(u.player.getUniqueId().toString(), u.player.getLocation());
                         u.player.teleport(Network.getInstance().getLobby().spawn);
-                        u.player.sendMessage(Utils.success("Teleported to spawn."));
+                        u.player.sendMessage(ChatUtils.success("Teleported to spawn."));
 
                     } else {
 

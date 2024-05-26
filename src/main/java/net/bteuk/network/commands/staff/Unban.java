@@ -1,8 +1,8 @@
 package net.bteuk.network.commands.staff;
 
 import net.bteuk.network.Network;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.staff.Moderation;
-import net.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
@@ -38,14 +38,14 @@ public class Unban extends Moderation implements CommandExecutor {
         //Check if sender is player, then check permissions
         if (sender instanceof Player p) {
             if (!p.hasPermission("uknet.ban")) {
-                p.sendMessage(Utils.error("You do not have permission to use this command."));
+                p.sendMessage(ChatUtils.error("You do not have permission to use this command."));
                 return true;
             }
         }
 
         //Check args.
         if (args.length < 1) {
-            sender.sendMessage(Utils.error("/unban <player>"));
+            sender.sendMessage(ChatUtils.error("/unban <player>"));
             return true;
         }
 
@@ -53,7 +53,7 @@ public class Unban extends Moderation implements CommandExecutor {
         //If uuid exists for name.
         if (!Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM player_data WHERE name='" + args[0] + "';")) {
             sender.sendMessage(Component.text(args[0], NamedTextColor.DARK_RED)
-                    .append(Utils.error(" is not a valid player.")));
+                    .append(ChatUtils.error(" is not a valid player.")));
             return true;
         }
 
@@ -83,11 +83,11 @@ public class Unban extends Moderation implements CommandExecutor {
             unban(uuid);
 
             //Send feedback.
-            return (Utils.success("Unbanned ")
+            return (ChatUtils.success("Unbanned ")
                     .append(Component.text(name, NamedTextColor.DARK_AQUA)));
 
         } else {
-            return (Utils.error(name + " is not currently banned."));
+            return (ChatUtils.error(name + " is not currently banned."));
         }
     }
 }

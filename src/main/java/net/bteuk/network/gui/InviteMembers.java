@@ -5,6 +5,7 @@ import net.bteuk.network.eventing.events.EventManager;
 import net.bteuk.network.gui.plotsystem.PlotInfo;
 import net.bteuk.network.gui.plotsystem.ZoneInfo;
 import net.bteuk.network.gui.regions.RegionInfo;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.sql.RegionSQL;
@@ -133,15 +134,15 @@ public class InviteMembers extends Gui {
                                     invite(u, uuid);
 
                                 } else {
-                                    u.player.sendMessage(Utils.error("You've already invited this player to your " + regionType.label + "."));
+                                    u.player.sendMessage(ChatUtils.error("You've already invited this player to your " + regionType.label + "."));
                                 }
 
                             } else {
-                                u.player.sendMessage(Utils.error("This player is already a member of your " + regionType.label + "."));
+                                u.player.sendMessage(ChatUtils.error("This player is already a member of your " + regionType.label + "."));
                             }
 
                         } else {
-                            u.player.sendMessage(Utils.error("This player is no longer online."));
+                            u.player.sendMessage(ChatUtils.error("This player is no longer online."));
                         }
 
                     });
@@ -299,9 +300,9 @@ public class InviteMembers extends Gui {
             EventManager.createEvent(uuid, "network", globalSQL.getString("SELECT server FROM online_users WHERE uuid='" + uuid + "';"),
                     "invite region " + region.regionName());
 
-            u.player.sendMessage(Utils.success("Invited ")
+            u.player.sendMessage(ChatUtils.success("Invited ")
                     .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "'"), NamedTextColor.DARK_AQUA))
-                    .append(Utils.success(" to region "))
+                    .append(ChatUtils.success(" to region "))
                     .append(Component.text(region.getTag(u.player.getUniqueId().toString()), NamedTextColor.DARK_AQUA)));
 
         } else if (regionType == RegionType.PLOT) {
@@ -317,9 +318,9 @@ public class InviteMembers extends Gui {
             EventManager.createEvent(uuid, "network", globalSQL.getString("SELECT server FROM online_users WHERE uuid='" + uuid + "';"),
                     "invite plot " + plotID);
 
-            u.player.sendMessage(Utils.success("Invited ")
+            u.player.sendMessage(ChatUtils.success("Invited ")
                     .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "'"), NamedTextColor.DARK_AQUA))
-                    .append(Utils.success(" to your Plot.")));
+                    .append(ChatUtils.success(" to your Plot.")));
 
         } else if (regionType == RegionType.ZONE) {
 
@@ -334,9 +335,9 @@ public class InviteMembers extends Gui {
             EventManager.createEvent(uuid, "network", globalSQL.getString("SELECT server FROM online_users WHERE uuid='" + uuid + "';"),
                     "invite zone " + zoneID);
 
-            u.player.sendMessage(Utils.success("Invited ")
+            u.player.sendMessage(ChatUtils.success("Invited ")
                     .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "'"), NamedTextColor.DARK_AQUA))
-                    .append(Utils.success(" to your Zone.")));
+                    .append(ChatUtils.success(" to your Zone.")));
 
         }
     }

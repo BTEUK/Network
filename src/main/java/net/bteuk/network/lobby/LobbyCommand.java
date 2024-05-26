@@ -2,7 +2,7 @@ package net.bteuk.network.lobby;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.commands.AbstractCommand;
-import net.bteuk.network.utils.Utils;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.enums.ServerType;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.Command;
@@ -16,7 +16,7 @@ public class LobbyCommand extends AbstractCommand {
 
     private final Lobby lobby;
 
-    private static final Component INVALID_FORMAT = Utils.error("/lobby reload portals");
+    private static final Component INVALID_FORMAT = ChatUtils.error("/lobby reload portals");
 
     public LobbyCommand(Network instance, Lobby lobby) {
         super(instance, "lobby");
@@ -44,7 +44,7 @@ public class LobbyCommand extends AbstractCommand {
             }
 
             lobby.reloadPortals();
-            sender.sendMessage(Utils.success("Reloaded portals"));
+            sender.sendMessage(ChatUtils.success("Reloaded portals"));
 
         } else {
             sender.sendMessage(INVALID_FORMAT);

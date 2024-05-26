@@ -2,9 +2,9 @@ package net.bteuk.network.commands.navigation;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.eventing.events.EventManager;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.utils.SwitchServer;
-import net.bteuk.network.utils.Utils;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -24,7 +24,7 @@ public class Back implements CommandExecutor {
         //Check if the sender is a player.
         if (!(sender instanceof Player p)) {
 
-            sender.sendMessage(Utils.error("This command can only be used by a player."));
+            sender.sendMessage(ChatUtils.error("This command can only be used by a player."));
             return true;
 
         }
@@ -35,7 +35,7 @@ public class Back implements CommandExecutor {
         //Check if the player has a previous coordinate.
         if (coordinateID == 0) {
 
-            p.sendMessage(Utils.error("You have not teleported anywhere previously."));
+            p.sendMessage(ChatUtils.error("You have not teleported anywhere previously."));
             return true;
 
         }
@@ -52,7 +52,7 @@ public class Back implements CommandExecutor {
 
             //Teleport player to the coordinate.
             p.teleport(l);
-            p.sendMessage(Utils.success("Teleported to previous location."));
+            p.sendMessage(ChatUtils.success("Teleported to previous location."));
 
         } else {
 

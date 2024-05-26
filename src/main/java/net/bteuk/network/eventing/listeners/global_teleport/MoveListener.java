@@ -2,11 +2,11 @@ package net.bteuk.network.eventing.listeners.global_teleport;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.eventing.events.EventManager;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.SwitchServer;
 import net.bteuk.network.utils.Time;
-import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.enums.RegionStatus;
 import net.bteuk.network.utils.regions.Region;
 import net.bteuk.network.utils.regions.RegionManager;
@@ -18,7 +18,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-import static net.bteuk.network.utils.Constants.*;
+import static net.bteuk.network.utils.Constants.EARTH_WORLD;
+import static net.bteuk.network.utils.Constants.LOGGER;
+import static net.bteuk.network.utils.Constants.REGIONS_ENABLED;
 import static net.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public class MoveListener implements Listener {
@@ -63,7 +65,7 @@ public class MoveListener implements Listener {
         //If u is null, cancel.
         if (u == null) {
             LOGGER.severe("User " + p.getName() + " can not be found!");
-            p.sendMessage(Utils.error("User can not be found, please relog!"));
+            p.sendMessage(ChatUtils.error("User can not be found, please relog!"));
             e.setCancelled(true);
             return;
         }
@@ -80,7 +82,7 @@ public class MoveListener implements Listener {
         if (u.afk) {
             u.last_time_log = u.last_movement;
             u.afk = false;
-            Network.getInstance().chat.broadcastAFK(u.player, false);
+            Network.getInstance().getChat().broadcastAFK(u.player, false);
         }
 
         // If regions are enabled, check for movement between regions.
@@ -141,20 +143,20 @@ public class MoveListener implements Listener {
 
                             } else {
 
-                                p.sendMessage(Utils.error("This region is on another server, however the server is currently offline."));
+                                p.sendMessage(ChatUtils.error("This region is on another server, however the server is currently offline."));
 
                             }
 
                         } else {
 
                             //You can't enter this region.
-                            p.sendMessage(Utils.error("The terrain for this region has not been generated, you must be at least Jr.Builder to load new terrain."));
+                            p.sendMessage(ChatUtils.error("The terrain for this region has not been generated, you must be at least Jr.Builder to load new terrain."));
                         }
 
                     } else {
 
                         //Cancel movement as the location is on another server.
-                        p.sendMessage(Utils.error("The terrain for this location is on another server, you may not enter."));
+                        p.sendMessage(ChatUtils.error("The terrain for this location is on another server, you may not enter."));
                     }
                     e.setCancelled(true);
                 } else {
@@ -169,28 +171,28 @@ public class MoveListener implements Listener {
                         if (region.isOwner(p.getUniqueId().toString())) {
 
                             p.sendActionBar(
-                                    Utils.success("You have entered ")
+                                    ChatUtils.success("You have entered ")
                                             .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
-                                            .append(Utils.success(" and left "))
+                                            .append(ChatUtils.success(" and left "))
                                             .append(Component.text(u.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
-                                            .append(Utils.success(", you are the owner of this region.")));
+                                            .append(ChatUtils.success(", you are the owner of this region.")));
                             region.setLastEnter(p.getUniqueId().toString());
 
                             //If the region is inactive, set it to active.
                             if (region.status() == RegionStatus.INACTIVE) {
                                 region.setDefault();
-                                p.sendMessage(Utils.success("This region is no longer \"Inactive\", it has been set back to default settings."));
+                                p.sendMessage(ChatUtils.success("This region is no longer \"Inactive\", it has been set back to default settings."));
                             }
 
                             //Check if the player is a region members.
                         } else if (region.isMember(p.getUniqueId().toString())) {
 
                             p.sendActionBar(
-                                    Utils.success("You have entered ")
+                                    ChatUtils.success("You have entered ")
                                             .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
-                                            .append(Utils.success(" and left "))
+                                            .append(ChatUtils.success(" and left "))
                                             .append(Component.text(u.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
-                                            .append(Utils.success(", you are a member of this region.")));
+                                            .append(ChatUtils.success(", you are a member of this region.")));
                             region.setLastEnter(p.getUniqueId().toString());
 
                             //If the region is inactive, make this member to owner.
@@ -204,8 +206,8 @@ public class MoveListener implements Listener {
                                 //Update any requests to take into account the new region owner.
                                 region.updateRequests();
 
-                                p.sendMessage(Utils.success("This region is no longer \"Inactive\", it has been set back to default settings."));
-                                p.sendMessage(Utils.success("You have been made the new region owner."));
+                                p.sendMessage(ChatUtils.success("This region is no longer \"Inactive\", it has been set back to default settings."));
+                                p.sendMessage(ChatUtils.success("You have been made the new region owner."));
 
                             }
 
@@ -213,19 +215,19 @@ public class MoveListener implements Listener {
                         } else if (region.status() == RegionStatus.OPEN && p.hasPermission("group.jrbuilder")) {
 
                             p.sendActionBar(
-                                    Utils.success("You have entered ")
+                                    ChatUtils.success("You have entered ")
                                             .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
-                                            .append(Utils.success(" and left "))
+                                            .append(ChatUtils.success(" and left "))
                                             .append(Component.text(u.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
-                                            .append(Utils.success(", you can build in this region.")));
+                                            .append(ChatUtils.success(", you can build in this region.")));
 
                         } else {
 
                             //Send default enter message.
                             p.sendActionBar(
-                                    Utils.success("You have entered ")
+                                    ChatUtils.success("You have entered ")
                                             .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
-                                            .append(Utils.success(" and left "))
+                                            .append(ChatUtils.success(" and left "))
                                             .append(Component.text(u.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA)));
 
                         }
@@ -236,7 +238,7 @@ public class MoveListener implements Listener {
                     } else {
 
                         //You can't enter this region.
-                        p.sendMessage(Utils.error("The terrain for this region has not been generated, you must be at least Jr.Builder to load new terrain."));
+                        p.sendMessage(ChatUtils.error("The terrain for this region has not been generated, you must be at least Jr.Builder to load new terrain."));
                         e.setCancelled(true);
                     }
                 }

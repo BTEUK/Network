@@ -2,8 +2,8 @@ package net.bteuk.network.commands;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.eventing.events.EventManager;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.PlotSQL;
-import net.bteuk.network.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -17,13 +17,13 @@ public class Zone implements CommandExecutor {
 
         if (!(sender instanceof Player p)) {
 
-            sender.sendMessage(Utils.error("You must be a player to run this command."));
+            sender.sendMessage(ChatUtils.error("You must be a player to run this command."));
             return true;
 
         }
 
         if (args.length < 2) {
-            p.sendMessage(Utils.error("/zone join <zoneID>"));
+            p.sendMessage(ChatUtils.error("/zone join <zoneID>"));
             return true;
         }
 
@@ -35,13 +35,13 @@ public class Zone implements CommandExecutor {
             zoneID = Integer.parseInt(args[1]);
 
         } catch (NumberFormatException e) {
-            p.sendMessage(Utils.error("/zone join <plotID>"));
+            p.sendMessage(ChatUtils.error("/zone join <plotID>"));
             return true;
         }
 
         //Check if the first arg is 'join'
         if (!args[0].equals("join")) {
-            p.sendMessage(Utils.error("/zone join <plotID>"));
+            p.sendMessage(ChatUtils.error("/zone join <plotID>"));
             return true;
         }
 
@@ -60,7 +60,7 @@ public class Zone implements CommandExecutor {
             return true;
 
         } else {
-            p.sendMessage(Utils.error("You have not been invited to join this Zone."));
+            p.sendMessage(ChatUtils.error("You have not been invited to join this Zone."));
             return true;
         }
     }

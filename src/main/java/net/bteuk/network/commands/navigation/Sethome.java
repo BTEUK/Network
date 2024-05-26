@@ -1,8 +1,8 @@
 package net.bteuk.network.commands.navigation;
 
 import net.bteuk.network.Network;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.GlobalSQL;
-import net.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -44,7 +44,7 @@ public class Sethome implements CommandExecutor {
 
         //Check if the sender is a player.
         if (!(sender instanceof Player p)) {
-            sender.sendMessage(Utils.error("This command can only be used by players."));
+            sender.sendMessage(ChatUtils.error("This command can only be used by players."));
             return true;
         }
 
@@ -55,7 +55,7 @@ public class Sethome implements CommandExecutor {
 
             //If already has a default home set, the player first has to delete it.
             if (globalSQL.hasRow("SELECT uuid FROM home WHERE uuid='" + p.getUniqueId() + "' AND name IS NULL;")) {
-                p.sendMessage(Utils.error("You already have a default home set, to delete it type ")
+                p.sendMessage(ChatUtils.error("You already have a default home set, to delete it type ")
                         .append(Component.text("/delhome", NamedTextColor.DARK_RED)));
                 return true;
             }
@@ -65,14 +65,14 @@ public class Sethome implements CommandExecutor {
 
             globalSQL.update("INSERT INTO home(coordinate_id,uuid) VALUES(" + coordinate_id + ",'" + p.getUniqueId() + "');");
 
-            p.sendMessage(Utils.success("Default home set to current location, to teleport here type ")
+            p.sendMessage(ChatUtils.success("Default home set to current location, to teleport here type ")
                     .append(Component.text("/home", NamedTextColor.DARK_AQUA)));
 
         } else {
 
             //Check for permission.
             if (!p.hasPermission("uknet.navigation.homes")) {
-                p.sendMessage(Utils.error("You do not have permission to set multiple homes, only to set a default home using ")
+                p.sendMessage(ChatUtils.error("You do not have permission to set multiple homes, only to set a default home using ")
                         .append(Component.text("/sethome", NamedTextColor.DARK_RED)));
                 return true;
             }
@@ -82,14 +82,14 @@ public class Sethome implements CommandExecutor {
 
             //Check name length.
             if (name.length() > 64) {
-                p.sendMessage(Utils.error("The home name must be 64 characters or less."));
+                p.sendMessage(ChatUtils.error("The home name must be 64 characters or less."));
                 return true;
             }
 
             if (globalSQL.hasRow("SELECT uuid FROM home WHERE uuid='" + p.getUniqueId() + "' AND name='" + name + "';")) {
-                p.sendMessage(Utils.error("You already have a home set with the name ")
+                p.sendMessage(ChatUtils.error("You already have a home set with the name ")
                         .append(Component.text(name, NamedTextColor.DARK_RED))
-                        .append(Utils.error(", you can delete it by typing "))
+                        .append(ChatUtils.error(", you can delete it by typing "))
                         .append(Component.text("/delhome " + name, NamedTextColor.DARK_RED)));
                 return true;
             }
@@ -99,7 +99,7 @@ public class Sethome implements CommandExecutor {
 
             globalSQL.update("INSERT INTO home(coordinate_id,uuid,name) VALUES(" + coordinate_id + ",'" + p.getUniqueId() + "','" + name + "');");
 
-            p.sendMessage(Utils.success("Home set to current location, to teleport here type ")
+            p.sendMessage(ChatUtils.success("Home set to current location, to teleport here type ")
                     .append(Component.text("/home " + name, NamedTextColor.DARK_AQUA)));
 
         }

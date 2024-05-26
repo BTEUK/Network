@@ -5,6 +5,7 @@ import net.bteuk.network.Network;
 import net.bteuk.network.eventing.events.EventManager;
 import net.bteuk.network.gui.Gui;
 import net.bteuk.network.gui.InviteMembers;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.NetworkUser;
@@ -65,7 +66,7 @@ public class PlotInfo extends Gui {
         // Get the plot status.
         PlotStatus status = PlotStatus.fromDatabaseValue(plotSQL.getString("SELECT status FROM plot_data WHERE id=" + plotID + ";"));
         if (status == null) {
-            user.player.sendMessage(Utils.error("This plot has an invalid status, can't open the info menu."));
+            user.player.sendMessage(ChatUtils.error("This plot has an invalid status, can't open the info menu."));
             return;
         }
         // Get the plot owner.
@@ -77,7 +78,7 @@ public class PlotInfo extends Gui {
         // Determine the type of menu to create.
         PLOT_INFO_TYPE plotInfoType = determineMenuType(status);
         if (plotInfoType == null || plotInfoType == PLOT_INFO_TYPE.DELETED) {
-            user.player.sendMessage(Utils.error("This plot not longer exists, can't open the info menu."));
+            user.player.sendMessage(ChatUtils.error("This plot not longer exists, can't open the info menu."));
             return;
         }
 
@@ -172,7 +173,7 @@ public class PlotInfo extends Gui {
                         u.player.closeInventory();
 
                     } catch (OutOfProjectionBoundsException e) {
-                        u.player.sendMessage(Utils.error("Can't find the location of this plot."));
+                        u.player.sendMessage(ChatUtils.error("Can't find the location of this plot."));
                         u.player.closeInventory();
                     }
                 });
@@ -381,7 +382,7 @@ public class PlotInfo extends Gui {
                                 SwitchServer.switchServer(u.player, server);
                             }
                         } else {
-                            user.player.sendMessage(Utils.error("You are not allowed to review this plot since you have contributed to it."));
+                            user.player.sendMessage(ChatUtils.error("You are not allowed to review this plot since you have contributed to it."));
                         }
                     });
         }

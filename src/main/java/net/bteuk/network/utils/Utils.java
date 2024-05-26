@@ -3,6 +3,7 @@ package net.bteuk.network.utils;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.bteuk.network.Network;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -283,26 +284,26 @@ public class Utils {
 
                 p.getInventory().setItem(slot, p.getInventory().getItem(7));
                 p.getInventory().setItem(7, item);
-                p.sendMessage(Utils.success("Set ").append(Component.text(name, NamedTextColor.DARK_AQUA).append(Utils.success(" to slot 8"))));
+                p.sendMessage(ChatUtils.success("Set ").append(Component.text(name, NamedTextColor.DARK_AQUA).append(ChatUtils.success(" to slot 8"))));
 
             } else {
 
                 p.getInventory().setItem(slot, p.getInventory().getItemInMainHand());
                 p.getInventory().setItemInMainHand(item);
-                p.sendMessage(Utils.success("Set ").append(Component.text(name, NamedTextColor.DARK_AQUA).append(Utils.success(" to main hand."))));
+                p.sendMessage(ChatUtils.success("Set ").append(Component.text(name, NamedTextColor.DARK_AQUA).append(ChatUtils.success(" to main hand."))));
 
             }
         } else if (emptySlot >= 0) {
             //The current slot is empty. This also implies no navigator, and thus the item does not yet exist in the inventory.
             //Set item to empty slot.
             p.getInventory().setItem(emptySlot, item);
-            p.sendMessage(Utils.success("Set ").append(Component.text(name, NamedTextColor.DARK_AQUA).append(Utils.success(" to slot " + (emptySlot + 1)))));
+            p.sendMessage(ChatUtils.success("Set ").append(Component.text(name, NamedTextColor.DARK_AQUA).append(ChatUtils.success(" to slot " + (emptySlot + 1)))));
 
         } else {
 
             //Player has no empty slots and is holding the navigator, set to item to slot 7.
             p.getInventory().setItem(7, item);
-            p.sendMessage(Utils.success("Set ").append(Component.text(name, NamedTextColor.DARK_AQUA).append(Utils.success(" to slot 8"))));
+            p.sendMessage(ChatUtils.success("Set ").append(Component.text(name, NamedTextColor.DARK_AQUA).append(ChatUtils.success(" to slot 8"))));
 
         }
     }

@@ -1,8 +1,8 @@
 package net.bteuk.network.lobby;
 
 import net.bteuk.network.Network;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
-import net.bteuk.network.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -30,7 +30,7 @@ public class HologramClickEvent implements Listener {
         // Get the user.
         NetworkUser u = instance.getUser(e.getPlayer());
         if (u == null) {
-            e.getPlayer().sendMessage(Utils.error("An error occurred, please rejoin."));
+            e.getPlayer().sendMessage(ChatUtils.error("An error occurred, please rejoin."));
             return;
         }
 

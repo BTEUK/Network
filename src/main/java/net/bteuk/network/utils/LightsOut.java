@@ -1,6 +1,7 @@
 package net.bteuk.network.utils;
 
 import net.bteuk.network.gui.Gui;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -58,12 +59,12 @@ public class LightsOut extends Gui {
         u.lightsOut = null;
         this.delete();
 
-        u.player.sendMessage(Utils.success("Congratulations, you beat Lights Out!"));
-        u.player.sendMessage(Utils.success("You took ")
+        u.player.sendMessage(ChatUtils.success("Congratulations, you beat Lights Out!"));
+        u.player.sendMessage(ChatUtils.success("You took ")
                 .append(Component.text(Time.minutes(timeDiff), NamedTextColor.DARK_AQUA))
-                .append(Utils.success(" " + Time.minuteString(timeDiff) + " and "))
+                .append(ChatUtils.success(" " + Time.minuteString(timeDiff) + " and "))
                 .append(Component.text(Time.seconds(timeDiff), NamedTextColor.DARK_AQUA))
-                .append(Utils.success(" " + Time.secondString(timeDiff) + ".")));
+                .append(ChatUtils.success(" " + Time.secondString(timeDiff) + ".")));
 
     }
 

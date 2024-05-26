@@ -2,12 +2,12 @@ package net.bteuk.network.utils.regions;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.eventing.events.EventManager;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.Time;
-import net.bteuk.network.utils.Utils;
-import net.bteuk.network.utils.worldguard.WorldGuard;
 import net.bteuk.network.utils.enums.RegionStatus;
 import net.bteuk.network.utils.enums.ServerType;
+import net.bteuk.network.utils.worldguard.WorldGuard;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -342,7 +342,7 @@ public record Region(String regionName, int x, int z) {
         Network.getInstance().regionSQL.update("DELETE FROM region_requests WHERE region='" + regionName + "' AND uuid='" + u.player.getUniqueId() + "'; ");
 
         //Send message to user.
-        u.player.sendMessage(Utils.success("Cancelled region join request."));
+        u.player.sendMessage(ChatUtils.success("Cancelled region join request."));
     }
 
     //Join region with owner or staff request.
@@ -352,8 +352,8 @@ public record Region(String regionName, int x, int z) {
         //Check if you don't already have a request for this region.
         if (hasRequest(u)) {
 
-            u.player.sendMessage(Utils.error("You have already requested to join this region."));
-            u.player.sendMessage(Utils.error("Check the request status in the region menu."));
+            u.player.sendMessage(ChatUtils.error("You have already requested to join this region."));
+            u.player.sendMessage(ChatUtils.error("Check the request status in the region menu."));
             return;
         }
 
@@ -367,14 +367,14 @@ public record Region(String regionName, int x, int z) {
                     u.player.getUniqueId() + "','" + getOwner() + "',0," + coordinate + ");");
 
             //Send message to player.
-            u.player.sendMessage(Utils.success("Requested to join region ")
+            u.player.sendMessage(ChatUtils.success("Requested to join region ")
                     .append(Component.text(regionName, NamedTextColor.DARK_AQUA))
-                    .append(Utils.success(", awaiting staff review.")));
+                    .append(ChatUtils.success(", awaiting staff review.")));
 
             Network.getInstance().getChat().broadcastMessage(
-                    Utils.success("A region join request has been submitted by ")
+                    ChatUtils.success("A region join request has been submitted by ")
                             .append(Component.text(u.player.getName(), NamedTextColor.DARK_AQUA))
-                            .append(Utils.success(" for region "))
+                            .append(ChatUtils.success(" for region "))
                             .append(Component.text(regionName, NamedTextColor.DARK_AQUA))
                     , "uknet:reviewer");
 
@@ -386,9 +386,9 @@ public record Region(String regionName, int x, int z) {
                     u.player.getUniqueId() + "','" + getOwner() + "',0," + coordinate + ");");
 
             //Send message to player.
-            u.player.sendMessage(Utils.success("Requested to join region ")
+            u.player.sendMessage(ChatUtils.success("Requested to join region ")
                     .append(Component.text(regionName, NamedTextColor.DARK_AQUA))
-                    .append(Utils.success(", awaiting owner review.")));
+                    .append(ChatUtils.success(", awaiting owner review.")));
 
             //If owner is in the online users list send a message.
             if (Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM online_users WHERE uuid='" + getOwner() + "';")) {
@@ -417,9 +417,9 @@ public record Region(String regionName, int x, int z) {
             //Join region in WorldGuard.
             WorldGuard.addMember(regionName, u.player.getUniqueId().toString(), u.player.getWorld());
 
-            u.player.sendMessage(Utils.success("You have joined the region ")
+            u.player.sendMessage(ChatUtils.success("You have joined the region ")
                     .append(Component.text(regionName, NamedTextColor.DARK_AQUA))
-                    .append(Utils.success(" as a member.")));
+                    .append(ChatUtils.success(" as a member.")));
 
         } else {
 
@@ -460,9 +460,9 @@ public record Region(String regionName, int x, int z) {
             //Join region in WorldGuard.
             WorldGuard.addMember(regionName, u.player.getUniqueId().toString(), u.player.getWorld());
 
-            u.player.sendMessage(Utils.success("You have joined the region ")
+            u.player.sendMessage(ChatUtils.success("You have joined the region ")
                     .append(Component.text(regionName, NamedTextColor.DARK_AQUA))
-                    .append(Utils.success(" as the owner.")));
+                    .append(ChatUtils.success(" as the owner.")));
 
         }
     }

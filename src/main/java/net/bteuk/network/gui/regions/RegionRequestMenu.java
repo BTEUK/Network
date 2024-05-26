@@ -2,6 +2,7 @@ package net.bteuk.network.gui.regions;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.gui.Gui;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.RegionSQL;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.Utils;
@@ -125,7 +126,7 @@ public class RegionRequestMenu extends Gui {
 
                         //Close the gui and send feedback.
                         u.player.closeInventory();
-                        u.player.sendMessage(Utils.success("Cancelled region request for ")
+                        u.player.sendMessage(ChatUtils.success("Cancelled region request for ")
                                 .append(Component.text(requests.get(finalI), NamedTextColor.DARK_AQUA)));
 
                     });

@@ -1,6 +1,7 @@
 package net.bteuk.network.commands;
 
 import net.bteuk.network.Network;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.enums.ServerType;
 import net.kyori.adventure.text.Component;
@@ -10,13 +11,20 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.GameMode;
-import org.bukkit.command.*;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 
 import static net.bteuk.network.utils.Constants.LOGGER;
 import static net.bteuk.network.utils.Constants.SERVER_TYPE;
@@ -53,7 +61,7 @@ public class Gamemode implements CommandExecutor, TabCompleter {
         //Check if sender is a player and that they have permission.
         if (!(sender instanceof Player p)) {
 
-            sender.sendMessage(Utils.error("This command can only be used by a player."));
+            sender.sendMessage(ChatUtils.error("This command can only be used by a player."));
             return true;
 
         }
@@ -61,7 +69,7 @@ public class Gamemode implements CommandExecutor, TabCompleter {
         //Check allowed server type.
         if (SERVER_TYPE != ServerType.PLOT && SERVER_TYPE != ServerType.EARTH) {
 
-            p.sendMessage(Utils.error("You do not have permission to use this command here."));
+            p.sendMessage(ChatUtils.error("You do not have permission to use this command here."));
             return true;
 
         }
@@ -69,7 +77,7 @@ public class Gamemode implements CommandExecutor, TabCompleter {
         //Check if the player has permission.
         if (!p.hasPermission("uknet.gamemode")) {
 
-            p.sendMessage(Utils.error("You do not have permission to use this command."));
+            p.sendMessage(ChatUtils.error("You do not have permission to use this command."));
             return true;
 
         }
@@ -111,7 +119,7 @@ public class Gamemode implements CommandExecutor, TabCompleter {
             if (!gamemodes.contains(args[0].toLowerCase(Locale.ROOT))) {
 
                 Component error = Component.text(args[0], NamedTextColor.DARK_RED);
-                error = error.append(Utils.error(" is not a valid gamemode"));
+                error = error.append(ChatUtils.error(" is not a valid gamemode"));
 
                 p.sendMessage(error);
                 return true;
@@ -120,7 +128,7 @@ public class Gamemode implements CommandExecutor, TabCompleter {
 
             //Set the player to this gamemode.
             p.setGameMode(GameMode.valueOf(args[0].toUpperCase(Locale.ROOT)));
-            p.sendMessage(Utils.success("Set gamemode to ").append(Component.text(StringUtils.capitalize(args[0].toLowerCase(Locale.ROOT)), NamedTextColor.DARK_AQUA)));
+            p.sendMessage(ChatUtils.success("Set gamemode to ").append(Component.text(StringUtils.capitalize(args[0].toLowerCase(Locale.ROOT)), NamedTextColor.DARK_AQUA)));
 
         }
 

@@ -1,9 +1,9 @@
 package net.bteuk.network.commands;
 
 import net.bteuk.network.Network;
-import net.bteuk.network.exceptions.InvalidFormatException;
 import net.bteuk.network.commands.tabcompleters.FixedArgSelector;
-import net.bteuk.network.utils.Utils;
+import net.bteuk.network.exceptions.InvalidFormatException;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.enums.TimesOfDay;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -18,9 +18,9 @@ import static java.lang.Math.floorMod;
 
 public class Ptime extends AbstractCommand {
 
-    private static final Component RESET_PLAYER_TIME = Utils.success("Reset player time, using server time.");
-    private static final Component SET_PLAYER_TIME = Utils.success("Set player time to ");
-    private static final Component INVALID_FORMAT = Utils.error("Invalid time format, try using HH:mm or Minecraft ticks.");
+    private static final Component RESET_PLAYER_TIME = ChatUtils.success("Reset player time, using server time.");
+    private static final Component SET_PLAYER_TIME = ChatUtils.success("Set player time to ");
+    private static final Component INVALID_FORMAT = ChatUtils.error("Invalid time format, try using HH:mm or Minecraft ticks.");
 
     public Ptime(Network instance) {
         super(instance, "ptime");

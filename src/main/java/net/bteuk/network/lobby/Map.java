@@ -5,10 +5,10 @@ import io.papermc.lib.PaperLib;
 import net.bteuk.network.Network;
 import net.bteuk.network.eventing.events.EventManager;
 import net.bteuk.network.gui.navigation.LocationMenu;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.Holograms;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.SwitchServer;
-import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.enums.Category;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -174,30 +174,30 @@ public class Map extends AbstractReloadableComponent {
         if (instance.getGlobalSQL().hasRow("SELECT location FROM location_data WHERE location='" + marker + "';")) {
             // Check if marker does not already exist.
             if (instance.getGlobalSQL().hasRow("SELECT location FROM location_marker WHERE location='" + marker + "';")) {
-                return Component.text(marker, NamedTextColor.DARK_RED).append(Utils.error(" already exists on the map."));
+                return Component.text(marker, NamedTextColor.DARK_RED).append(ChatUtils.error(" already exists on the map."));
             }
             // Create coordinate id.
             int coordinate_id = instance.getGlobalSQL().addCoordinate(marker_location);
             // Add marker.
             instance.getGlobalSQL().update("INSERT INTO location_marker(location,coordinate_id) VALUES('" + marker + "'," + coordinate_id + ");");
             reload();
-            return Utils.success("Added marker for location ").append(Component.text(marker, NamedTextColor.DARK_AQUA));
+            return ChatUtils.success("Added marker for location ").append(Component.text(marker, NamedTextColor.DARK_AQUA));
         } else {
             // Get the subcategory id.
             int subcategory_id = instance.getGlobalSQL().getInt("SELECT id FROM location_subcategory WHERE name='" + marker + "';");
             if (subcategory_id == 0) {
-                return Component.text(marker, NamedTextColor.DARK_RED).append(Utils.error(" is not a valid location or subcategory name."));
+                return Component.text(marker, NamedTextColor.DARK_RED).append(ChatUtils.error(" is not a valid location or subcategory name."));
             }
             // Check if marker does not already exist.
             if (instance.getGlobalSQL().hasRow("SELECT subcategory FROM location_marker WHERE subcategory='" + subcategory_id + "';")) {
-                return Component.text(marker, NamedTextColor.DARK_RED).append(Utils.error(" already exists on the map."));
+                return Component.text(marker, NamedTextColor.DARK_RED).append(ChatUtils.error(" already exists on the map."));
             }
             // Create coordinate id.
             int coordinate_id = instance.getGlobalSQL().addCoordinate(marker_location);
             // Add marker.
             instance.getGlobalSQL().update("INSERT INTO location_marker(subcategory,coordinate_id) VALUES('" + subcategory_id + "'," + coordinate_id + ");");
             reload();
-            return Utils.success("Added marker for subcategory ").append(Component.text(marker, NamedTextColor.DARK_AQUA));
+            return ChatUtils.success("Added marker for subcategory ").append(Component.text(marker, NamedTextColor.DARK_AQUA));
         }
     }
 
@@ -210,12 +210,12 @@ public class Map extends AbstractReloadableComponent {
             instance.getGlobalSQL().update("DELETE FROM location_marker WHERE location='" + marker + "';");
             instance.getGlobalSQL().update("DELETE FROM coordinates WHERE id=" + coordinate_id);
             reload();
-            return Utils.success("Removed marker for location ").append(Component.text(marker, NamedTextColor.DARK_AQUA));
+            return ChatUtils.success("Removed marker for location ").append(Component.text(marker, NamedTextColor.DARK_AQUA));
         } else {
             // Else check if it's a valid subcategory.
             int subcategory_id = instance.getGlobalSQL().getInt("SELECT id FROM location_subcategory WHERE name='" + marker + "';");
             if (subcategory_id == 0) {
-                return Component.text(marker, NamedTextColor.DARK_RED).append(Utils.error(" is not a valid marker."));
+                return Component.text(marker, NamedTextColor.DARK_RED).append(ChatUtils.error(" is not a valid marker."));
             }
             // Remove coordinate id.
             int coordinate_id = instance.getGlobalSQL().getInt("SELECT coordinate_id FROM location_marker WHERE subcategory=" + subcategory_id + ";");
@@ -223,7 +223,7 @@ public class Map extends AbstractReloadableComponent {
             instance.getGlobalSQL().update("DELETE FROM location_marker WHERE subcategory=" + subcategory_id + ";");
             instance.getGlobalSQL().update("DELETE FROM coordinates WHERE id=" + coordinate_id);
             reload();
-            return Utils.success("Removed marker for subcategory ").append(Component.text(marker, NamedTextColor.DARK_AQUA));
+            return ChatUtils.success("Removed marker for subcategory ").append(Component.text(marker, NamedTextColor.DARK_AQUA));
         }
     }
 
@@ -317,7 +317,7 @@ public class Map extends AbstractReloadableComponent {
         String server = instance.getGlobalSQL().getString("SELECT server FROM coordinates WHERE id=" + coordinate_id + ";");
 
         if (server == null) {
-            u.sendMessage(Utils.error("An error occurred, please contact a server administrator."));
+            u.sendMessage(ChatUtils.error("An error occurred, please contact a server administrator."));
             return;
         }
 
@@ -333,7 +333,7 @@ public class Map extends AbstractReloadableComponent {
         int id = instance.getGlobalSQL().getInt("SELECT id FROM location_subcategory WHERE name='" + subcategory + "';");
 
         if (id == 0) {
-            u.sendMessage(Utils.error("An error occurred, please contact a server administrator."));
+            u.sendMessage(ChatUtils.error("An error occurred, please contact a server administrator."));
             return;
         }
 

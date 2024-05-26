@@ -1,13 +1,13 @@
 package net.bteuk.network.commands;
 
 import net.bteuk.network.Network;
+import net.bteuk.network.commands.tabcompleters.FixedArgSelector;
 import net.bteuk.network.eventing.events.EventManager;
 import net.bteuk.network.gui.plotsystem.PlotInfo;
 import net.bteuk.network.gui.plotsystem.PlotMenu;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.PlotSQL;
-import net.bteuk.network.commands.tabcompleters.FixedArgSelector;
 import net.bteuk.network.utils.NetworkUser;
-import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.enums.PlotStatus;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -68,7 +68,7 @@ public class Plot extends AbstractCommand {
         // Get the user.
         NetworkUser u = instance.getUser(p);
         if (u == null) {
-            p.sendMessage(Utils.error("An error occurred, please rejoin!"));
+            p.sendMessage(ChatUtils.error("An error occurred, please rejoin!"));
             LOGGER.severe("No user exists for player " + p.getName());
             return;
         }
@@ -88,13 +88,13 @@ public class Plot extends AbstractCommand {
         // Check if the plot exists and is not deleted.
         PlotStatus status = PlotStatus.fromDatabaseValue(plotSQL.getString("SELECT status FROM plot_data WHERE id=" + plot + ";"));
         if (status == null || status == PlotStatus.DELETED) {
-            p.sendMessage(Utils.error("This plot does not exist."));
+            p.sendMessage(ChatUtils.error("This plot does not exist."));
             return;
         }
         // Get the user.
         NetworkUser u = instance.getUser(p);
         if (u == null) {
-            p.sendMessage(Utils.error("An error occurred, please rejoin!"));
+            p.sendMessage(ChatUtils.error("An error occurred, please rejoin!"));
             LOGGER.severe("No user exists for player " + p.getName());
             return;
         }
@@ -122,13 +122,13 @@ public class Plot extends AbstractCommand {
             //Remove invite.
             plotSQL.update("DELETE FROM plot_invites WHERE id=" + plot + " AND uuid='" + p.getUniqueId() + "';");
         } else {
-            p.sendMessage(Utils.error("You have not been invited to join this plot."));
+            p.sendMessage(ChatUtils.error("You have not been invited to join this plot."));
         }
     }
 
     private void error(Player p) {
-        p.sendMessage(Utils.error("/plot menu"));
-        p.sendMessage(Utils.error("/plot info <plotID>"));
-        p.sendMessage(Utils.error("/plot join <plotID>"));
+        p.sendMessage(ChatUtils.error("/plot menu"));
+        p.sendMessage(ChatUtils.error("/plot info <plotID>"));
+        p.sendMessage(ChatUtils.error("/plot join <plotID>"));
     }
 }

@@ -1,5 +1,6 @@
 package net.bteuk.network.utils;
 
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -17,7 +18,7 @@ class UtilsTest {
 
     @Test
     void testErrorVarAtStart() {
-        Component component = Utils.error("%s message with var at start.", "Error");
+        Component component = ChatUtils.error("%s message with var at start.", "Error");
         HashMap<String, NamedTextColor> segments = new LinkedHashMap<>();
         segments.put("Error", DARK_RED);
         segments.put(" message with var at start.", RED);
@@ -28,7 +29,7 @@ class UtilsTest {
 
     @Test
     void testErrorVarAtEnd() {
-        Component component = Utils.error("This message ends with a %s", "Var");
+        Component component = ChatUtils.error("This message ends with a %s", "Var");
         HashMap<String, NamedTextColor> segments = new LinkedHashMap<>();
         segments.put("This message ends with a ", RED);
         segments.put("Var", DARK_RED);
@@ -39,7 +40,7 @@ class UtilsTest {
 
     @Test
     void testErrorVarAtStartAndEnd() {
-        Component component = Utils.error("%s message starts and ends with a %s", "Error", "Var");
+        Component component = ChatUtils.error("%s message starts and ends with a %s", "Error", "Var");
         HashMap<String, NamedTextColor> segments = new LinkedHashMap<>();
         segments.put("Error", DARK_RED);
         segments.put(" message starts and ends with a ", RED);
@@ -51,7 +52,7 @@ class UtilsTest {
 
     @Test
     void testErrorMultipleVars() {
-        Component component = Utils.error("%s%s %s", "This ", "Error", "Is only vars");
+        Component component = ChatUtils.error("%s%s %s", "This ", "Error", "Is only vars");
         HashMap<String, NamedTextColor> segments = new LinkedHashMap<>();
         segments.put("This ", DARK_RED);
         segments.put("Error", DARK_RED);
@@ -64,7 +65,7 @@ class UtilsTest {
 
     @Test
     void testErrorWithWrongNumberOfVars() {
-        Component component = Utils.error("This %s message should include %s vars.", "Error");
+        Component component = ChatUtils.error("This %s message should include %s vars.", "Error");
         HashMap<String, NamedTextColor> segments = new LinkedHashMap<>();
         segments.put("This ", RED);
         segments.put("Error", DARK_RED);

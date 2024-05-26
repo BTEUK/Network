@@ -11,6 +11,7 @@ import net.bteuk.network.gui.plotsystem.ZoneMenu;
 import net.bteuk.network.gui.progressmap.LocalFeatureListGUI;
 import net.bteuk.network.gui.regions.RegionInfo;
 import net.bteuk.network.gui.regions.RegionMenu;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.SwitchServer;
 import net.bteuk.network.utils.Utils;
@@ -91,7 +92,7 @@ public class BuildGui extends Gui {
 
                     if (id == 0) {
 
-                        u.player.sendMessage(Utils.error("There are no plots available, please wait for new plots to be added."));
+                        u.player.sendMessage(ChatUtils.error("There are no plots available, please wait for new plots to be added."));
                         u.player.closeInventory();
 
                     } else {
@@ -453,7 +454,7 @@ public class BuildGui extends Gui {
 
                     } else {
 
-                        u.player.sendMessage(Utils.error("You must be at least a Jr.Builder to join zones."));
+                        u.player.sendMessage(ChatUtils.error("You must be at least a Jr.Builder to join zones."));
 
                     }
 
@@ -510,7 +511,7 @@ public class BuildGui extends Gui {
                         {
                             u.mainGui = this;
                             u.mainGui.open(u);
-                            u.player.sendMessage(Utils.error("Could not locate you"));
+                            u.player.sendMessage(ChatUtils.error("Could not locate you"));
                         }
                         else
                         {

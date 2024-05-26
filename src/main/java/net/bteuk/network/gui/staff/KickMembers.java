@@ -2,6 +2,7 @@ package net.bteuk.network.gui.staff;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.gui.Gui;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.regions.Region;
@@ -103,9 +104,9 @@ public class KickMembers extends Gui {
                         region.leaveRegion(uuid, "&cYou have been kicked from region &4" + region.getTag(uuid));
 
                         //Send message to user.
-                        u.player.sendMessage(Utils.success("Kicked ")
+                        u.player.sendMessage(ChatUtils.success("Kicked ")
                                 .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid ='" + region.getOwner() + "';"), NamedTextColor.DARK_AQUA))
-                                .append(Utils.success(" from the region")));
+                                .append(ChatUtils.success(" from the region")));
 
                         //Refresh the gui.
                         this.refresh();
