@@ -78,6 +78,7 @@ public class Connect implements Listener {
         // When the proxy has received the request it'll send a response which will then create the user object on the server.
         UserConnectRequest userConnectRequest = new UserConnectRequest(SERVER_NAME, e.getPlayer().getUniqueId().toString(), e.getPlayer().getName(), TextureUtils.getTexture(e.getPlayer().getPlayerProfile()), channels, tabPlayer);
         Bukkit.getScheduler().runTaskAsynchronously(Network.getInstance(), () -> Network.getInstance().getChat().sendSocketMesage(userConnectRequest));
+        LOGGER.info(String.format("%s connected to the server, sent request to proxy to add player as NetworkUser", e.getPlayer().getName()));
 
     }
 
@@ -157,6 +158,7 @@ public class Connect implements Listener {
             return;
         }
 
+        LOGGER.info(String.format("User connect reply received from the proxy, creating NetworkUser for %s", player.getName()));
         NetworkUser user = new NetworkUser(player, reply);
         Network.getInstance().addUser(user);
 

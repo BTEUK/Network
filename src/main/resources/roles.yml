@@ -41,30 +41,30 @@ roles:
   publicrelations:
     name: 'PR'
     prefix: '[PR]'
-    colour:
+    colour: '#43aa16'
     weight: 8
   eventsteam:
     name: 'Events'
     prefix: '[Events]'
-    colour:
+    colour: '#e777ae'
     weight: 9
   developer:
     name: 'Dev'
     prefix: '[Dev]'
-    colour:
+    colour: '#41b9d2'
     weight: 10
   support:
     name: 'Support'
     prefix: '[Support]'
-    colour:
+    colour: '#2e8bf5'
     weight: 11
   moderator:
     name: 'Mod'
     prefix: '[Mod]'
-    colour:
+    colour: '#715aec'
     weight: 12
   administrator:
     name: 'Admin'
     prefix: '[Admin]'
-    colour:
+    colour: '#af5ffc'
     weight: 13

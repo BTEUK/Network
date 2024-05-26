@@ -101,10 +101,10 @@ public final class Roles {
         // Add the roles.
         keys.forEach(key -> ROLES.add(new Role(
                 key,
-                roles.getString(key + "name", null),
-                roles.getString(key + "prefix", null),
-                roles.getString(key + "colour", null),
-                roles.getInt(key + "weight", 0)))
+                roles.getString(key + ".name", null),
+                roles.getString(key + ".prefix", null),
+                roles.getString(key + ".colour", null),
+                roles.getInt(key + ".weight", 0)))
         );
     }
 

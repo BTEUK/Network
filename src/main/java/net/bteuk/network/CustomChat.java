@@ -14,6 +14,7 @@ import net.bteuk.network.lib.dto.UserConnectReply;
 import net.bteuk.network.lib.socket.OutputSocket;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
+import net.bteuk.network.utils.Role;
 import net.bteuk.network.utils.Roles;
 import net.bteuk.network.utils.Statistics;
 import net.bteuk.network.utils.Time;
@@ -31,9 +32,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
+import static net.bteuk.network.lib.enums.ChatChannels.STAFF;
 import static net.bteuk.network.utils.Constants.GLOBAL_CHAT;
 import static net.bteuk.network.utils.Constants.LOGGER;
-import static net.bteuk.network.utils.Constants.STAFF_CHAT;
 import static net.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public class CustomChat extends Moderation implements Listener, PluginMessageListener {
@@ -128,19 +129,14 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
     public static ChatMessage getChatMessage(Component component, NetworkUser u) {
 
         ChatMessage chatMessage = new ChatMessage();
-        Component message = component.color(NamedTextColor.WHITE);
+        Component message = playerMessageFormat(u, component);
 
-        if (STAFF_CHAT && u.getChatChannel().equals("staff")) {
-            chatMessage.setChannel("staff");
+        if (u.getChatChannel().equals(STAFF.getChannelName())) {
             message = Component.text("[Staff]", NamedTextColor.RED).append(message);
             // Prefix the chat message with [Staff]
-        } else if (u.getChatChannel().equals("global")) {
-            chatMessage.setChannel("global");
-        } else {
-            // No other channels are currently supported.
-            LOGGER.warning(String.format("User %s used channel %s, this channel does not exist!", u.player.getName(), u.getChatChannel()));
         }
 
+        chatMessage.setChannel(u.getChatChannel());
         chatMessage.setSender(u.player.getUniqueId().toString());
         chatMessage.setComponent(message);
         return chatMessage;
@@ -354,6 +350,23 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
         // Send message
         sendSocketMesage(chatMessage);
 
+    }
+
+    /**
+     * Format a player message to add the player prefix and name.
+     *
+     * @param message the {@link Component} to format
+     * @return the {@link Component} formatted message
+     */
+    private static Component playerMessageFormat(NetworkUser user, Component message) {
+        Role userRole = user.getRole();
+        return userRole.getColouredPrefix() // The prefix based on the role.
+                .append(Component.space())
+                .append(ChatUtils.line(user.player.getName())) // Player name in white without formatting.
+                .append(Component.space())
+                .append(ChatUtils.line(">").decorate(TextDecoration.BOLD)) // Arrow between the player and message in bold.
+                .append(Component.space())
+                .append(message.color(NamedTextColor.WHITE)); // The message in white without formatting.
     }
 
 //    /**

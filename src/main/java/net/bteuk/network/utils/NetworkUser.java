@@ -48,7 +48,7 @@ public class NetworkUser {
     // The default is global.
     @Getter
     @Setter
-    private String chatChannel = "global";
+    private String chatChannel;
 
     //Region information.
     public boolean inRegion;
@@ -128,6 +128,9 @@ public class NetworkUser {
         wasInPortal = false;
         afk = false;
         last_movement = Time.currentTime();
+
+        // Set the role.
+        role = Roles.getPrimaryRole(player);
 
         //Get discord linked status.
         //If they're linked get discord id.

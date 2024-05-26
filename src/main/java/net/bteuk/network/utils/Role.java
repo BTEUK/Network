@@ -3,6 +3,8 @@ package net.bteuk.network.utils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
 
 @Getter
 @Setter
@@ -19,8 +21,17 @@ public class Role implements Comparable<Role> {
 
     private int weight;
 
+    /**
+     * Get the prefix with the colour for the role.
+     * @return the {@link Component} prefix
+     */
+    public Component getColouredPrefix() {
+        return Component.text(prefix, TextColor.fromHexString(colour));
+    }
+
     @Override
     public int compareTo(Role o) {
         return o.getWeight() - weight;
     }
+
 }

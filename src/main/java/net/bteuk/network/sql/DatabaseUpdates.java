@@ -105,6 +105,15 @@ public class DatabaseUpdates {
 
         LOGGER.info("Updating database from 1.5.0 to 1.6.0");
 
+        // TODO: Remove online users tables.
+
+
+        // Remove staff_chat column in player_data.
+        Network.getInstance().getGlobalSQL().update("ALTER TABLE player_data DROP COLUMN staff_chat;");
+
+        // Add chat_channel column in player_data.
+        Network.getInstance().getGlobalSQL().update("ALTER TABLE player_data ADD COLUMN chat_channel VARCHAR(64) NOT NULL DEFAULT 'global';");
+
     }
 
     private void update5_6() {
