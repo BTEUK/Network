@@ -5,12 +5,10 @@ import net.bteuk.network.exceptions.NotMutedException;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.Statistics;
-import net.bteuk.network.utils.TextureUtils;
 import net.bteuk.network.utils.Time;
 import net.bteuk.network.utils.staff.Moderation;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,14 +19,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Objects;
 
-import static net.bteuk.network.utils.Constants.DISCORD_CHAT;
 import static net.bteuk.network.utils.Constants.LOGGER;
 import static net.bteuk.network.utils.Constants.REGIONS_ENABLED;
 import static net.bteuk.network.utils.Constants.SERVER_NAME;
 import static net.bteuk.network.utils.Constants.TPLL_ENABLED;
-import static net.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public class CommandPreProcess extends Moderation implements Listener {
 
@@ -62,7 +57,7 @@ public class CommandPreProcess extends Moderation implements Listener {
             if (u.afk) {
                 u.last_time_log = Time.currentTime();
                 u.afk = false;
-                Network.getInstance().chat.broadcastAFK(u.player, false);
+                Network.getInstance().getChat().broadcastAFK(u.player, false);
             }
 
         }
@@ -182,7 +177,7 @@ public class CommandPreProcess extends Moderation implements Listener {
                 if (u.afk) {
                     u.last_time_log = Time.currentTime();
                     u.afk = false;
-                    Network.getInstance().chat.broadcastAFK(u.player, false);
+                    Network.getInstance().getChat().broadcastAFK(u.player, false);
                 }
 
 
@@ -232,12 +227,12 @@ public class CommandPreProcess extends Moderation implements Listener {
                 String name = Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
                 String player_skin = Network.getInstance().getGlobalSQL().getString("SELECT player_skin FROM player_data WHERE uuid='" + uuid + "';");
 
-                //Run disconnect message.
-                if (DISCORD_CHAT) {
-                    Component message = Component.text(TextureUtils.getAvatarUrl(u.player.getUniqueId(), player_skin) + " ")
-                            .append(LegacyComponentSerializer.legacyAmpersand().deserialize(Objects.requireNonNull(CONFIG.getString("chat.custom_messages.leave")).replace("%player%", name)));
-                    instance.chat.broadcastDiscordAnnouncement(message, "disconnect");
-                }
+//                //Run disconnect message.
+//                if (DISCORD_CHAT) {
+//                    Component message = Component.text(TextureUtils.getAvatarUrl(u.player.getUniqueId(), player_skin) + " ")
+//                            .append(LegacyComponentSerializer.legacyAmpersand().deserialize(Objects.requireNonNull(CONFIG.getString("chat.custom_messages.leave")).replace("%player%", name)));
+//                    instance.getChat().broadcastDiscordAnnouncement(message, "disconnect");
+//                }
 
             }
 

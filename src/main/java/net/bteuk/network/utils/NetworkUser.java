@@ -84,6 +84,7 @@ public class NetworkUser {
     public boolean isLinked;
 
     @Getter
+    @Setter
     private long discordId;
 
     //If the player is currently in a portal,

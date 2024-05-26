@@ -2,6 +2,7 @@ package net.bteuk.network.utils.regions;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.eventing.events.EventManager;
+import net.bteuk.network.lib.dto.ChatMessage;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.Time;
@@ -371,12 +372,9 @@ public record Region(String regionName, int x, int z) {
                     .append(Component.text(regionName, NamedTextColor.DARK_AQUA))
                     .append(ChatUtils.success(", awaiting staff review.")));
 
-            Network.getInstance().getChat().broadcastMessage(
-                    ChatUtils.success("A region join request has been submitted by ")
-                            .append(Component.text(u.player.getName(), NamedTextColor.DARK_AQUA))
-                            .append(ChatUtils.success(" for region "))
-                            .append(Component.text(regionName, NamedTextColor.DARK_AQUA))
-                    , "uknet:reviewer");
+            ChatMessage chatMessage = new ChatMessage("reviewer", "server",
+                    ChatUtils.success("A region join request has been submitted by %s for region %s", u.player.getName(), regionName));
+            Network.getInstance().getChat().sendSocketMesage(chatMessage);
 
         } else {
             //Owner request

@@ -74,7 +74,7 @@ public class Staff implements CommandExecutor {
                 Network.getInstance().getGlobalSQL().update("UPDATE player_data SET chat_channel='" + channel + "' WHERE uuid='"+ p.getUniqueId() + "';");
             } else {
                 // Send message in staff chat.
-                Network.getInstance().chat.sendSocketMesage(CustomChat.getChatMessage(Component.text(String.join(" ", args)), u));
+                Network.getInstance().getChat().sendSocketMesage(CustomChat.getChatMessage(Component.text(String.join(" ", args)), u));
             }
             return true;
         }

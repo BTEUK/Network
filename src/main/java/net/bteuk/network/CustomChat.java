@@ -137,8 +137,8 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
         } else if (u.getChatChannel().equals("global")) {
             chatMessage.setChannel("global");
         } else {
-            // A private channel was used, add the correct prefix to the message.
-
+            // No other channels are currently supported.
+            LOGGER.warning(String.format("User %s used channel %s, this channel does not exist!", u.player.getName(), u.getChatChannel()));
         }
 
         chatMessage.setSender(u.player.getUniqueId().toString());
@@ -214,7 +214,7 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
         if (discordLinking.isUnlink() && discordLinking.getDiscordId() != -1) {
             // Unlink
             for (NetworkUser u : instance.getUsers()) {
-                if (u.isLinked && u.discord_id == discordLinking.getDiscordId()) {
+                if (u.isLinked && u.getDiscordId() == discordLinking.getDiscordId()) {
                     // Unlink
                     u.isLinked = false;
                 }
@@ -235,7 +235,7 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
                     instance.getGlobalSQL().update("INSERT INTO discord(uuid,discord_id) VALUES('" + discordLinking.getUuid() + "'," + discordLinking.getDiscordId() + ");");
 
                     user.isLinked = true;
-                    user.discord_id = discordLinking.getDiscordId();
+                    user.setDiscordId(discordLinking.getDiscordId());
 
                     // Get the highest role for syncing and sync it, except for guest.
                     String role = Roles.builderRole(user.player);

@@ -1,7 +1,9 @@
 package net.bteuk.network.utils;
 
 import net.bteuk.network.Network;
+import net.bteuk.network.lib.dto.ChatMessage;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
@@ -14,7 +16,7 @@ import java.io.File;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static net.bteuk.network.utils.Constants.DISCORD_CHAT;
+import static net.bteuk.network.lib.enums.ChatChannels.GLOBAL;
 import static net.bteuk.network.utils.Constants.DISCORD_LINKING;
 import static net.bteuk.network.utils.NetworkConfig.CONFIG;
 
@@ -125,8 +127,8 @@ public final class Roles {
             //Get discord id.
             long discord_id = Network.getInstance().getGlobalSQL().getLong("SELECT discord_id FROM discord WHERE uuid='" + uuid + "';");
 
-            //Sync roles.
-            Network.getInstance().getTimers().discordSync(discord_id, nRole);
+//            //Sync roles.
+//            Network.getInstance().getTimers().discordSync(discord_id, nRole);
 
         }
 
@@ -140,12 +142,11 @@ public final class Roles {
             Component promotation_message = Component.text(name)
                     .append(PROMOTION_TEMPLATE)
                     .append(LegacyComponentSerializer.legacyAmpersand().deserialize(colouredRole));
+            promotation_message = promotation_message.decorate(TextDecoration.BOLD);
 
-            Network.getInstance().getChat().broadcastMessage(promotation_message, "uknet:globalchat");
-            //Add discord formatting to make the message bold.
-            if (DISCORD_CHAT) {
-                Network.getInstance().getChat().broadcastDiscordAnnouncement(promotation_message, "promotion");
-            }
+            ChatMessage chatMessage = new ChatMessage(GLOBAL.getChannelName(), "server", promotation_message);
+            Network.getInstance().getChat().sendSocketMesage(chatMessage);
+
         }
 
         //Check if the player is online.

@@ -9,6 +9,7 @@ import net.bteuk.network.eventing.listeners.navigation.LocationNameListener;
 import net.bteuk.network.gui.Gui;
 import net.bteuk.network.gui.staff.LocationRequests;
 import net.bteuk.network.gui.staff.StaffGui;
+import net.bteuk.network.lib.dto.ChatMessage;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.utils.NetworkUser;
@@ -25,6 +26,7 @@ import org.bukkit.Material;
 
 import java.util.Arrays;
 
+import static net.bteuk.network.lib.enums.ChatChannels.REVIEWER;
 import static net.bteuk.network.utils.Constants.SERVER_NAME;
 import static net.bteuk.network.utils.Constants.SERVER_TYPE;
 
@@ -544,11 +546,10 @@ public class AddLocation extends Gui {
         }
 
         //Notify reviewers.
-        Network.getInstance().chat.broadcastMessage(ChatUtils.success("A new location has been requested."), "uknet:reviewer");
+        ChatMessage chatMessage = new ChatMessage(REVIEWER.getChannelName(), "server", ChatUtils.success("A new location has been requested."));
+        Network.getInstance().getChat().sendSocketMesage(chatMessage);
 
-        u.player.sendMessage(ChatUtils.success("Location ")
-                .append(Component.text(name, NamedTextColor.DARK_AQUA))
-                .append(ChatUtils.success(" requested.")));
+        u.player.sendMessage(ChatUtils.success("Location %s requested.", name));
 
         //Delete gui.
         this.delete();
