@@ -114,6 +114,9 @@ public class DatabaseUpdates {
         // Add chat_channel column in player_data.
         Network.getInstance().getGlobalSQL().update("ALTER TABLE player_data ADD COLUMN chat_channel VARCHAR(64) NOT NULL DEFAULT 'global';");
 
+        // Version 1.6.0
+        Network.getInstance().getGlobalSQL().update("UPDATE unique_data SET data_value='1.6.0' WHERE data_key='version';");
+
     }
 
     private void update5_6() {

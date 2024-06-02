@@ -158,28 +158,20 @@ public class TabManager {
 
             @Override
             public void onPacketSending(PacketEvent event) {
-
                 PacketContainer packet = event.getPacket();
-
-                //If packet is for adding a player, intercept it and add the custom display name.
-                if (packet.getPlayerInfoActions().read(0).contains(UPDATE_LISTED)) {
+                if (packet.getPlayerInfoActions().read(0).contains(ADD_PLAYER)) {
 
                     List<PlayerInfoData> infoList = packet.getPlayerInfoDataLists().read(1);
                     List<PlayerInfoData> newInfoList = new ArrayList<>();
 
                     infoList.forEach(info -> {
                         // Create an exact copy, but set 'listed' to false.
-                        // We know that this is a real player since they will have a valid chat session.
-                        if (info.getRemoteChatSessionData() != null) {
-                            newInfoList.add(new PlayerInfoData(info.getProfileId(), info.getLatency(), false, info.getGameMode(), info.getProfile(), info.getDisplayName(), info.getRemoteChatSessionData()));
-                        } else {
-                            newInfoList.add(info);
-                        }
+                        newInfoList.add(new PlayerInfoData(info.getProfileId(), info.getLatency(), false, info.getGameMode(), info.getProfile(), info.getDisplayName(), info.getRemoteChatSessionData()));
                     });
 
                     packet.getPlayerInfoDataLists().write(1, newInfoList);
                     event.setPacket(packet);
-
+                    //event.setCancelled(true);
                 }
             }
         };

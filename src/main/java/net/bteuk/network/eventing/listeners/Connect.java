@@ -72,6 +72,7 @@ public class Connect implements Listener {
 
         if (primaryRole != null) {
             tabPlayer.setPrimaryGroup(primaryRole.getId());
+            tabPlayer.setPrefix(primaryRole.getColouredPrefix());
         }
 
         // Send a user connect request to the proxy, this will handle the rest.
