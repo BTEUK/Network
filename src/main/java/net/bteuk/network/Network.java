@@ -68,7 +68,6 @@ import net.bteuk.network.utils.Statistics;
 import net.bteuk.network.utils.Time;
 import net.bteuk.network.utils.Tips;
 import net.bteuk.network.utils.Utils;
-import net.bteuk.network.sql.Tutorials;
 import net.bteuk.network.utils.enums.ServerType;
 import net.bteuk.network.utils.regions.RegionManager;
 import net.kyori.adventure.text.Component;
@@ -77,18 +76,12 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import teachingtutorials.utils.DBConnection;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import static net.bteuk.network.utils.Constants.REGIONS_ENABLED;
-import static net.bteuk.network.utils.Constants.SERVER_NAME;
-import static net.bteuk.network.utils.Constants.SERVER_TYPE;
-import static net.bteuk.network.utils.Constants.TAB;
-import static net.bteuk.network.utils.Constants.TIPS;
-import static net.bteuk.network.utils.Constants.TPLL_ENABLED;
-import static net.bteuk.network.utils.Constants.TUTORIALS;
-import static net.bteuk.network.utils.Constants.PROGRESS_MAP;
+import static net.bteuk.network.utils.Constants.*;
 import static net.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public final class Network extends JavaPlugin {
@@ -166,9 +159,9 @@ public final class Network extends JavaPlugin {
     @Getter
     private Tpll tpll;
 
-    //Tutorials
+    //Tutorials DB connection
     @Getter
-    private Tutorials tutorials;
+    private DBConnection tutorialsDBConnection;
 
     @Override
     public void onEnable() {
@@ -230,6 +223,30 @@ public final class Network extends JavaPlugin {
             return;
         }
 
+        //Setup tutorials DB connection and connect
+        if (TUTORIALS)
+        {
+            //Initialise the DBConnection object
+            tutorialsDBConnection = new DBConnection();
+
+            //Extract database details from the config
+            String szHost = CONFIG.getString("tutorials.database.host");
+            int iPort = CONFIG.getInt("tutorials.database.port");
+            String szDBName = CONFIG.getString("tutorials.database.name");
+            String szUsername = CONFIG.getString("tutorials.database.username");
+            String szPassword = CONFIG.getString("tutorials.database.password");
+
+            //Set up the DBConnection object with details
+            tutorialsDBConnection.externalMySQLSetup(szHost, iPort, szDBName, szUsername, szPassword);
+
+            //Attempt to connect to the DB
+            if (!tutorialsDBConnection.connect()) {
+                getLogger().severe("Failed to connect to the Tutorials database, please check that you have set the config values correctly.");
+                getLogger().severe("Disabling Network");
+                return;
+            }
+        }
+
         //Update database.
         new DatabaseUpdates().updateDatabase();
 
@@ -272,12 +289,6 @@ public final class Network extends JavaPlugin {
 
         //Setup connect, this handles all connections to the server.
         connect = new Connect(this, globalSQL, plotSQL, regionSQL);
-
-        //Enable the tutorial if enabled.
-        if (TUTORIALS) {
-            tutorials = new Tutorials();
-        }
-
         //Create navigator.
         navigatorGui = new NavigatorGui();
         navigator = Utils.createItem(Material.NETHER_STAR, 1, Utils.title("Navigator"), Utils.line("Click to open the navigator."));
@@ -510,6 +521,9 @@ public final class Network extends JavaPlugin {
 
             }
         }
+
+        //Disconnect from tutorials
+        tutorialsDBConnection.disconnect();
 
         //Disable bungeecord channel.
         instance.getServer().getMessenger().unregisterOutgoingPluginChannel(instance);

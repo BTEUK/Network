@@ -2,7 +2,7 @@ package net.bteuk.network.commands;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.gui.BuildGui;
-import net.bteuk.network.gui.TutorialsGui;
+import net.bteuk.network.gui.tutorials.TutorialsGui;
 import net.bteuk.network.gui.navigation.ExploreGui;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.Utils;
