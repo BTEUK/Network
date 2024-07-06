@@ -32,6 +32,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
+import static net.bteuk.network.commands.AFK.updateAfkStatus;
 import static net.bteuk.network.lib.enums.ChatChannels.STAFF;
 import static net.bteuk.network.utils.Constants.GLOBAL_CHAT;
 import static net.bteuk.network.utils.Constants.LOGGER;
@@ -97,26 +98,26 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
         if (!e.isCancelled()) {
             e.setCancelled(true);
             //Get user, if staff chat enabled send message to staff chat.
-            NetworkUser u = instance.getUser(e.getPlayer());
+            NetworkUser user = instance.getUser(e.getPlayer());
 
             //If u is null, cancel.
-            if (u == null) {
+            if (user == null) {
                 LOGGER.severe("User " + e.getPlayer().getName() + " can not be found!");
                 e.getPlayer().sendMessage(ChatUtils.error("User can not be found, please relog!"));
                 return;
             }
 
             //Reset last movement of player, if they're afk unset that.
-            u.last_movement = Time.currentTime();
+            user.last_movement = Time.currentTime();
 
-            if (u.afk) {
-                u.last_time_log = u.last_movement;
-                u.afk = false;
-                broadcastAFK(u.player, false);
+            if (user.afk) {
+                user.last_time_log = user.last_movement;
+                user.afk = false;
+                updateAfkStatus(user, false);
             }
 
             Statistics.addMessage(e.getPlayer().getUniqueId().toString(), Time.getDate(Time.currentTime()));
-            ChatMessage chatMessage = getChatMessage(e.message(), u);
+            ChatMessage chatMessage = getChatMessage(e.message(), user);
 
             sendSocketMesage(chatMessage);
         }

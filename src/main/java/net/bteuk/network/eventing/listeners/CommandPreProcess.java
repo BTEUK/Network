@@ -20,6 +20,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import static net.bteuk.network.commands.AFK.updateAfkStatus;
 import static net.bteuk.network.utils.Constants.LOGGER;
 import static net.bteuk.network.utils.Constants.REGIONS_ENABLED;
 import static net.bteuk.network.utils.Constants.SERVER_NAME;
@@ -43,22 +44,21 @@ public class CommandPreProcess extends Moderation implements Listener {
 
             //If player is afk, unset it.
             //Reset last logged time.
-            NetworkUser u = instance.getUser(e.getPlayer());
+            NetworkUser user = instance.getUser(e.getPlayer());
 
             //If u is null, cancel.
-            if (u == null) {
+            if (user == null) {
                 LOGGER.severe("User " + e.getPlayer().getName() + " can not be found!");
                 e.getPlayer().sendMessage(ChatUtils.error("User can not be found, please relog!"));
                 e.setCancelled(true);
                 return;
             }
 
-            u.last_movement = Time.currentTime();
-            if (u.afk) {
-                u.last_time_log = Time.currentTime();
-                u.afk = false;
-                Network.getInstance().getChat().broadcastAFK(u.player, false);
-            }
+            user.last_movement = Time.currentTime();
+            if (user.afk) {
+                user.last_time_log = Time.currentTime();
+                user.afk = false;
+                updateAfkStatus(user, false);             }
 
         }
 
@@ -168,16 +168,16 @@ public class CommandPreProcess extends Moderation implements Listener {
 
         }
 
-        for (NetworkUser u : users) {
+        for (NetworkUser user : users) {
 
-            u.last_movement = Time.currentTime();
+            user.last_movement = Time.currentTime();
             if (server != null) {
 
                 //Reset last logged time.
-                if (u.afk) {
-                    u.last_time_log = Time.currentTime();
-                    u.afk = false;
-                    Network.getInstance().getChat().broadcastAFK(u.player, false);
+                if (user.afk) {
+                    user.last_time_log = Time.currentTime();
+                    user.afk = false;
+                    updateAfkStatus(user, false);
                 }
 
 
@@ -187,7 +187,7 @@ public class CommandPreProcess extends Moderation implements Listener {
                     DataOutputStream out = new DataOutputStream(stream);
                     out.writeUTF("Connect");
                     out.writeUTF(server);
-                    u.player.sendPluginMessage(instance, "BungeeCord", stream.toByteArray());
+                    user.player.sendPluginMessage(instance, "BungeeCord", stream.toByteArray());
                 } catch (IOException e) {
                     LOGGER.severe("IOException when attempting to switch player to another server.");
                     return;
@@ -196,12 +196,12 @@ public class CommandPreProcess extends Moderation implements Listener {
             } else {
 
                 //Reset last logged time.
-                if (u.afk) {
-                    u.last_time_log = Time.currentTime();
-                    u.afk = false;
+                if (user.afk) {
+                    user.last_time_log = Time.currentTime();
+                    user.afk = false;
                 }
 
-                String uuid = u.player.getUniqueId().toString();
+                String uuid = user.player.getUniqueId().toString();
 
                 //Remove any outstanding invites that this player has sent.
                 instance.getPlotSQL().update("DELETE FROM plot_invites WHERE owner='" + uuid + "';");
@@ -221,7 +221,7 @@ public class CommandPreProcess extends Moderation implements Listener {
                         instance.getGlobalSQL().getInt("SELECT count(uuid) FROM online_users;") + ");");
 
                 //Kick the player.
-                u.player.kick(Component.text("The server is restarting!", NamedTextColor.RED));
+                user.player.kick(Component.text("The server is restarting!", NamedTextColor.RED));
 
                 //Send the disconnect messagein discord, since the standard leaveserver event has been blocked.
                 String name = Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
@@ -238,7 +238,7 @@ public class CommandPreProcess extends Moderation implements Listener {
 
             //Update statistics
             long time = Time.currentTime();
-            Statistics.save(u, Time.getDate(time), time);
+            Statistics.save(user, Time.getDate(time), time);
 
         }
 

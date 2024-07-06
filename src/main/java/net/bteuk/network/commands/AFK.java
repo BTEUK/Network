@@ -1,6 +1,7 @@
 package net.bteuk.network.commands;
 
 import net.bteuk.network.Network;
+import net.bteuk.network.lib.dto.UserUpdate;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.Statistics;
@@ -42,7 +43,7 @@ public class AFK implements CommandExecutor {
             //Reset last logged time.
             u.last_time_log = u.last_movement = Time.currentTime();
             u.afk = false;
-            Network.getInstance().getChat().broadcastAFK(u.player, false);
+            updateAfkStatus(u, false);
 
         } else {
 
@@ -52,11 +53,23 @@ public class AFK implements CommandExecutor {
             Statistics.save(u, Time.getDate(time), time);
 
             u.afk = true;
-            Network.getInstance().getChat().broadcastAFK(u.player, true);
+            updateAfkStatus(u, true);
 
         }
 
         return true;
+
+    }
+
+    public static void updateAfkStatus(NetworkUser user, boolean afk) {
+
+        // Broadcast the afk message and send a user update event.
+        Network.getInstance().getChat().broadcastAFK(user.player, true);
+
+        UserUpdate userUpdateEvent = new UserUpdate();
+        userUpdateEvent.setUuid(user.player.getUniqueId().toString());
+        userUpdateEvent.setAfk(afk);
+        Network.getInstance().getChat().sendSocketMesage(userUpdateEvent);
 
     }
 }

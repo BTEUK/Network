@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import static net.bteuk.network.commands.AFK.updateAfkStatus;
 import static net.bteuk.network.utils.Constants.DISCORD_LINKING;
 import static net.bteuk.network.utils.Constants.LOGGER;
 import static net.bteuk.network.utils.Constants.REGIONS_ENABLED;
@@ -209,7 +210,7 @@ public class Timers {
                     Statistics.save(user, Time.getDate(time), time);
 
                     //Send message to chat and discord.
-                    Network.getInstance().getChat().broadcastAFK(user.player, true);
+                    updateAfkStatus(user, true);
 
                 }
             }

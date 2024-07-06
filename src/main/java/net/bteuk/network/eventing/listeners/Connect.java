@@ -2,6 +2,7 @@ package net.bteuk.network.eventing.listeners;
 
 import lombok.Setter;
 import net.bteuk.network.Network;
+import net.bteuk.network.TabManager;
 import net.bteuk.network.building_companion.BuildingCompanion;
 import net.bteuk.network.gui.Gui;
 import net.bteuk.network.lib.dto.TabPlayer;
@@ -13,8 +14,6 @@ import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.sql.RegionSQL;
 import net.bteuk.network.utils.NetworkUser;
-import net.bteuk.network.utils.Role;
-import net.bteuk.network.utils.Roles;
 import net.bteuk.network.utils.Statistics;
 import net.bteuk.network.utils.TextureUtils;
 import net.bteuk.network.utils.Time;
@@ -65,15 +64,7 @@ public class Connect implements Listener {
         Set<String> channels = NetworkUser.getChannels(e.getPlayer());
 
         // Get the TabPlayer instance for this player.
-        TabPlayer tabPlayer = new TabPlayer();
-        tabPlayer.setUuid(e.getPlayer().getUniqueId().toString());
-        tabPlayer.setName(e.getPlayer().getName());
-        Role primaryRole = Roles.getPrimaryRole(e.getPlayer());
-
-        if (primaryRole != null) {
-            tabPlayer.setPrimaryGroup(primaryRole.getId());
-            tabPlayer.setPrefix(primaryRole.getColouredPrefix());
-        }
+        TabPlayer tabPlayer = TabManager.createTabPlayer(e.getPlayer());
 
         // Send a user connect request to the proxy, this will handle the rest.
         // When the proxy has received the request it'll send a response which will then create the user object on the server.
@@ -163,7 +154,7 @@ public class Connect implements Listener {
         NetworkUser user = new NetworkUser(player, reply);
         Network.getInstance().addUser(user);
 
-        // Play a short sound to the player, this will imply that the connection is complete.
+        // TODO Play a short sound to the player, this will imply that the connection is complete.
 
     }
 

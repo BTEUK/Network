@@ -8,28 +8,24 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.events.PacketListener;
-import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.PlayerInfoData;
 import net.bteuk.network.lib.dto.AddTeamEvent;
+import net.bteuk.network.lib.dto.TabPlayer;
 import net.bteuk.network.utils.Role;
 import net.bteuk.network.utils.Roles;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.scoreboard.Team;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import static com.comphenix.protocol.wrappers.EnumWrappers.PlayerInfoAction.ADD_PLAYER;
-import static com.comphenix.protocol.wrappers.EnumWrappers.PlayerInfoAction.UPDATE_DISPLAY_NAME;
-import static com.comphenix.protocol.wrappers.EnumWrappers.PlayerInfoAction.UPDATE_GAME_MODE;
-import static com.comphenix.protocol.wrappers.EnumWrappers.PlayerInfoAction.UPDATE_LATENCY;
-import static com.comphenix.protocol.wrappers.EnumWrappers.PlayerInfoAction.UPDATE_LISTED;
 import static net.bteuk.network.utils.Constants.LOGGER;
 
 public class TabManager {
@@ -41,11 +37,23 @@ public class TabManager {
 
     private Scoreboard scoreboard;
 
-    private final EnumSet<EnumWrappers.PlayerInfoAction> actions = EnumSet.of(ADD_PLAYER, UPDATE_GAME_MODE, UPDATE_LISTED, UPDATE_LATENCY, UPDATE_DISPLAY_NAME);
-
     private static final char[] ALPHABET = "abcdefghijklmnopqrstuvwxyz".toCharArray();
 
     private final Map<String, Team> teams = new HashMap<>();
+
+    public static TabPlayer createTabPlayer(Player player) {
+        TabPlayer tabPlayer = new TabPlayer();
+        tabPlayer.setUuid(player.getUniqueId().toString());
+        tabPlayer.setName(player.getName());
+        Role primaryRole = Roles.getPrimaryRole(player);
+
+        if (primaryRole != null) {
+            tabPlayer.setPrimaryGroup(primaryRole.getId());
+            tabPlayer.setPrefix(primaryRole.getColouredPrefix());
+        }
+
+        return tabPlayer;
+    }
 
     public TabManager(Network instance) {
 

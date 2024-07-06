@@ -18,6 +18,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
+import static net.bteuk.network.commands.AFK.updateAfkStatus;
 import static net.bteuk.network.utils.Constants.EARTH_WORLD;
 import static net.bteuk.network.utils.Constants.LOGGER;
 import static net.bteuk.network.utils.Constants.REGIONS_ENABLED;
@@ -60,10 +61,10 @@ public class MoveListener implements Listener {
         }
 
         Player p = e.getPlayer();
-        NetworkUser u = Network.getInstance().getUser(p);
+        NetworkUser user = Network.getInstance().getUser(p);
 
         //If u is null, cancel.
-        if (u == null) {
+        if (user == null) {
             LOGGER.severe("User " + p.getName() + " can not be found!");
             p.sendMessage(ChatUtils.error("User can not be found, please relog!"));
             e.setCancelled(true);
@@ -71,37 +72,37 @@ public class MoveListener implements Listener {
         }
 
         //Cancel event if player is switching server.
-        if (u.switching) {
+        if (user.switching) {
             e.setCancelled(true);
             return;
         }
 
         //Reset last movement of player, if they're afk unset that.
-        u.last_movement = Time.currentTime();
+        user.last_movement = Time.currentTime();
 
-        if (u.afk) {
-            u.last_time_log = u.last_movement;
-            u.afk = false;
-            Network.getInstance().getChat().broadcastAFK(u.player, false);
+        if (user.afk) {
+            user.last_time_log = user.last_movement;
+            user.afk = false;
+            updateAfkStatus(user, false);
         }
 
         // If regions are enabled, check for movement between regions.
         // If the player is currently not in a region then that implies they are in a world without regions, so movement will not effect this.
         // Not being in a region also means that region is null.
-        if (REGIONS_ENABLED && u.inRegion) {
+        if (REGIONS_ENABLED && user.inRegion) {
 
             // Get x and z of the region as int rounded down with any necessary coordinate transforms.
-            int x = ((e.getTo().getX() >= 0 ? (int) e.getTo().getX() : ((int) e.getTo().getX()) - 1) + u.dx) >> 9;
-            int z = ((e.getTo().getZ() >= 0 ? (int) e.getTo().getZ() : ((int) e.getTo().getZ()) - 1) + u.dz) >> 9;
+            int x = ((e.getTo().getX() >= 0 ? (int) e.getTo().getX() : ((int) e.getTo().getX()) - 1) + user.dx) >> 9;
+            int z = ((e.getTo().getZ() >= 0 ? (int) e.getTo().getZ() : ((int) e.getTo().getZ()) - 1) + user.dz) >> 9;
 
             // Check if the player has moved to another region.
-            if (!u.region.equals(x, z)) {
+            if (!user.region.equals(x, z)) {
 
                 //Get new region.
                 Region region = regionManager.getRegion(x, z);
 
                 //Check if the new region is on this server or not.
-                if (!u.region.getServer().equals(region.getServer())) {
+                if (!user.region.getServer().equals(region.getServer())) {
 
                     //If cross-server teleport is enabled teleport them to the correct server and location.
                     if (teleportEnabled) {
@@ -126,20 +127,20 @@ public class MoveListener implements Listener {
                                     int zTransform = plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
 
                                     //Set join event to teleport there.
-                                    EventManager.createJoinEvent(u.player.getUniqueId().toString(), "network", "teleport " +
+                                    EventManager.createJoinEvent(user.player.getUniqueId().toString(), "network", "teleport " +
                                             location + " " + (e.getTo().getX() + xTransform) + " " + (e.getTo().getZ() + zTransform) + " " + e.getTo().getYaw() + " " + e.getTo().getPitch());
 
                                 } else {
 
                                     //Set join event to teleport there.
-                                    EventManager.createJoinEvent(u.player.getUniqueId().toString(), "network", "teleport " +
-                                            EARTH_WORLD + " " + (e.getTo().getX() + u.dx) + " " + (e.getTo().getZ()  + u.dz) + " " + e.getTo().getYaw() + " " + e.getTo().getPitch());
+                                    EventManager.createJoinEvent(user.player.getUniqueId().toString(), "network", "teleport " +
+                                            EARTH_WORLD + " " + (e.getTo().getX() + user.dx) + " " + (e.getTo().getZ()  + user.dz) + " " + e.getTo().getYaw() + " " + e.getTo().getPitch());
 
                                 }
 
                                 //Switch server.
                                 e.setCancelled(true);
-                                SwitchServer.switchServer(u.player, region.getServer());
+                                SwitchServer.switchServer(user.player, region.getServer());
 
                             } else {
 
@@ -174,7 +175,7 @@ public class MoveListener implements Listener {
                                     ChatUtils.success("You have entered ")
                                             .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
                                             .append(ChatUtils.success(" and left "))
-                                            .append(Component.text(u.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                            .append(Component.text(user.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
                                             .append(ChatUtils.success(", you are the owner of this region.")));
                             region.setLastEnter(p.getUniqueId().toString());
 
@@ -191,7 +192,7 @@ public class MoveListener implements Listener {
                                     ChatUtils.success("You have entered ")
                                             .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
                                             .append(ChatUtils.success(" and left "))
-                                            .append(Component.text(u.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                            .append(Component.text(user.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
                                             .append(ChatUtils.success(", you are a member of this region.")));
                             region.setLastEnter(p.getUniqueId().toString());
 
@@ -218,7 +219,7 @@ public class MoveListener implements Listener {
                                     ChatUtils.success("You have entered ")
                                             .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
                                             .append(ChatUtils.success(" and left "))
-                                            .append(Component.text(u.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                            .append(Component.text(user.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
                                             .append(ChatUtils.success(", you can build in this region.")));
 
                         } else {
@@ -228,12 +229,12 @@ public class MoveListener implements Listener {
                                     ChatUtils.success("You have entered ")
                                             .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
                                             .append(ChatUtils.success(" and left "))
-                                            .append(Component.text(u.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA)));
+                                            .append(Component.text(user.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA)));
 
                         }
 
                         //Update the region the player is in.
-                        u.region = region;
+                        user.region = region;
 
                     } else {
 
