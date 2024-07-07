@@ -157,8 +157,12 @@ commands:
     usage: /<command>
     description: Map command.
   pmute:
-    usage: /<pmute>
+    usage: /<command>
     description: Mute a player
   punmute:
-    usage: /<punmute>
+    usage: /<command>
     description: Unmute a player
+  msg:
+    aliases: [ w, tell ]
+    usage: /<command>
+    description: Sends a direct message to a player.

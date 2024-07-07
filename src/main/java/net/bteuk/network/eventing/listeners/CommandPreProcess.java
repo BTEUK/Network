@@ -1,12 +1,10 @@
 package net.bteuk.network.eventing.listeners;
 
 import net.bteuk.network.Network;
-import net.bteuk.network.exceptions.NotMutedException;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.Statistics;
 import net.bteuk.network.utils.Time;
-import net.bteuk.network.utils.staff.Moderation;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -26,7 +24,7 @@ import static net.bteuk.network.utils.Constants.REGIONS_ENABLED;
 import static net.bteuk.network.utils.Constants.SERVER_NAME;
 import static net.bteuk.network.utils.Constants.TPLL_ENABLED;
 
-public class CommandPreProcess extends Moderation implements Listener {
+public class CommandPreProcess implements Listener {
 
     private final Network instance;
 
@@ -81,22 +79,10 @@ public class CommandPreProcess extends Moderation implements Listener {
             if (Bukkit.getServer().getPluginManager().getPlugin("skulls") != null) {
                 e.setMessage(e.getMessage().replace("/hdb", "/skulls"));
             }
-        } else if (isCommand(e.getMessage(), "/tell", "/msg", "/w", "/me")) {
-            //If player is muted cancel.
-            if (isMuted(e.getPlayer().getUniqueId().toString())) {
-                e.setCancelled(true);
-                try {
-
-                    //Send message and end event.
-                    e.getPlayer().sendMessage(getMutedComponent(e.getPlayer().getUniqueId().toString()));
-
-                } catch (NotMutedException ex) {
-
-                    //Unset the muted status.
-                    e.setCancelled(false);
-
-                }
-            }
+        } else if (isCommand(e.getMessage(), "/me")) {
+            // This command is not allowed.
+            e.setCancelled(true);
+            e.getPlayer().sendMessage(ChatUtils.error("You do not have permission to use this command."));
         }
     }
 

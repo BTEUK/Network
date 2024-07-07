@@ -28,7 +28,6 @@ public abstract class PmuteAction extends AbstractCommand {
         Player p = getPlayer(sender);
 
         if (p == null) {
-            sender.sendMessage(COMMAND_ONLY_BY_PLAYER);
             return;
         }
 

@@ -5,7 +5,6 @@ import net.bteuk.network.exceptions.DurationFormatException;
 import net.bteuk.network.exceptions.NotBannedException;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.Time;
-import net.bteuk.network.utils.staff.Moderation;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
@@ -18,8 +17,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 
 import static net.bteuk.network.utils.Constants.LOGGER;
+import static net.bteuk.network.utils.staff.Moderation.ban;
+import static net.bteuk.network.utils.staff.Moderation.getDuration;
 
-public class Ban extends Moderation implements CommandExecutor {
+public class Ban implements CommandExecutor {
 
     //Constructor to enable the command.
     public Ban(Network instance) {

@@ -33,7 +33,6 @@ public class Ptime extends AbstractCommand {
         Player p = getPlayer(sender);
 
         if (p == null) {
-            sender.sendMessage(COMMAND_ONLY_BY_PLAYER);
             return true;
         }
 

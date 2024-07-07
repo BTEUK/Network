@@ -2,7 +2,6 @@ package net.bteuk.network.commands.staff;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.lib.utils.ChatUtils;
-import net.bteuk.network.utils.staff.Moderation;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
@@ -15,8 +14,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 
 import static net.bteuk.network.utils.Constants.LOGGER;
+import static net.bteuk.network.utils.staff.Moderation.kick;
 
-public class Kick extends Moderation implements CommandExecutor {
+public class Kick implements CommandExecutor {
 
     //Constructor to enable the command.
     public Kick(Network instance) {

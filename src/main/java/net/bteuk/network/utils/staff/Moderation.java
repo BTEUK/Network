@@ -19,13 +19,12 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 /**
- * Abstract class for moderation.
- * Must be implemented to use.
+ * Utility class for moderation
  */
-public abstract class Moderation {
+public class Moderation {
 
     //Ban the player.
-    public void ban(String uuid, long end_time, String reason) throws NotBannedException {
+    public static void ban(String uuid, long end_time, String reason) throws NotBannedException {
 
         //Get time.
         long time = Time.currentTime();
@@ -42,7 +41,7 @@ public abstract class Moderation {
     }
 
     //Mute the player.
-    public void mute(String uuid, long end_time, String reason) throws NotMutedException {
+    public static void mute(String uuid, long end_time, String reason) throws NotMutedException {
 
         //Get time.
         long time = Time.currentTime();
@@ -59,21 +58,21 @@ public abstract class Moderation {
     }
 
     //Unban the player.
-    public void unban(String uuid) {
+    public static void unban(String uuid) {
         //Get time.
         long time = Time.currentTime();
         Network.getInstance().getGlobalSQL().update("UPDATE moderation SET end_time=" + time + " WHERE uuid='" + uuid + "' AND end_time>" + time + " AND type='ban';");
     }
 
     //Unmute the player.
-    public void unmute(String uuid) {
+    public static void unmute(String uuid) {
         //Get time.
         long time = Time.currentTime();
         Network.getInstance().getGlobalSQL().update("UPDATE moderation SET end_time=" + time + " WHERE uuid='" + uuid + "' AND end_time>" + time + " AND type='mute';");
     }
 
     //Kick the player.
-    public void kick(String uuid, String reason) {
+    public static void kick(String uuid, String reason) {
 
         //Check if the player is currently online.
         if (Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "';")) {
@@ -90,33 +89,33 @@ public abstract class Moderation {
      * @param uuid the uuid of the player
      * @return true if the player is currently banned, false if not
      */
-    public boolean isBanned(String uuid) {
+    public static boolean isBanned(String uuid) {
         return (Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM moderation WHERE uuid='" + uuid + "' AND end_time>" + Time.currentTime() + " AND type='ban';"));
     }
 
     //If the player is currently muted, return true.
-    public boolean isMuted(String uuid) {
+    public static boolean isMuted(String uuid) {
         return (Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM moderation WHERE uuid='" + uuid + "' AND end_time>" + Time.currentTime() + " AND type='mute';"));
     }
 
     //Get reason why player is banned.
-    public String getBannedReason(String uuid) {
+    public static String getBannedReason(String uuid) {
         return (Network.getInstance().getGlobalSQL().getString("SELECT reason FROM moderation WHERE uuid='" + uuid + "' AND end_time>" + Time.currentTime() + " AND type='ban';"));
     }
 
     //Get reason why player is muted.
-    public String getMutedReason(String uuid) {
+    public static String getMutedReason(String uuid) {
         return (Network.getInstance().getGlobalSQL().getString("SELECT reason FROM moderation WHERE uuid='" + uuid + "' AND end_time>" + Time.currentTime() + " AND type='mute';"));
     }
 
     //Get duration of ban.
-    public String getBanDuration(String uuid) {
+    public static String getBanDuration(String uuid) {
         long time = Network.getInstance().getGlobalSQL().getLong("SELECT end_time FROM moderation WHERE uuid='" + uuid + "' AND end_time>" + Time.currentTime() + " AND type='ban';");
         return Time.getDateTime(time);
     }
 
     //Get duration of mute.
-    public String getMuteDuration(String uuid) {
+    public static String getMuteDuration(String uuid) {
         long time = Network.getInstance().getGlobalSQL().getLong("SELECT end_time FROM moderation WHERE uuid='" + uuid + "' AND end_time>" + Time.currentTime() + " AND type='mute';");
         return Time.getDateTime(time);
     }
@@ -129,7 +128,7 @@ public abstract class Moderation {
      * @return the component of the banned message with reason and duration
      * @throws NotBannedException if the player is not banned
      */
-    public Component getBannedComponent(String uuid) throws NotBannedException {
+    public static Component getBannedComponent(String uuid) throws NotBannedException {
         if (isBanned(uuid)) {
             return Component.text("You have been banned for ", NamedTextColor.RED)
                     .append(Component.text(getBannedReason(uuid), NamedTextColor.DARK_RED))
@@ -148,7 +147,7 @@ public abstract class Moderation {
      * @return the component of the muted message with reason and duration
      * @throws NotMutedException if the player is not muted
      */
-    public Component getMutedComponent(String uuid) throws NotMutedException {
+    public static Component getMutedComponent(String uuid) throws NotMutedException {
         if (isMuted(uuid)) {
             return ChatUtils.error("You have been muted for ")
                     .append(Component.text(getMutedReason(uuid), NamedTextColor.DARK_RED))
@@ -166,7 +165,7 @@ public abstract class Moderation {
      * @return duration in milliseconds after converting the input string
      * @throws DurationFormatException if the input string is not formatted correctly
      */
-    public long getDuration(String formattedInput) throws DurationFormatException {
+    public static long getDuration(String formattedInput) throws DurationFormatException {
 
         if (formattedInput == null) {
             throw new NullPointerException();

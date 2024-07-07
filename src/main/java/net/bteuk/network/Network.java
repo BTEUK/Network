@@ -8,12 +8,15 @@ import net.bteuk.network.commands.Discord;
 import net.bteuk.network.commands.Gamemode;
 import net.bteuk.network.commands.Hdb;
 import net.bteuk.network.commands.Help;
+import net.bteuk.network.commands.Msg;
 import net.bteuk.network.commands.Navigator;
 import net.bteuk.network.commands.Nightvision;
 import net.bteuk.network.commands.Phead;
 import net.bteuk.network.commands.Plot;
+import net.bteuk.network.commands.Pmute;
 import net.bteuk.network.commands.ProgressMap;
 import net.bteuk.network.commands.Ptime;
+import net.bteuk.network.commands.Punmute;
 import net.bteuk.network.commands.RegionCommand;
 import net.bteuk.network.commands.Rules;
 import net.bteuk.network.commands.Season;
@@ -387,6 +390,13 @@ public final class Network extends JavaPlugin {
 
         //Phead command.
         new Phead(this);
+
+        // Pmute and unmute
+        new Pmute(this);
+        new Punmute(this);
+
+        // msg, tell and w
+        new Msg(this);
 
         //Homes commands.
         if (CONFIG.getBoolean("homes.enabled")) {

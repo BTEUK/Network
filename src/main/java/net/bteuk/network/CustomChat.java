@@ -18,7 +18,6 @@ import net.bteuk.network.utils.Role;
 import net.bteuk.network.utils.Roles;
 import net.bteuk.network.utils.Statistics;
 import net.bteuk.network.utils.Time;
-import net.bteuk.network.utils.staff.Moderation;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -37,8 +36,10 @@ import static net.bteuk.network.lib.enums.ChatChannels.STAFF;
 import static net.bteuk.network.utils.Constants.GLOBAL_CHAT;
 import static net.bteuk.network.utils.Constants.LOGGER;
 import static net.bteuk.network.utils.NetworkConfig.CONFIG;
+import static net.bteuk.network.utils.staff.Moderation.getMutedComponent;
+import static net.bteuk.network.utils.staff.Moderation.isMuted;
 
-public class CustomChat extends Moderation implements Listener, PluginMessageListener {
+public class CustomChat implements Listener, PluginMessageListener {
 
     private final Network instance;
 
@@ -141,6 +142,10 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
         chatMessage.setSender(u.player.getUniqueId().toString());
         chatMessage.setComponent(message);
         return chatMessage;
+    }
+
+    public static DirectMessage getDirectMessage(String message, String senderName, String senderUuid, String recipientName, String recipientUuid) {
+        return new DirectMessage(recipientUuid, senderUuid, directMessageFormat(message, senderName, recipientName));
     }
 
     //Receives a message from the chat socket in json format.
@@ -368,6 +373,20 @@ public class CustomChat extends Moderation implements Listener, PluginMessageLis
                 .append(ChatUtils.line(">").decorate(TextDecoration.BOLD)) // Arrow between the player and message in bold.
                 .append(Component.space())
                 .append(message.color(NamedTextColor.WHITE)); // The message in white without formatting.
+    }
+
+    private static Component directMessageFormat(String message, String sender, String recipient) {
+        return ChatUtils.line("[").decorate(TextDecoration.BOLD)
+                .append(ChatUtils.line(sender))
+                .append(Component.space())
+                .append(ChatUtils.line("->"))
+                .append(Component.space())
+                .append(ChatUtils.line(recipient))
+                .append(ChatUtils.line("]").decorate(TextDecoration.BOLD))
+                .append(Component.space())
+                .append(ChatUtils.line(">").decorate(TextDecoration.BOLD)) // Arrow between the player and message in bold.
+                .append(Component.space())
+                .append(ChatUtils.line(message)); // The message in white without formatting.
     }
 
 //    /**

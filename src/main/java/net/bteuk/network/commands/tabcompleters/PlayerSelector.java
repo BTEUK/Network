@@ -10,6 +10,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Online player name selector for the 1st command argument.
+ */
 public class PlayerSelector extends AbstractTabCompleter {
 
     @Override

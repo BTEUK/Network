@@ -14,7 +14,7 @@ public class Pmute extends PmuteAction {
 
     private static Component ERROR = ChatUtils.error("/pmute [player]");
 
-    protected Pmute(Network instance) {
+    public Pmute(Network instance) {
         super(instance, "pmute", ERROR);
     }
 

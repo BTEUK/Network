@@ -2,14 +2,16 @@ package net.bteuk.network.eventing.listeners;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.exceptions.NotBannedException;
-import net.bteuk.network.utils.staff.Moderation;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 
-public class PreJoinServer extends Moderation implements Listener {
+import static net.bteuk.network.utils.staff.Moderation.getBannedComponent;
+import static net.bteuk.network.utils.staff.Moderation.isBanned;
+
+public class PreJoinServer implements Listener {
 
     public PreJoinServer(Network instance) {
 

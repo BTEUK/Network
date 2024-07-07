@@ -2,7 +2,6 @@ package net.bteuk.network.commands.staff;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.lib.utils.ChatUtils;
-import net.bteuk.network.utils.staff.Moderation;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
@@ -13,8 +12,10 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import static net.bteuk.network.utils.Constants.LOGGER;
+import static net.bteuk.network.utils.staff.Moderation.isBanned;
+import static net.bteuk.network.utils.staff.Moderation.unban;
 
-public class Unban extends Moderation implements CommandExecutor {
+public class Unban implements CommandExecutor {
 
     //Constructor to enable the command.
     public Unban(Network instance) {
