@@ -2,50 +2,50 @@ name: Network
 version: '${project.version}'
 main: net.bteuk.network.Network
 api-version: 1.20
-depend: [ PlaceholderAPI, WorldGuard, ProtocolLib]
+depend: [ PlaceholderAPI, WorldGuard, ProtocolLib ]
 
 softdepend:
   - DecentHolograms
 
 commands:
   plot:
-    aliases: [plots]
+    aliases: [ plots ]
     usage: /<command>
     description: Allows players to manipulate plots without using the gui.
   tpll:
     usage: /<command>
     description: Teleport to coordinates.
   ll:
-    aliases: [location]
+    aliases: [ location ]
     usage: /<command>
     description: Returns the coordinates where the player is standing with a link to google maps.
   navigator:
-    aliases: [nav,gui,menu,claim]
+    aliases: [ nav,gui,menu,claim ]
     usage: /<command>
     description: Opens the main gui, will always return to the previous menu if possible.
   staff:
-    aliases: [st]
+    aliases: [ st ]
     usage: /<command>
     description: Opens the Staff Menu.
   region:
     usage: /<command>
     description: Allows players to manipulate regions without using the gui.
   teleport:
-    aliases: [tp]
+    aliases: [ tp ]
     usage: /<command>
     description: Teleport to any online player.
   back:
     usage: /<command>
     description: Teleports the player to the previous teleported location.
   teleporttoggle:
-    aliases: [tptoggle, toggleteleport, toggletp]
+    aliases: [ tptoggle, toggleteleport, toggletp ]
     usage: /<command>
     description: Enables/Disables the ability for other players to teleport to you.
   discord:
     usage: /<command>
     description: Sends a link to our discord server.
   nightvision:
-    aliases: [nv]
+    aliases: [ nv ]
     usage: /<command>
     description: Toggle nightvision.
   speed:
@@ -103,7 +103,7 @@ commands:
     usage: /<command>
     description: Switch server by command.
   gamemode:
-    aliases: [gm]
+    aliases: [ gm ]
     usage: /<command>
     description: Switch gamemode.
   phead:
@@ -136,7 +136,7 @@ commands:
     aliases:
       - progress
   tips:
-    aliases: [toggletips, tipstoggle]
+    aliases: [ toggletips, tipstoggle ]
     usage: /<command>
     description: Toggles tips in chat.
   ptime:
@@ -145,7 +145,7 @@ commands:
   season:
     usage: /<command>
     description: Command for creating, starting and ending seasons.
-    aliases: [seasons]
+    aliases: [ seasons ]
   exp:
     usage: /<command>
     description: Test command for adding exp.
@@ -156,3 +156,9 @@ commands:
   map:
     usage: /<command>
     description: Map command.
+  pmute:
+    usage: /<pmute>
+    description: Mute a player
+  punmute:
+    usage: /<punmute>
+    description: Unmute a player
