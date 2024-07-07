@@ -1,5 +1,6 @@
 package net.bteuk.network.gui.plotsystem;
 
+import com.destroystokyo.paper.profile.PlayerProfile;
 import lombok.Getter;
 import lombok.Setter;
 import net.bteuk.network.Network;
@@ -11,10 +12,17 @@ import net.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * This Gui class allows the player to view accepted plots.
@@ -43,6 +51,13 @@ public class AcceptedPlotMenu extends Gui {
 
     @Setter
     private int page = 1;
+
+    /**
+     * Hashmap to store the {@link PlayerProfile} so they do not need to be called on each refresh.
+     */
+    private final Map<String, PlayerProfile> playerProfiles = new ConcurrentHashMap<>();
+
+    private final Map<String, CompletableFuture<Void>> completableProfiles = new ConcurrentHashMap<>();
 
     public AcceptedPlotMenu(NetworkUser user) {
 
@@ -128,7 +143,14 @@ public class AcceptedPlotMenu extends Gui {
             }
 
             // The icon is the player head of the plot builder.
-            setItem(slot, Utils.createPlayerSkull(plots.get(plotID), 1,
+            PlayerProfile profile = playerProfiles.get(plots.get(plotID));
+            if (profile == null) {
+                profile = Bukkit.createProfile(UUID.fromString(plots.get(plotID)));
+                // Add player profiles to a list of futures, they will be fetched asynchronously.
+                completableProfiles.put(plots.get(plotID), getCompletableProfile(profile));
+                playerProfiles.put(plots.get(plotID), profile);
+            }
+            setItem(slot, Utils.createPlayerSkull(profile, 1,
                             Utils.title("Plot " + plotID),
                             Utils.line("Completed by: ").append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + plots.get(plotID) + "';"), NamedTextColor.GRAY)),
                             Utils.line("Click to open the menu of this plot.")),
@@ -165,15 +187,34 @@ public class AcceptedPlotMenu extends Gui {
                     u.mainGui = new PlotMenu(u);
                     u.mainGui.open(u);
                 });
+
+        // Complete the player-profiles and refresh the gui.
+        completeProfiles();
+    }
+
+    private void completeProfiles() {
+        CompletableFuture<Void> future = CompletableFuture.allOf((CompletableFuture<?>) completableProfiles.values());
+        completableProfiles.clear();
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(() -> {
+            try {
+                future.get();
+            } catch (Exception e) {
+                // Ignored
+            }
+            // Refresh the gui.
+            Bukkit.getScheduler().runTask(Network.getInstance(), this::refresh);
+        });
     }
 
     public void refresh() {
-
         this.clearGui();
         createGui();
-
     }
 
+    private CompletableFuture<Void> getCompletableProfile(PlayerProfile profile) {
+        return CompletableFuture.runAsync(profile::complete);
+    }
 
     @Override
     public void delete() {

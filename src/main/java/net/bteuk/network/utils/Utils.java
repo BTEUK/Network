@@ -216,11 +216,28 @@ public class Utils {
         meta.displayName(displayName);
         List<Component> lore = new ArrayList<>(Arrays.asList(loreString));
         meta.lore(lore);
-        item.setItemMeta(meta);
 
         OfflinePlayer p = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
 
         meta.setOwningPlayer(p);
+        item.setItemMeta(meta);
+
+        return item;
+
+    }
+
+    public static ItemStack createPlayerSkull(PlayerProfile profile, int amount, Component displayName, Component... loreString) {
+
+        ItemStack item;
+
+        item = new ItemStack(Material.PLAYER_HEAD);
+        item.setAmount(amount);
+
+        SkullMeta meta = (SkullMeta) item.getItemMeta();
+        meta.displayName(displayName);
+        List<Component> lore = new ArrayList<>(Arrays.asList(loreString));
+        meta.lore(lore);
+        meta.setPlayerProfile(profile);
         item.setItemMeta(meta);
 
         return item;
