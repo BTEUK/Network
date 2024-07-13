@@ -29,6 +29,10 @@ public class Role implements Comparable<Role> {
         return Component.text(prefix, TextColor.fromHexString(colour));
     }
 
+    public Component getColouredRoleName() {
+        return Component.text(name, TextColor.fromHexString(colour));
+    }
+
     @Override
     public int compareTo(Role o) {
         return o.getWeight() - weight;

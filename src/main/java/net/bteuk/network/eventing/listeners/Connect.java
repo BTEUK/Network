@@ -9,6 +9,7 @@ import net.bteuk.network.lib.dto.TabPlayer;
 import net.bteuk.network.lib.dto.UserConnectReply;
 import net.bteuk.network.lib.dto.UserConnectRequest;
 import net.bteuk.network.lib.dto.UserDisconnect;
+import net.bteuk.network.lib.dto.UserRemove;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.sql.PlotSQL;
@@ -68,7 +69,10 @@ public class Connect implements Listener {
 
         // Send a user connect request to the proxy, this will handle the rest.
         // When the proxy has received the request it'll send a response which will then create the user object on the server.
-        UserConnectRequest userConnectRequest = new UserConnectRequest(SERVER_NAME, e.getPlayer().getUniqueId().toString(), e.getPlayer().getName(), TextureUtils.getTexture(e.getPlayer().getPlayerProfile()), channels, tabPlayer);
+        UserConnectRequest userConnectRequest = new UserConnectRequest(
+                SERVER_NAME, e.getPlayer().getUniqueId().toString(), e.getPlayer().getName(),
+                TextureUtils.getTexture(e.getPlayer().getPlayerProfile()), channels, tabPlayer
+        );
         Bukkit.getScheduler().runTaskAsynchronously(Network.getInstance(), () -> Network.getInstance().getChat().sendSocketMesage(userConnectRequest));
         LOGGER.info(String.format("%s connected to the server, sent request to proxy to add player as NetworkUser", e.getPlayer().getName()));
 
@@ -155,6 +159,14 @@ public class Connect implements Listener {
         Network.getInstance().addUser(user);
 
         // TODO Play a short sound to the player, this will imply that the connection is complete.
+
+    }
+
+    public static void handleUserRemove(UserRemove userRemove) {
+
+        // TODO: Implement users that are no longer on the server but 'offline'.
+        // TODO: This will then remove them. Currently this is not implemented.
+        LOGGER.info(String.format("User remove event received from the Proxy for %s", userRemove.getUuid()));
 
     }
 

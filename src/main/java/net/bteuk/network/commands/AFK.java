@@ -64,7 +64,7 @@ public class AFK implements CommandExecutor {
     public static void updateAfkStatus(NetworkUser user, boolean afk) {
 
         // Broadcast the afk message and send a user update event.
-        Network.getInstance().getChat().broadcastAFK(user.player, true);
+        Network.getInstance().getChat().broadcastAFK(user.player, afk);
 
         UserUpdate userUpdateEvent = new UserUpdate();
         userUpdateEvent.setUuid(user.player.getUniqueId().toString());

@@ -2,7 +2,7 @@ name: Network
 version: '${project.version}'
 main: net.bteuk.network.Network
 api-version: 1.20
-depend: [ PlaceholderAPI, WorldGuard, ProtocolLib ]
+depend: [ PlaceholderAPI, WorldGuard, ProtocolLib, LuckPerms ]
 
 softdepend:
   - DecentHolograms

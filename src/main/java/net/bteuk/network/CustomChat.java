@@ -11,6 +11,7 @@ import net.bteuk.network.lib.dto.DirectMessage;
 import net.bteuk.network.lib.dto.DiscordLinking;
 import net.bteuk.network.lib.dto.DiscordRole;
 import net.bteuk.network.lib.dto.UserConnectReply;
+import net.bteuk.network.lib.dto.UserRemove;
 import net.bteuk.network.lib.socket.OutputSocket;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
@@ -166,6 +167,8 @@ public class CustomChat implements Listener, PluginMessageListener {
                 instance.getTab().handle(addTeamEvent);
             } else if (object instanceof UserConnectReply userConnectReply) {
                 Connect.handleUserConnectReply(userConnectReply);
+            } else if (object instanceof UserRemove userRemove) {
+                Connect.handleUserRemove(userRemove);
             }
 
         } catch (IOException e) {
@@ -365,7 +368,7 @@ public class CustomChat implements Listener, PluginMessageListener {
      * @return the {@link Component} formatted message
      */
     private static Component playerMessageFormat(NetworkUser user, Component message) {
-        Role userRole = user.getRole();
+        Role userRole = user.getPrimaryRole();
         return userRole.getColouredPrefix() // The prefix based on the role.
                 .append(Component.space())
                 .append(ChatUtils.line(user.player.getName())) // Player name in white without formatting.

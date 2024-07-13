@@ -15,6 +15,16 @@ import java.util.List;
  */
 public class PlayerSelector extends AbstractTabCompleter {
 
+    private final int argIndex;
+
+    public PlayerSelector() {
+        this.argIndex = 0;
+    }
+
+    public PlayerSelector(int argIndex) {
+        this.argIndex = argIndex;
+    }
+
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
 
@@ -30,6 +40,6 @@ public class PlayerSelector extends AbstractTabCompleter {
             names.add(Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';"));
         }
 
-        return onTabCompleteArg(args, names, 0);
+        return onTabCompleteArg(args, names, argIndex);
     }
 }

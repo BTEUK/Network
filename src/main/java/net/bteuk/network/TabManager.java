@@ -45,6 +45,7 @@ public class TabManager {
         TabPlayer tabPlayer = new TabPlayer();
         tabPlayer.setUuid(player.getUniqueId().toString());
         tabPlayer.setName(player.getName());
+        tabPlayer.setPing(player.getPing());
         Role primaryRole = Roles.getPrimaryRole(player);
 
         if (primaryRole != null) {

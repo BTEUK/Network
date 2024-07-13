@@ -109,7 +109,7 @@ public class NetworkUser {
 
     @Getter
     @Setter
-    private Role role;
+    private Role primaryRole;
 
     public NetworkUser(Player player, UserConnectReply reply) {
 
@@ -129,8 +129,7 @@ public class NetworkUser {
         afk = false;
         last_movement = Time.currentTime();
 
-        // Set the role.
-        role = Roles.getPrimaryRole(player);
+        primaryRole = Roles.getPrimaryRole(player);
 
         //Get discord linked status.
         //If they're linked get discord id.
