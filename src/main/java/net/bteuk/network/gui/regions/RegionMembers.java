@@ -2,6 +2,7 @@ package net.bteuk.network.gui.regions;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.gui.Gui;
+import net.bteuk.network.lib.dto.DirectMessage;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.utils.Time;
@@ -161,7 +162,10 @@ public class RegionMembers extends Gui {
                                     .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid ='" + region.getOwner() + "';"), NamedTextColor.DARK_AQUA)));
 
                             //Send message to new owner.
-                            globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aYou are now the owner of region &3" + region.getTag(uuid) + "');");
+                            DirectMessage directMessage = new DirectMessage(uuid, "server",
+                                    ChatUtils.success("You are now the owner of region %s.", region.getTag(uuid)),
+                                    true);
+                            Network.getInstance().getChat().sendSocketMesage(directMessage);
 
                             //Return to region info.
                             this.delete();
@@ -181,7 +185,7 @@ public class RegionMembers extends Gui {
 
                         {
                             //Remove them from the region.
-                            region.leaveRegion(uuid, "&cYou have been kicked from region &4" + region.getTag(uuid));
+                            region.leaveRegion(uuid, ChatUtils.error("You have been kicked from region %s", region.getTag(uuid)));
 
                             //Send message to user.
                             u.player.sendMessage(ChatUtils.success("Kicked &3" +

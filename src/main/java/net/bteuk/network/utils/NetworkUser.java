@@ -6,6 +6,7 @@ import net.bteuk.network.Network;
 import net.bteuk.network.building_companion.BuildingCompanion;
 import net.bteuk.network.commands.Nightvision;
 import net.bteuk.network.gui.Gui;
+import net.bteuk.network.lib.dto.DirectMessage;
 import net.bteuk.network.lib.dto.UserConnectReply;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.regions.Region;
@@ -287,10 +288,11 @@ public class NetworkUser {
      * Send the user an offline message. This also works for online players.
      *
      * @param uuid uuid of the user
-     * @param message the message to send using legacy ampersand format
+     * @param message the message to send
      */
-    public static void sendOfflineMessage(String uuid, String message) {
-        Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','" + message + "');");
+    public static void sendOfflineMessage(String uuid, Component message) {
+        DirectMessage directMessage = new DirectMessage(uuid, "server", message, true);
+        Network.getInstance().getChat().sendSocketMesage(directMessage);
     }
 
     public void updateCoordinateTransform(PlotSQL plotSQL, Location l) {

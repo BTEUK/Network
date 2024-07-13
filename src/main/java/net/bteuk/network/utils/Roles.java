@@ -8,9 +8,8 @@ import net.bteuk.network.lib.dto.TabPlayer;
 import net.bteuk.network.lib.dto.UserUpdate;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.luckperms.api.model.group.Group;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
@@ -20,6 +19,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import java.io.File;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
@@ -138,13 +138,13 @@ public final class Roles {
 
         //Announce the promotion in chat and discord.
         //Send a message to the user if not online, so they'll be notified of their promotion next time they join the server.
-        String colouredRole = CONFIG.getString("roles." + nRole + ".colour") + CONFIG.getString("roles." + nRole + ".name");
+        Component colouredRole = Component.text(Objects.requireNonNull(CONFIG.getString("roles." + nRole + ".name")), TextColor.fromHexString(Objects.requireNonNull(CONFIG.getString("roles." + nRole + ".colour"))));
         if (CONFIG.getBoolean("chat.announce_promotions")) {
             String name = Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
 
             Component promotation_message = Component.text(name)
                     .append(PROMOTION_TEMPLATE)
-                    .append(LegacyComponentSerializer.legacyAmpersand().deserialize(colouredRole));
+                    .append(colouredRole);
             promotation_message = promotation_message.decorate(TextDecoration.BOLD);
 
             ChatMessage chatMessage = new ChatMessage(GLOBAL.getChannelName(), "server", promotation_message);
@@ -156,9 +156,10 @@ public final class Roles {
         if (!Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "';")) {
 
             //Send a message that will show when they next log in.
-            Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','" +
-                    PlainTextComponentSerializer.plainText().serialize(PROMOTION_SELF) + colouredRole
-                    + "');");
+            DirectMessage directMessage = new DirectMessage(uuid, "server",
+                    PROMOTION_SELF.append(colouredRole),
+                    true);
+            Network.getInstance().getChat().sendSocketMesage(directMessage);
 
         }
     }

@@ -271,7 +271,7 @@ public final class Network extends JavaPlugin {
         chat = new CustomChat(this);
 
         //Setup connect, this handles all connections to the server.
-        connect = new Connect(this, globalSQL, plotSQL, regionSQL);
+        connect = new Connect(this);
 
         //Enable the tutorial if enabled.
         if (TUTORIALS) {
@@ -297,7 +297,7 @@ public final class Network extends JavaPlugin {
         teleportListener = new TeleportListener(this);
 
         //Setup Timers
-        timers = new Timers(this, globalSQL, connect);
+        timers = new Timers(this, globalSQL);
         timers.startTimers();
 
         //Create bungeecord channel

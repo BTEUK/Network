@@ -6,7 +6,6 @@ import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 import static net.bteuk.network.utils.Constants.ANNOUNCE_OVERALL_LEVELUPS;
 import static net.bteuk.network.utils.Constants.ANNOUNCE_SEASONAL_LEVELUPS;
@@ -100,7 +99,7 @@ public class Progression {
         }
 
         //Send a message to the player.
-        NetworkUser.sendOfflineMessage(uuid, LegacyComponentSerializer.legacyAmpersand().serialize(playerMessage));
+        NetworkUser.sendOfflineMessage(uuid, playerMessage);
 
     }
 }

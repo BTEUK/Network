@@ -11,13 +11,12 @@ import net.bteuk.network.lib.dto.UserConnectRequest;
 import net.bteuk.network.lib.dto.UserDisconnect;
 import net.bteuk.network.lib.dto.UserRemove;
 import net.bteuk.network.lib.utils.ChatUtils;
-import net.bteuk.network.sql.GlobalSQL;
-import net.bteuk.network.sql.PlotSQL;
-import net.bteuk.network.sql.RegionSQL;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.Statistics;
 import net.bteuk.network.utils.TextureUtils;
 import net.bteuk.network.utils.Time;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -37,16 +36,12 @@ public class Connect implements Listener {
 
     private final Network instance;
 
-    private final GlobalSQL globalSQL;
-
     @Setter
     private boolean blockLeaveEvent;
 
-    public Connect(Network instance, GlobalSQL globalSQL, PlotSQL plotSQL, RegionSQL regionSQL) {
+    public Connect(Network instance) {
 
         this.instance = instance;
-
-        this.globalSQL = globalSQL;
 
         this.blockLeaveEvent = false;
 
@@ -158,7 +153,10 @@ public class Connect implements Listener {
         NetworkUser user = new NetworkUser(player, reply);
         Network.getInstance().addUser(user);
 
-        // TODO Play a short sound to the player, this will imply that the connection is complete.
+        // Send offline messages to the player.
+        reply.getMessages().forEach(player::sendMessage);
+
+        player.playSound(Sound.sound(Key.key("block.note_block.bell"), Sound.Source.PLAYER, 1f, 1f));
 
     }
 

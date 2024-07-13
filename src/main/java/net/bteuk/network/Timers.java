@@ -2,13 +2,11 @@ package net.bteuk.network;
 
 import lombok.Getter;
 import net.bteuk.network.eventing.events.EventManager;
-import net.bteuk.network.eventing.listeners.Connect;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.Statistics;
 import net.bteuk.network.utils.Time;
 import net.bteuk.network.utils.regions.Inactivity;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 
@@ -36,18 +34,9 @@ public class Timers {
     //SQL
     private final GlobalSQL globalSQL;
 
-    //Network connect.
-    private final Connect connect;
-
     //Server events
     private ArrayList<String[]> events;
     private boolean isBusy;
-
-    //Uuids
-    private ArrayList<String> uuids;
-
-    //Messages
-    private ArrayList<String> messages;
 
     //Navigator Check
     private ItemStack slot9;
@@ -68,14 +57,12 @@ public class Timers {
     @Getter
     private final EventManager eventManager;
 
-    public Timers(Network instance, GlobalSQL globalSQL, Connect connect) {
+    public Timers(Network instance, GlobalSQL globalSQL) {
 
         this.instance = instance;
         this.users = instance.getUsers();
 
         this.globalSQL = globalSQL;
-
-        this.connect = connect;
 
         this.timers = new ArrayList<>();
 
@@ -182,22 +169,6 @@ public class Timers {
                     } else if (!(slot9.equals(instance.navigator))) {
                         user.player.getInventory().setItem(8, instance.navigator);
                     }
-                }
-
-                //Check for messages that have been sent to this player.
-                if (globalSQL.hasRow("SELECT message FROM messages WHERE recipient='" + user.player.getUniqueId() + "';")) {
-
-                    //Get messages.
-                    messages = globalSQL.getStringList("SELECT message FROM messages WHERE recipient='" + user.player.getUniqueId() + "';");
-
-                    for (String message : messages) {
-
-                        user.player.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(message));
-
-                    }
-
-                    //Delete messages.
-                    globalSQL.update("DELETE FROM messages WHERE recipient='" + user.player.getUniqueId() + "'");
                 }
 
                 //Check if the player is afk.

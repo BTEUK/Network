@@ -101,7 +101,7 @@ public class KickMembers extends Gui {
 
                     {
                         //Remove them from the region.
-                        region.leaveRegion(uuid, "&cYou have been kicked from region &4" + region.getTag(uuid));
+                        region.leaveRegion(uuid, ChatUtils.error("You have been kicked from region %s", region.getTag(uuid)));
 
                         //Send message to user.
                         u.player.sendMessage(ChatUtils.success("Kicked ")

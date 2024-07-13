@@ -202,14 +202,10 @@ public class CommandPreProcess implements Listener {
                 //Since this closes the server tab does not need to be updated for these players.
                 instance.getGlobalSQL().update("DELETE FROM online_users WHERE uuid='" + uuid + "';");
 
-                //Log playercount in database
-                instance.getGlobalSQL().update("INSERT INTO player_count(log_time,players) VALUES(" + Time.currentTime() + "," +
-                        instance.getGlobalSQL().getInt("SELECT count(uuid) FROM online_users;") + ");");
-
                 //Kick the player.
                 user.player.kick(Component.text("The server is restarting!", NamedTextColor.RED));
 
-                //Send the disconnect messagein discord, since the standard leaveserver event has been blocked.
+                //Send the disconnect message in discord, since the standard leaveserver event has been blocked.
                 String name = Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
                 String player_skin = Network.getInstance().getGlobalSQL().getString("SELECT player_skin FROM player_data WHERE uuid='" + uuid + "';");
 
