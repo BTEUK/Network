@@ -61,7 +61,6 @@ import net.bteuk.network.gui.NavigatorGui;
 import net.bteuk.network.lobby.Lobby;
 import net.bteuk.network.lobby.LobbyCommand;
 import net.bteuk.network.sql.DatabaseInit;
-import net.bteuk.network.sql.DatabaseUpdates;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.sql.RegionSQL;
@@ -233,9 +232,6 @@ public final class Network extends JavaPlugin {
             getLogger().severe("Disabling Network");
             return;
         }
-
-        //Update database.
-        new DatabaseUpdates().updateDatabase();
 
         if (!globalSQL.hasRow("SELECT name FROM server_data WHERE name='" + SERVER_NAME + "';")) {
 

@@ -5,7 +5,9 @@ import net.bteuk.network.lib.utils.ChatUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.jetbrains.annotations.NotNull; /**
+import org.jetbrains.annotations.NotNull;
+
+/**
  * Command to add a role to a player.
  */
 public class Promote extends PromotionAction {
