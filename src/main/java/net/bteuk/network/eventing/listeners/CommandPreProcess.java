@@ -54,10 +54,9 @@ public class CommandPreProcess implements Listener {
 
             user.last_movement = Time.currentTime();
             if (user.afk) {
-                user.last_time_log = Time.currentTime();
                 user.afk = false;
-                updateAfkStatus(user, false);             }
-
+                updateAfkStatus(user, false);
+            }
         }
 
         //Replace /region with /network:region
@@ -159,9 +158,7 @@ public class CommandPreProcess implements Listener {
             user.last_movement = Time.currentTime();
             if (server != null) {
 
-                //Reset last logged time.
                 if (user.afk) {
-                    user.last_time_log = Time.currentTime();
                     user.afk = false;
                     updateAfkStatus(user, false);
                 }
@@ -181,9 +178,7 @@ public class CommandPreProcess implements Listener {
 
             } else {
 
-                //Reset last logged time.
                 if (user.afk) {
-                    user.last_time_log = Time.currentTime();
                     user.afk = false;
                 }
 

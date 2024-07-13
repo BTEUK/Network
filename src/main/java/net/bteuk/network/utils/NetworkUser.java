@@ -75,12 +75,6 @@ public class NetworkUser {
     public boolean afk;
     public long last_movement;
 
-    //Information for online-time logging.
-    //Records when the player online-time was last logged.
-    public long last_time_log;
-    //Total active time in current session.
-    public long active_time;
-
     //If linked to discord.
     public boolean isLinked;
 
@@ -173,9 +167,6 @@ public class NetworkUser {
         }
 
         runEvents();
-
-        last_time_log = Time.currentTime();
-        active_time = 0;
 
         //Give the player nightvision if enabled or remove it if disabled.
         if (nightvisionEnabled) {

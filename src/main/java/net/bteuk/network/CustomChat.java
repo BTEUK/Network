@@ -17,7 +17,6 @@ import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.Role;
 import net.bteuk.network.utils.Roles;
-import net.bteuk.network.utils.Statistics;
 import net.bteuk.network.utils.Time;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -113,14 +112,10 @@ public class CustomChat implements Listener, PluginMessageListener {
             user.last_movement = Time.currentTime();
 
             if (user.afk) {
-                user.last_time_log = user.last_movement;
                 user.afk = false;
                 updateAfkStatus(user, false);
             }
-
-            Statistics.addMessage(e.getPlayer().getUniqueId().toString(), Time.getDate(Time.currentTime()));
             ChatMessage chatMessage = getChatMessage(e.message(), user);
-
             sendSocketMesage(chatMessage);
         }
     }

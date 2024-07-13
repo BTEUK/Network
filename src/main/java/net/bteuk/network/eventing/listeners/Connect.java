@@ -93,7 +93,7 @@ public class Connect implements Listener {
 
         //Reset last logged time.
         if (u.afk) {
-            u.last_time_log = u.last_movement = Time.currentTime();
+            u.last_movement = Time.currentTime();
             u.afk = false;
         }
 

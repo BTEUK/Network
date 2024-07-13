@@ -93,7 +93,7 @@ public class Progression {
         if (announce_levelup) {
 
             // Announce level-up.
-            ChatMessage chatMessage = new ChatMessage("global", uuid, globalMessage);
+            ChatMessage chatMessage = new ChatMessage("global", "server", globalMessage);
             Network.getInstance().getChat().sendSocketMesage(chatMessage);
 
         }

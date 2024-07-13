@@ -81,7 +81,6 @@ public class MoveListener implements Listener {
         user.last_movement = Time.currentTime();
 
         if (user.afk) {
-            user.last_time_log = user.last_movement;
             user.afk = false;
             updateAfkStatus(user, false);
         }

@@ -67,7 +67,6 @@ import net.bteuk.network.sql.RegionSQL;
 import net.bteuk.network.sql.Tutorials;
 import net.bteuk.network.utils.NetworkConfig;
 import net.bteuk.network.utils.NetworkUser;
-import net.bteuk.network.utils.Statistics;
 import net.bteuk.network.utils.Time;
 import net.bteuk.network.utils.Tips;
 import net.bteuk.network.utils.Utils;
@@ -494,14 +493,9 @@ public final class Network extends JavaPlugin {
 
                 //Reset last logged time.
                 if (u.afk) {
-                    u.last_time_log = u.last_movement = Time.currentTime();
+                    u.last_movement = Time.currentTime();
                     u.afk = false;
                 }
-
-                //Update statistics
-                long time = Time.currentTime();
-                Statistics.save(u, Time.getDate(time), time);
-
             }
         }
 

@@ -4,7 +4,6 @@ import net.bteuk.network.Network;
 import net.bteuk.network.lib.dto.UserUpdate;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
-import net.bteuk.network.utils.Statistics;
 import net.bteuk.network.utils.Time;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -39,22 +38,13 @@ public class AFK implements CommandExecutor {
 
         //Switch afk status.
         if (u.afk) {
-
             //Reset last logged time.
-            u.last_time_log = u.last_movement = Time.currentTime();
+            u.last_movement = Time.currentTime();
             u.afk = false;
             updateAfkStatus(u, false);
-
         } else {
-
-            long time = Time.currentTime();
-
-            //Update playtime, and pause it.
-            Statistics.save(u, Time.getDate(time), time);
-
             u.afk = true;
             updateAfkStatus(u, true);
-
         }
 
         return true;
