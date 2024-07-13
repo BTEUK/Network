@@ -11,20 +11,15 @@ public class VoidTeleport implements Listener {
     private final Lobby lobby;
 
     public VoidTeleport(Network instance, Lobby lobby) {
-
         this.lobby = lobby;
         Bukkit.getServer().getPluginManager().registerEvents(this, instance);
-
     }
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent e) {
-
         if (e.getTo().getY() < 0) {
-
             //Teleport to spawnpoint.
             e.getPlayer().teleport(lobby.spawn);
-
         }
     }
 }

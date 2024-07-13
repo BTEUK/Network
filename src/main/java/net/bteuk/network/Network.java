@@ -492,19 +492,6 @@ public final class Network extends JavaPlugin {
                 //Set last_online time in playerdata.
                 instance.globalSQL.update("UPDATE player_data SET last_online=" + Time.currentTime() + " WHERE UUID='" + uuid + "';");
 
-                //Remove player from online_users.
-//                instance.globalSQL.update("DELETE FROM online_users WHERE uuid='" + uuid + "';");
-
-//                if (TAB) {
-//                    //Update tab for all players.
-//                    //This is done with the tab chat channel.
-//                    instance.chat.broadcastMessage(Component.text("remove " + uuid), "uknet:tab");
-//                }
-
-                //Log playercount in database
-//                instance.globalSQL.update("INSERT INTO player_count(log_time,players) VALUES(" + Time.currentTime() + "," +
-//                        instance.globalSQL.getInt("SELECT count(uuid) FROM online_users;") + ");");
-
                 //Reset last logged time.
                 if (u.afk) {
                     u.last_time_log = u.last_movement = Time.currentTime();
@@ -525,16 +512,7 @@ public final class Network extends JavaPlugin {
 
     //Get user from player.
     public NetworkUser getUser(Player p) {
-
-        for (NetworkUser u : networkUsers) {
-
-            if (u.player.equals(p)) {
-                return u;
-
-            }
-        }
-
-        return null;
+        return networkUsers.stream().filter(user -> user.player.equals(p)).findFirst().orElse(null);
     }
 
     //Get users.
@@ -549,11 +527,8 @@ public final class Network extends JavaPlugin {
 
     }
 
-    //Get user from player.
     public void removeUser(NetworkUser u) {
-
         networkUsers.remove(u);
-
     }
 
     //Check if user is on the server.

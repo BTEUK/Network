@@ -60,7 +60,7 @@ public class Connect implements Listener {
         Set<String> channels = NetworkUser.getChannels(e.getPlayer());
 
         // Get the TabPlayer instance for this player.
-        TabPlayer tabPlayer = TabManager.createTabPlayer(e.getPlayer());
+        TabPlayer tabPlayer = TabManager.createTabPlayerFromPlayer(e.getPlayer());
 
         // Send a user connect request to the proxy, this will handle the rest.
         // When the proxy has received the request it'll send a response which will then create the user object on the server.

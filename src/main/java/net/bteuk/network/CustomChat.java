@@ -193,7 +193,6 @@ public class CustomChat implements Listener, PluginMessageListener {
             }
 
             case "reviewer" -> {
-
                 // Send only to reviewers.
                 for (Player p : instance.getServer().getOnlinePlayers()) {
                     if (p.hasPermission("group.reviewer")) {
@@ -202,16 +201,13 @@ public class CustomChat implements Listener, PluginMessageListener {
                 }
             }
         }
-
     }
 
     private void handleDirectMessage(DirectMessage message) {
-
         // Send the message if the player is on this server.
         instance.getServer().getOnlinePlayers().stream()
                 .filter(player -> player.getUniqueId().toString().equals(message.getRecipient()))
                 .forEach(player -> player.sendMessage(message.getComponent()));
-
     }
 
     private void handleDiscordLinking(DiscordLinking discordLinking) {
@@ -254,95 +250,6 @@ public class CustomChat implements Listener, PluginMessageListener {
                 });
     }
 
-//    private void sendReceivedMessage(Component component, String channel) {
-//        switch (channel) {
-//            case "uknet:discord_linking" -> {
-//
-//                //This is for account linking.
-//                String plainMessage = PlainTextComponentSerializer.plainText().serialize(component);
-//                String[] args = plainMessage.split(" ");
-//                if (args[0].equalsIgnoreCase("link")) {
-//
-//                    //Check if player is online.
-//                    Player p = Bukkit.getPlayer(UUID.fromString(args[1]));
-//                    if (!(p == null)) {
-//                        if (p.isOnline()) {
-//
-//                            //Link account.
-//                            instance.getGlobalSQL().update("INSERT INTO discord(uuid,discord_id) VALUES('" + args[1] + "','" + args[2] + "');");
-//                            NetworkUser u = Network.getInstance().getUser(p);
-//
-//                            //If u is null, cancel.
-//                            if (u == null) {
-//                                LOGGER.severe("User " + p.getName() + " can not be found!");
-//                                p.sendMessage(ChatUtils.error("User can not be found, please relog!"));
-//                                return;
-//                            }
-//
-//                            u.isLinked = true;
-//                            u.discord_id = Long.parseLong(args[2]);
-//
-//                            //Get the highest role for syncing and sync it, except for guest.
-//                            String role = Roles.builderRole(p);
-//
-//                            //Remove all roles except current role.
-//                            for (Map.Entry<String, Long> entry : Network.getInstance().getTimers().getRoles().entrySet()) {
-//
-//                                if (role.equals(entry.getKey())) {
-//                                    broadcastMessage(Component.text("addrole " + args[2] + " " + entry.getValue()), "uknet:discord_linking");
-//                                } else {
-//                                    broadcastMessage(Component.text("removerole " + args[2] + " " + entry.getValue()), "uknet:discord_linking");
-//                                }
-//
-//                            }
-//
-//                            p.sendMessage(ChatUtils.success("Your discord has been linked!"));
-//
-//                        }
-//                    }
-//                }
-//            }
-//            case "uknet:tab" ->
-//
-//                //Run a tab update, the structure is the following.
-//                //'update/add/remove <uuid>'
-//                //This allows us to only update what is necessary.
-//                //Make sure it runs after all other scheduled tasks, so it does not front-run the disconnect event if the player just left this server.
-//                    Bukkit.getScheduler().runTask(instance, () -> Network.getInstance().tab.updateAll(PlainTextComponentSerializer.plainText().serialize(component)));
-//        }
-//    }
-
-//    public void broadcastMessage(Component message, String channel) {
-//
-//        //If global chat is enabled send the message to the proxy using the chat socket.
-//        if (GLOBAL_CHAT) {
-//
-//            Bukkit.getScheduler().runTaskAsynchronously(instance, () -> {
-//                try (Socket socket = new Socket(IP, port)) {
-//
-//                    //Convert component to json and write to output.
-//                    OutputStream output = socket.getOutputStream();
-//                    ObjectOutputStream objectOutput = new ObjectOutputStream(output);
-//
-//                    // Send player message
-//                    objectOutput.writeObject(Utils.toJson(message));
-//                    objectOutput.writeObject(channel);
-//                    objectOutput.flush();
-//
-//                    objectOutput.close();
-//                } catch (IOException ex) {
-//                    LOGGER.severe("Could not broadcast message to server socket!");
-//                }
-//            });
-//        } else {
-//
-//            //Send locally.
-//            //Check for valid channels.
-//            sendReceivedMessage(message, channel);
-//
-//        }
-//    }
-
     // Send afk or no longer afk message to players ingame and discord.
     public void broadcastAFK(Player p, boolean afk) {
 
@@ -358,7 +265,6 @@ public class CustomChat implements Listener, PluginMessageListener {
 
         // Send message
         sendSocketMesage(chatMessage);
-
     }
 
     /**
@@ -391,14 +297,4 @@ public class CustomChat implements Listener, PluginMessageListener {
                 .append(Component.space())
                 .append(ChatUtils.line(message)); // The message in white without formatting.
     }
-
-//    /**
-//     * Broadcasts a discord announcement. The announcement type is used to decide how to use/format the message.
-//     *
-//     * @param message           the message to announce
-//     * @param announcement_type the type of announcement
-//     */
-//    public void broadcastDiscordAnnouncement(Component message, String announcement_type) {
-//        broadcastMessage(Component.text(announcement_type).append(Component.text(" ").append(message)), "uknet:discord_announcements");
-//    }
 }

@@ -41,7 +41,18 @@ public class TabManager {
 
     private final Map<String, Team> teams = new HashMap<>();
 
-    public static TabPlayer createTabPlayer(Player player) {
+    public TabManager(Network instance) {
+
+        this.instance = instance;
+        pm = ProtocolLibrary.getProtocolManager();
+
+        // Teams are used to sort the tab-list by role.
+        initTeams();
+
+        startTab();
+    }
+
+    public static TabPlayer createTabPlayerFromPlayer(Player player) {
         TabPlayer tabPlayer = new TabPlayer();
         tabPlayer.setUuid(player.getUniqueId().toString());
         tabPlayer.setName(player.getName());
@@ -54,19 +65,6 @@ public class TabManager {
         }
 
         return tabPlayer;
-    }
-
-    public TabManager(Network instance) {
-
-        this.instance = instance;
-        pm = ProtocolLibrary.getProtocolManager();
-
-        // Teams are used to sort the tab-list by role.
-        initTeams();
-
-        startTab();
-        LOGGER.info("Enabled Tab");
-
     }
 
     public void closeTab() {
@@ -84,10 +82,8 @@ public class TabManager {
     }
 
     private void startTab() {
-
         createPacketListeners();
         pm.addPacketListener(pl);
-
     }
 
     /**
@@ -164,7 +160,6 @@ public class TabManager {
      */
     private void createPacketListeners() {
         pl = new PacketAdapter(instance, ListenerPriority.NORMAL, PacketType.Play.Server.PLAYER_INFO) {
-
             @Override
             public void onPacketSending(PacketEvent event) {
                 PacketContainer packet = event.getPacket();
@@ -180,7 +175,6 @@ public class TabManager {
 
                     packet.getPlayerInfoDataLists().write(1, newInfoList);
                     event.setPacket(packet);
-                    //event.setCancelled(true);
                 }
             }
         };
