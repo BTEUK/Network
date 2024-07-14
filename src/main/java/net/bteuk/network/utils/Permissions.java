@@ -1,6 +1,7 @@
 package net.bteuk.network.utils;
 
 import net.luckperms.api.LuckPerms;
+import net.luckperms.api.cacheddata.CachedPermissionData;
 import net.luckperms.api.model.data.DataMutateResult;
 import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.user.User;
@@ -79,5 +80,21 @@ public final class Permissions {
 
         UserManager userManager = provider.getUserManager();
         return userManager.loadUser(UUID.fromString(uuid)).thenApplyAsync(User::getPrimaryGroup);
+    }
+
+    public static CompletableFuture<Boolean> hasGroup(String uuid, String roleID) {
+        LuckPerms provider = getProvider();
+
+        if (provider == null) {
+            return null;
+        }
+
+        UserManager userManager = provider.getUserManager();
+
+        // Add group to user. Returns boolean to indicate success.
+        return userManager.loadUser(UUID.fromString(uuid)).thenApplyAsync(user -> {
+            CachedPermissionData permissionData = user.getCachedData().getPermissionData();
+            return permissionData.checkPermission("group." + roleID).asBoolean();
+        });
     }
 }

@@ -75,6 +75,37 @@ public final class Roles {
         }
     }
 
+    /**
+     * Get the builder role for a potentially offline player.
+     * @param uuid the uuid of the player
+     * @return a {@link CompletableFuture} with a String
+     */
+    public static CompletableFuture<String> builderRole(String uuid) {
+        return CompletableFuture.supplyAsync(() -> {
+            CompletableFuture<Boolean> isReviewer = Permissions.hasGroup(uuid, "reviewer");
+            CompletableFuture<Boolean> isArchitect = Permissions.hasGroup(uuid, "architect");
+            CompletableFuture<Boolean> isBuilder = Permissions.hasGroup(uuid, "builder");
+            CompletableFuture<Boolean> isJrbuilder = Permissions.hasGroup(uuid, "jrbuilder");
+            CompletableFuture<Boolean> isApprentice = Permissions.hasGroup(uuid, "apprentice");
+            CompletableFuture<Boolean> isApplicant = Permissions.hasGroup(uuid, "applicant");
+            if (isReviewer != null && isReviewer.join()) {
+                return "reviewer";
+            } else if (isArchitect != null && isArchitect.join()) {
+                return "architect";
+            } else if (isBuilder != null && isBuilder.join()) {
+                return "builder";
+            } else if (isJrbuilder != null && isJrbuilder.join()) {
+                return "jrbuilder";
+            } else if (isApprentice != null && isApprentice.join()) {
+                return "apprentice";
+            } else if (isApplicant != null && isApplicant.join()) {
+                return "applicant";
+            } else {
+                return "default";
+            }
+        });
+    }
+
     public static Role getPrimaryRole(Player p) {
         // Get the configuration if not yet fetches.
         if (ROLES == null) {
