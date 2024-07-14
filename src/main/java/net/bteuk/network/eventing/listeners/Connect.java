@@ -12,7 +12,6 @@ import net.bteuk.network.lib.dto.UserDisconnect;
 import net.bteuk.network.lib.dto.UserRemove;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
-import net.bteuk.network.utils.Statistics;
 import net.bteuk.network.utils.TextureUtils;
 import net.bteuk.network.utils.Time;
 import net.kyori.adventure.key.Key;
@@ -102,10 +101,6 @@ public class Connect implements Listener {
         if (companion != null) {
             companion.disable();
         }
-
-        //Update statistics
-        long time = Time.currentTime();
-        Statistics.save(u, Time.getDate(time), time);
 
         //Remove user from list.
         instance.removeUser(u);

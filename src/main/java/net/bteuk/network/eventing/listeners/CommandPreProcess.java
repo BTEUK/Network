@@ -3,7 +3,6 @@ package net.bteuk.network.eventing.listeners;
 import net.bteuk.network.Network;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
-import net.bteuk.network.utils.Statistics;
 import net.bteuk.network.utils.Time;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -205,18 +204,13 @@ public class CommandPreProcess implements Listener {
                 String player_skin = Network.getInstance().getGlobalSQL().getString("SELECT player_skin FROM player_data WHERE uuid='" + uuid + "';");
 
 //                //Run disconnect message.
+                //TODO
 //                if (DISCORD_CHAT) {
 //                    Component message = Component.text(TextureUtils.getAvatarUrl(u.player.getUniqueId(), player_skin) + " ")
 //                            .append(LegacyComponentSerializer.legacyAmpersand().deserialize(Objects.requireNonNull(CONFIG.getString("chat.custom_messages.leave")).replace("%player%", name)));
 //                    instance.getChat().broadcastDiscordAnnouncement(message, "disconnect");
 //                }
-
             }
-
-            //Update statistics
-            long time = Time.currentTime();
-            Statistics.save(user, Time.getDate(time), time);
-
         }
 
         //Block movement and teleport listeners.

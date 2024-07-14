@@ -4,7 +4,6 @@ import lombok.Getter;
 import net.bteuk.network.eventing.events.EventManager;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.utils.NetworkUser;
-import net.bteuk.network.utils.Statistics;
 import net.bteuk.network.utils.Time;
 import net.bteuk.network.utils.regions.Inactivity;
 import org.bukkit.Bukkit;
@@ -136,9 +135,6 @@ public class Timers {
                     //Set player as AFK
                     user.afk = true;
 
-                    //Save statistics.
-                    Statistics.save(user, Time.getDate(time), time);
-
                     //Send message to chat and discord.
                     updateAfkStatus(user, true);
 
@@ -181,10 +177,6 @@ public class Timers {
                     }
                 }
             }
-
-            //Update online time of all players.
-            Statistics.saveAll();
-
         }, 0L, 1200L));
     }
 
