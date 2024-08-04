@@ -1,15 +1,12 @@
 package net.bteuk.network.utils;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
-import me.clip.placeholderapi.PlaceholderAPI;
 import net.bteuk.network.Network;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -37,15 +34,6 @@ import static net.bteuk.network.utils.Constants.MIN_Y;
 public class Utils {
 
     private static final Pattern PATTERN = Pattern.compile("%s");
-
-    public static String tabName(String displayName) {
-        return tabName(displayName.split(" ")[0], displayName.split(" ")[1]);
-    }
-
-    public static String tabName(String prefix, String name) {
-        Component component = LegacyComponentSerializer.legacyAmpersand().deserialize(prefix + " " + name);
-        return GsonComponentSerializer.gson().serialize(component);
-    }
 
     public static Component title(String message) {
         return Component.text(message, NamedTextColor.AQUA, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false);
@@ -131,18 +119,6 @@ public class Utils {
     public static Component tip(String tip) {
         return Component.text("[TIP] ", TextColor.color(0x346beb))
                 .append(Utils.line(tip));
-    }
-
-    public static String toJson(Component component) {
-        return GsonComponentSerializer.gson().serialize(component);
-    }
-
-    //Adds the chat formatting to the message.
-    public static Component chatFormat(Player player, Component message) {
-        //Get prefix placeholder and convert from legacy format.
-        //Legacy format for RGB is like &#a25981
-        Component newMessage = LegacyComponentSerializer.legacyAmpersand().deserialize(PlaceholderAPI.setPlaceholders(player, "%luckperms_prefix% &f%player_name% &7&l> &r&f"));
-        return newMessage.append(message);
     }
 
     public static ItemStack createItem(Material material, int amount, Component displayName, Component... loreString) {
