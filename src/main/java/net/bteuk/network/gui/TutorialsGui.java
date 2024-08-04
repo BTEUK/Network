@@ -1,7 +1,10 @@
 package net.bteuk.network.gui;
 
 import net.bteuk.network.Network;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
+import net.bteuk.network.utils.Role;
+import net.bteuk.network.utils.Roles;
 import net.bteuk.network.utils.SwitchServer;
 import net.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
@@ -28,6 +31,8 @@ public class TutorialsGui extends Gui {
     private void createGui() {
 
         boolean inLesson = Network.getInstance().getTutorials().hasRow("SELECT InLesson FROM Players WHERE UUID='" + user.player.getUniqueId() + "' AND InLesson=1;");
+
+        Role applicant = Roles.getRoleById("applicant");
 
         //Add the compulsory tutorial button if enabled.
         if (CONFIG.getBoolean("tutorials.compulsory_tutorial")) {
@@ -60,7 +65,9 @@ public class TutorialsGui extends Gui {
 
                 setItem(13, Utils.createItem(Material.BOOK, 1,
                                 Utils.title(inLesson ? "Continue Compulsory Tutorial" : "Start Compulsory Tutorial"),
-                                Utils.line("Gain the applicant rank!")),
+                                Utils.line("Gain the ")
+                                        .append(applicant == null ? Utils.line("Applicant") : applicant.getColouredRoleName())
+                                        .append(ChatUtils.line("rank!"))),
                         u -> {
 
                             //Switch to the tutorial.

@@ -19,10 +19,13 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import java.io.File;
+import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static net.bteuk.network.lib.enums.ChatChannels.GLOBAL;
 import static net.bteuk.network.utils.NetworkConfig.CONFIG;
@@ -37,11 +40,22 @@ public final class Roles {
 
     private static Set<Role> ROLES;
 
+    private static LinkedHashSet<String> BUILDER_ROLE_NAMES = Stream.of("reviewer", "architect", "builder", "jrbuilder", "apprentice", "applicant", "default")
+            .collect(Collectors.toCollection(LinkedHashSet::new));
+
     public static Set<Role> getRoles() {
         if (ROLES == null) {
             loadRoles();
         }
         return ROLES;
+    }
+
+    public static Role getRoleById(String roleId) {
+        // Get the configuration if not yet fetches.
+        if (ROLES == null) {
+            loadRoles();
+        }
+        return ROLES.stream().filter(role -> role.getId().equalsIgnoreCase(roleId)).findFirst().orElse(null);
     }
 
     /*
@@ -57,22 +71,15 @@ public final class Roles {
             Architect
 
      */
-    public static String builderRole(Player p) {
-        if (p.hasPermission("group.reviewer")) {
-            return "reviewer";
-        } else if (p.hasPermission("group.architect")) {
-            return "architect";
-        } else if (p.hasPermission("group.builder")) {
-            return "builder";
-        } else if (p.hasPermission("group.jrbuilder")) {
-            return "jrbuilder";
-        } else if (p.hasPermission("group.apprentice")) {
-            return "apprentice";
-        } else if (p.hasPermission("group.applicant")) {
-            return "applicant";
-        } else {
-            return "default";
+    public static Role builderRole(Player p) {
+        String roleToGet = "default";
+        for (String roleName : BUILDER_ROLE_NAMES) {
+            if (p.hasPermission("group." + roleName)) {
+                roleToGet = roleName;
+                break;
+            }
         }
+        return getRoleById(roleToGet);
     }
 
     /**
@@ -302,9 +309,5 @@ public final class Roles {
         }
         message = message.decorate(TextDecoration.BOLD);
         return new DirectMessage(uuid, "server", message, true);
-    }
-
-    private static Role getRoleById(String roleId) {
-        return ROLES.stream().filter(role -> role.getId().equalsIgnoreCase(roleId)).findFirst().orElse(null);
     }
 }
