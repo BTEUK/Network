@@ -234,10 +234,15 @@ public class CustomChat implements Listener, PluginMessageListener {
                     user.setDiscordId(discordLinking.getDiscordId());
 
                     // Get the highest role for syncing and sync it, except for guest.
-                    String role = Roles.builderRole(user.player);
+                    Role role = Roles.builderRole(user.player);
 
                     // Add the role in discord.
-                    DiscordRole discordRole = new DiscordRole(user.player.getUniqueId().toString(), role, true);
+                    if (role == null) {
+                        user.sendMessage(ChatUtils.error("You have an invalid role, please contact an administrator."));
+                        return;
+                    }
+
+                    DiscordRole discordRole = new DiscordRole(user.player.getUniqueId().toString(), role.getId(), true);
                     outputSocket.sendSocketMessage(discordRole);
 
                     user.sendMessage(ChatUtils.success("Your discord has been linked!"));
