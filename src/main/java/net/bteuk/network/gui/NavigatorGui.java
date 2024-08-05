@@ -5,6 +5,7 @@ import net.bteuk.network.commands.navigation.Back;
 import net.bteuk.network.commands.Nightvision;
 import net.bteuk.network.eventing.events.EventManager;
 import net.bteuk.network.gui.navigation.ExploreGui;
+import net.bteuk.network.gui.tutorials.TutorialsGui;
 import net.bteuk.network.utils.LightsOut;
 import net.bteuk.network.utils.SwitchServer;
 import net.bteuk.network.utils.Utils;
