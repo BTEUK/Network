@@ -176,12 +176,17 @@
         <dependency>
             <groupId>com.github.BTEUK</groupId>
             <artifactId>ProgressMapper</artifactId>
-            <version>2f3fc96c3f</version>
+            <version>2f3fc96c3</version>
         </dependency>
         <dependency>
             <groupId>com.github.BTEUK</groupId>
             <artifactId>NetworkLib</artifactId>
             <version>df57f0798b</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.BTEUK</groupId>
+            <artifactId>TeachingTutorials</artifactId>
+            <version>4a3b7d7139</version>
         </dependency>
 
         <!-- Test dependencies -->
