@@ -72,11 +72,18 @@ import net.bteuk.network.utils.Tips;
 import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.enums.ServerType;
 import net.bteuk.network.utils.regions.RegionManager;
+import net.kyori.adventure.text.Component;
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scoreboard.Criteria;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.ScoreboardManager;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -85,6 +92,9 @@ import static net.bteuk.network.utils.Constants.PROGRESS_MAP;
 import static net.bteuk.network.utils.Constants.REGIONS_ENABLED;
 import static net.bteuk.network.utils.Constants.SERVER_NAME;
 import static net.bteuk.network.utils.Constants.SERVER_TYPE;
+import static net.bteuk.network.utils.Constants.SIDEBAR_CONTENT;
+import static net.bteuk.network.utils.Constants.SIDEBAR_ENABLED;
+import static net.bteuk.network.utils.Constants.SIDEBAR_TITLE;
 import static net.bteuk.network.utils.Constants.TAB;
 import static net.bteuk.network.utils.Constants.TIPS;
 import static net.bteuk.network.utils.Constants.TPLL_ENABLED;
@@ -310,18 +320,18 @@ public final class Network extends JavaPlugin {
         getCommand("rules").setExecutor(new Rules());
         if (SERVER_TYPE == ServerType.LOBBY) {
 
-            //Set spawn location and enable auto-spawn teleport when falling in the void.
+            // Set spawn location and enable auto-spawn teleport when falling in the void.
             lobby.setSpawn();
             lobby.enableVoidTeleport();
 
             lobby.reloadPortals();
 
-            //Setup the map.
-            lobby.reloadMap();
-
             //Set the rules lectern.
             lobby.setLectern();
         }
+
+        // Set up the map.
+        lobby.reloadMap();
 
         //Create lobby command, will run /spawn if not in the lobby server.
         new LobbyCommand(this, lobby);
@@ -451,6 +461,23 @@ public final class Network extends JavaPlugin {
         new Exp(this);
 
         new BuildingCompanionCommand(this);
+
+        // Set sidebar if enabled.
+        if (SIDEBAR_ENABLED) {
+            ScoreboardManager manager = Bukkit.getScoreboardManager();
+            Scoreboard scoreboard = manager.getMainScoreboard();
+            Objective objective = scoreboard.getObjective("sidebar");
+            if (objective != null) {
+                objective.unregister();
+            }
+            objective = scoreboard.registerNewObjective("sidebar", Criteria.DUMMY, Component.text(SIDEBAR_TITLE));
+            objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+            int score = SIDEBAR_CONTENT.size();
+            for (String sidebarText: SIDEBAR_CONTENT) {
+                score--;
+                objective.getScore(sidebarText).setScore(score);
+            }
+        }
 
         //Enable server in server table.
         globalSQL.update("UPDATE server_data SET online=1 WHERE name='" + SERVER_NAME + "';");

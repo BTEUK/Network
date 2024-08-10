@@ -3,6 +3,9 @@ package net.bteuk.network.utils;
 import net.bteuk.network.Network;
 import net.bteuk.network.utils.enums.ServerType;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Logger;
 
 import static net.bteuk.network.utils.NetworkConfig.CONFIG;
@@ -65,6 +68,10 @@ public class Constants {
     public static final boolean ANNOUNCE_OVERALL_LEVELUPS;
     public static final boolean ANNOUNCE_SEASONAL_LEVELUPS;
 
+    public static final boolean SIDEBAR_ENABLED;
+    public static final String SIDEBAR_TITLE;
+    public static final List<String> SIDEBAR_CONTENT;
+
     static {
 
         LOGGER = Network.getInstance().getLogger();
@@ -103,6 +110,21 @@ public class Constants {
         PROGRESSION = CONFIG.getBoolean("progression.enabled");
         ANNOUNCE_OVERALL_LEVELUPS = CONFIG.getBoolean("progression.announce_level-ups.overall");
         ANNOUNCE_SEASONAL_LEVELUPS = CONFIG.getBoolean("progression.announce_level-ups.seasonal");
+
+        SIDEBAR_ENABLED = CONFIG.getBoolean("sidebar.enabled");
+        SIDEBAR_TITLE = CONFIG.getString("sidebar.title", "");
+
+        List<?> sidebarTextConfig = CONFIG.getList("sidebar.text");
+        List<String> sidebarText = new ArrayList<>();
+        if (sidebarTextConfig != null && !sidebarTextConfig.isEmpty()) {
+            sidebarTextConfig.forEach(listItem -> {
+                if (listItem instanceof String listTextItem) {
+                    sidebarText.add(listTextItem);
+                }
+            });
+        }
+
+        SIDEBAR_CONTENT = Collections.unmodifiableList(sidebarText);
 
         if (CONFIG.getString("earth_world") == null) {
             //Setting default value.

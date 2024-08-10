@@ -82,7 +82,6 @@ public class Map extends AbstractReloadableComponent {
         }
 
         // Get the server of the map, this is important in deciding which features to enable.
-        // If the server is not
         server = CONFIG.getString("map.server");
         if (server == null || !instance.getGlobalSQL().hasRow("SELECT * FROM server_data WHERE name='" + server + "';")) {
             setEnabled(false);

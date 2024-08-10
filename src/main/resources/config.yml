@@ -145,3 +145,14 @@ progression:
   announce_level-ups:
     overall: false
     seasonal: true
+
+# Scoreboard to display in sidebar.
+sidebar:
+  enabled: false
+  title: "BTE Games"
+  text:
+    - "BTE UK currently competing in the BTE Games!"
+    - "Please join event.buildtheearth.net"
+    - "Select BTE UK to choose our team."
+    - "You can not change your selection!"
+    - "Check our /discord for more information."
