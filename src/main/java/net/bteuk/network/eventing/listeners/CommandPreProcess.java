@@ -3,6 +3,7 @@ package net.bteuk.network.eventing.listeners;
 import net.bteuk.network.Network;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
+import net.bteuk.network.utils.SwitchServer;
 import net.bteuk.network.utils.Time;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -12,9 +13,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import static net.bteuk.network.commands.AFK.updateAfkStatus;
@@ -36,14 +34,14 @@ public class CommandPreProcess implements Listener {
     @EventHandler
     public void onCommandPreProcess(PlayerCommandPreprocessEvent e) {
 
-        //Reset afk status.
+        // Reset afk status.
         if (!e.getMessage().startsWith("/afk")) {
 
-            //If player is afk, unset it.
-            //Reset last logged time.
+            // If player is afk, unset it.
+            // Reset last logged time.
             NetworkUser user = instance.getUser(e.getPlayer());
 
-            //If u is null, cancel.
+            // If u is null, cancel.
             if (user == null) {
                 LOGGER.severe("User " + e.getPlayer().getName() + " can not be found!");
                 e.getPlayer().sendMessage(ChatUtils.error("User can not be found, please relog!"));
@@ -111,33 +109,34 @@ public class CommandPreProcess implements Listener {
                 instance.allow_shutdown = true;
                 onServerClose(instance.getUsers());
 
-                //Delay shutdown by 3 seconds to make sure players have switched server.
+                // Delay shutdown by 3 seconds to make sure players have switched server.
                 s.setCancelled(true);
-                Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "stop"), 60L);
+                Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> {
+                    // Disable the LeaveServer event, although everyone should already be disconnected by now.
+                    if (instance.getConnect() != null) {
+                        instance.getConnect().setBlockLeaveEvent(true);
+                    }
+
+                    Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "stop");
+                }, 60L);
             }
         }
     }
 
-    //This class executes when the server closes, instead of a player server quit event since that will cause errors.
-    //It for the most part copies the methods.
+    // This class executes when the server closes, instead of a player server quit event since that will cause errors.
+    // It for the most part copies the methods.
     public void onServerClose(ArrayList<NetworkUser> users) {
 
-        //Disable server in server table.
+        // Disable server in server table.
         instance.getGlobalSQL().update("UPDATE server_data SET online=0 WHERE name='" + SERVER_NAME + "';");
 
-        //Block the LeaveServer listener so it doesn't trigger since it causes an error.
-        //It needs to be active to prevent the leave message to show in chat.
-        if (instance.getConnect() != null) {
-            instance.getConnect().setBlockLeaveEvent(true);
-        }
-
-        //Check if another server is online,
-        //If true then switch all the players to this server.
-        //Always check the lobby and earth first.
-        //Remove all players from network.
+        // Check if another server is online,
+        // If true then switch all the players to this server.
+        // Always check the lobby and earth first.
+        // Remove all players from network.
         String server = null;
 
-        //Try different servers.
+        // Try different servers.
         if (instance.getGlobalSQL().hasRow("SELECT name FROM server_data WHERE type='LOBBY' AND online=1;")) {
 
             server = instance.getGlobalSQL().getString("SELECT name FROM server_data WHERE type='LOBBY' AND online=1;");
@@ -153,72 +152,20 @@ public class CommandPreProcess implements Listener {
         }
 
         for (NetworkUser user : users) {
-
-            user.last_movement = Time.currentTime();
+            // Switch the player to another server, if available, else kick them.
             if (server != null) {
-
-                if (user.afk) {
-                    user.afk = false;
-                    updateAfkStatus(user, false);
-                }
-
-
-                //Switch the player to that server.
-                try {
-                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    DataOutputStream out = new DataOutputStream(stream);
-                    out.writeUTF("Connect");
-                    out.writeUTF(server);
-                    user.player.sendPluginMessage(instance, "BungeeCord", stream.toByteArray());
-                } catch (IOException e) {
-                    LOGGER.severe("IOException when attempting to switch player to another server.");
-                    return;
-                }
-
+                SwitchServer.switchServer(user.player, server);
             } else {
-
-                if (user.afk) {
-                    user.afk = false;
-                }
-
-                String uuid = user.player.getUniqueId().toString();
-
-                //Remove any outstanding invites that this player has sent.
-                instance.getPlotSQL().update("DELETE FROM plot_invites WHERE owner='" + uuid + "';");
-
-                //Remove any outstanding invites that this player has received.
-                instance.getPlotSQL().update("DELETE FROM plot_invites WHERE uuid='" + uuid + "';");
-
-                //Set last_online time in playerdata.
-                instance.getGlobalSQL().update("UPDATE player_data SET last_online=" + Time.currentTime() + " WHERE UUID='" + uuid + "';");
-
-                //Remove player from online_users.
-                //Since this closes the server tab does not need to be updated for these players.
-                instance.getGlobalSQL().update("DELETE FROM online_users WHERE uuid='" + uuid + "';");
-
-                //Kick the player.
+                // Kick the player.
                 user.player.kick(Component.text("The server is restarting!", NamedTextColor.RED));
-
-                //Send the disconnect message in discord, since the standard leaveserver event has been blocked.
-                String name = Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
-                String player_skin = Network.getInstance().getGlobalSQL().getString("SELECT player_skin FROM player_data WHERE uuid='" + uuid + "';");
-
-//                //Run disconnect message.
-                //TODO
-//                if (DISCORD_CHAT) {
-//                    Component message = Component.text(TextureUtils.getAvatarUrl(u.player.getUniqueId(), player_skin) + " ")
-//                            .append(LegacyComponentSerializer.legacyAmpersand().deserialize(Objects.requireNonNull(CONFIG.getString("chat.custom_messages.leave")).replace("%player%", name)));
-//                    instance.getChat().broadcastDiscordAnnouncement(message, "disconnect");
-//                }
             }
         }
 
-        //Block movement and teleport listeners.
+        // Block movement and teleport listeners.
         instance.moveListener.block();
         instance.teleportListener.block();
 
-        //Remove users from list.
+        // Remove users from list.
         users.clear();
-
     }
 }
