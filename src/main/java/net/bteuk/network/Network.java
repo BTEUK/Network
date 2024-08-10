@@ -64,7 +64,6 @@ import net.bteuk.network.sql.DatabaseInit;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.sql.RegionSQL;
-import net.bteuk.network.sql.Tutorials;
 import net.bteuk.network.utils.NetworkConfig;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.Time;
