@@ -147,7 +147,7 @@ public class TeleportEvent extends AbstractEvent {
                 World world = Bukkit.getWorld(event[1]);
 
                 if (world == null) {
-                    p.sendMessage(ChatUtils.error("World can not be found."));
+                    p.sendMessage(ChatUtils.error("World %s can not be found.", event[1]));
                     return;
                 }
 

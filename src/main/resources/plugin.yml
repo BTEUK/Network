@@ -166,3 +166,9 @@ commands:
     aliases: [ w, tell ]
     usage: /<command>
     description: Sends a direct message to a player.
+  promote:
+    usage: /<command>
+    description: Add a role to a player.
+  demote:
+    usage: /<command>
+    description: Remove a role from a player.

@@ -141,7 +141,7 @@ public class CustomChat implements Listener, PluginMessageListener {
     }
 
     public static DirectMessage getDirectMessage(String message, String senderName, String senderUuid, String recipientName, String recipientUuid) {
-        return new DirectMessage(recipientUuid, senderUuid, directMessageFormat(message, senderName, recipientName));
+        return new DirectMessage(recipientUuid, senderUuid, directMessageFormat(message, senderName, recipientName), false);
     }
 
     //Receives a message from the chat socket in json format.
@@ -167,6 +167,7 @@ public class CustomChat implements Listener, PluginMessageListener {
             }
 
         } catch (IOException e) {
+            e.printStackTrace();
             // Ignored
             LOGGER.severe("An error occurred while receiving message from proxy.");
         }

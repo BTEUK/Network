@@ -4,6 +4,7 @@ import lombok.Getter;
 import net.bteuk.network.commands.AFK;
 import net.bteuk.network.commands.BuildingCompanionCommand;
 import net.bteuk.network.commands.Clear;
+import net.bteuk.network.commands.Demote;
 import net.bteuk.network.commands.Discord;
 import net.bteuk.network.commands.Gamemode;
 import net.bteuk.network.commands.Hdb;
@@ -15,6 +16,7 @@ import net.bteuk.network.commands.Phead;
 import net.bteuk.network.commands.Plot;
 import net.bteuk.network.commands.Pmute;
 import net.bteuk.network.commands.ProgressMap;
+import net.bteuk.network.commands.Promote;
 import net.bteuk.network.commands.Ptime;
 import net.bteuk.network.commands.Punmute;
 import net.bteuk.network.commands.RegionCommand;
@@ -480,6 +482,9 @@ public final class Network extends JavaPlugin {
         new Exp(this);
 
         new BuildingCompanionCommand(this);
+
+        new Promote(this);
+        new Demote(this);
 
         // Set sidebar if enabled.
         if (SIDEBAR_ENABLED) {

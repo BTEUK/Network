@@ -15,7 +15,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-import static net.bteuk.network.utils.Constants.DISCORD_LINKING;
 import static net.bteuk.network.utils.Constants.LOGGER;
 import static net.bteuk.network.utils.NetworkConfig.CONFIG;
 
@@ -44,49 +43,47 @@ public class Discord implements CommandExecutor {
                 }
 
                 //If discord linking is enabled
-                if (DISCORD_LINKING) {
-                    if (args[0].equalsIgnoreCase("link")) {
+                if (args[0].equalsIgnoreCase("link")) {
 
-                        //Check if account isn't already linked, send info to unlink.
-                        if (user.isLinked) {
-                            p.sendMessage(ChatUtils.error("You are already linked, to unlink do %s", "/discord unlink"));
-                            return true;
-                        }
-
-                        //Send random code in chat, this must be sent to the UK Bot to link your discord account.
-                        //Create random code from the last 6 digits of the time.
-                        String time = String.valueOf(Time.currentTime());
-                        String token = time.substring(time.length() - 6);
-
-                        DiscordLinking discordLinking = new DiscordLinking();
-                        discordLinking.setUuid(p.getUniqueId().toString());
-                        discordLinking.setToken(token);
-                        
-                        Network.getInstance().getChat().sendSocketMesage(discordLinking);
-
-                        p.sendMessage(ChatUtils.success("To link your Discord please DM the code %s to the UK Bot within the next 5 minutes.", token));
+                    //Check if account isn't already linked, send info to unlink.
+                    if (user.isLinked) {
+                        p.sendMessage(ChatUtils.error("You are already linked, to unlink do %s", "/discord unlink"));
                         return true;
-
-                    } else if (args[0].equalsIgnoreCase("unlink")) {
-
-                        //Check if account is not linked, then ask user to link first.
-                        if (!user.isLinked) {
-                            p.sendMessage(ChatUtils.error("You are not linked, to link do %s", "/discord link"));
-                            return true;
-                        }
-
-                        //Remove linked roles from discord, then unlink.
-                        //Since discord connections are handled via the proxy, get all the roles that must be unlinked and send that to the proxy with the chat socket.
-                        DiscordLinking discordLinking = new DiscordLinking();
-                        discordLinking.setUuid(p.getUniqueId().toString());
-                        discordLinking.setDiscordId(user.getDiscordId());
-                        discordLinking.setUnlink(true);
-                        
-                        user.isLinked = false;
-                        p.sendMessage(ChatUtils.success("Unlinked your Discord."));
-                        return true;
-
                     }
+
+                    //Send random code in chat, this must be sent to the UK Bot to link your discord account.
+                    //Create random code from the last 6 digits of the time.
+                    String time = String.valueOf(Time.currentTime());
+                    String token = time.substring(time.length() - 6);
+
+                    DiscordLinking discordLinking = new DiscordLinking();
+                    discordLinking.setUuid(p.getUniqueId().toString());
+                    discordLinking.setToken(token);
+
+                    Network.getInstance().getChat().sendSocketMesage(discordLinking);
+
+                    p.sendMessage(ChatUtils.success("To link your Discord please DM the code %s to the UK Bot within the next 5 minutes.", token));
+                    return true;
+
+                } else if (args[0].equalsIgnoreCase("unlink")) {
+
+                    //Check if account is not linked, then ask user to link first.
+                    if (!user.isLinked) {
+                        p.sendMessage(ChatUtils.error("You are not linked, to link do %s", "/discord link"));
+                        return true;
+                    }
+
+                    //Remove linked roles from discord, then unlink.
+                    //Since discord connections are handled via the proxy, get all the roles that must be unlinked and send that to the proxy with the chat socket.
+                    DiscordLinking discordLinking = new DiscordLinking();
+                    discordLinking.setUuid(p.getUniqueId().toString());
+                    discordLinking.setDiscordId(user.getDiscordId());
+                    discordLinking.setUnlink(true);
+
+                    user.isLinked = false;
+                    p.sendMessage(ChatUtils.success("Unlinked your Discord."));
+                    return true;
+
                 }
             }
         }

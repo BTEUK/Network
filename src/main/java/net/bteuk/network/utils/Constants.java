@@ -44,12 +44,6 @@ public class Constants {
 
     //Custom table
     public static final boolean TAB;
-
-    //Discord chat compatibility
-    public static final boolean DISCORD_CHAT;
-
-    //Discord role linking
-    public static final boolean DISCORD_LINKING;
     
     //Are tips enabled
     public static final boolean TIPS;
@@ -95,9 +89,6 @@ public class Constants {
         STAFF_CHAT = CONFIG.getBoolean("staff.staff_chat.enabled");
 
         TAB = CONFIG.getBoolean("chat.global_chat.tab.enabled");
-
-        DISCORD_CHAT = CONFIG.getBoolean("chat.global_chat.discord.chat.enabled");
-        DISCORD_LINKING = CONFIG.getBoolean("chat.global_chat.discord.linking.enabled");
 
         TIPS = CONFIG.getBoolean("chat.tips.enabled");
 

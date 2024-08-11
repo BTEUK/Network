@@ -49,7 +49,8 @@ public class Map extends AbstractReloadableComponent {
     /**
      * Coordinates of the map.
      */
-    private Location map_location;
+    private String mapWorld;
+    private Location mapLocation;
 
     /**
      * HashMap of the holograms
@@ -92,17 +93,17 @@ public class Map extends AbstractReloadableComponent {
         // Set the location of the map.
         // If the map is on this server the world must exist.
         // Set the coordinates of the location first, the server is not relevant for this part.
-        map_location = new Location(null, CONFIG.getDouble("map.location.x", 0), CONFIG.getDouble("map.location.y", 0),
+        mapLocation = new Location(null, CONFIG.getDouble("map.location.x", 0), CONFIG.getDouble("map.location.y", 0),
                 CONFIG.getDouble("map.location.z", 0), (float) CONFIG.getDouble("map.location.yaw", 0), (float) CONFIG.getDouble("map.location.pitch", 0));
+        mapWorld = CONFIG.getString("map.location.world");
         if (Objects.equals(SERVER_NAME, server)) {
-            String world = CONFIG.getString("map.location.world");
-            if (world == null || Bukkit.getWorld(world) == null) {
+            if (mapWorld == null || Bukkit.getWorld(mapWorld) == null) {
                 setEnabled(false);
                 LOGGER.warning("The map world does not exist on this server, disabling the map.");
                 return;
             }
             // Set the world, the coordinates have already been set.
-            map_location.setWorld(Bukkit.getWorld(world));
+            mapLocation.setWorld(Bukkit.getWorld(mapWorld));
 
             // Register the hologram click event.
             hologramClickEvent = new HologramClickEvent(instance, this);
@@ -145,11 +146,11 @@ public class Map extends AbstractReloadableComponent {
     protected void teleport(Player p) {
         // If the map is on this server teleport the player directly, else switch server first.
         if (Objects.equals(SERVER_NAME, server)) {
-            PaperLib.teleportAsync(p, map_location);
+            PaperLib.teleportAsync(p, mapLocation);
         } else {
             // Create teleport event.
-            EventManager.createTeleportEvent(true, p.getUniqueId().toString(), "network", String.format("teleport %f %f %f %f %f",
-                            map_location.getX(), map_location.getY(), map_location.getZ(), map_location.getYaw(), map_location.getPitch()),
+            EventManager.createTeleportEvent(true, p.getUniqueId().toString(), "network", String.format("teleport %s %f %f %f %f %f",
+                            mapWorld, mapLocation.getX(), mapLocation.getY(), mapLocation.getZ(), mapLocation.getYaw(), mapLocation.getPitch()),
                     "&aTeleporting to the map.", p.getLocation());
 
             // Switch server.
