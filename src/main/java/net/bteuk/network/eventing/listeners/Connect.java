@@ -82,49 +82,49 @@ public class Connect implements Listener {
             return;
         }
 
-        NetworkUser u = instance.getUser(e.getPlayer());
+        NetworkUser user = instance.getUser(e.getPlayer());
 
         //If u is null, cancel.
-        if (u == null) {
+        if (user == null) {
             LOGGER.severe("User " + e.getPlayer().getName() + " can not be found!");
             e.getPlayer().sendMessage(ChatUtils.error("User can not be found, please relog!"));
             return;
         }
 
         //Reset last logged time.
-        if (u.afk) {
-            u.last_movement = Time.currentTime();
-            u.afk = false;
+        if (user.afk) {
+            user.last_movement = Time.currentTime();
+            user.afk = false;
         }
 
         // If the companion is enabled, disable it.
-        BuildingCompanion companion = u.getCompanion();
+        BuildingCompanion companion = user.getCompanion();
         if (companion != null) {
             companion.disable();
         }
 
         //Remove user from list.
-        instance.removeUser(u);
+        instance.removeUser(user);
 
         //Get player uuid.
-        UUID playerUUID = u.player.getUniqueId();
+        UUID playerUUID = user.player.getUniqueId();
 
         //If they are currently in an inventory, remove them from the list of open inventories.
         Gui.openInventories.remove(playerUUID);
 
         //Delete any guis that may exist.
-        if (u.mainGui != null) {
-            u.mainGui.delete();
+        if (user.mainGui != null) {
+            user.mainGui.delete();
         }
-        if (u.staffGui != null) {
-            u.staffGui.delete();
+        if (user.staffGui != null) {
+            user.staffGui.delete();
         }
-        if (u.lightsOut != null) {
-            u.lightsOut.delete();
+        if (user.lightsOut != null) {
+            user.lightsOut.delete();
         }
 
         // Send a disconnect event to the proxy to handle potential messages.
-        UserDisconnect userDisconnect = new UserDisconnect(u.player.getUniqueId().toString(), u.isNavigatorEnabled(), u.isTeleportEnabled(), u.isNightvisionEnabled(), u.getChatChannel(), u.isTips_enabled());
+        UserDisconnect userDisconnect = user.createDisconnectEvent();
         Bukkit.getScheduler().runTaskAsynchronously(Network.getInstance(), () -> Network.getInstance().getChat().sendSocketMesage(userDisconnect));
     }
 

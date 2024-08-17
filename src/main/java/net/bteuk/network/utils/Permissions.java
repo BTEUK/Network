@@ -20,12 +20,24 @@ import static net.buildtheearth.terraminusminus.TerraMinusMinus.LOGGER;
  */
 public final class Permissions {
 
-    private Permissions() {}
+    private Permissions() {
+    }
 
     private static LuckPerms getProvider() {
         RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
 
         return provider == null ? null : provider.getProvider();
+    }
+
+    public static CompletableFuture<User> getUser(String uuid) {
+        LuckPerms provider = getProvider();
+
+        if (provider == null) {
+            return null;
+        }
+
+        UserManager userManager = provider.getUserManager();
+        return userManager.loadUser(UUID.fromString(uuid));
     }
 
     /**
@@ -44,31 +56,32 @@ public final class Permissions {
         return provider.getGroupManager().getGroup(groupName);
     }
 
-    public static CompletableFuture<Boolean> modifyGroup(String uuid, Group group, boolean remove) {
+    /**
+     * @param uuid user to modify the group for
+     * @param group the group to modify
+     * @param remove true if the group should be removed
+     * @return the primary role after the modification
+     */
+    public static String modifyGroup(String uuid, Group group, boolean remove) {
         LuckPerms provider = getProvider();
-
         if (provider == null) {
             return null;
         }
-
         UserManager userManager = provider.getUserManager();
+        User user = userManager.loadUser(UUID.fromString(uuid)).join();
 
-        // Add group to user. Returns boolean to indicate success.
-        return userManager.loadUser(UUID.fromString(uuid)).thenApplyAsync(user -> {
-            InheritanceNode node = InheritanceNode.builder(group).build();
-            DataMutateResult result;
-            if (remove) {
-                result = user.data().remove(node);
-            } else {
-                result = user.data().add(node);
-            }
-            // Save the user if successful.
-            if (result.wasSuccessful()) {
-                userManager.saveUser(user);
-            }
-
-            return result.wasSuccessful();
-        });
+        InheritanceNode node = InheritanceNode.builder(group).build();
+        DataMutateResult result;
+        if (remove) {
+            result = user.data().remove(node);
+        } else {
+            result = user.data().add(node);
+        }
+        if (result.wasSuccessful()) {
+            userManager.saveUser(user).join();
+            return user.getPrimaryGroup();
+        }
+        return null;
     }
 
     public static CompletableFuture<String> getPrimaryGroup(String uuid) {

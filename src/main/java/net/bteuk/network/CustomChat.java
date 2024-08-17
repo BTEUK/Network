@@ -10,8 +10,13 @@ import net.bteuk.network.lib.dto.ChatMessage;
 import net.bteuk.network.lib.dto.DirectMessage;
 import net.bteuk.network.lib.dto.DiscordLinking;
 import net.bteuk.network.lib.dto.DiscordRole;
+import net.bteuk.network.lib.dto.OnlineUserAdd;
+import net.bteuk.network.lib.dto.OnlineUserRemove;
+import net.bteuk.network.lib.dto.OnlineUsersReply;
+import net.bteuk.network.lib.dto.OnlineUsersRequest;
 import net.bteuk.network.lib.dto.UserConnectReply;
 import net.bteuk.network.lib.dto.UserRemove;
+import net.bteuk.network.lib.dto.UserUpdate;
 import net.bteuk.network.lib.socket.OutputSocket;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
@@ -63,8 +68,11 @@ public class CustomChat implements Listener, PluginMessageListener {
                     CONFIG.getInt("chat.global_chat.socket.port")
             );
 
-            //Register channel for messages received from the proxy.
+            // Register channel for messages received from the proxy.
             instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:network", this);
+
+            // Request all online users in the Network.
+            sendSocketMesage(new OnlineUsersRequest());
 
             LOGGER.info("Successfully enabled Global Chat!");
         }
@@ -164,6 +172,14 @@ public class CustomChat implements Listener, PluginMessageListener {
                 Connect.handleUserConnectReply(userConnectReply);
             } else if (object instanceof UserRemove userRemove) {
                 Connect.handleUserRemove(userRemove);
+            } else if (object instanceof UserUpdate userUpdate) {
+                handleUserUpdate(userUpdate);
+            } else if (object instanceof OnlineUsersReply onlineUsersReply) {
+                instance.handleOnlineUsersReply(onlineUsersReply);
+            } else if (object instanceof OnlineUserAdd onlineUserAdd) {
+                instance.handleOnlineUserAdd(onlineUserAdd);
+            } else if (object instanceof OnlineUserRemove onlineUserRemove) {
+                instance.handleOnlineUserRemove(onlineUserRemove);
             }
 
         } catch (IOException e) {
@@ -209,11 +225,12 @@ public class CustomChat implements Listener, PluginMessageListener {
     private void handleDiscordLinking(DiscordLinking discordLinking) {
 
         if (discordLinking.isUnlink() && discordLinking.getDiscordId() != -1) {
-            // Unlink
-            for (NetworkUser u : instance.getUsers()) {
-                if (u.isLinked && u.getDiscordId() == discordLinking.getDiscordId()) {
+            // Unlink, this is only used if the user is no longer in the discord server.
+            // Hence why no roles need to be removed.
+            for (NetworkUser user : instance.getUsers()) {
+                if (user.isLinked && user.getDiscordId() == discordLinking.getDiscordId()) {
                     // Unlink
-                    u.isLinked = false;
+                    user.isLinked = false;
                 }
             }
             return;
@@ -249,6 +266,20 @@ public class CustomChat implements Listener, PluginMessageListener {
                     user.sendMessage(ChatUtils.success("Your discord has been linked!"));
 
                 });
+    }
+
+    private void handleUserUpdate(UserUpdate userUpdate) {
+        // If the user is online check if anything needs updating.
+        instance.getUsers().stream().filter(user -> user.player.getUniqueId().toString().equals(userUpdate.getUuid())).findFirst().ifPresent(user ->  {
+            if (userUpdate.getTabPlayer() != null && !userUpdate.getTabPlayer().getPrimaryGroup().equals(user.getPrimaryRole().getId())) {
+                // Update the primary role.
+                Role primaryRole = Roles.getRoleById(userUpdate.getTabPlayer().getPrimaryGroup());
+                if (primaryRole != null) {
+                    LOGGER.info(String.format("Updated primary role for %s to %s", user.player.getName(), primaryRole.getName()));
+                    user.setPrimaryRole(primaryRole);
+                }
+            }
+        });
     }
 
     // Send afk or no longer afk message to players ingame and discord.

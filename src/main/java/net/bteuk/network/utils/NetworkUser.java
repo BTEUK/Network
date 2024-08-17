@@ -8,6 +8,7 @@ import net.bteuk.network.commands.Nightvision;
 import net.bteuk.network.gui.Gui;
 import net.bteuk.network.lib.dto.DirectMessage;
 import net.bteuk.network.lib.dto.UserConnectReply;
+import net.bteuk.network.lib.dto.UserDisconnect;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.regions.Region;
 import net.kyori.adventure.text.Component;
@@ -24,25 +25,26 @@ import static net.bteuk.network.lib.enums.ChatChannels.REVIEWER;
 import static net.bteuk.network.lib.enums.ChatChannels.STAFF;
 import static net.bteuk.network.utils.Constants.EARTH_WORLD;
 import static net.bteuk.network.utils.Constants.REGIONS_ENABLED;
+import static net.bteuk.network.utils.Constants.SERVER_NAME;
 import static net.bteuk.network.utils.Constants.SERVER_TYPE;
 import static net.bteuk.network.utils.enums.ServerType.EARTH;
 import static net.bteuk.network.utils.enums.ServerType.PLOT;
 
 public class NetworkUser {
 
-    //Network instance.
+    // Network instance.
     private final Network instance;
 
-    //Player instance.
+    // Player instance.
     public final Player player;
 
-    //Main gui, includes everything that is part of the navigator.
+    // Main gui, includes everything that is part of the navigator.
     public Gui mainGui;
 
-    //Lights out, a gui game.
+    // Lights out, a gui game.
     public LightsOut lightsOut;
 
-    //Staff gui.
+    // Staff gui.
     public Gui staffGui;
 
     // The current active chat channel.
@@ -63,9 +65,11 @@ public class NetworkUser {
     private boolean navigatorEnabled;
 
     @Getter
+    @Setter
     private boolean teleportEnabled;
 
     @Getter
+    @Setter
     private boolean nightvisionEnabled;
 
     //If the player is switching server.
@@ -90,7 +94,7 @@ public class NetworkUser {
     //Should tips be displayed for the player.
     @Getter
     @Setter
-    private boolean tips_enabled;
+    private boolean tipsEnabled;
 
     //Building companion tool.
     @Getter
@@ -116,7 +120,7 @@ public class NetworkUser {
         teleportEnabled = reply.isTeleportEnabled();
         nightvisionEnabled = reply.isNightvisionEnabled();
         chatChannel = reply.getChatChannel();
-        tips_enabled = reply.isTipsEnabled();
+        tipsEnabled = reply.isTipsEnabled();
 
         switching = false;
         inPortal = false;
@@ -178,6 +182,18 @@ public class NetworkUser {
             Nightvision.removeNightvision(player);
 
         }
+    }
+
+    public UserDisconnect createDisconnectEvent() {
+        return new UserDisconnect(
+                player.getUniqueId().toString(),
+                SERVER_NAME,
+                isNavigatorEnabled(),
+                isTeleportEnabled(),
+                isNightvisionEnabled(),
+                getChatChannel(),
+                isTipsEnabled()
+        );
     }
 
     private void runEvents() {

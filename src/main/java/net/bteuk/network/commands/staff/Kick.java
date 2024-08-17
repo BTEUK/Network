@@ -62,7 +62,7 @@ public class Kick implements CommandExecutor {
         String uuid = Network.getInstance().getGlobalSQL().getString("SELECT uuid FROM player_data WHERE name='" + args[0] + "';");
 
         //Check if player is online.
-        if (!Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "';")) {
+        if (!Network.getInstance().isOnlineOnNetwork(uuid)) {
             sender.sendMessage(Component.text(args[0], NamedTextColor.DARK_RED)
                     .append(ChatUtils.error(" is not online.")));
             return true;

@@ -69,7 +69,7 @@ public class ModerationActionGui extends Gui {
                             u -> {
 
                                 //If a reason has been set, kick the user, if they're still online.
-                                if (Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "';")) {
+                                if (Network.getInstance().isOnlineOnNetwork(uuid)) {
                                     if (reason != null) {
 
                                         //Kick the user.

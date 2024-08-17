@@ -90,7 +90,7 @@ public class Tips {
                         for (NetworkUser user : Network.getInstance().getUsers()) {
 
                             //Check if the user has tips enabled.
-                            if (user.isTips_enabled()) {
+                            if (user.isTipsEnabled()) {
 
                                 //Get builder role from database.
                                 String role = Network.getInstance().getGlobalSQL().getString("SELECT builder_role FROM player_data WHERE uuid='" + user.player.getUniqueId() + "';");

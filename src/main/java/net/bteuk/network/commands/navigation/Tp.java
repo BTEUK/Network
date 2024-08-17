@@ -15,8 +15,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-import static net.bteuk.network.utils.Constants.SERVER_NAME;
-
 public class Tp implements CommandExecutor {
 
     @Override
@@ -45,7 +43,7 @@ public class Tp implements CommandExecutor {
             String uuid = Network.getInstance().getGlobalSQL().getString("SELECT uuid FROM player_data WHERE name='" + args[0] + "';");
 
             //Check if the player is online.
-            if (Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "';")) {
+            if (Network.getInstance().isOnlineOnNetwork(uuid)) {
 
                 //Check if the player has teleport enabled/disabled.
                 //If disabled cancel teleport.
@@ -53,7 +51,7 @@ public class Tp implements CommandExecutor {
 
                     //If the player is on your server teleport.
                     //Else switch server and add teleport join event.
-                    if (Network.getInstance().getGlobalSQL().getString("SELECT server FROM online_users WHERE uuid='" + uuid + "';").equals(SERVER_NAME)) {
+                    if (Network.getInstance().hasPlayer(uuid)) {
 
                         //Get player location.
                         Player player = Bukkit.getPlayer(UUID.fromString(uuid));
@@ -73,10 +71,9 @@ public class Tp implements CommandExecutor {
                         }
 
                     } else {
-
                         EventManager.createTeleportEvent(true, p.getUniqueId().toString(), "network", "teleport player " + uuid, p.getLocation());
-                        SwitchServer.switchServer(p, Network.getInstance().getGlobalSQL().getString("SELECT server FROM online_users WHERE uuid='" + uuid + "';"));
-
+                        Network.getInstance().getOnlineUser(uuid).ifPresentOrElse(onlineUser -> SwitchServer.switchServer(p, onlineUser.getServer()),
+                                () -> p.sendMessage(Component.text(args[0], NamedTextColor.DARK_RED).append(ChatUtils.error(" is no longer online."))));
                     }
 
 

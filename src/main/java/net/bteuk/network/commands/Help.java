@@ -1,5 +1,7 @@
 package net.bteuk.network.commands;
 
+import net.bteuk.network.Network;
+import net.bteuk.network.commands.tabcompleters.FixedArgSelector;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.Role;
 import net.bteuk.network.utils.Roles;
@@ -8,14 +10,20 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class Help implements CommandExecutor {
+import java.util.Arrays;
 
-    private static Component ROLE_ERROR = ChatUtils.error("An error occurred while loading a role, please contact an administrator.");
+public class Help extends AbstractCommand {
+
+    private static final Component ROLE_ERROR = ChatUtils.error("An error occurred while loading a role, please contact an administrator.");
+
+    public Help(Network instance) {
+        super(instance, "help");
+        command.setTabCompleter(new FixedArgSelector(Arrays.asList("building", "explore", "plots", "regions", "utils", "worldedit"), 0));
+    }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
@@ -67,6 +75,8 @@ public class Help implements CommandExecutor {
 
     private void help(Player p) {
 
+        p.sendMessage(Utils.title("Help:"));
+
         //Navigator
         p.sendMessage(Component.text("/navigator", NamedTextColor.GRAY).append(Utils.line(" - Click to open the navigator, access most server features from here."))
                 .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/navigator")));
@@ -108,6 +118,8 @@ public class Help implements CommandExecutor {
             return;
         }
 
+        p.sendMessage(Utils.title("Building on the server:"));
+
         Component roleMessage = Utils.line("You currently have the builder role ")
                 .append(builderRole.getColouredRoleName());
 
@@ -121,7 +133,7 @@ public class Help implements CommandExecutor {
                         .append(builderRole.getColouredRoleName())
                         .append(ChatUtils.line(" has all the functions of an "))
                         .append(architect.getColouredRoleName())
-                        .append(ChatUtils.line(" but can also review plots, region request and navigation requests."));
+                        .append(ChatUtils.line(" but can also review plots, region requests and navigation requests."));
             }
 
             case "architect" -> {
@@ -133,7 +145,7 @@ public class Help implements CommandExecutor {
                         .append(builderRole.getColouredRoleName())
                         .append(ChatUtils.line(" has all the functions of a "))
                         .append(builder.getColouredRoleName())
-                        .append(ChatUtils.line(" can create zones in the plotsystem and create new plots."));
+                        .append(ChatUtils.line(" and can create zones in the plotsystem and create new plots."));
             }
 
             case "builder" -> ChatUtils.line("A ")
@@ -213,10 +225,12 @@ public class Help implements CommandExecutor {
         p.sendMessage(Utils.title("Exploring the server:"));
 
         //Exploring using the gui or map.
-        p.sendMessage(Utils.line("\nUsing the navigator ")
+        p.sendMessage(Utils.line("Using the navigator ")
                 .append(Component.text("/navigator", NamedTextColor.GRAY))
                 .append(Utils.line(" you can access many locations that are being or have been built on the server.")));
-        p.sendMessage(Utils.line("Alternatively you can use the map located in the lobby ")
+        p.sendMessage(Utils.line("Alternatively you can use the ")
+                .append(Component.text("/map", NamedTextColor.GRAY))
+                .append(Utils.line(" located in the "))
                 .append(Component.text("/lobby", NamedTextColor.GRAY)));
 
         //Tpll can be used otherwise but for roles without region access they can't load new terrain.
@@ -224,7 +238,7 @@ public class Help implements CommandExecutor {
 
         switch (builderRole.getId()) {
 
-            case "apprentice", "applicant", "guest" ->
+            case "apprentice", "applicant", "default" ->
                     p.sendMessage(Utils.line("\nTo access other areas you can try using ")
                             .append(Component.text("/tpll <lat> <lon>", NamedTextColor.GRAY))
                             .append(Utils.line(", however you will only be able to teleport to locations that have already been generated on the server.")));
@@ -241,8 +255,17 @@ public class Help implements CommandExecutor {
         }
 
         //Home command for saving personal locations.
-        //TODO: Add /home
+        switch (builderRole.getId()) {
+            case "apprentice", "applicant", "default" -> p.sendMessage(Utils.line("\nYou can set a ")
+                    .append(Component.text("/home", NamedTextColor.GRAY))
+                    .append(Utils.line(" using "))
+                    .append(Component.text("/sethome", NamedTextColor.GRAY)));
 
+            default -> p.sendMessage(Utils.line("\nYou can set ")
+                    .append(Component.text("/homes", NamedTextColor.GRAY))
+                    .append(Utils.line(" using "))
+                    .append(Component.text("/sethome <name>", NamedTextColor.GRAY)));
+        }
     }
 
     private void plots(Player p) {
@@ -260,7 +283,7 @@ public class Help implements CommandExecutor {
 
         p.sendMessage(Utils.title("Plots:"));
 
-        p.sendMessage(Utils.line("\nA plot will usually include a building or row of connected buildings. " +
+        p.sendMessage(Utils.line("A plot will usually include a building or row of connected buildings. " +
                 "The goal of a plot is to complete that building and then submit it."));
 
         p.sendMessage(Utils.line("\nYou can claim a plot in the building menu or using ")
@@ -296,11 +319,14 @@ public class Help implements CommandExecutor {
 
         p.sendMessage(Utils.title("Regions:"));
 
-        p.sendMessage(Utils.line("\nA region represents a &7512 by 512 area &fin a grid of regions, they cover the whole world."));
+        p.sendMessage(Utils.line("A region represents a 512 by 512 area in a grid of regions, they cover the whole world."));
         p.sendMessage(Utils.line("Regions provide an added layer of security and accountability in determining who has built where and when. " +
                 "We keep track of every player who joins a region, this allows us to trace back any wrongdoers with relative ease."));
 
-        p.sendMessage(Utils.line("\nTo join a region you must be a &7Jr.Builder &for above, this is both to prevent griefers and to ensure building standards."));
+        Role jrbuilder = Roles.getRoleById("jrbuilder");
+        p.sendMessage(Utils.line("\nTo join a region you must be a ")
+                .append(jrbuilder.getColouredRoleName())
+                .append(Utils.line(" or above, this is both to prevent griefers and to ensure building standards.")));
 
         p.sendMessage(Utils.line("\nYou can join a region by clicking on the dark oak door in the build menu. " +
                 "If the region already has an owner then they must accept your request before you are able to build in the region."));
@@ -333,9 +359,9 @@ public class Help implements CommandExecutor {
 
         p.sendMessage(Utils.title("WorldEdit:"));
 
-        p.sendMessage(Component.text("\n//wand", NamedTextColor.GRAY)
+        p.sendMessage(Component.text("//wand", NamedTextColor.GRAY)
                 .append(Utils.line(" - Gives you the selection tool for WorldEdit.")));
-        p.sendMessage(Utils.line("&7Left click to select your first point, right click to add a second (or more for certain selection types)."));
+        p.sendMessage(Utils.line("Left click to select your first point, right click to add a second (or more for certain selection types)."));
 
         p.sendMessage(Component.text("\n//set <block>", NamedTextColor.GRAY)
                 .append(Utils.line(" - Sets the area you've selected to the specified block.")));
@@ -346,9 +372,9 @@ public class Help implements CommandExecutor {
         p.sendMessage(Component.text("//line <block>", NamedTextColor.GRAY)
                 .append(Utils.line(" - Creates a line between your two selected points.")));
 
-        p.sendMessage(Component.text("\n&7//undo", NamedTextColor.GRAY)
+        p.sendMessage(Component.text("\n//undo", NamedTextColor.GRAY)
                 .append(Utils.line(" and "))
-                .append(Component.text("\n&7//redo", NamedTextColor.GRAY))
+                .append(Component.text("//redo", NamedTextColor.GRAY))
                 .append(Utils.line(" allow you to undo or redo any WorldEdit command.")));
 
         Component worldEditMessage = Utils.line("For more information you can reference: ")

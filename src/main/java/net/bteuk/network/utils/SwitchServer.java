@@ -2,6 +2,7 @@ package net.bteuk.network.utils;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.lib.dto.SwitchServerEvent;
+import net.bteuk.network.lib.dto.UserDisconnect;
 import net.bteuk.network.lib.utils.ChatUtils;
 import org.bukkit.entity.Player;
 
@@ -12,10 +13,10 @@ public class SwitchServer {
 
     public static void switchServer(Player p, String server) {
 
-        NetworkUser u = Network.getInstance().getUser(p);
+        NetworkUser user = Network.getInstance().getUser(p);
 
         //If u is null, cancel.
-        if (u == null) {
+        if (user == null) {
             LOGGER.severe("User " + p.getName() + " can not be found!");
             p.sendMessage(ChatUtils.error("User can not be found, please relog!"));
             return;
@@ -47,10 +48,11 @@ public class SwitchServer {
         }
 
         //Set switching to true in user.
-        u.switching = true;
+        user.switching = true;
 
         // Send switch server event to the proxy.
-        SwitchServerEvent switchServerEvent = new SwitchServerEvent(p.getUniqueId().toString(), server, SERVER_NAME);
+        UserDisconnect userDisconnect = user.createDisconnectEvent();
+        SwitchServerEvent switchServerEvent = new SwitchServerEvent(p.getUniqueId().toString(), server, SERVER_NAME, userDisconnect);
         Network.getInstance().getChat().sendSocketMesage(switchServerEvent);
     }
 }

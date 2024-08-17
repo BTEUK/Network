@@ -28,19 +28,17 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static net.bteuk.network.lib.enums.ChatChannels.GLOBAL;
+import static net.bteuk.network.utils.Constants.LOGGER;
 import static net.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public final class Roles {
 
     private static final Component PROMOTION_TEMPLATE = Component.text(" has been promoted to ");
-    private static final Component DEMOTION_TEMPLATE = Component.text(" has been demoted from ");
     private static final Component PROMOTION_SELF = Component.text("You have been promoted to ");
-
-    private static final Component DEMOTION_SELF = Component.text("You have been demoted from ");
 
     private static Set<Role> ROLES;
 
-    private static LinkedHashSet<String> BUILDER_ROLE_NAMES = Stream.of("reviewer", "architect", "builder", "jrbuilder", "apprentice", "applicant", "default")
+    private static final LinkedHashSet<String> BUILDER_ROLE_NAMES = Stream.of("reviewer", "architect", "builder", "jrbuilder", "apprentice", "applicant", "default")
             .collect(Collectors.toCollection(LinkedHashSet::new));
 
     public static Set<Role> getRoles() {
@@ -191,7 +189,7 @@ public final class Roles {
         }
 
         //Check if the player is online.
-        if (!Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "';")) {
+        if (!Network.getInstance().isOnlineOnNetwork(uuid)) {
 
             //Send a message that will show when they next log in.
             DirectMessage directMessage = new DirectMessage(uuid, "server",
@@ -207,7 +205,7 @@ public final class Roles {
      * @param uuid the uuid of the player to promote.
      * @param roleId the role to add or remove
      * @param remove whether to remove the role or not
-     * @param announce whether to announce the promotion/demotion
+     * @param announce whether to announce the promotion (demotion is never announced)
      * @return {@link CompletableFuture} completableFuture with {@link Component} message.
      */
     public static CompletableFuture<Component> alterRole(String uuid, String name, String roleId, boolean remove, boolean announce) {
@@ -222,34 +220,20 @@ public final class Roles {
 
         return CompletableFuture.supplyAsync(() -> {
 
-            CompletableFuture<String> groupBeforeFuture = Permissions.getPrimaryGroup(uuid);
-
-            if (groupBeforeFuture == null) {
-                return ChatUtils.error("No primary group could be found for this user.");
+            String groupBefore;
+            try {
+                groupBefore = Objects.requireNonNull(Permissions.getPrimaryGroup(uuid)).join();
+            } catch (Exception e) {
+                return ChatUtils.error("An error occurred while fetching the primary group.");
             }
 
-            String groupBefore = groupBeforeFuture.join();
+            String groupAfter = Permissions.modifyGroup(uuid, group, remove);
 
-            CompletableFuture<Boolean> booleanFuture = Permissions.modifyGroup(uuid, group, remove);
-
-            if (booleanFuture == null) {
+            if (groupAfter == null) {
                 return ChatUtils.error("Modifying the permissions failed!");
             }
 
-            boolean success = booleanFuture.join();
-
-            if (!success) {
-                return ChatUtils.error("Modifying the permissions failed!");
-            }
-
-            CompletableFuture<String> groupAfterFuture = Permissions.getPrimaryGroup(uuid);
-
-            if (groupAfterFuture == null) {
-                return ChatUtils.error("No primary group could be found for this user.");
-            }
-
-            String groupAfter = groupAfterFuture.join();
-
+            LOGGER.info(String.format("Group before %s, group after %s", groupBefore, groupAfter));
             if (!groupBefore.equals(groupAfter)) {
                 // Update primary role in TAB.
                 Role primaryRole = getRoleById(groupAfter);
@@ -267,13 +251,13 @@ public final class Roles {
             DiscordRole discordRole = new DiscordRole(uuid, roleId, !remove);
             Network.getInstance().getChat().sendSocketMesage(discordRole);
 
-            if (announce) {
-                ChatMessage chatMessage = getPromotionChatMessage(remove, name, role);
-                Network.getInstance().getChat().sendSocketMesage(chatMessage);
+            if (announce && !remove) {
+                sendPromotionChatMessage(name, role);
             }
 
-            DirectMessage directMessage = getPromotionDirectMessage(remove, uuid, role);
-            Network.getInstance().getChat().sendSocketMesage(directMessage);
+            if (!remove) {
+                sendPromotionDirectMessage(uuid, role);
+            }
 
             if (remove) {
                 return ChatUtils.success("Demoted %s from %s", name, roleId);
@@ -283,31 +267,18 @@ public final class Roles {
         });
     }
 
-    private static ChatMessage getPromotionChatMessage(boolean remove, String name, Role role) {
-        Component message;
-        if (remove) {
-            message = Component.text(name)
-                    .append(DEMOTION_TEMPLATE)
-                    .append(role.getColouredRoleName());
-        } else {
-            message = Component.text(name)
-                    .append(PROMOTION_TEMPLATE)
-                    .append(role.getColouredRoleName());
-        }
-        message = message.decorate(TextDecoration.BOLD);
-        return new ChatMessage(GLOBAL.getChannelName(), "server", message);
+    private static void sendPromotionChatMessage(String name, Role role) {
+        Component message = Component.text(name)
+                .append(PROMOTION_TEMPLATE)
+                .append(role.getColouredRoleName())
+                .decorate(TextDecoration.BOLD);
+        Network.getInstance().getChat().sendSocketMesage(new ChatMessage(GLOBAL.getChannelName(), "server", message));
     }
 
-    private static DirectMessage getPromotionDirectMessage(boolean remove, String uuid, Role role) {
-        Component message;
-        if (remove) {
-            message = DEMOTION_SELF
-                    .append(role.getColouredRoleName());
-        } else {
-            message = PROMOTION_TEMPLATE
-                    .append(role.getColouredRoleName());
-        }
-        message = message.decorate(TextDecoration.BOLD);
-        return new DirectMessage(uuid, "server", message, true);
+    private static void sendPromotionDirectMessage(String uuid, Role role) {
+        Component message = PROMOTION_SELF
+                .append(role.getColouredRoleName())
+                .decorate(TextDecoration.BOLD);
+        Network.getInstance().getChat().sendSocketMesage(new DirectMessage(uuid, "server", message, true));
     }
 }

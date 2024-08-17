@@ -60,6 +60,10 @@ import net.bteuk.network.eventing.listeners.PreJoinServer;
 import net.bteuk.network.eventing.listeners.global_teleport.MoveListener;
 import net.bteuk.network.eventing.listeners.global_teleport.TeleportListener;
 import net.bteuk.network.gui.NavigatorGui;
+import net.bteuk.network.lib.dto.OnlineUser;
+import net.bteuk.network.lib.dto.OnlineUserAdd;
+import net.bteuk.network.lib.dto.OnlineUserRemove;
+import net.bteuk.network.lib.dto.OnlineUsersReply;
 import net.bteuk.network.lobby.Lobby;
 import net.bteuk.network.lobby.LobbyCommand;
 import net.bteuk.network.sql.DatabaseInit;
@@ -89,6 +93,8 @@ import teachingtutorials.utils.DBConnection;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Optional;
 
 import static net.bteuk.network.utils.Constants.PROGRESS_MAP;
 import static net.bteuk.network.utils.Constants.REGIONS_ENABLED;
@@ -117,7 +123,11 @@ public final class Network extends JavaPlugin {
     @Getter
     private RegionManager regionManager;
 
-    //User List
+    // List of users connected to the network.
+    @Getter
+    private HashSet<OnlineUser> onlineUsers;
+
+    // Server User List
     private ArrayList<NetworkUser> networkUsers;
 
     //Guis
@@ -299,10 +309,11 @@ public final class Network extends JavaPlugin {
     //Server enabling procedure when the config has been set up.
     public void enablePlugin() {
 
-        //Create user list.
+        // Create user list.
         networkUsers = new ArrayList<>();
+        onlineUsers = new HashSet<>();
 
-        //Enabled chat, both global and normal chat are handled through this.
+        // Enabled chat, both global and normal chat are handled through this.
         chat = new CustomChat(this);
 
         //Setup connect, this handles all connections to the server.
@@ -376,18 +387,18 @@ public final class Network extends JavaPlugin {
 
         getCommand("teleport").setExecutor(new Tp());
         getCommand("teleport").setTabCompleter(new PlayerSelector());
-        getCommand("teleporttoggle").setExecutor(new TpToggle());
+        new TpToggle(instance);
 
         getCommand("back").setExecutor(new Back());
 
-        getCommand("discord").setExecutor(new Discord());
+        new Discord(this);
 
         new ll(this);
 
-        getCommand("nightvision").setExecutor(new Nightvision());
+        new Nightvision(this);
         getCommand("speed").setExecutor(new Speed());
 
-        getCommand("help").setExecutor(new Help());
+        new Help(this);
 
         getCommand("warp").setExecutor(new Warp());
         getCommand("warp").setTabCompleter(new LocationSelector());
@@ -486,14 +497,16 @@ public final class Network extends JavaPlugin {
         new Promote(this);
         new Demote(this);
 
+        // Unregister sidebar.
+        ScoreboardManager manager = Bukkit.getScoreboardManager();
+        Scoreboard scoreboard = manager.getMainScoreboard();
+        Objective objective = scoreboard.getObjective("sidebar");
+        if (objective != null) {
+            objective.unregister();
+        }
         // Set sidebar if enabled.
         if (SIDEBAR_ENABLED) {
-            ScoreboardManager manager = Bukkit.getScoreboardManager();
-            Scoreboard scoreboard = manager.getMainScoreboard();
-            Objective objective = scoreboard.getObjective("sidebar");
-            if (objective != null) {
-                objective.unregister();
-            }
+
             objective = scoreboard.registerNewObjective("sidebar", Criteria.DUMMY, Component.text(SIDEBAR_TITLE));
             objective.setDisplaySlot(DisplaySlot.SIDEBAR);
             int score = SIDEBAR_CONTENT.size();
@@ -579,7 +592,29 @@ public final class Network extends JavaPlugin {
         networkUsers.remove(u);
     }
 
-    //Check if user is on the server.
+    public void handleOnlineUsersReply(OnlineUsersReply onlineUsersReply) {
+        onlineUsers.addAll(onlineUsersReply.getOnlineUsers());
+    }
+
+    public void handleOnlineUserAdd(OnlineUserAdd onlineUserAdd) {
+        onlineUsers.remove(onlineUserAdd.getUser());
+        onlineUsers.add(onlineUserAdd.getUser());
+    }
+
+    public void handleOnlineUserRemove(OnlineUserRemove onlineUserRemove) {
+        Optional<OnlineUser> optionalOnlineUser = onlineUsers.stream().filter(onlineUser -> onlineUser.getUuid().equals(onlineUserRemove.getUuid())).findFirst();
+        optionalOnlineUser.ifPresent(onlineUser -> onlineUsers.remove(onlineUser));
+    }
+
+    public boolean isOnlineOnNetwork(String uuid) {
+        return onlineUsers.stream().anyMatch(onlineUser -> onlineUser.getUuid().equals(uuid));
+    }
+
+    public Optional<OnlineUser> getOnlineUser(String uuid) {
+        return onlineUsers.stream().filter(onlineUser -> onlineUser.getUuid().equals(uuid)).findFirst();
+    }
+
+    // Check if user is on this server.
     public boolean hasPlayer(String uuid) {
         for (NetworkUser u : getUsers()) {
             if (u.player.getUniqueId().toString().equals(uuid)) {

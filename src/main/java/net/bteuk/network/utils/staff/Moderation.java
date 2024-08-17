@@ -1,12 +1,5 @@
 package net.bteuk.network.utils.staff;
 
-/*
-
-This class will have all the functionality dealing with moderation.
-This includes /ban /mute /kick
-
- */
-
 import net.bteuk.network.Network;
 import net.bteuk.network.eventing.events.EventManager;
 import net.bteuk.network.exceptions.DurationFormatException;
@@ -75,13 +68,10 @@ public class Moderation {
     //Kick the player.
     public static void kick(String uuid, String reason) {
 
-        //Check if the player is currently online.
-        if (Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "';")) {
-            //Kick them with the reason.
-            EventManager.createEvent(uuid, "network",
-                    Network.getInstance().getGlobalSQL().getString("SELECT server FROM online_users WHERE uuid='" + uuid + "';"),
-                    "kick", reason);
-        }
+        //Kick them with the reason, if online.
+        Network.getInstance().getOnlineUser(uuid).ifPresent(onlineUser -> EventManager.createEvent(uuid, "network",
+                onlineUser.getServer(),
+                "kick", reason));
     }
 
     /**
