@@ -576,6 +576,10 @@ public final class Network extends JavaPlugin {
         return networkUsers.stream().filter(user -> user.player.equals(p)).findFirst().orElse(null);
     }
 
+    public Optional<NetworkUser> getNetworkUserByUuid(String uuid) {
+        return networkUsers.stream().filter(user -> user.player.getUniqueId().toString().equals(uuid)).findFirst();
+    }
+
     //Get users.
     public ArrayList<NetworkUser> getUsers() {
         return networkUsers;
@@ -610,8 +614,12 @@ public final class Network extends JavaPlugin {
         return onlineUsers.stream().anyMatch(onlineUser -> onlineUser.getUuid().equals(uuid));
     }
 
-    public Optional<OnlineUser> getOnlineUser(String uuid) {
+    public Optional<OnlineUser> getOnlineUserByUuid(String uuid) {
         return onlineUsers.stream().filter(onlineUser -> onlineUser.getUuid().equals(uuid)).findFirst();
+    }
+
+    public Optional<OnlineUser> getOnlineUserByNameIgnoreCase(String name) {
+        return onlineUsers.stream().filter(onlineUser -> onlineUser.getName().equalsIgnoreCase(name)).findFirst();
     }
 
     // Check if user is on this server.

@@ -299,7 +299,7 @@ public class InviteMembers extends Gui {
                     u.player.getUniqueId() + "','" + uuid + "');");
 
             String name = globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "'");
-            Network.getInstance().getOnlineUser(uuid).ifPresentOrElse(onlineUser -> {
+            Network.getInstance().getOnlineUserByUuid(uuid).ifPresentOrElse(onlineUser -> {
                         EventManager.createEvent(uuid, "network", onlineUser.getServer(),
                                 "invite region " + region.regionName());
                         u.player.sendMessage(ChatUtils.success("Invited %s to region %s", name, region.getTag(u.player.getUniqueId().toString())));
@@ -317,7 +317,7 @@ public class InviteMembers extends Gui {
                     u.player.getUniqueId() + "','" + uuid + "');");
 
             String name = globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "'");
-            Network.getInstance().getOnlineUser(uuid).ifPresentOrElse(onlineUser -> {
+            Network.getInstance().getOnlineUserByUuid(uuid).ifPresentOrElse(onlineUser -> {
                         EventManager.createEvent(uuid, "network", onlineUser.getServer(),
                                 "invite plot " + plotID);
                         u.player.sendMessage(ChatUtils.success("Invited %s to your Plot.", name));
@@ -335,7 +335,7 @@ public class InviteMembers extends Gui {
                     u.player.getUniqueId() + "','" + uuid + "');");
 
             String name = globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "'");
-            Network.getInstance().getOnlineUser(uuid).ifPresentOrElse(onlineUser -> {
+            Network.getInstance().getOnlineUserByUuid(uuid).ifPresentOrElse(onlineUser -> {
                         EventManager.createEvent(uuid, "network", onlineUser.getServer(),
                                 "invite zone " + zoneID);
                         u.player.sendMessage(ChatUtils.success("Invited %s to zone your Zone.", name));

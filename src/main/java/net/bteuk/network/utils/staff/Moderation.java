@@ -69,7 +69,7 @@ public class Moderation {
     public static void kick(String uuid, String reason) {
 
         //Kick them with the reason, if online.
-        Network.getInstance().getOnlineUser(uuid).ifPresent(onlineUser -> EventManager.createEvent(uuid, "network",
+        Network.getInstance().getOnlineUserByUuid(uuid).ifPresent(onlineUser -> EventManager.createEvent(uuid, "network",
                 onlineUser.getServer(),
                 "kick", reason));
     }

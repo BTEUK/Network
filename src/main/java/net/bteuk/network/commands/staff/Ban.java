@@ -58,12 +58,12 @@ public class Ban implements CommandExecutor {
         //Check player.
         //If uuid exists for name.
         if (!Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM player_data WHERE name='" + args[0] + "';")) {
-            sender.sendMessage(Component.text(args[0], NamedTextColor.DARK_RED)
-                    .append(ChatUtils.error(" is not a valid player.")));
+            sender.sendMessage(ChatUtils.error("%s is not a valid player."));
             return true;
         }
 
         String uuid = Network.getInstance().getGlobalSQL().getString("SELECT uuid FROM player_data WHERE name='" + args[0] + "';");
+        String name = Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE name='" + args[0] + "';");
 
         //Get the duration of the ban.
         long time;
@@ -82,7 +82,7 @@ public class Ban implements CommandExecutor {
         //Combine all remaining args to create a reason.
         String reason = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
 
-        sender.sendMessage(banPlayer(args[0], uuid, end_time, reason));
+        sender.sendMessage(banPlayer(name, uuid, end_time, reason));
         return true;
 
     }

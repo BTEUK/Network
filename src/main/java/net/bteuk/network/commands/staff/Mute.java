@@ -64,6 +64,7 @@ public class Mute implements CommandExecutor {
         }
 
         String uuid = Network.getInstance().getGlobalSQL().getString("SELECT uuid FROM player_data WHERE name='" + args[0] + "';");
+        String name = Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE name='" + args[0] + "';");
 
         //Get the duration of the ban.
         long time;
@@ -82,7 +83,7 @@ public class Mute implements CommandExecutor {
         //Combine all remaining args to create a reason.
         String reason = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
 
-        sender.sendMessage(mutePlayer(args[0], uuid, end_time, reason));
+        sender.sendMessage(mutePlayer(name, uuid, end_time, reason));
         return true;
 
     }

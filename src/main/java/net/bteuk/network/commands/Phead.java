@@ -69,9 +69,10 @@ public class Phead implements CommandExecutor {
 
             //Get uuid.
             String uuid = Network.getInstance().getGlobalSQL().getString("SELECT uuid FROM player_data WHERE name='" + args[0] + "';");
+            String name = Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE name='" + args[0] + "';");
 
             //Give item to player.
-            Utils.giveItem(p, Utils.createPlayerSkull(uuid, 1, Component.text(args[0] + "'s head", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)), args[0] + "'s head");
+            Utils.giveItem(p, Utils.createPlayerSkull(uuid, 1, Component.text(name + "'s head", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)), name + "'s head");
 
         } else {
 

@@ -60,10 +60,11 @@ public class Kick implements CommandExecutor {
         }
 
         String uuid = Network.getInstance().getGlobalSQL().getString("SELECT uuid FROM player_data WHERE name='" + args[0] + "';");
+        String name = Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE name='" + args[0] + "';");
 
         //Check if player is online.
         if (!Network.getInstance().isOnlineOnNetwork(uuid)) {
-            sender.sendMessage(Component.text(args[0], NamedTextColor.DARK_RED)
+            sender.sendMessage(Component.text(name, NamedTextColor.DARK_RED)
                     .append(ChatUtils.error(" is not online.")));
             return true;
         }
@@ -71,7 +72,7 @@ public class Kick implements CommandExecutor {
         //Combine all remaining args to create a reason.
         String reason = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
 
-        sender.sendMessage(kickPlayer(args[0], uuid, reason));
+        sender.sendMessage(kickPlayer(name, uuid, reason));
 
         return true;
     }

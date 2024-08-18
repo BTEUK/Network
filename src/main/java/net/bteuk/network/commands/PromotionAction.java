@@ -36,13 +36,15 @@ public abstract class PromotionAction extends AbstractCommand {
         }
 
         // Search for the uuid of the player.
+        // Also retrieve the name, as it is possible the cases aren't correct.
         String uuid = instance.getGlobalSQL().getString("SELECT uuid FROM player_data WHERE name='" + args[0] + "';");
+        String name = instance.getGlobalSQL().getString("SELECT name FROM player_data WHERE name='" + args[0] + "';");
         if (uuid == null) {
             sender.sendMessage(error);
             return;
         }
 
-        CompletableFuture<Component> resultFuture = Roles.alterRole(uuid, args[0], args[1], demote, false);
+        CompletableFuture<Component> resultFuture = Roles.alterRole(uuid, name, args[1], demote, false);
         resultFuture.thenAcceptAsync(sender::sendMessage);
     }
 }

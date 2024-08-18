@@ -59,8 +59,9 @@ public class Unmute implements CommandExecutor {
         }
 
         String uuid = Network.getInstance().getGlobalSQL().getString("SELECT uuid FROM player_data WHERE name='" + args[0] + "';");
+        String name = Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE name='" + args[0] + "';");
 
-        sender.sendMessage(unmutePlayer(args[0], uuid));
+        sender.sendMessage(unmutePlayer(name, uuid));
 
         return true;
     }

@@ -48,7 +48,9 @@ public class Msg extends AbstractCommand {
         }
 
         // Search for the uuid of the player.
+        // Also retrieve the name, as it is possible the cases aren't correct.
         String uuid = instance.getGlobalSQL().getString("SELECT uuid FROM player_data WHERE name='" + args[0] + "';");
+        String name = instance.getGlobalSQL().getString("SELECT name FROM player_data WHERE name='" + args[0] + "';");
         if (uuid == null) {
             p.sendMessage(ERROR);
             return true;
@@ -66,7 +68,7 @@ public class Msg extends AbstractCommand {
 
         // Send direct message, the message is created using all other command arguments.
         String message = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
-        DirectMessage directMessage = getDirectMessage(message, p.getName(), p.getUniqueId().toString(), args[0], uuid);
+        DirectMessage directMessage = getDirectMessage(message, p.getName(), p.getUniqueId().toString(), name, uuid);
         // Also send the message to the sender.
         p.sendMessage(directMessage.getComponent());
         instance.getChat().sendSocketMesage(directMessage);
