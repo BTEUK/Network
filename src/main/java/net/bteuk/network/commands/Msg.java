@@ -4,6 +4,7 @@ import net.bteuk.network.Network;
 import net.bteuk.network.commands.tabcompleters.PlayerSelector;
 import net.bteuk.network.exceptions.NotMutedException;
 import net.bteuk.network.lib.dto.DirectMessage;
+import net.bteuk.network.lib.enums.ChatChannels;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.Command;
@@ -68,7 +69,7 @@ public class Msg extends AbstractCommand {
 
         // Send direct message, the message is created using all other command arguments.
         String message = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
-        DirectMessage directMessage = getDirectMessage(message, p.getName(), p.getUniqueId().toString(), name, uuid);
+        DirectMessage directMessage = getDirectMessage(message, p.getName(), p.getUniqueId().toString(), name, uuid, ChatChannels.GLOBAL);
         // Also send the message to the sender.
         p.sendMessage(directMessage.getComponent());
         instance.getChat().sendSocketMesage(directMessage);

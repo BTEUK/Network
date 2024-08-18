@@ -6,6 +6,7 @@ import net.bteuk.network.exceptions.DurationFormatException;
 import net.bteuk.network.exceptions.NotBannedException;
 import net.bteuk.network.exceptions.NotMutedException;
 import net.bteuk.network.lib.dto.DirectMessage;
+import net.bteuk.network.lib.enums.ChatChannels;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.Time;
 import net.kyori.adventure.text.Component;
@@ -47,7 +48,7 @@ public class Moderation {
         Network.getInstance().getGlobalSQL().update("INSERT INTO moderation(uuid,start_time,end_time,reason,type) VALUES('" + uuid + "'," + time + "," + end_time + ",'" + reason + "','mute');");
 
         //Notify the user.
-        DirectMessage directMessage = new DirectMessage(uuid, "server", getMutedComponent(uuid), true);
+        DirectMessage directMessage = new DirectMessage(ChatChannels.GLOBAL.getChannelName(), uuid, "server", getMutedComponent(uuid), true);
         Network.getInstance().getChat().sendSocketMesage(directMessage);
     }
 

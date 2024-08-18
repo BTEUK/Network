@@ -17,6 +17,7 @@ import net.bteuk.network.lib.dto.OnlineUsersRequest;
 import net.bteuk.network.lib.dto.UserConnectReply;
 import net.bteuk.network.lib.dto.UserRemove;
 import net.bteuk.network.lib.dto.UserUpdate;
+import net.bteuk.network.lib.enums.ChatChannels;
 import net.bteuk.network.lib.socket.OutputSocket;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
@@ -26,7 +27,6 @@ import net.bteuk.network.utils.Time;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -148,8 +148,8 @@ public class CustomChat implements Listener, PluginMessageListener {
         return chatMessage;
     }
 
-    public static DirectMessage getDirectMessage(String message, String senderName, String senderUuid, String recipientName, String recipientUuid) {
-        return new DirectMessage(recipientUuid, senderUuid, directMessageFormat(message, senderName, recipientName), false);
+    public static DirectMessage getDirectMessage(String message, String senderName, String senderUuid, String recipientName, String recipientUuid, ChatChannels channel) {
+        return new DirectMessage(channel.getChannelName(), recipientUuid, senderUuid, directMessageFormat(message, senderName, recipientName), false);
     }
 
     //Receives a message from the chat socket in json format.
@@ -160,9 +160,7 @@ public class CustomChat implements Listener, PluginMessageListener {
             ObjectMapper mapper = new ObjectMapper();
             AbstractTransferObject object = mapper.readValue(message, AbstractTransferObject.class);
 
-            if (object instanceof ChatMessage chatMessage) {
-                handleChatMessage(chatMessage);
-            } else if (object instanceof DirectMessage directMessage) {
+            if (object instanceof DirectMessage directMessage) {
                 handleDirectMessage(directMessage);
             } else if (object instanceof DiscordLinking discordLinking) {
                 handleDiscordLinking(discordLinking);
@@ -189,37 +187,30 @@ public class CustomChat implements Listener, PluginMessageListener {
         }
     }
 
-    private void handleChatMessage(ChatMessage message) {
-
-        switch (message.getChannel()) {
-
-            case "global" -> Bukkit.getServer().broadcast(message.getComponent());
-
-            case "staff" -> {
-                // Send only to staff.
-                for (Player p : instance.getServer().getOnlinePlayers()) {
-                    if (p.hasPermission("uknet.staff")) {
-                        p.sendMessage(message.getComponent());
-                    }
-                }
-            }
-
-            case "reviewer" -> {
-                // Send only to reviewers.
-                for (Player p : instance.getServer().getOnlinePlayers()) {
-                    if (p.hasPermission("group.reviewer")) {
-                        p.sendMessage(message.getComponent());
-                    }
-                }
-            }
-        }
-    }
-
     private void handleDirectMessage(DirectMessage message) {
         // Send the message if the player is on this server.
         instance.getServer().getOnlinePlayers().stream()
                 .filter(player -> player.getUniqueId().toString().equals(message.getRecipient()))
-                .forEach(player -> player.sendMessage(message.getComponent()));
+                .forEach(player -> {
+                    switch (message.getChannel()) {
+
+                        case "global" -> player.sendMessage(message.getComponent());
+
+                        case "staff" -> {
+                            if (player.hasPermission("uknet.staff")) {
+                                player.sendMessage(message.getComponent());
+                            }
+                        }
+
+                        case "reviewer" -> {
+                            // Send only to reviewers.
+                            if (player.hasPermission("group.reviewer")) {
+                                player.sendMessage(message.getComponent());
+                            }
+                        }
+                    }
+                    player.sendMessage(message.getComponent());
+                });
     }
 
     private void handleDiscordLinking(DiscordLinking discordLinking) {
@@ -270,7 +261,7 @@ public class CustomChat implements Listener, PluginMessageListener {
 
     private void handleUserUpdate(UserUpdate userUpdate) {
         // If the user is online check if anything needs updating.
-        instance.getUsers().stream().filter(user -> user.player.getUniqueId().toString().equals(userUpdate.getUuid())).findFirst().ifPresent(user ->  {
+        instance.getUsers().stream().filter(user -> user.player.getUniqueId().toString().equals(userUpdate.getUuid())).findFirst().ifPresent(user -> {
             if (userUpdate.getTabPlayer() != null && !userUpdate.getTabPlayer().getPrimaryGroup().equals(user.getPrimaryRole().getId())) {
                 // Update the primary role.
                 Role primaryRole = Roles.getRoleById(userUpdate.getTabPlayer().getPrimaryGroup());
@@ -287,7 +278,7 @@ public class CustomChat implements Listener, PluginMessageListener {
 
         ChatMessage chatMessage = new ChatMessage();
         chatMessage.setSender(p.getUniqueId().toString());
-        chatMessage.setChannel("global");
+        chatMessage.setChannel(ChatChannels.GLOBAL.getChannelName());
 
         if (afk) {
             chatMessage.setComponent(Component.text(String.format(AFK, p.getName()), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, true));

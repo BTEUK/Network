@@ -2,6 +2,7 @@ package net.bteuk.network.eventing.events;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.lib.dto.DirectMessage;
+import net.bteuk.network.lib.enums.ChatChannels;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.enums.RegionStatus;
 import net.bteuk.network.utils.regions.Region;
@@ -61,7 +62,7 @@ public class RegionEvent extends AbstractEvent {
                         region.acceptRequest(event[4]);
 
                         //Send feedback to user who accepted the request.
-                        DirectMessage directMessage = new DirectMessage(uuid, "server",
+                        DirectMessage directMessage = new DirectMessage(ChatChannels.GLOBAL.getChannelName(), uuid, "server",
                                 ChatUtils.success("Accepted region request for %s in the region %s.", Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + event[4] + "';"), event[3]),
                                 true);
                         Network.getInstance().getChat().sendSocketMesage(directMessage);
@@ -74,7 +75,7 @@ public class RegionEvent extends AbstractEvent {
                     region.denyRequest(event[4]);
 
                     //Send feedback to user who denied the request.
-                    DirectMessage directMessage = new DirectMessage(uuid, "server",
+                    DirectMessage directMessage = new DirectMessage(ChatChannels.GLOBAL.getChannelName(), uuid, "server",
                             ChatUtils.success("Denied region request for %s in the region %s.", Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + event[4] + "';"), event[3]),
                             true);
                     Network.getInstance().getChat().sendSocketMesage(directMessage);
@@ -98,7 +99,7 @@ public class RegionEvent extends AbstractEvent {
                     region.makeOwner(member);
 
                     //Send message to member that they are now the owner.
-                    DirectMessage directMessage = new DirectMessage(member, "server",
+                    DirectMessage directMessage = new DirectMessage(ChatChannels.GLOBAL.getChannelName(), member, "server",
                             ChatUtils.success("Transferred ownership of region %s to you due to the previous owner leaving the region.", region.getTag(member)),
                             true);
                     Network.getInstance().getChat().sendSocketMesage(directMessage);
@@ -125,7 +126,7 @@ public class RegionEvent extends AbstractEvent {
                 region.joinRegion(uuid, coordinateID);
 
                 //Send message to plot owner.
-                DirectMessage directMessage = new DirectMessage(region.getOwner(), "server",
+                DirectMessage directMessage = new DirectMessage(ChatChannels.GLOBAL.getChannelName(), region.getOwner(), "server",
                         ChatUtils.success("%s has joined the region %s.", Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';"), region.getTag(region.getOwner())),
                         true);
                 Network.getInstance().getChat().sendSocketMesage(directMessage);

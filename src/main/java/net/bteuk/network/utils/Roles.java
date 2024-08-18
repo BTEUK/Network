@@ -6,6 +6,7 @@ import net.bteuk.network.lib.dto.DirectMessage;
 import net.bteuk.network.lib.dto.DiscordRole;
 import net.bteuk.network.lib.dto.TabPlayer;
 import net.bteuk.network.lib.dto.UserUpdate;
+import net.bteuk.network.lib.enums.ChatChannels;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
@@ -192,7 +193,7 @@ public final class Roles {
         if (!Network.getInstance().isOnlineOnNetwork(uuid)) {
 
             //Send a message that will show when they next log in.
-            DirectMessage directMessage = new DirectMessage(uuid, "server",
+            DirectMessage directMessage = new DirectMessage(ChatChannels.GLOBAL.getChannelName(), uuid, "server",
                     PROMOTION_SELF.append(colouredRole),
                     true);
             Network.getInstance().getChat().sendSocketMesage(directMessage);
@@ -279,6 +280,6 @@ public final class Roles {
         Component message = PROMOTION_SELF
                 .append(role.getColouredRoleName())
                 .decorate(TextDecoration.BOLD);
-        Network.getInstance().getChat().sendSocketMesage(new DirectMessage(uuid, "server", message, true));
+        Network.getInstance().getChat().sendSocketMesage(new DirectMessage(ChatChannels.GLOBAL.getChannelName(), uuid, "server", message, true));
     }
 }

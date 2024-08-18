@@ -64,7 +64,7 @@ public class Staff implements CommandExecutor {
         if (args.length > 0 && STAFF_CHAT) {
             if (args[0].equalsIgnoreCase("chat")) {
                 String channel = GLOBAL.getChannelName();
-                if (u.getChatChannel().equals("staff")) {
+                if (u.getChatChannel().equals(STAFF.getChannelName())) {
                     u.player.sendMessage(ChatUtils.success("Disabled staff chat."));
                 } else {
                     // Set the chat channel to staff.

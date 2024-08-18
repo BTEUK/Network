@@ -4,6 +4,7 @@ import net.bteuk.network.Network;
 import net.bteuk.network.eventing.events.EventManager;
 import net.bteuk.network.lib.dto.ChatMessage;
 import net.bteuk.network.lib.dto.DirectMessage;
+import net.bteuk.network.lib.enums.ChatChannels;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.Time;
@@ -103,7 +104,7 @@ public record Region(String regionName, int x, int z) {
 
             //Send message to user.
             //Is sent before actual removal so we can read the region tag.
-            DirectMessage directMessage = new DirectMessage(uuid, "server",
+            DirectMessage directMessage = new DirectMessage(ChatChannels.GLOBAL.getChannelName(), uuid, "server",
                     ChatUtils.success("You have been kicked from region %s, it has been moved to the plot system.", getTag(uuid)),
                     true);
             Network.getInstance().getChat().sendSocketMesage(directMessage);
@@ -337,7 +338,7 @@ public record Region(String regionName, int x, int z) {
         Network.getInstance().regionSQL.update("DELETE FROM region_requests WHERE region='" + regionName + "' AND uuid='" + uuid + "';");
 
         //Send message to user.
-        DirectMessage directMessage = new DirectMessage(uuid, "server",
+        DirectMessage directMessage = new DirectMessage(ChatChannels.GLOBAL.getChannelName(), uuid, "server",
                 ChatUtils.success("Your request to join region %s has been denied.", regionName),
                 true);
         Network.getInstance().getChat().sendSocketMesage(directMessage);
@@ -380,7 +381,7 @@ public record Region(String regionName, int x, int z) {
                     .append(Component.text(regionName, NamedTextColor.DARK_AQUA))
                     .append(ChatUtils.success(", awaiting staff review.")));
 
-            ChatMessage chatMessage = new ChatMessage("reviewer", "server",
+            ChatMessage chatMessage = new ChatMessage(ChatChannels.REVIEWER.getChannelName(), "server",
                     ChatUtils.success("A region join request has been submitted by %s for region %s", u.player.getName(), regionName));
             Network.getInstance().getChat().sendSocketMesage(chatMessage);
 
@@ -397,7 +398,7 @@ public record Region(String regionName, int x, int z) {
                     .append(ChatUtils.success(", awaiting owner review.")));
 
             //Send the owner a message.
-            DirectMessage directMessage = new DirectMessage(getOwner(), "server",
+            DirectMessage directMessage = new DirectMessage(ChatChannels.GLOBAL.getChannelName(), getOwner(), "server",
                     ChatUtils.success("%s has requested to join region %s.", u.player.getName(), getTag(getOwner())),
                     false);
             Network.getInstance().getChat().sendSocketMesage(directMessage);
@@ -445,7 +446,7 @@ public record Region(String regionName, int x, int z) {
                 Network.getInstance().regionSQL.update("INSERT INTO region_logs(region,uuid,start_time) VALUES('" + regionName + "','" +
                         owner + "'," + Time.currentTime() + ");");
 
-                DirectMessage directMessage = new DirectMessage(owner, "server",
+                DirectMessage directMessage = new DirectMessage(ChatChannels.GLOBAL.getChannelName(), owner, "server",
                         ChatUtils.success("You have been demoted to a member in region %s due to inactivity.", getTag(owner)),
                         true);
                 Network.getInstance().getChat().sendSocketMesage(directMessage);
@@ -494,7 +495,7 @@ public record Region(String regionName, int x, int z) {
             WorldGuard.addMember(regionName, uuid, Bukkit.getWorld(Objects.requireNonNull(EARTH_WORLD)));
 
             //Send message to user.
-            DirectMessage directMessage = new DirectMessage(uuid, "server",
+            DirectMessage directMessage = new DirectMessage(ChatChannels.GLOBAL.getChannelName(), uuid, "server",
                     ChatUtils.success("You have joined the region %s as a member.", regionName),
                     true);
             Network.getInstance().getChat().sendSocketMesage(directMessage);
@@ -516,7 +517,7 @@ public record Region(String regionName, int x, int z) {
                 Network.getInstance().regionSQL.update("INSERT INTO region_logs(region,uuid,start_time) VALUES('" + regionName + "','" +
                         owner + "'," + Time.currentTime() + ");");
 
-                DirectMessage directMessage = new DirectMessage(owner, "server",
+                DirectMessage directMessage = new DirectMessage(ChatChannels.GLOBAL.getChannelName(), owner, "server",
                         ChatUtils.success("You have been demoted to a member in region %s due to inactivity.", getTag(owner)),
                         true);
                 Network.getInstance().getChat().sendSocketMesage(directMessage);
@@ -534,7 +535,7 @@ public record Region(String regionName, int x, int z) {
             //Join region in WorldGuard.
             WorldGuard.addMember(regionName, uuid, Bukkit.getWorld(Objects.requireNonNull(EARTH_WORLD)));
 
-            DirectMessage directMessage = new DirectMessage(uuid, "server",
+            DirectMessage directMessage = new DirectMessage(ChatChannels.GLOBAL.getChannelName(), uuid, "server",
                     ChatUtils.success("You have joined the region %s as the owner.", regionName),
                     true);
             Network.getInstance().getChat().sendSocketMesage(directMessage);
@@ -551,7 +552,7 @@ public record Region(String regionName, int x, int z) {
 
             //Send message to user.
             //Is sent before actual removal so we can read the region tag.
-            DirectMessage directMessage = new DirectMessage(uuid, "server", message, true);
+            DirectMessage directMessage = new DirectMessage(ChatChannels.GLOBAL.getChannelName(), uuid, "server", message, true);
             Network.getInstance().getChat().sendSocketMesage(directMessage);
 
             //Leave region in database.

@@ -9,6 +9,7 @@ import net.bteuk.network.gui.Gui;
 import net.bteuk.network.lib.dto.DirectMessage;
 import net.bteuk.network.lib.dto.UserConnectReply;
 import net.bteuk.network.lib.dto.UserDisconnect;
+import net.bteuk.network.lib.enums.ChatChannels;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.regions.Region;
 import net.kyori.adventure.text.Component;
@@ -298,7 +299,7 @@ public class NetworkUser {
      * @param message the message to send
      */
     public static void sendOfflineMessage(String uuid, Component message) {
-        DirectMessage directMessage = new DirectMessage(uuid, "server", message, true);
+        DirectMessage directMessage = new DirectMessage(ChatChannels.GLOBAL.getChannelName(), uuid, "server", message, true);
         Network.getInstance().getChat().sendSocketMesage(directMessage);
     }
 

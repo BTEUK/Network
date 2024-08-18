@@ -2,6 +2,7 @@ package net.bteuk.network.utils.progression;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.lib.dto.ChatMessage;
+import net.bteuk.network.lib.enums.ChatChannels;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
 import net.kyori.adventure.text.Component;
@@ -93,7 +94,7 @@ public class Progression {
         if (announce_levelup) {
 
             // Announce level-up.
-            ChatMessage chatMessage = new ChatMessage("global", "server", globalMessage);
+            ChatMessage chatMessage = new ChatMessage(ChatChannels.GLOBAL.getChannelName(), "server", globalMessage);
             Network.getInstance().getChat().sendSocketMesage(chatMessage);
 
         }
