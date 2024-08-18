@@ -19,7 +19,9 @@ public class Promote extends PromotionAction {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        onCommand(sender, args, false);
+        if (hasPermission(sender, "uknet.staff.promote")) {
+            onCommand(sender, args, false);
+        }
         return true;
     }
 }

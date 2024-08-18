@@ -19,7 +19,9 @@ public class Demote extends PromotionAction {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        onCommand(sender, args, true);
+        if (hasPermission(sender, "uknet.staff.demote")) {
+            onCommand(sender, args, true);
+        }
         return true;
     }
 }
