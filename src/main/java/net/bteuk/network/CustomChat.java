@@ -209,7 +209,6 @@ public class CustomChat implements Listener, PluginMessageListener {
                             }
                         }
                     }
-                    player.sendMessage(message.getComponent());
                 });
     }
 
@@ -302,7 +301,7 @@ public class CustomChat implements Listener, PluginMessageListener {
                 .append(Component.space())
                 .append(ChatUtils.line(user.player.getName())) // Player name in white without formatting.
                 .append(Component.space())
-                .append(ChatUtils.line(">").decorate(TextDecoration.BOLD)) // Arrow between the player and message in bold.
+                .append(Component.text(">", NamedTextColor.GRAY).decorate(TextDecoration.BOLD)) // Arrow between the player and message in bold.
                 .append(Component.space())
                 .append(message.color(NamedTextColor.WHITE)); // The message in white without formatting.
     }
@@ -316,7 +315,7 @@ public class CustomChat implements Listener, PluginMessageListener {
                 .append(ChatUtils.line(recipient))
                 .append(ChatUtils.line("]").decorate(TextDecoration.BOLD))
                 .append(Component.space())
-                .append(ChatUtils.line(">").decorate(TextDecoration.BOLD)) // Arrow between the player and message in bold.
+                .append(Component.text(">", NamedTextColor.GRAY).decorate(TextDecoration.BOLD)) // Arrow between the player and message in bold.
                 .append(Component.space())
                 .append(ChatUtils.line(message)); // The message in white without formatting.
     }

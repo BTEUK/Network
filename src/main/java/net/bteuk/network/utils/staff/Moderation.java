@@ -6,7 +6,9 @@ import net.bteuk.network.exceptions.DurationFormatException;
 import net.bteuk.network.exceptions.NotBannedException;
 import net.bteuk.network.exceptions.NotMutedException;
 import net.bteuk.network.lib.dto.DirectMessage;
+import net.bteuk.network.lib.dto.ModerationEvent;
 import net.bteuk.network.lib.enums.ChatChannels;
+import net.bteuk.network.lib.enums.ModerationAction;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.Time;
 import net.kyori.adventure.text.Component;
@@ -47,8 +49,13 @@ public class Moderation {
         }
         Network.getInstance().getGlobalSQL().update("INSERT INTO moderation(uuid,start_time,end_time,reason,type) VALUES('" + uuid + "'," + time + "," + end_time + ",'" + reason + "','mute');");
 
+        // Update Tab by sending a moderation event.
+        Component mutedComponent = getMutedComponent(uuid);
+        ModerationEvent moderationEvent = new ModerationEvent(ModerationAction.MUTE, null, uuid, end_time, mutedComponent);
+        Network.getInstance().getChat().sendSocketMesage(moderationEvent);
+
         //Notify the user.
-        DirectMessage directMessage = new DirectMessage(ChatChannels.GLOBAL.getChannelName(), uuid, "server", getMutedComponent(uuid), true);
+        DirectMessage directMessage = new DirectMessage(ChatChannels.GLOBAL.getChannelName(), uuid, "server", mutedComponent, true);
         Network.getInstance().getChat().sendSocketMesage(directMessage);
     }
 
@@ -64,6 +71,10 @@ public class Moderation {
         //Get time.
         long time = Time.currentTime();
         Network.getInstance().getGlobalSQL().update("UPDATE moderation SET end_time=" + time + " WHERE uuid='" + uuid + "' AND end_time>" + time + " AND type='mute';");
+
+        // Update Tab by sending a moderation event.
+        ModerationEvent moderationEvent = new ModerationEvent(ModerationAction.UNMUTE, null, uuid, 0L, null);
+        Network.getInstance().getChat().sendSocketMesage(moderationEvent);
     }
 
     //Kick the player.
