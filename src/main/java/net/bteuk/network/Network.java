@@ -6,6 +6,7 @@ import net.bteuk.network.commands.BuildingCompanionCommand;
 import net.bteuk.network.commands.Clear;
 import net.bteuk.network.commands.Demote;
 import net.bteuk.network.commands.Discord;
+import net.bteuk.network.commands.Focus;
 import net.bteuk.network.commands.Gamemode;
 import net.bteuk.network.commands.Hdb;
 import net.bteuk.network.commands.Help;
@@ -496,6 +497,8 @@ public final class Network extends JavaPlugin {
 
         new Promote(this);
         new Demote(this);
+
+        new Focus(this);
 
         // Unregister sidebar.
         ScoreboardManager manager = Bukkit.getScoreboardManager();

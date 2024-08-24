@@ -172,3 +172,7 @@ commands:
   demote:
     usage: /<command>
     description: Remove a role from a player.
+  focus:
+    aliases: [focusmode, fm]
+    usage: /<command>
+    description: Toggle focus mode, hides chat and players.

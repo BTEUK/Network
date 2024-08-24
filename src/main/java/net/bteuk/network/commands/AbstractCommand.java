@@ -18,7 +18,7 @@ import static net.bteuk.network.utils.Constants.LOGGER;
 public abstract class AbstractCommand implements CommandExecutor {
 
     protected static final Component COMMAND_ONLY_BY_PLAYER = ChatUtils.error("This command can only be run by a player.");
-    protected  static final Component NO_PERMISSION = ChatUtils.error("You do not have permission to use this command.");
+    protected static final Component NO_PERMISSION = ChatUtils.error("You do not have permission to use this command.");
 
     protected PluginCommand command;
 

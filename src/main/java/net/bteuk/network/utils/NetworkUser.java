@@ -10,6 +10,7 @@ import net.bteuk.network.lib.dto.DirectMessage;
 import net.bteuk.network.lib.dto.UserConnectReply;
 import net.bteuk.network.lib.dto.UserDisconnect;
 import net.bteuk.network.lib.enums.ChatChannels;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.regions.Region;
 import net.kyori.adventure.text.Component;
@@ -111,6 +112,9 @@ public class NetworkUser {
     @Setter
     private Role primaryRole;
 
+    @Getter
+    private boolean focusEnabled;
+
     public NetworkUser(Player player, UserConnectReply reply) {
 
         this.instance = Network.getInstance();
@@ -122,6 +126,7 @@ public class NetworkUser {
         nightvisionEnabled = reply.isNightvisionEnabled();
         chatChannel = reply.getChatChannel();
         tipsEnabled = reply.isTipsEnabled();
+        setFocusEnabled(reply.isFocusEnabled());
 
         switching = false;
         inPortal = false;
@@ -182,6 +187,11 @@ public class NetworkUser {
 
             Nightvision.removeNightvision(player);
 
+        }
+
+        // If focus mode is enabled hide other players.
+        if (focusEnabled) {
+            hidePlayers();
         }
     }
 
@@ -317,5 +327,43 @@ public class NetworkUser {
                 player.getLocation().getYaw(),
                 player.getLocation().getPitch()
         );
+    }
+
+    public void toggleFocus() {
+        setFocusEnabled(!isFocusEnabled());
+        if (isFocusEnabled()) {
+            player.sendMessage(ChatUtils.success("Enabled focus mode"));
+        } else {
+            player.sendMessage(ChatUtils.success("Disabled focus mode"));
+        }
+    }
+
+    private void setFocusEnabled(boolean enabled) {
+        focusEnabled = enabled;
+        if (focusEnabled) {
+            hidePlayers();
+        } else {
+            showPlayers();
+        }
+    }
+
+    public void hidePlayer(Player playerToHide) {
+        player.hidePlayer(instance, playerToHide);
+    }
+
+    private void hidePlayers() {
+        instance.getServer().getOnlinePlayers().forEach(serverPlayer -> {
+            if (player != serverPlayer) {
+                player.hidePlayer(instance, serverPlayer);
+            }
+        });
+    }
+
+    private void showPlayers() {
+        instance.getServer().getOnlinePlayers().forEach(serverPlayer -> {
+            if (player != serverPlayer) {
+                player.showPlayer(instance, serverPlayer);
+            }
+        });
     }
 }

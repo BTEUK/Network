@@ -149,6 +149,13 @@ public class Connect implements Listener {
         NetworkUser user = new NetworkUser(player, reply);
         Network.getInstance().addUser(user);
 
+        // Hide this player for all players in focus mode.
+        Network.getInstance().getUsers().forEach(serverUser -> {
+            if (serverUser.isFocusEnabled()) {
+                serverUser.hidePlayer(player);
+            }
+        });
+
         // Send offline messages to the player.
         reply.getMessages().forEach(player::sendMessage);
 
