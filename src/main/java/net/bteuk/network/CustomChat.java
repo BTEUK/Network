@@ -38,7 +38,6 @@ import java.io.IOException;
 
 import static net.bteuk.network.commands.AFK.updateAfkStatus;
 import static net.bteuk.network.lib.enums.ChatChannels.STAFF;
-import static net.bteuk.network.utils.Constants.GLOBAL_CHAT;
 import static net.bteuk.network.utils.Constants.LOGGER;
 import static net.bteuk.network.utils.NetworkConfig.CONFIG;
 import static net.bteuk.network.utils.staff.Moderation.getMutedComponent;
@@ -59,29 +58,23 @@ public class CustomChat implements Listener, PluginMessageListener {
 
         instance.getServer().getPluginManager().registerEvents(this, instance);
 
-        //If global chat is enabled, register the listeners.
-        if (GLOBAL_CHAT) {
+        // Set up the output socket.
+        outputSocket = new OutputSocket(
+                CONFIG.getString("chat.socket.IP"),
+                CONFIG.getInt("chat.socket.port")
+        );
 
-            // Setup the output socket.
-            outputSocket = new OutputSocket(
-                    CONFIG.getString("chat.global_chat.socket.IP"),
-                    CONFIG.getInt("chat.global_chat.socket.port")
-            );
+        // Register channel for messages received from the proxy.
+        instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:network", this);
 
-            // Register channel for messages received from the proxy.
-            instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:network", this);
+        // Request all online users in the Network.
+        sendSocketMesage(new OnlineUsersRequest());
 
-            // Request all online users in the Network.
-            sendSocketMesage(new OnlineUsersRequest());
-
-            LOGGER.info("Successfully enabled Global Chat!");
-        }
+        LOGGER.info("Successfully enabled Chat!");
     }
 
     public void onDisable() {
-        if (GLOBAL_CHAT) {
-            instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:network");
-        }
+        instance.getServer().getMessenger().unregisterIncomingPluginChannel(instance, "uknet:network");
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

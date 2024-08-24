@@ -104,7 +104,6 @@ import static net.bteuk.network.utils.Constants.SERVER_TYPE;
 import static net.bteuk.network.utils.Constants.SIDEBAR_CONTENT;
 import static net.bteuk.network.utils.Constants.SIDEBAR_ENABLED;
 import static net.bteuk.network.utils.Constants.SIDEBAR_TITLE;
-import static net.bteuk.network.utils.Constants.TAB;
 import static net.bteuk.network.utils.Constants.TIPS;
 import static net.bteuk.network.utils.Constants.TPLL_ENABLED;
 import static net.bteuk.network.utils.Constants.TUTORIALS;
@@ -256,8 +255,7 @@ public final class Network extends JavaPlugin {
         }
 
         //Setup tutorials DB connection and connect
-        if (TUTORIALS)
-        {
+        if (TUTORIALS) {
             //Initialise the DBConnection object
             tutorialsDBConnection = new DBConnection();
 
@@ -471,9 +469,7 @@ public final class Network extends JavaPlugin {
         getCommand("region").setExecutor(new RegionCommand());
 
         //Enable tab.
-        if (TAB) {
-            tab = new TabManager(this);
-        }
+        tab = new TabManager(this);
 
         //Enable tips.
         if (TIPS) {
@@ -513,7 +509,7 @@ public final class Network extends JavaPlugin {
             objective = scoreboard.registerNewObjective("sidebar", Criteria.DUMMY, Component.text(SIDEBAR_TITLE));
             objective.setDisplaySlot(DisplaySlot.SIDEBAR);
             int score = SIDEBAR_CONTENT.size();
-            for (String sidebarText: SIDEBAR_CONTENT) {
+            for (String sidebarText : SIDEBAR_CONTENT) {
                 score--;
                 objective.getScore(sidebarText).setScore(score);
             }

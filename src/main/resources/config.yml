@@ -75,17 +75,10 @@ homes:
 
 #Chat Settings
 chat:
-  #Global allows for cross-server implementation of chat.
-  #Requires the proxy-plugin which is built for Velocity.
-  global_chat:
-    enabled: true
-    socket:
-      IP: localhost
-      port: 30589
+  socket:
+    IP: localhost
+    port: 30589
 
-    #Custom tab menu
-    tab:
-      enabled: true
   #Whether to announce role promotions in chat.
   announce_promotions: true
 
