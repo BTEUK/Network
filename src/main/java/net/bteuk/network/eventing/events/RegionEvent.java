@@ -6,7 +6,7 @@ import net.bteuk.network.lib.enums.ChatChannels;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.enums.RegionStatus;
 import net.bteuk.network.utils.regions.Region;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Location;
 
 public class RegionEvent extends AbstractEvent {
@@ -88,7 +88,7 @@ public class RegionEvent extends AbstractEvent {
                 region = Network.getInstance().getRegionManager().getRegion(event[2]);
 
                 //Leave region.
-                region.leaveRegion(uuid, PlainTextComponentSerializer.plainText().deserialize(eMessage));
+                region.leaveRegion(uuid, LegacyComponentSerializer.legacyAmpersand().deserialize(eMessage));
 
                 //If the region has members after you've left but no owner.
                 //Find the most recent member and make them owner.

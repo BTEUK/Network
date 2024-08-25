@@ -189,8 +189,7 @@ public class RegionMembers extends Gui {
                             region.leaveRegion(uuid, ChatUtils.error("You have been kicked from region %s", region.getTag(uuid)));
 
                             //Send message to user.
-                            u.player.sendMessage(ChatUtils.success("Kicked &3" +
-                                    globalSQL.getString("SELECT name FROM player_data WHERE uuid ='" + uuid + "';") + " &afrom the region"));
+                            u.player.sendMessage(ChatUtils.success("Kicked %s from the region", globalSQL.getString("SELECT name FROM player_data WHERE uuid ='" + uuid + "';")));
 
                             //Refresh the gui.
                             //Delay this action so the user can be kicked, even if on another server.

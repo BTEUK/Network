@@ -7,6 +7,7 @@ import net.bteuk.network.building_companion.BuildingCompanion;
 import net.bteuk.network.commands.Nightvision;
 import net.bteuk.network.gui.Gui;
 import net.bteuk.network.lib.dto.DirectMessage;
+import net.bteuk.network.lib.dto.FocusEvent;
 import net.bteuk.network.lib.dto.UserConnectReply;
 import net.bteuk.network.lib.dto.UserDisconnect;
 import net.bteuk.network.lib.enums.ChatChannels;
@@ -345,6 +346,8 @@ public class NetworkUser {
         } else {
             showPlayers();
         }
+        FocusEvent focusEvent = new FocusEvent(player.getUniqueId().toString(), focusEnabled);
+        instance.getChat().sendSocketMesage(focusEvent);
     }
 
     public void hidePlayer(Player playerToHide) {

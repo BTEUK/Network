@@ -105,7 +105,7 @@ public record Region(String regionName, int x, int z) {
             //Send message to user.
             //Is sent before actual removal so we can read the region tag.
             DirectMessage directMessage = new DirectMessage(ChatChannels.GLOBAL.getChannelName(), uuid, "server",
-                    ChatUtils.success("You have been kicked from region %s, it has been moved to the plot system.", getTag(uuid)),
+                    ChatUtils.error("You have been kicked from region %s, it has been moved to the plot system.", getTag(uuid)),
                     true);
             Network.getInstance().getChat().sendSocketMesage(directMessage);
 

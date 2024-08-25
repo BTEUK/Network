@@ -16,11 +16,11 @@ commands:
     usage: /<command>
     description: Teleport to coordinates.
   ll:
-    aliases: [ location ]
+    aliases: [ location, where ]
     usage: /<command>
     description: Returns the coordinates where the player is standing with a link to google maps.
   navigator:
-    aliases: [ nav,gui,menu,claim ]
+    aliases: [ nav, gui, menu, claim ]
     usage: /<command>
     description: Opens the main gui, will always return to the previous menu if possible.
   staff:
