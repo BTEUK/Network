@@ -117,7 +117,7 @@ public class Map extends AbstractReloadableComponent {
         }
 
         // Enable the map command.
-        new MapCommand(instance, this, "map");
+        new MapCommand(instance, this, server);
 
         setEnabled(true);
     }

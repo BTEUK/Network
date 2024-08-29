@@ -563,7 +563,9 @@ public final class Network extends JavaPlugin {
         }
 
         //Disconnect from tutorials
-        tutorialsDBConnection.disconnect();
+        if (TUTORIALS) {
+            tutorialsDBConnection.disconnect();
+        }
 
         //Disable bungeecord channel.
         instance.getServer().getMessenger().unregisterOutgoingPluginChannel(instance);
