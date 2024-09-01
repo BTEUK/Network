@@ -13,6 +13,7 @@ import net.bteuk.network.lib.dto.AddTeamEvent;
 import net.bteuk.network.lib.dto.TabPlayer;
 import net.bteuk.network.utils.Role;
 import net.bteuk.network.utils.Roles;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
@@ -129,7 +130,7 @@ public class TabManager {
         }
 
         // Set the team prefix.
-        team.prefix(role.getColouredPrefix());
+        team.prefix(role.getColouredPrefix().append(Component.space()));
         return team;
     }
 

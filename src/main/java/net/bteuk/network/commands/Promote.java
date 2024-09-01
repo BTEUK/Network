@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
  * Command to add a role to a player.
  */
 public class Promote extends PromotionAction {
-    private static Component ERROR = ChatUtils.error("/promote [player] [role]");
+    private static final Component ERROR = ChatUtils.error("/promote [player] [role]");
 
     public Promote(Network instance) {
         super(instance, "promote", ERROR);
