@@ -4,6 +4,7 @@ import net.bteuk.network.Network;
 import net.bteuk.network.eventing.events.EventManager;
 import net.bteuk.network.gui.BuildGui;
 import net.bteuk.network.gui.Gui;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.Roles;
@@ -248,8 +249,8 @@ public class PlotServerLocations extends Gui {
                         //If no plots fit the specified parameters the id will be 0.
                         if (id == 0) {
 
-                            u.player.sendMessage(Utils.error("No plots are available with the specified settings,"));
-                            u.player.sendMessage(Utils.error("try another location or change the settings."));
+                            u.player.sendMessage(ChatUtils.error("No plots are available with the specified settings,"));
+                            u.player.sendMessage(ChatUtils.error("try another location or change the settings."));
 
                         } else {
 

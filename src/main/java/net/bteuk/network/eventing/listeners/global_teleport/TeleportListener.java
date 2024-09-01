@@ -1,9 +1,9 @@
 package net.bteuk.network.eventing.listeners.global_teleport;
 
 import net.bteuk.network.Network;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.NetworkUser;
-import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.enums.RegionStatus;
 import net.bteuk.network.utils.enums.ServerType;
 import net.bteuk.network.utils.regions.Region;
@@ -17,7 +17,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
-import static net.bteuk.network.utils.Constants.*;
+import static net.bteuk.network.utils.Constants.EARTH_WORLD;
+import static net.bteuk.network.utils.Constants.LOGGER;
+import static net.bteuk.network.utils.Constants.REGIONS_ENABLED;
+import static net.bteuk.network.utils.Constants.SERVER_TYPE;
 import static net.bteuk.network.utils.enums.ServerType.EARTH;
 
 public class TeleportListener implements Listener {
@@ -51,7 +54,7 @@ public class TeleportListener implements Listener {
         if (blocked || e.getCause() == PlayerTeleportEvent.TeleportCause.SPECTATE) {
             e.setCancelled(true);
             if (e.getCause() == PlayerTeleportEvent.TeleportCause.SPECTATE) {
-                e.getPlayer().sendMessage(Utils.error("Teleporting via the spectator menu is disabled, please use /tp <player>"));
+                e.getPlayer().sendMessage(ChatUtils.error("Teleporting via the spectator menu is disabled, please use /tp <player>"));
             }
             return;
         }
@@ -62,7 +65,7 @@ public class TeleportListener implements Listener {
         //If u is null, cancel.
         if (u == null) {
             LOGGER.severe("User " + p.getName() + " can not be found!");
-            p.sendMessage(Utils.error("User can not be found, please relog!"));
+            p.sendMessage(ChatUtils.error("User can not be found, please relog!"));
             e.setCancelled(true);
             return;
         }
@@ -107,28 +110,28 @@ public class TeleportListener implements Listener {
                                 if (region.isOwner(p.getUniqueId().toString())) {
 
                                     p.sendActionBar(
-                                            Utils.success("You have entered ")
+                                            ChatUtils.success("You have entered ")
                                                     .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
-                                                    .append(Utils.success(" and left "))
+                                                    .append(ChatUtils.success(" and left "))
                                                     .append(Component.text(u.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
-                                                    .append(Utils.success(", you are the owner of this region.")));
+                                                    .append(ChatUtils.success(", you are the owner of this region.")));
                                     region.setLastEnter(p.getUniqueId().toString());
 
                                     //If the region is inactive, set it to active.
                                     if (region.status() == RegionStatus.INACTIVE) {
                                         region.setDefault();
-                                        p.sendMessage(Utils.success("This region is no longer \"Inactive\", it has been set back to default settings."));
+                                        p.sendMessage(ChatUtils.success("This region is no longer \"Inactive\", it has been set back to default settings."));
                                     }
 
                                     //Check if the player is a region members.
                                 } else if (region.isMember(p.getUniqueId().toString())) {
 
                                     p.sendActionBar(
-                                            Utils.success("You have entered ")
+                                            ChatUtils.success("You have entered ")
                                                     .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
-                                                    .append(Utils.success(" and left "))
+                                                    .append(ChatUtils.success(" and left "))
                                                     .append(Component.text(u.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
-                                                    .append(Utils.success(", you are a member of this region.")));
+                                                    .append(ChatUtils.success(", you are a member of this region.")));
                                     region.setLastEnter(p.getUniqueId().toString());
 
                                     //If the region is inactive, make this member to owner.
@@ -142,8 +145,8 @@ public class TeleportListener implements Listener {
                                         //Update any requests to take into account the new region owner.
                                         region.updateRequests();
 
-                                        p.sendMessage(Utils.success("This region is no longer \"Inactive\", it has been set back to default settings."));
-                                        p.sendMessage(Utils.success("You have been made the new region owner."));
+                                        p.sendMessage(ChatUtils.success("This region is no longer \"Inactive\", it has been set back to default settings."));
+                                        p.sendMessage(ChatUtils.success("You have been made the new region owner."));
 
                                     }
 
@@ -151,19 +154,19 @@ public class TeleportListener implements Listener {
                                 } else if (region.status() == RegionStatus.OPEN && p.hasPermission("group.jrbuilder")) {
 
                                     p.sendActionBar(
-                                            Utils.success("You have entered ")
+                                            ChatUtils.success("You have entered ")
                                                     .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
-                                                    .append(Utils.success(" and left "))
+                                                    .append(ChatUtils.success(" and left "))
                                                     .append(Component.text(u.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
-                                                    .append(Utils.success(", you can build in this region.")));
+                                                    .append(ChatUtils.success(", you can build in this region.")));
 
                                 } else {
 
                                     //Send default enter message.
                                     p.sendActionBar(
-                                            Utils.success("You have entered ")
+                                            ChatUtils.success("You have entered ")
                                                     .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
-                                                    .append(Utils.success(" and left "))
+                                                    .append(ChatUtils.success(" and left "))
                                                     .append(Component.text(u.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA)));
 
                                 }
@@ -174,7 +177,7 @@ public class TeleportListener implements Listener {
                             } else {
 
                                 //You can't enter this region.
-                                p.sendMessage(Utils.error("The terrain for this region has not been generated, you must be at least Jr.Builder to load new terrain."));
+                                p.sendMessage(ChatUtils.error("The terrain for this region has not been generated, you must be at least Jr.Builder to load new terrain."));
                                 e.setCancelled(true);
                             }
 
@@ -191,24 +194,24 @@ public class TeleportListener implements Listener {
                             if (region.isOwner(p.getUniqueId().toString())) {
 
                                 p.sendActionBar(
-                                        Utils.success("You have entered ")
+                                        ChatUtils.success("You have entered ")
                                                 .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
-                                                .append(Utils.success(", you are the owner of this region.")));
+                                                .append(ChatUtils.success(", you are the owner of this region.")));
                                 region.setLastEnter(p.getUniqueId().toString());
 
                                 //If the region is inactive, set it to active.
                                 if (region.status() == RegionStatus.INACTIVE) {
                                     region.setDefault();
-                                    p.sendMessage(Utils.success("This region is no longer \"Inactive\", it has been set back to default settings."));
+                                    p.sendMessage(ChatUtils.success("This region is no longer \"Inactive\", it has been set back to default settings."));
                                 }
 
                                 //Check if the player is a region members.
                             } else if (region.isMember(p.getUniqueId().toString())) {
 
                                 p.sendActionBar(
-                                        Utils.success("You have entered ")
+                                        ChatUtils.success("You have entered ")
                                                 .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
-                                                .append(Utils.success(", you are a member of this region.")));
+                                                .append(ChatUtils.success(", you are a member of this region.")));
                                 region.setLastEnter(p.getUniqueId().toString());
 
                                 //If the region is inactive, make this member to owner.
@@ -222,8 +225,8 @@ public class TeleportListener implements Listener {
                                     //Update any requests to take into account the new region owner.
                                     region.updateRequests();
 
-                                    p.sendMessage(Utils.success("This region is no longer \"Inactive\", it has been set back to default settings."));
-                                    p.sendMessage(Utils.success("You have been made the new region owner."));
+                                    p.sendMessage(ChatUtils.success("This region is no longer \"Inactive\", it has been set back to default settings."));
+                                    p.sendMessage(ChatUtils.success("You have been made the new region owner."));
 
                                 }
 
@@ -231,15 +234,15 @@ public class TeleportListener implements Listener {
                             } else if (region.status() == RegionStatus.OPEN && p.hasPermission("group.jrbuilder")) {
 
                                 p.sendActionBar(
-                                        Utils.success("You have entered ")
+                                        ChatUtils.success("You have entered ")
                                                 .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
-                                                .append(Utils.success(", you can build in this region.")));
+                                                .append(ChatUtils.success(", you can build in this region.")));
 
                             } else {
 
                                 //Send default enter message.
                                 p.sendActionBar(
-                                        Utils.success("You have entered ")
+                                        ChatUtils.success("You have entered ")
                                                 .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA)));
 
                             }
@@ -251,7 +254,7 @@ public class TeleportListener implements Listener {
                         } else {
 
                             //You can't enter this region.
-                            p.sendMessage(Utils.error("The terrain for this region has not been generated, you must be at least Jr.Builder to load new terrain."));
+                            p.sendMessage(ChatUtils.error("The terrain for this region has not been generated, you must be at least Jr.Builder to load new terrain."));
                             e.setCancelled(true);
                         }
 
@@ -261,7 +264,7 @@ public class TeleportListener implements Listener {
 
                     //Send default leave message.
                     p.sendActionBar(
-                            Utils.success("You have left ")
+                            ChatUtils.success("You have left ")
                                     .append(Component.text(u.region.regionName(), NamedTextColor.DARK_AQUA)));
 
                     //Set inRegion to false.
@@ -292,9 +295,9 @@ public class TeleportListener implements Listener {
 
                             //Send default enter message.
                             p.sendActionBar(
-                                    Utils.success("You have entered ")
+                                    ChatUtils.success("You have entered ")
                                             .append(Component.text(region.regionName(), NamedTextColor.DARK_AQUA))
-                                            .append(Utils.success(" and left "))
+                                            .append(ChatUtils.success(" and left "))
                                             .append(Component.text(u.region.regionName(), NamedTextColor.DARK_AQUA)));
 
                             //Update the region the player is in.
@@ -305,7 +308,7 @@ public class TeleportListener implements Listener {
 
                         //Send default enter message.
                         p.sendActionBar(
-                                Utils.success("You have entered ")
+                                ChatUtils.success("You have entered ")
                                         .append(Component.text(region.regionName(), NamedTextColor.DARK_AQUA)));
 
                         //Update the region the player is in.
@@ -318,7 +321,7 @@ public class TeleportListener implements Listener {
 
                     //Send default leave message.
                     p.sendActionBar(
-                            Utils.success("You have left ")
+                            ChatUtils.success("You have left ")
                                     .append(Component.text(u.region.regionName(), NamedTextColor.DARK_AQUA)));
 
                     //Set inRegion to false.

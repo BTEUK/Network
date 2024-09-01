@@ -1,10 +1,10 @@
 package net.bteuk.network.commands;
 
 import net.bteuk.network.Network;
+import net.bteuk.network.lib.dto.UserUpdate;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
-import net.bteuk.network.utils.Statistics;
 import net.bteuk.network.utils.Time;
-import net.bteuk.network.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -21,7 +21,7 @@ public class AFK implements CommandExecutor {
         //Check if the sender is a player.
         if (!(sender instanceof Player p)) {
 
-            sender.sendMessage(Utils.error("This command can only be run by a player."));
+            sender.sendMessage(ChatUtils.error("This command can only be run by a player."));
             return true;
 
         }
@@ -32,31 +32,34 @@ public class AFK implements CommandExecutor {
         //If u is null, cancel.
         if (u == null) {
             LOGGER.severe("User " + p.getName() + " can not be found!");
-            p.sendMessage(Utils.error("User can not be found, please relog!"));
+            p.sendMessage(ChatUtils.error("User can not be found, please relog!"));
             return true;
         }
 
         //Switch afk status.
         if (u.afk) {
-
             //Reset last logged time.
-            u.last_time_log = u.last_movement = Time.currentTime();
+            u.last_movement = Time.currentTime();
             u.afk = false;
-            Network.getInstance().chat.broadcastAFK(u.player, false);
-
+            updateAfkStatus(u, false);
         } else {
-
-            long time = Time.currentTime();
-
-            //Update playtime, and pause it.
-            Statistics.save(u, Time.getDate(time), time);
-
             u.afk = true;
-            Network.getInstance().chat.broadcastAFK(u.player, true);
-
+            updateAfkStatus(u, true);
         }
 
         return true;
+
+    }
+
+    public static void updateAfkStatus(NetworkUser user, boolean afk) {
+
+        // Broadcast the afk message and send a user update event.
+        Network.getInstance().getChat().broadcastAFK(user.player, afk);
+
+        UserUpdate userUpdateEvent = new UserUpdate();
+        userUpdateEvent.setUuid(user.player.getUniqueId().toString());
+        userUpdateEvent.setAfk(afk);
+        Network.getInstance().getChat().sendSocketMesage(userUpdateEvent);
 
     }
 }

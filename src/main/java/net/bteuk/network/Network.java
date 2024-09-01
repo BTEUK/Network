@@ -4,27 +4,32 @@ import lombok.Getter;
 import net.bteuk.network.commands.AFK;
 import net.bteuk.network.commands.BuildingCompanionCommand;
 import net.bteuk.network.commands.Clear;
+import net.bteuk.network.commands.Demote;
 import net.bteuk.network.commands.Discord;
+import net.bteuk.network.commands.Focus;
 import net.bteuk.network.commands.Gamemode;
-import net.bteuk.network.lobby.LobbyCommand;
-import net.bteuk.network.commands.Ptime;
-import net.bteuk.network.commands.Season;
-import net.bteuk.network.commands.give.GiveBarrier;
-import net.bteuk.network.commands.give.GiveDebugStick;
-import net.bteuk.network.commands.give.GiveLight;
 import net.bteuk.network.commands.Hdb;
 import net.bteuk.network.commands.Help;
+import net.bteuk.network.commands.Msg;
 import net.bteuk.network.commands.Navigator;
 import net.bteuk.network.commands.Nightvision;
 import net.bteuk.network.commands.Phead;
 import net.bteuk.network.commands.Plot;
+import net.bteuk.network.commands.Pmute;
+import net.bteuk.network.commands.ProgressMap;
+import net.bteuk.network.commands.Promote;
+import net.bteuk.network.commands.Ptime;
+import net.bteuk.network.commands.Punmute;
 import net.bteuk.network.commands.RegionCommand;
 import net.bteuk.network.commands.Rules;
+import net.bteuk.network.commands.Season;
 import net.bteuk.network.commands.Speed;
 import net.bteuk.network.commands.TipsToggle;
 import net.bteuk.network.commands.Zone;
+import net.bteuk.network.commands.give.GiveBarrier;
+import net.bteuk.network.commands.give.GiveDebugStick;
+import net.bteuk.network.commands.give.GiveLight;
 import net.bteuk.network.commands.ll;
-import net.bteuk.network.commands.ProgressMap;
 import net.bteuk.network.commands.navigation.Back;
 import net.bteuk.network.commands.navigation.Delhome;
 import net.bteuk.network.commands.navigation.Home;
@@ -45,26 +50,29 @@ import net.bteuk.network.commands.staff.Mute;
 import net.bteuk.network.commands.staff.Staff;
 import net.bteuk.network.commands.staff.Unban;
 import net.bteuk.network.commands.staff.Unmute;
+import net.bteuk.network.commands.tabcompleters.LocationSelector;
+import net.bteuk.network.commands.tabcompleters.PlayerSelector;
+import net.bteuk.network.commands.tabcompleters.ServerSelector;
 import net.bteuk.network.eventing.listeners.CommandPreProcess;
 import net.bteuk.network.eventing.listeners.Connect;
 import net.bteuk.network.eventing.listeners.GuiListener;
 import net.bteuk.network.eventing.listeners.PlayerInteract;
 import net.bteuk.network.eventing.listeners.PreJoinServer;
-import net.bteuk.network.sql.DatabaseInit;
-import net.bteuk.network.commands.tabcompleters.LocationSelector;
-import net.bteuk.network.commands.tabcompleters.PlayerSelector;
-import net.bteuk.network.commands.tabcompleters.ServerSelector;
-import net.bteuk.network.gui.NavigatorGui;
 import net.bteuk.network.eventing.listeners.global_teleport.MoveListener;
 import net.bteuk.network.eventing.listeners.global_teleport.TeleportListener;
+import net.bteuk.network.gui.NavigatorGui;
+import net.bteuk.network.lib.dto.OnlineUser;
+import net.bteuk.network.lib.dto.OnlineUserAdd;
+import net.bteuk.network.lib.dto.OnlineUserRemove;
+import net.bteuk.network.lib.dto.OnlineUsersReply;
 import net.bteuk.network.lobby.Lobby;
-import net.bteuk.network.sql.DatabaseUpdates;
+import net.bteuk.network.lobby.LobbyCommand;
+import net.bteuk.network.sql.DatabaseInit;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.sql.RegionSQL;
 import net.bteuk.network.utils.NetworkConfig;
 import net.bteuk.network.utils.NetworkUser;
-import net.bteuk.network.utils.Statistics;
 import net.bteuk.network.utils.Time;
 import net.bteuk.network.utils.Tips;
 import net.bteuk.network.utils.Utils;
@@ -72,16 +80,33 @@ import net.bteuk.network.utils.enums.ServerType;
 import net.bteuk.network.utils.regions.RegionManager;
 import net.kyori.adventure.text.Component;
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scoreboard.Criteria;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.ScoreboardManager;
 import teachingtutorials.utils.DBConnection;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Optional;
 
-import static net.bteuk.network.utils.Constants.*;
+import static net.bteuk.network.utils.Constants.PROGRESS_MAP;
+import static net.bteuk.network.utils.Constants.REGIONS_ENABLED;
+import static net.bteuk.network.utils.Constants.SERVER_NAME;
+import static net.bteuk.network.utils.Constants.SERVER_TYPE;
+import static net.bteuk.network.utils.Constants.SIDEBAR_CONTENT;
+import static net.bteuk.network.utils.Constants.SIDEBAR_ENABLED;
+import static net.bteuk.network.utils.Constants.SIDEBAR_TITLE;
+import static net.bteuk.network.utils.Constants.TIPS;
+import static net.bteuk.network.utils.Constants.TPLL_ENABLED;
+import static net.bteuk.network.utils.Constants.TUTORIALS;
 import static net.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public final class Network extends JavaPlugin {
@@ -98,7 +123,11 @@ public final class Network extends JavaPlugin {
     @Getter
     private RegionManager regionManager;
 
-    //User List
+    // List of users connected to the network.
+    @Getter
+    private HashSet<OnlineUser> onlineUsers;
+
+    // Server User List
     private ArrayList<NetworkUser> networkUsers;
 
     //Guis
@@ -113,7 +142,8 @@ public final class Network extends JavaPlugin {
     public RegionSQL regionSQL;
 
     //Chat
-    public CustomChat chat;
+    @Getter
+    private CustomChat chat;
 
     //Timers
     @Getter
@@ -133,7 +163,8 @@ public final class Network extends JavaPlugin {
     public TeleportListener teleportListener;
 
     //Tab
-    public TabManager tab;
+    @Getter
+    private TabManager tab;
 
     //Kick Command
     @Getter
@@ -224,8 +255,7 @@ public final class Network extends JavaPlugin {
         }
 
         //Setup tutorials DB connection and connect
-        if (TUTORIALS)
-        {
+        if (TUTORIALS) {
             //Initialise the DBConnection object
             tutorialsDBConnection = new DBConnection();
 
@@ -246,9 +276,6 @@ public final class Network extends JavaPlugin {
                 return;
             }
         }
-
-        //Update database.
-        new DatabaseUpdates().updateDatabase();
 
         if (!globalSQL.hasRow("SELECT name FROM server_data WHERE name='" + SERVER_NAME + "';")) {
 
@@ -281,14 +308,16 @@ public final class Network extends JavaPlugin {
     //Server enabling procedure when the config has been set up.
     public void enablePlugin() {
 
-        //Create user list.
+        // Create user list.
         networkUsers = new ArrayList<>();
+        onlineUsers = new HashSet<>();
 
-        //Enabled chat, both global and normal chat are handled through this.
+        // Enabled chat, both global and normal chat are handled through this.
         chat = new CustomChat(this);
 
         //Setup connect, this handles all connections to the server.
-        connect = new Connect(this, globalSQL, plotSQL, regionSQL);
+        connect = new Connect(this);
+
         //Create navigator.
         navigatorGui = new NavigatorGui();
         navigator = Utils.createItem(Material.NETHER_STAR, 1, Utils.title("Navigator"), Utils.line("Click to open the navigator."));
@@ -308,7 +337,7 @@ public final class Network extends JavaPlugin {
         teleportListener = new TeleportListener(this);
 
         //Setup Timers
-        timers = new Timers(this, globalSQL, connect);
+        timers = new Timers(this, globalSQL);
         timers.startTimers();
 
         //Create bungeecord channel
@@ -322,18 +351,18 @@ public final class Network extends JavaPlugin {
         getCommand("rules").setExecutor(new Rules());
         if (SERVER_TYPE == ServerType.LOBBY) {
 
-            //Set spawn location and enable auto-spawn teleport when falling in the void.
+            // Set spawn location and enable auto-spawn teleport when falling in the void.
             lobby.setSpawn();
             lobby.enableVoidTeleport();
 
             lobby.reloadPortals();
 
-            //Setup the map.
-            lobby.reloadMap();
-
             //Set the rules lectern.
             lobby.setLectern();
         }
+
+        // Set up the map.
+        lobby.reloadMap();
 
         //Create lobby command, will run /spawn if not in the lobby server.
         new LobbyCommand(this, lobby);
@@ -357,18 +386,18 @@ public final class Network extends JavaPlugin {
 
         getCommand("teleport").setExecutor(new Tp());
         getCommand("teleport").setTabCompleter(new PlayerSelector());
-        getCommand("teleporttoggle").setExecutor(new TpToggle());
+        new TpToggle(instance);
 
         getCommand("back").setExecutor(new Back());
 
-        getCommand("discord").setExecutor(new Discord());
+        new Discord(this);
 
         new ll(this);
 
-        getCommand("nightvision").setExecutor(new Nightvision());
+        new Nightvision(this);
         getCommand("speed").setExecutor(new Speed());
 
-        getCommand("help").setExecutor(new Help());
+        new Help(this);
 
         getCommand("warp").setExecutor(new Warp());
         getCommand("warp").setTabCompleter(new LocationSelector());
@@ -397,6 +426,13 @@ public final class Network extends JavaPlugin {
 
         //Phead command.
         new Phead(this);
+
+        // Pmute and unmute
+        new Pmute(this);
+        new Punmute(this);
+
+        // msg, tell and w
+        new Msg(this);
 
         //Homes commands.
         if (CONFIG.getBoolean("homes.enabled")) {
@@ -433,9 +469,7 @@ public final class Network extends JavaPlugin {
         getCommand("region").setExecutor(new RegionCommand());
 
         //Enable tab.
-        if (TAB) {
-            tab = new TabManager(this);
-        }
+        tab = new TabManager(this);
 
         //Enable tips.
         if (TIPS) {
@@ -456,6 +490,30 @@ public final class Network extends JavaPlugin {
         new Exp(this);
 
         new BuildingCompanionCommand(this);
+
+        new Promote(this);
+        new Demote(this);
+
+        new Focus(this);
+
+        // Unregister sidebar.
+        ScoreboardManager manager = Bukkit.getScoreboardManager();
+        Scoreboard scoreboard = manager.getMainScoreboard();
+        Objective objective = scoreboard.getObjective("sidebar");
+        if (objective != null) {
+            objective.unregister();
+        }
+        // Set sidebar if enabled.
+        if (SIDEBAR_ENABLED) {
+
+            objective = scoreboard.registerNewObjective("sidebar", Criteria.DUMMY, Component.text(SIDEBAR_TITLE));
+            objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+            int score = SIDEBAR_CONTENT.size();
+            for (String sidebarText : SIDEBAR_CONTENT) {
+                score--;
+                objective.getScore(sidebarText).setScore(score);
+            }
+        }
 
         //Enable server in server table.
         globalSQL.update("UPDATE server_data SET online=1 WHERE name='" + SERVER_NAME + "';");
@@ -496,34 +554,18 @@ public final class Network extends JavaPlugin {
                 //Set last_online time in playerdata.
                 instance.globalSQL.update("UPDATE player_data SET last_online=" + Time.currentTime() + " WHERE UUID='" + uuid + "';");
 
-                //Remove player from online_users.
-                instance.globalSQL.update("DELETE FROM online_users WHERE uuid='" + uuid + "';");
-
-                if (TAB) {
-                    //Update tab for all players.
-                    //This is done with the tab chat channel.
-                    instance.chat.broadcastMessage(Component.text("remove " + uuid), "uknet:tab");
-                }
-
-                //Log playercount in database
-                instance.globalSQL.update("INSERT INTO player_count(log_time,players) VALUES(" + Time.currentTime() + "," +
-                        instance.globalSQL.getInt("SELECT count(uuid) FROM online_users;") + ");");
-
                 //Reset last logged time.
                 if (u.afk) {
-                    u.last_time_log = u.last_movement = Time.currentTime();
+                    u.last_movement = Time.currentTime();
                     u.afk = false;
                 }
-
-                //Update statistics
-                long time = Time.currentTime();
-                Statistics.save(u, Time.getDate(time), time);
-
             }
         }
 
         //Disconnect from tutorials
-        tutorialsDBConnection.disconnect();
+        if (TUTORIALS) {
+            tutorialsDBConnection.disconnect();
+        }
 
         //Disable bungeecord channel.
         instance.getServer().getMessenger().unregisterOutgoingPluginChannel(instance);
@@ -532,16 +574,11 @@ public final class Network extends JavaPlugin {
 
     //Get user from player.
     public NetworkUser getUser(Player p) {
+        return networkUsers.stream().filter(user -> user.player.equals(p)).findFirst().orElse(null);
+    }
 
-        for (NetworkUser u : networkUsers) {
-
-            if (u.player.equals(p)) {
-                return u;
-
-            }
-        }
-
-        return null;
+    public Optional<NetworkUser> getNetworkUserByUuid(String uuid) {
+        return networkUsers.stream().filter(user -> user.player.getUniqueId().toString().equals(uuid)).findFirst();
     }
 
     //Get users.
@@ -556,14 +593,37 @@ public final class Network extends JavaPlugin {
 
     }
 
-    //Get user from player.
     public void removeUser(NetworkUser u) {
-
         networkUsers.remove(u);
-
     }
 
-    //Check if user is on the server.
+    public void handleOnlineUsersReply(OnlineUsersReply onlineUsersReply) {
+        onlineUsers.addAll(onlineUsersReply.getOnlineUsers());
+    }
+
+    public void handleOnlineUserAdd(OnlineUserAdd onlineUserAdd) {
+        onlineUsers.remove(onlineUserAdd.getUser());
+        onlineUsers.add(onlineUserAdd.getUser());
+    }
+
+    public void handleOnlineUserRemove(OnlineUserRemove onlineUserRemove) {
+        Optional<OnlineUser> optionalOnlineUser = onlineUsers.stream().filter(onlineUser -> onlineUser.getUuid().equals(onlineUserRemove.getUuid())).findFirst();
+        optionalOnlineUser.ifPresent(onlineUser -> onlineUsers.remove(onlineUser));
+    }
+
+    public boolean isOnlineOnNetwork(String uuid) {
+        return onlineUsers.stream().anyMatch(onlineUser -> onlineUser.getUuid().equals(uuid));
+    }
+
+    public Optional<OnlineUser> getOnlineUserByUuid(String uuid) {
+        return onlineUsers.stream().filter(onlineUser -> onlineUser.getUuid().equals(uuid)).findFirst();
+    }
+
+    public Optional<OnlineUser> getOnlineUserByNameIgnoreCase(String name) {
+        return onlineUsers.stream().filter(onlineUser -> onlineUser.getName().equalsIgnoreCase(name)).findFirst();
+    }
+
+    // Check if user is on this server.
     public boolean hasPlayer(String uuid) {
         for (NetworkUser u : getUsers()) {
             if (u.player.getUniqueId().toString().equals(uuid)) {

@@ -1,6 +1,6 @@
 package net.bteuk.network.commands;
 
-import net.bteuk.network.utils.Utils;
+import net.bteuk.network.lib.utils.ChatUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -15,7 +15,7 @@ public class Clear implements CommandExecutor {
         //Check if the sender is a player.
         if (!(sender instanceof Player p)) {
 
-            sender.sendMessage(Utils.error("This command can only be run by a player."));
+            sender.sendMessage(ChatUtils.error("This command can only be run by a player."));
             return true;
 
         }
@@ -23,14 +23,14 @@ public class Clear implements CommandExecutor {
         //Check permission.
         if (!p.hasPermission("uknet.clear")) {
 
-            p.sendMessage(Utils.error("You do not have permission to use this command."));
+            p.sendMessage(ChatUtils.error("You do not have permission to use this command."));
             return true;
 
         }
 
         //Clear inventory.
         p.getInventory().clear();
-        p.sendMessage(Utils.success("Cleared your inventory."));
+        p.sendMessage(ChatUtils.success("Cleared your inventory."));
 
         return true;
 

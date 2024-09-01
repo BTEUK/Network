@@ -9,9 +9,7 @@ import org.bukkit.event.player.PlayerTakeLecternBookEvent;
 public class TakeBookEvent implements Listener {
 
     public TakeBookEvent(Network instance) {
-
         Bukkit.getServer().getPluginManager().registerEvents(this, instance);
-
     }
 
     @EventHandler

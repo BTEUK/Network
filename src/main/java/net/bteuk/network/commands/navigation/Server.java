@@ -1,6 +1,7 @@
 package net.bteuk.network.commands.navigation;
 
 import net.bteuk.network.Network;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.SwitchServer;
 import net.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
@@ -26,7 +27,7 @@ public class Server implements CommandExecutor {
         //Check if sender is a player and that they have permission.
         if (!(sender instanceof Player p)) {
 
-            sender.sendMessage(Utils.error("This command can only be used by a player."));
+            sender.sendMessage(ChatUtils.error("This command can only be used by a player."));
             return true;
 
         }
@@ -34,7 +35,7 @@ public class Server implements CommandExecutor {
         //Check if the player has permission.
         if (!p.hasPermission("uknet.navigation.server")) {
 
-            p.sendMessage(Utils.error("You do not have permission to use this command."));
+            p.sendMessage(ChatUtils.error("You do not have permission to use this command."));
             return true;
 
         }
@@ -85,7 +86,7 @@ public class Server implements CommandExecutor {
                 //Check if the player is not already on this server.
                 if (Objects.equals(SERVER_NAME, args[0])) {
 
-                    p.sendMessage(Utils.error("You are already on this server."));
+                    p.sendMessage(ChatUtils.error("You are already on this server."));
 
                 } else {
 
@@ -95,7 +96,7 @@ public class Server implements CommandExecutor {
 
             } else {
 
-                p.sendMessage(Utils.error("The server ").append(Component.text(args[0], NamedTextColor.DARK_RED).append(Utils.error(" does not exist!"))));
+                p.sendMessage(ChatUtils.error("The server ").append(Component.text(args[0], NamedTextColor.DARK_RED).append(ChatUtils.error(" does not exist!"))));
 
             }
 

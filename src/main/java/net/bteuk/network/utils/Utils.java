@@ -1,14 +1,12 @@
 package net.bteuk.network.utils;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
-import me.clip.placeholderapi.PlaceholderAPI;
 import net.bteuk.network.Network;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -35,16 +33,7 @@ import static net.bteuk.network.utils.Constants.MIN_Y;
 
 public class Utils {
 
-    private static final Pattern PATTTERN = Pattern.compile("%s");
-
-    public static String tabName(String displayName) {
-        return tabName(displayName.split(" ")[0], displayName.split(" ")[1]);
-    }
-
-    public static String tabName(String prefix, String name) {
-        Component component = LegacyComponentSerializer.legacyAmpersand().deserialize(prefix + " " + name);
-        return GsonComponentSerializer.gson().serialize(component);
-    }
+    private static final Pattern PATTERN = Pattern.compile("%s");
 
     public static Component title(String message) {
         return Component.text(message, NamedTextColor.AQUA, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false);
@@ -95,7 +84,7 @@ public class Utils {
         // Find the number of vars needed.
         int lastIdx = 0;
         int count = 0;
-        Matcher matcher = PATTTERN.matcher(message);
+        Matcher matcher = PATTERN.matcher(message);
         while (matcher.find()) {
             int idx = matcher.start();
             if (idx != lastIdx) {
@@ -130,18 +119,6 @@ public class Utils {
     public static Component tip(String tip) {
         return Component.text("[TIP] ", TextColor.color(0x346beb))
                 .append(Utils.line(tip));
-    }
-
-    public static String toJson(Component component) {
-        return GsonComponentSerializer.gson().serialize(component);
-    }
-
-    //Adds the chat formatting to the message.
-    public static Component chatFormat(Player player, Component message) {
-        //Get prefix placeholder and convert from legacy format.
-        //Legacy format for RGB is like &#a25981
-        Component newMessage = LegacyComponentSerializer.legacyAmpersand().deserialize(PlaceholderAPI.setPlaceholders(player, "%luckperms_prefix% &f%player_name% &7&l> &r&f"));
-        return newMessage.append(message);
     }
 
     public static ItemStack createItem(Material material, int amount, Component displayName, Component... loreString) {
@@ -215,11 +192,28 @@ public class Utils {
         meta.displayName(displayName);
         List<Component> lore = new ArrayList<>(Arrays.asList(loreString));
         meta.lore(lore);
-        item.setItemMeta(meta);
 
         OfflinePlayer p = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
 
         meta.setOwningPlayer(p);
+        item.setItemMeta(meta);
+
+        return item;
+
+    }
+
+    public static ItemStack createPlayerSkull(PlayerProfile profile, int amount, Component displayName, Component... loreString) {
+
+        ItemStack item;
+
+        item = new ItemStack(Material.PLAYER_HEAD);
+        item.setAmount(amount);
+
+        SkullMeta meta = (SkullMeta) item.getItemMeta();
+        meta.displayName(displayName);
+        List<Component> lore = new ArrayList<>(Arrays.asList(loreString));
+        meta.lore(lore);
+        meta.setPlayerProfile(profile);
         item.setItemMeta(meta);
 
         return item;
@@ -283,26 +277,26 @@ public class Utils {
 
                 p.getInventory().setItem(slot, p.getInventory().getItem(7));
                 p.getInventory().setItem(7, item);
-                p.sendMessage(Utils.success("Set ").append(Component.text(name, NamedTextColor.DARK_AQUA).append(Utils.success(" to slot 8"))));
+                p.sendMessage(ChatUtils.success("Set ").append(Component.text(name, NamedTextColor.DARK_AQUA).append(ChatUtils.success(" to slot 8"))));
 
             } else {
 
                 p.getInventory().setItem(slot, p.getInventory().getItemInMainHand());
                 p.getInventory().setItemInMainHand(item);
-                p.sendMessage(Utils.success("Set ").append(Component.text(name, NamedTextColor.DARK_AQUA).append(Utils.success(" to main hand."))));
+                p.sendMessage(ChatUtils.success("Set ").append(Component.text(name, NamedTextColor.DARK_AQUA).append(ChatUtils.success(" to main hand."))));
 
             }
         } else if (emptySlot >= 0) {
             //The current slot is empty. This also implies no navigator, and thus the item does not yet exist in the inventory.
             //Set item to empty slot.
             p.getInventory().setItem(emptySlot, item);
-            p.sendMessage(Utils.success("Set ").append(Component.text(name, NamedTextColor.DARK_AQUA).append(Utils.success(" to slot " + (emptySlot + 1)))));
+            p.sendMessage(ChatUtils.success("Set ").append(Component.text(name, NamedTextColor.DARK_AQUA).append(ChatUtils.success(" to slot " + (emptySlot + 1)))));
 
         } else {
 
             //Player has no empty slots and is holding the navigator, set to item to slot 7.
             p.getInventory().setItem(7, item);
-            p.sendMessage(Utils.success("Set ").append(Component.text(name, NamedTextColor.DARK_AQUA).append(Utils.success(" to slot 8"))));
+            p.sendMessage(ChatUtils.success("Set ").append(Component.text(name, NamedTextColor.DARK_AQUA).append(ChatUtils.success(" to slot 8"))));
 
         }
     }

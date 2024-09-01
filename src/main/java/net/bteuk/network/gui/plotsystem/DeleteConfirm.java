@@ -4,6 +4,7 @@ import net.bteuk.network.Network;
 import net.bteuk.network.eventing.events.EventManager;
 import net.bteuk.network.gui.BuildGui;
 import net.bteuk.network.gui.Gui;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.enums.RegionType;
@@ -49,7 +50,7 @@ public class DeleteConfirm extends Gui {
 
                         u.mainGui = new PlotMenu(u);
                         u.player.closeInventory();
-                        u.sendMessage(Utils.success("Deleting plot %s...", String.valueOf(id)));
+                        u.sendMessage(ChatUtils.success("Deleting plot %s...", String.valueOf(id)));
 
                         //Add server event to delete plot or zone.
                         EventManager.createEvent(u.player.getUniqueId().toString(), "plotsystem", plotSQL.getString("SELECT server FROM location_data WHERE name='" +
@@ -59,7 +60,7 @@ public class DeleteConfirm extends Gui {
 
                         u.mainGui = new ZoneMenu(u);
                         u.player.closeInventory();
-                        u.sendMessage(Utils.success("Deleting zone %s...", String.valueOf(id)));
+                        u.sendMessage(ChatUtils.success("Deleting zone %s...", String.valueOf(id)));
 
                         //Add server event to delete plot or zone.
                         EventManager.createEvent(u.player.getUniqueId().toString(), "plotsystem", plotSQL.getString("SELECT server FROM location_data WHERE name='" +

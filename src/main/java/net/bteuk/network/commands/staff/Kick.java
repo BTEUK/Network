@@ -1,8 +1,7 @@
 package net.bteuk.network.commands.staff;
 
 import net.bteuk.network.Network;
-import net.bteuk.network.utils.staff.Moderation;
-import net.bteuk.network.utils.Utils;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
@@ -15,8 +14,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 
 import static net.bteuk.network.utils.Constants.LOGGER;
+import static net.bteuk.network.utils.staff.Moderation.kick;
 
-public class Kick extends Moderation implements CommandExecutor {
+public class Kick implements CommandExecutor {
 
     //Constructor to enable the command.
     public Kick(Network instance) {
@@ -40,14 +40,14 @@ public class Kick extends Moderation implements CommandExecutor {
         //Check if sender is player, then check permissions
         if (sender instanceof Player p) {
             if (!p.hasPermission("uknet.kick")) {
-                p.sendMessage(Utils.error("You do not have permission to use this command."));
+                p.sendMessage(ChatUtils.error("You do not have permission to use this command."));
                 return true;
             }
         }
 
         //Check args.
         if (args.length < 2) {
-            sender.sendMessage(Utils.error("/kick <player> <reason>"));
+            sender.sendMessage(ChatUtils.error("/kick <player> <reason>"));
             return true;
         }
 
@@ -55,23 +55,24 @@ public class Kick extends Moderation implements CommandExecutor {
         //If uuid exists for name.
         if (!Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM player_data WHERE name='" + args[0] + "';")) {
             sender.sendMessage(Component.text(args[0], NamedTextColor.DARK_RED)
-                    .append(Utils.error(" is not a valid player.")));
+                    .append(ChatUtils.error(" is not a valid player.")));
             return true;
         }
 
         String uuid = Network.getInstance().getGlobalSQL().getString("SELECT uuid FROM player_data WHERE name='" + args[0] + "';");
+        String name = Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE name='" + args[0] + "';");
 
         //Check if player is online.
-        if (!Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "';")) {
-            sender.sendMessage(Component.text(args[0], NamedTextColor.DARK_RED)
-                    .append(Utils.error(" is not online.")));
+        if (!Network.getInstance().isOnlineOnNetwork(uuid)) {
+            sender.sendMessage(Component.text(name, NamedTextColor.DARK_RED)
+                    .append(ChatUtils.error(" is not online.")));
             return true;
         }
 
         //Combine all remaining args to create a reason.
         String reason = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
 
-        sender.sendMessage(kickPlayer(args[0], uuid, reason));
+        sender.sendMessage(kickPlayer(name, uuid, reason));
 
         return true;
     }
@@ -80,9 +81,9 @@ public class Kick extends Moderation implements CommandExecutor {
 
         kick(uuid, reason);
 
-        return (Utils.success("Kicked ")
+        return (ChatUtils.success("Kicked ")
                 .append(Component.text(name, NamedTextColor.DARK_AQUA))
-                .append(Utils.success(" for reason: "))
+                .append(ChatUtils.success(" for reason: "))
                 .append(Component.text(reason, NamedTextColor.DARK_AQUA)));
 
     }

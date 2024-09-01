@@ -1,9 +1,9 @@
 package net.bteuk.network.eventing.events;
 
 import net.bteuk.network.Network;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.sql.PlotSQL;
-import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.regions.Region;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -32,13 +32,13 @@ public class InviteEvent extends AbstractEvent {
 
                     int id = Integer.parseInt(event[2]);
 
-                    p.sendMessage(Utils.success("You have been invited to plot ")
+                    p.sendMessage(ChatUtils.success("You have been invited to plot ")
                             .append(Component.text(event[2], NamedTextColor.DARK_AQUA))
-                            .append(Utils.success(" by "))
+                            .append(ChatUtils.success(" by "))
                             .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
                                     plotSQL.getString("SELECT owner FROM plot_invites WHERE id=" + id + ";") + "';"), NamedTextColor.DARK_AQUA)));
 
-                    Component message = Utils.success("To join the plot click here!");
+                    Component message = ChatUtils.success("To join the plot click here!");
                     message = message.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/plot join " + event[2]));
                     p.sendMessage(message);
 
@@ -57,13 +57,13 @@ public class InviteEvent extends AbstractEvent {
 
                     int id = Integer.parseInt(event[2]);
 
-                    p.sendMessage(Utils.success("You have been invited to zone ")
+                    p.sendMessage(ChatUtils.success("You have been invited to zone ")
                             .append(Component.text(event[2], NamedTextColor.DARK_AQUA))
-                            .append(Utils.success(" by "))
+                            .append(ChatUtils.success(" by "))
                             .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
                                     plotSQL.getString("SELECT owner FROM zone_invites WHERE id=" + id + ";") + "';"), NamedTextColor.DARK_AQUA)));
 
-                    Component message = Utils.success("To join the zone click here!");
+                    Component message = ChatUtils.success("To join the zone click here!");
                     message = message.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/zone join " + event[2]));
                     p.sendMessage(message);
 
@@ -80,13 +80,13 @@ public class InviteEvent extends AbstractEvent {
                     GlobalSQL globalSQL = Network.getInstance().getGlobalSQL();
                     Region region = Network.getInstance().getRegionManager().getRegion(event[2]);
 
-                    p.sendMessage(Utils.success("You have been invited to region ")
+                    p.sendMessage(ChatUtils.success("You have been invited to region ")
                             .append(Component.text(event[2], NamedTextColor.DARK_AQUA))
-                            .append(Utils.success(" by "))
+                            .append(ChatUtils.success(" by "))
                             .append(Component.text(
                                     globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + region.getOwner() + "';"), NamedTextColor.DARK_AQUA)));
 
-                    Component message = Utils.success("To join the region click here!");
+                    Component message = ChatUtils.success("To join the region click here!");
                     message = message.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/region join " + event[2]));
                     p.sendMessage(message);
 

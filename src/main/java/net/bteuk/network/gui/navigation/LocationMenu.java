@@ -4,6 +4,7 @@ import net.bteuk.network.Network;
 import net.bteuk.network.commands.navigation.Back;
 import net.bteuk.network.eventing.events.EventManager;
 import net.bteuk.network.gui.Gui;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.SwitchServer;
 import net.bteuk.network.utils.Utils;
@@ -182,7 +183,7 @@ public class LocationMenu extends Gui {
                                 Back.setPreviousCoordinate(u.player.getUniqueId().toString(), u.player.getLocation());
 
                                 u.player.teleport(l);
-                                u.player.sendMessage(Utils.success("Teleported to ")
+                                u.player.sendMessage(ChatUtils.success("Teleported to ")
                                         .append(Component.text(location.getKey(), NamedTextColor.DARK_AQUA)));
 
                             } else {
@@ -227,7 +228,7 @@ public class LocationMenu extends Gui {
                             }
                             returnGui.open(u);
                         } else {
-                            u.player.sendMessage(Utils.error("An error occurred, please contact an admin."));
+                            u.player.sendMessage(ChatUtils.error("An error occurred, please contact an admin."));
                             u.player.closeInventory();
                         }
                     });

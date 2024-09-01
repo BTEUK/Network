@@ -1,7 +1,7 @@
 package net.bteuk.network.commands;
 
 import net.bteuk.network.Network;
-import net.bteuk.network.utils.Utils;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
@@ -13,7 +13,7 @@ import java.util.Arrays;
 
 public class Season extends AbstractCommand {
 
-    private static final Component INVALID_COMMAND_ARGUMENTS = Utils.error("/season create|start|end [season_name]");
+    private static final Component INVALID_COMMAND_ARGUMENTS = ChatUtils.error("/season create|start|end [season_name]");
 
     public Season(Network instance) {
         super(instance, "season");
@@ -36,7 +36,7 @@ public class Season extends AbstractCommand {
 
             //Don't allow season command to alter the default season.
             if (args[1].equalsIgnoreCase("default")) {
-                sender.sendMessage(Utils.error("The default season can not be modified!"));
+                sender.sendMessage(ChatUtils.error("The default season can not be modified!"));
                 return true;
             }
 
@@ -75,16 +75,16 @@ public class Season extends AbstractCommand {
 
         //Create the season if it does not already exist.
         if (Network.getInstance().getGlobalSQL().hasRow("SELECT id FROM seasons WHERE id='" + name + "';")) {
-            return Utils.error("A season with the name ")
+            return ChatUtils.error("A season with the name ")
                     .append(Component.text(name, NamedTextColor.DARK_RED)
-                            .append(Utils.error(" already exists.")));
+                            .append(ChatUtils.error(" already exists.")));
         }
 
         if (Network.getInstance().getGlobalSQL().update("INSERT INTO seasons(id) VALUES('" + name + "');")) {
-            return Utils.success("Season created with name ")
+            return ChatUtils.success("Season created with name ")
                     .append(Component.text(name, NamedTextColor.DARK_AQUA));
         } else {
-            return Utils.success("An error occurred while creating the season, please contact a server admin.");
+            return ChatUtils.success("An error occurred while creating the season, please contact a server admin.");
         }
     }
 
@@ -95,24 +95,24 @@ public class Season extends AbstractCommand {
 
         //Check if the season exists, and is not already active.
         if (!Network.getInstance().getGlobalSQL().hasRow("SELECT id FROM seasons WHERE id='" + name + "';")) {
-            return Utils.error("A season with the name ")
+            return ChatUtils.error("A season with the name ")
                     .append(Component.text(name, NamedTextColor.DARK_RED)
-                            .append(Utils.error(" doesn't exists.")));
+                            .append(ChatUtils.error(" doesn't exists.")));
         } else if (Network.getInstance().getGlobalSQL().hasRow("SELECT id FROM seasons WHERE id='" + name + "' AND active=1;")) {
-            return Utils.error("The season ")
+            return ChatUtils.error("The season ")
                     .append(Component.text(name, NamedTextColor.DARK_RED)
-                            .append(Utils.error(" has already started.")));
+                            .append(ChatUtils.error(" has already started.")));
         } else if (Network.getInstance().getGlobalSQL().getInt("SELECT id FROM seasons WHERE id='" + name + "' AND active=1;") > 1) {
-            return Utils.error("There is already an active season, cancel season ")
+            return ChatUtils.error("There is already an active season, cancel season ")
                     .append(Component.text(Network.getInstance().getGlobalSQL().getString("SELECT id FROM seasons WHERE active=1 and id<>'default';"), NamedTextColor.DARK_RED))
-                    .append(Utils.error(" first."));
+                    .append(ChatUtils.error(" first."));
         }
 
         if (Network.getInstance().getGlobalSQL().update("UPDATE seasons SET active=1 WHERE id='" + name + "';")) {
-            return Utils.success("Started season ")
+            return ChatUtils.success("Started season ")
                     .append(Component.text(name, NamedTextColor.DARK_AQUA));
         } else {
-            return Utils.success("An error occurred while starting the season, please contact a server admin.");
+            return ChatUtils.success("An error occurred while starting the season, please contact a server admin.");
         }
     }
 
@@ -123,20 +123,20 @@ public class Season extends AbstractCommand {
 
         //Check if the season exists, and is active.
         if (!Network.getInstance().getGlobalSQL().hasRow("SELECT id FROM seasons WHERE id='" + name + "';")) {
-            return Utils.error("A season with the name ")
+            return ChatUtils.error("A season with the name ")
                     .append(Component.text(name, NamedTextColor.DARK_RED)
-                            .append(Utils.error(" doesn't exists.")));
+                            .append(ChatUtils.error(" doesn't exists.")));
         } else if (!Network.getInstance().getGlobalSQL().hasRow("SELECT id FROM seasons WHERE id='" + name + "' AND active=1;")) {
-            return Utils.error("The season ")
+            return ChatUtils.error("The season ")
                     .append(Component.text(name, NamedTextColor.DARK_RED)
-                            .append(Utils.error(" is not active.")));
+                            .append(ChatUtils.error(" is not active.")));
         }
 
         if (Network.getInstance().getGlobalSQL().update("UPDATE seasons SET active=0 WHERE id='" + name + "';")) {
-            return Utils.success("Ended season ")
+            return ChatUtils.success("Ended season ")
                     .append(Component.text(name, NamedTextColor.DARK_AQUA));
         } else {
-            return Utils.success("An error occurred while starting the season, please contact a server admin.");
+            return ChatUtils.success("An error occurred while starting the season, please contact a server admin.");
         }
     }
 }

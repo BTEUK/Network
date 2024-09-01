@@ -4,8 +4,8 @@ import io.papermc.paper.event.player.AsyncChatEvent;
 import lombok.Getter;
 import net.bteuk.network.Network;
 import net.bteuk.network.gui.staff.ModerationActionGui;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
-import net.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -35,7 +35,7 @@ public class ModerationReasonListener implements Listener {
         task = Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
             //Send message to player telling them it's been timer out.
             if (u.player != null) {
-                u.player.sendMessage(Utils.error("'Set " + gui.getType().label.toLowerCase(Locale.ROOT) + " reason' cancelled."));
+                u.player.sendMessage(ChatUtils.error("'Set " + gui.getType().label.toLowerCase(Locale.ROOT) + " reason' cancelled."));
             }
             unregister();
         }, 1200L);
@@ -53,13 +53,13 @@ public class ModerationReasonListener implements Listener {
             //Check if message is 256 characters or less.
             if (PlainTextComponentSerializer.plainText().serialize(e.message()).length() > 64) {
 
-                e.getPlayer().sendMessage(Utils.error("The region tag can't be longer than 256 characters, please try again."));
+                e.getPlayer().sendMessage(ChatUtils.error("The region tag can't be longer than 256 characters, please try again."));
 
             } else {
 
                 //Set the reason.
                 gui.setReason(PlainTextComponentSerializer.plainText().serialize(e.message()));
-                e.getPlayer().sendMessage(Utils.success("Set reason to: ")
+                e.getPlayer().sendMessage(ChatUtils.success("Set reason to: ")
                         .append(e.message().color(DARK_AQUA)));
 
                 //Refresh and reopen the gui.

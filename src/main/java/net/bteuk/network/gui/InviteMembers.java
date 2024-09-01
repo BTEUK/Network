@@ -5,6 +5,8 @@ import net.bteuk.network.eventing.events.EventManager;
 import net.bteuk.network.gui.plotsystem.PlotInfo;
 import net.bteuk.network.gui.plotsystem.ZoneInfo;
 import net.bteuk.network.gui.regions.RegionInfo;
+import net.bteuk.network.lib.dto.OnlineUser;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.sql.RegionSQL;
@@ -17,7 +19,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class InviteMembers extends Gui {
 
@@ -52,7 +54,7 @@ public class InviteMembers extends Gui {
     private void createGui() {
 
         //Get all online players in the network.
-        ArrayList<String> online_users = globalSQL.getStringList("SELECT uuid FROM online_users;");
+        List<String> online_users = Network.getInstance().getOnlineUsers().stream().map(OnlineUser::getUuid).toList();
 
         //Slot count.
         int slot = 10;
@@ -122,7 +124,7 @@ public class InviteMembers extends Gui {
                     {
 
                         //Check if the player is still online.
-                        if (globalSQL.hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "';")) {
+                        if (Network.getInstance().isOnlineOnNetwork(uuid)) {
 
                             //Check if the player is not already a member of the region, plot or zone.
                             if (!isMember(uuid)) {
@@ -133,15 +135,15 @@ public class InviteMembers extends Gui {
                                     invite(u, uuid);
 
                                 } else {
-                                    u.player.sendMessage(Utils.error("You've already invited this player to your " + regionType.label + "."));
+                                    u.player.sendMessage(ChatUtils.error("You've already invited this player to your " + regionType.label + "."));
                                 }
 
                             } else {
-                                u.player.sendMessage(Utils.error("This player is already a member of your " + regionType.label + "."));
+                                u.player.sendMessage(ChatUtils.error("This player is already a member of your " + regionType.label + "."));
                             }
 
                         } else {
-                            u.player.sendMessage(Utils.error("This player is no longer online."));
+                            u.player.sendMessage(ChatUtils.error("This player is no longer online."));
                         }
 
                     });
@@ -296,13 +298,13 @@ public class InviteMembers extends Gui {
             regionSQL.update("INSERT INTO region_invites(region,owner,uuid) VALUES('" + region.regionName() + "','" +
                     u.player.getUniqueId() + "','" + uuid + "');");
 
-            EventManager.createEvent(uuid, "network", globalSQL.getString("SELECT server FROM online_users WHERE uuid='" + uuid + "';"),
-                    "invite region " + region.regionName());
-
-            u.player.sendMessage(Utils.success("Invited ")
-                    .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "'"), NamedTextColor.DARK_AQUA))
-                    .append(Utils.success(" to region "))
-                    .append(Component.text(region.getTag(u.player.getUniqueId().toString()), NamedTextColor.DARK_AQUA)));
+            String name = globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "'");
+            Network.getInstance().getOnlineUserByUuid(uuid).ifPresentOrElse(onlineUser -> {
+                        EventManager.createEvent(uuid, "network", onlineUser.getServer(),
+                                "invite region " + region.regionName());
+                        u.player.sendMessage(ChatUtils.success("Invited %s to region %s", name, region.getTag(u.player.getUniqueId().toString())));
+                    },
+                    () -> u.player.sendMessage(ChatUtils.error("%s is no longer online.", name)));
 
         } else if (regionType == RegionType.PLOT) {
 
@@ -314,12 +316,13 @@ public class InviteMembers extends Gui {
             plotSQL.update("INSERT INTO plot_invites(id,owner,uuid) VALUES(" + plotID + ",'" +
                     u.player.getUniqueId() + "','" + uuid + "');");
 
-            EventManager.createEvent(uuid, "network", globalSQL.getString("SELECT server FROM online_users WHERE uuid='" + uuid + "';"),
-                    "invite plot " + plotID);
-
-            u.player.sendMessage(Utils.success("Invited ")
-                    .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "'"), NamedTextColor.DARK_AQUA))
-                    .append(Utils.success(" to your Plot.")));
+            String name = globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "'");
+            Network.getInstance().getOnlineUserByUuid(uuid).ifPresentOrElse(onlineUser -> {
+                        EventManager.createEvent(uuid, "network", onlineUser.getServer(),
+                                "invite plot " + plotID);
+                        u.player.sendMessage(ChatUtils.success("Invited %s to your Plot.", name));
+                    },
+                    () -> u.player.sendMessage(ChatUtils.error("%s is no longer online.", name)));
 
         } else if (regionType == RegionType.ZONE) {
 
@@ -331,12 +334,13 @@ public class InviteMembers extends Gui {
             plotSQL.update("INSERT INTO zone_invites(id,owner,uuid) VALUES(" + zoneID + ",'" +
                     u.player.getUniqueId() + "','" + uuid + "');");
 
-            EventManager.createEvent(uuid, "network", globalSQL.getString("SELECT server FROM online_users WHERE uuid='" + uuid + "';"),
-                    "invite zone " + zoneID);
-
-            u.player.sendMessage(Utils.success("Invited ")
-                    .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "'"), NamedTextColor.DARK_AQUA))
-                    .append(Utils.success(" to your Zone.")));
+            String name = globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "'");
+            Network.getInstance().getOnlineUserByUuid(uuid).ifPresentOrElse(onlineUser -> {
+                        EventManager.createEvent(uuid, "network", onlineUser.getServer(),
+                                "invite zone " + zoneID);
+                        u.player.sendMessage(ChatUtils.success("Invited %s to zone your Zone.", name));
+                    },
+                    () -> u.player.sendMessage(ChatUtils.error("%s is no longer online.", name)));
 
         }
     }

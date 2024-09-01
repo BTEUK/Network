@@ -3,6 +3,9 @@ package net.bteuk.network.utils;
 import net.bteuk.network.Network;
 import net.bteuk.network.utils.enums.ServerType;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Logger;
 
 import static net.bteuk.network.utils.NetworkConfig.CONFIG;
@@ -30,23 +33,11 @@ public class Constants {
     //Earth world name.
     public static final String EARTH_WORLD;
 
-    //Is global chat enabled
-    public static final boolean GLOBAL_CHAT;
-
     //Custom join/leave messages.
     public static final boolean CUSTOM_MESSAGES;
 
     //Is staff chat enabled
     public static final boolean STAFF_CHAT;
-
-    //Custom table
-    public static final boolean TAB;
-
-    //Discord chat compatibility
-    public static final boolean DISCORD_CHAT;
-
-    //Discord role linking
-    public static final boolean DISCORD_LINKING;
     
     //Are tips enabled
     public static final boolean TIPS;
@@ -65,6 +56,10 @@ public class Constants {
     public static final boolean ANNOUNCE_OVERALL_LEVELUPS;
     public static final boolean ANNOUNCE_SEASONAL_LEVELUPS;
 
+    public static final boolean SIDEBAR_ENABLED;
+    public static final String SIDEBAR_TITLE;
+    public static final List<String> SIDEBAR_CONTENT;
+
     static {
 
         LOGGER = Network.getInstance().getLogger();
@@ -82,15 +77,9 @@ public class Constants {
         MAX_Y = CONFIG.getInt("tpll.max_y");
         MIN_Y = CONFIG.getInt("tpll.min_y");
 
-        GLOBAL_CHAT = CONFIG.getBoolean("chat.global_chat.enabled");
         CUSTOM_MESSAGES = CONFIG.getBoolean("chat.custom_messages.enabled");
 
         STAFF_CHAT = CONFIG.getBoolean("staff.staff_chat.enabled");
-
-        TAB = CONFIG.getBoolean("chat.global_chat.tab.enabled");
-
-        DISCORD_CHAT = CONFIG.getBoolean("chat.global_chat.discord.chat.enabled");
-        DISCORD_LINKING = CONFIG.getBoolean("chat.global_chat.discord.linking.enabled");
 
         TIPS = CONFIG.getBoolean("chat.tips.enabled");
 
@@ -103,6 +92,21 @@ public class Constants {
         PROGRESSION = CONFIG.getBoolean("progression.enabled");
         ANNOUNCE_OVERALL_LEVELUPS = CONFIG.getBoolean("progression.announce_level-ups.overall");
         ANNOUNCE_SEASONAL_LEVELUPS = CONFIG.getBoolean("progression.announce_level-ups.seasonal");
+
+        SIDEBAR_ENABLED = CONFIG.getBoolean("sidebar.enabled");
+        SIDEBAR_TITLE = CONFIG.getString("sidebar.title", "");
+
+        List<?> sidebarTextConfig = CONFIG.getList("sidebar.text");
+        List<String> sidebarText = new ArrayList<>();
+        if (sidebarTextConfig != null && !sidebarTextConfig.isEmpty()) {
+            sidebarTextConfig.forEach(listItem -> {
+                if (listItem instanceof String listTextItem) {
+                    sidebarText.add(listTextItem);
+                }
+            });
+        }
+
+        SIDEBAR_CONTENT = Collections.unmodifiableList(sidebarText);
 
         if (CONFIG.getString("earth_world") == null) {
             //Setting default value.

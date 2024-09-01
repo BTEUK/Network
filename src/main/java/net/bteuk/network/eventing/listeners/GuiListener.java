@@ -2,8 +2,8 @@ package net.bteuk.network.eventing.listeners;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.gui.Gui;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
-import net.bteuk.network.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -44,7 +44,7 @@ public class GuiListener implements Listener {
             //If u is null, cancel.
             if (u == null) {
                 LOGGER.severe("User " + e.getWhoClicked().getName() + " can not be found!");
-                e.getWhoClicked().sendMessage(Utils.error("User can not be found, please relog!"));
+                e.getWhoClicked().sendMessage(ChatUtils.error("User can not be found, please relog!"));
                 return;
             }
 

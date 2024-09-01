@@ -2,6 +2,7 @@ package net.bteuk.network.commands.give;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.commands.AbstractCommand;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.Utils;
 import org.bukkit.command.CommandSender;
@@ -24,7 +25,7 @@ public abstract class GiveItem extends AbstractCommand {
         //Check if the sender is a player.
         if (!(sender instanceof Player p)) {
 
-            sender.sendMessage(Utils.error("You must be a player to use this command."));
+            sender.sendMessage(ChatUtils.error("You must be a player to use this command."));
             return true;
 
         }
@@ -32,7 +33,7 @@ public abstract class GiveItem extends AbstractCommand {
         //Check if the user has permission.
         if (!p.hasPermission(permission)) {
 
-            p.sendMessage(Utils.error("You do not have permission to use this command."));
+            p.sendMessage(ChatUtils.error("You do not have permission to use this command."));
             return true;
 
         }
@@ -43,7 +44,7 @@ public abstract class GiveItem extends AbstractCommand {
         //If u is null, cancel.
         if (u == null) {
             LOGGER.severe("User " + p.getName() + " can not be found!");
-            p.sendMessage(Utils.error("User can not be found, please relog!"));
+            p.sendMessage(ChatUtils.error("User can not be found, please relog!"));
             return true;
         }
 

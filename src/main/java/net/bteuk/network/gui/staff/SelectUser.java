@@ -2,6 +2,7 @@ package net.bteuk.network.gui.staff;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.gui.Gui;
+import net.bteuk.network.lib.dto.OnlineUser;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.utils.Time;
 import net.bteuk.network.utils.Utils;
@@ -41,7 +42,7 @@ public class SelectUser extends Gui {
             case BAN, MUTE, KICK ->
 
                     //Get online users.
-                    users = globalSQL.getStringList("SELECT uuid FROM online_users;");
+                    users = Network.getInstance().getOnlineUsers().stream().map(OnlineUser::getUuid).toList();
 
             case UNBAN ->
 

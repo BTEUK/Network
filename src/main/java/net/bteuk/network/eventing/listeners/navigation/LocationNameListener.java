@@ -3,8 +3,8 @@ package net.bteuk.network.eventing.listeners.navigation;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.bteuk.network.Network;
 import net.bteuk.network.gui.navigation.AddLocation;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
-import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.enums.AddLocationType;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -34,7 +34,7 @@ public class LocationNameListener implements Listener {
         task = Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
             //Send message to player telling them it's been timer out.
             if (p != null) {
-                p.sendMessage(Utils.error("'Set Location Name' cancelled."));
+                p.sendMessage(ChatUtils.error("'Set Location Name' cancelled."));
 
                 //If AddLocation gui still exists, reopen it.
                 //Also check if player is actually still online.
@@ -72,14 +72,14 @@ public class LocationNameListener implements Listener {
 
             //Check if message is under 64 character.
             if (PlainTextComponentSerializer.plainText().serialize(e.message()).length() > 64) {
-                e.getPlayer().sendMessage(Utils.error("The location name can't be longer than 64 characters."));
+                e.getPlayer().sendMessage(ChatUtils.error("The location name can't be longer than 64 characters."));
             } else {
 
                 //Set location name.
                 gui.setName(PlainTextComponentSerializer.plainText().serialize(e.message()));
 
                 //Send message to player.
-                p.sendMessage(Utils.success("Set location name to ")
+                p.sendMessage(ChatUtils.success("Set location name to ")
                         .append(e.message().color(NamedTextColor.DARK_AQUA)));
 
                 //Unregister listener and task.

@@ -2,11 +2,15 @@ package net.bteuk.network.commands;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.commands.tabcompleters.PlayerSelector;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.command.*;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,7 +43,7 @@ public class Phead implements CommandExecutor {
         //Check if sender is a player and that they have permission.
         if (!(sender instanceof Player p)) {
 
-            sender.sendMessage(Utils.error("This command can only be used by a player."));
+            sender.sendMessage(ChatUtils.error("This command can only be used by a player."));
             return true;
 
         }
@@ -47,7 +51,7 @@ public class Phead implements CommandExecutor {
         //Check if the player has permission.
         if (!p.hasPermission("uknet.phead")) {
 
-            p.sendMessage(Utils.error("You do not have permission to use this command."));
+            p.sendMessage(ChatUtils.error("You do not have permission to use this command."));
             return true;
 
         }
@@ -55,7 +59,7 @@ public class Phead implements CommandExecutor {
         //Check if there is at least 1 arg.
         if (args.length < 1) {
 
-            p.sendMessage(Utils.error("/phead <name>"));
+            p.sendMessage(ChatUtils.error("/phead <name>"));
             return true;
 
         }
@@ -65,13 +69,14 @@ public class Phead implements CommandExecutor {
 
             //Get uuid.
             String uuid = Network.getInstance().getGlobalSQL().getString("SELECT uuid FROM player_data WHERE name='" + args[0] + "';");
+            String name = Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE name='" + args[0] + "';");
 
             //Give item to player.
-            Utils.giveItem(p, Utils.createPlayerSkull(uuid, 1, Component.text(args[0] + "'s head", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)), args[0] + "'s head");
+            Utils.giveItem(p, Utils.createPlayerSkull(uuid, 1, Component.text(name + "'s head", NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false)), name + "'s head");
 
         } else {
 
-            p.sendMessage(Component.text(args[0], NamedTextColor.DARK_RED).append(Utils.error(" could not be found.")));
+            p.sendMessage(Component.text(args[0], NamedTextColor.DARK_RED).append(ChatUtils.error(" could not be found.")));
 
         }
 

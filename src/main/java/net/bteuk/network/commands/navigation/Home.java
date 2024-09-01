@@ -1,11 +1,11 @@
 package net.bteuk.network.commands.navigation;
 
 import net.bteuk.network.Network;
-import net.bteuk.network.eventing.events.EventManager;
-import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.commands.tabcompleters.HomeSelector;
+import net.bteuk.network.eventing.events.EventManager;
+import net.bteuk.network.lib.utils.ChatUtils;
+import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.utils.SwitchServer;
-import net.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -52,7 +52,7 @@ public class Home extends HomeSelector implements CommandExecutor {
 
         //Check if the sender is a player.
         if (!(sender instanceof Player p)) {
-            sender.sendMessage(Utils.error("This command can only be used by players."));
+            sender.sendMessage(ChatUtils.error("This command can only be used by players."));
             return true;
         }
 
@@ -63,7 +63,7 @@ public class Home extends HomeSelector implements CommandExecutor {
 
             //If a default home is set, teleport to it.
             if (!globalSQL.hasRow("SELECT uuid FROM home WHERE uuid='" + p.getUniqueId() + "' AND name IS NULL;")) {
-                p.sendMessage(Utils.error("You do not have a default home set, you can set it typing ")
+                p.sendMessage(ChatUtils.error("You do not have a default home set, you can set it typing ")
                         .append(Component.text("/sethome", NamedTextColor.DARK_RED)));
                 return true;
             }
@@ -82,7 +82,7 @@ public class Home extends HomeSelector implements CommandExecutor {
 
                 //Teleport to the location.
                 p.teleport(l);
-                p.sendMessage(Utils.success("Teleported to your default home."));
+                p.sendMessage(ChatUtils.success("Teleported to your default home."));
 
             } else {
 
@@ -100,7 +100,7 @@ public class Home extends HomeSelector implements CommandExecutor {
 
             //Check for permission.
             if (!p.hasPermission("uknet.navigation.homes")) {
-                p.sendMessage(Utils.error("You do not have permission to set multiple homes, you can only use your default home with ")
+                p.sendMessage(ChatUtils.error("You do not have permission to set multiple homes, you can only use your default home with ")
                         .append(Component.text("/home", NamedTextColor.DARK_RED)));
                 return true;
             }
@@ -110,7 +110,7 @@ public class Home extends HomeSelector implements CommandExecutor {
 
             //Check if home with this name exists.
             if (!globalSQL.hasRow("SELECT uuid FROM home WHERE uuid='" + p.getUniqueId() + "' AND name='" + name + "';")) {
-                p.sendMessage(Utils.error("You do not have a home with the name ")
+                p.sendMessage(ChatUtils.error("You do not have a home with the name ")
                         .append(Component.text(name, NamedTextColor.DARK_RED)));
                 return true;
             }
@@ -129,7 +129,7 @@ public class Home extends HomeSelector implements CommandExecutor {
 
                 //Teleport to the location.
                 p.teleport(l);
-                p.sendMessage(Utils.success("Teleported to your home ")
+                p.sendMessage(ChatUtils.success("Teleported to your home ")
                         .append(Component.text(name, NamedTextColor.DARK_AQUA)));
 
             } else {

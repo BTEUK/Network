@@ -1,36 +1,27 @@
 package net.bteuk.network.eventing.listeners;
 
 import net.bteuk.network.Network;
-import net.bteuk.network.exceptions.NotMutedException;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
-import net.bteuk.network.utils.Statistics;
-import net.bteuk.network.utils.TextureUtils;
+import net.bteuk.network.utils.SwitchServer;
 import net.bteuk.network.utils.Time;
-import net.bteuk.network.utils.Utils;
-import net.bteuk.network.utils.staff.Moderation;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Objects;
 
-import static net.bteuk.network.utils.Constants.DISCORD_CHAT;
+import static net.bteuk.network.commands.AFK.updateAfkStatus;
 import static net.bteuk.network.utils.Constants.LOGGER;
 import static net.bteuk.network.utils.Constants.REGIONS_ENABLED;
 import static net.bteuk.network.utils.Constants.SERVER_NAME;
 import static net.bteuk.network.utils.Constants.TPLL_ENABLED;
-import static net.bteuk.network.utils.NetworkConfig.CONFIG;
 
-public class CommandPreProcess extends Moderation implements Listener {
+public class CommandPreProcess implements Listener {
 
     private final Network instance;
 
@@ -43,28 +34,26 @@ public class CommandPreProcess extends Moderation implements Listener {
     @EventHandler
     public void onCommandPreProcess(PlayerCommandPreprocessEvent e) {
 
-        //Reset afk status.
+        // Reset afk status.
         if (!e.getMessage().startsWith("/afk")) {
 
-            //If player is afk, unset it.
-            //Reset last logged time.
-            NetworkUser u = instance.getUser(e.getPlayer());
+            // If player is afk, unset it.
+            // Reset last logged time.
+            NetworkUser user = instance.getUser(e.getPlayer());
 
-            //If u is null, cancel.
-            if (u == null) {
+            // If u is null, cancel.
+            if (user == null) {
                 LOGGER.severe("User " + e.getPlayer().getName() + " can not be found!");
-                e.getPlayer().sendMessage(Utils.error("User can not be found, please relog!"));
+                e.getPlayer().sendMessage(ChatUtils.error("User can not be found, please relog!"));
                 e.setCancelled(true);
                 return;
             }
 
-            u.last_movement = Time.currentTime();
-            if (u.afk) {
-                u.last_time_log = Time.currentTime();
-                u.afk = false;
-                Network.getInstance().chat.broadcastAFK(u.player, false);
+            user.last_movement = Time.currentTime();
+            if (user.afk) {
+                user.afk = false;
+                updateAfkStatus(user, false);
             }
-
         }
 
         //Replace /region with /network:region
@@ -86,22 +75,10 @@ public class CommandPreProcess extends Moderation implements Listener {
             if (Bukkit.getServer().getPluginManager().getPlugin("skulls") != null) {
                 e.setMessage(e.getMessage().replace("/hdb", "/skulls"));
             }
-        } else if (isCommand(e.getMessage(), "/tell", "/msg", "/w", "/me")) {
-            //If player is muted cancel.
-            if (isMuted(e.getPlayer().getUniqueId().toString())) {
-                e.setCancelled(true);
-                try {
-
-                    //Send message and end event.
-                    e.getPlayer().sendMessage(getMutedComponent(e.getPlayer().getUniqueId().toString()));
-
-                } catch (NotMutedException ex) {
-
-                    //Unset the muted status.
-                    e.setCancelled(false);
-
-                }
-            }
+        } else if (isCommand(e.getMessage(), "/me")) {
+            // This command is not allowed.
+            e.setCancelled(true);
+            e.getPlayer().sendMessage(ChatUtils.error("You do not have permission to use this command."));
         }
     }
 
@@ -132,33 +109,34 @@ public class CommandPreProcess extends Moderation implements Listener {
                 instance.allow_shutdown = true;
                 onServerClose(instance.getUsers());
 
-                //Delay shutdown by 3 seconds to make sure players have switched server.
+                // Delay shutdown by 3 seconds to make sure players have switched server.
                 s.setCancelled(true);
-                Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "stop"), 60L);
+                Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> {
+                    // Disable the LeaveServer event, although everyone should already be disconnected by now.
+                    if (instance.getConnect() != null) {
+                        instance.getConnect().setBlockLeaveEvent(true);
+                    }
+
+                    Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "stop");
+                }, 60L);
             }
         }
     }
 
-    //This class executes when the server closes, instead of a player server quit event since that will cause errors.
-    //It for the most part copies the methods.
+    // This class executes when the server closes, instead of a player server quit event since that will cause errors.
+    // It for the most part copies the methods.
     public void onServerClose(ArrayList<NetworkUser> users) {
 
-        //Disable server in server table.
+        // Disable server in server table.
         instance.getGlobalSQL().update("UPDATE server_data SET online=0 WHERE name='" + SERVER_NAME + "';");
 
-        //Block the LeaveServer listener so it doesn't trigger since it causes an error.
-        //It needs to be active to prevent the leave message to show in chat.
-        if (instance.getConnect() != null) {
-            instance.getConnect().setBlockLeaveEvent(true);
-        }
-
-        //Check if another server is online,
-        //If true then switch all the players to this server.
-        //Always check the lobby and earth first.
-        //Remove all players from network.
+        // Check if another server is online,
+        // If true then switch all the players to this server.
+        // Always check the lobby and earth first.
+        // Remove all players from network.
         String server = null;
 
-        //Try different servers.
+        // Try different servers.
         if (instance.getGlobalSQL().hasRow("SELECT name FROM server_data WHERE type='LOBBY' AND online=1;")) {
 
             server = instance.getGlobalSQL().getString("SELECT name FROM server_data WHERE type='LOBBY' AND online=1;");
@@ -173,86 +151,21 @@ public class CommandPreProcess extends Moderation implements Listener {
 
         }
 
-        for (NetworkUser u : users) {
-
-            u.last_movement = Time.currentTime();
+        for (NetworkUser user : users) {
+            // Switch the player to another server, if available, else kick them.
             if (server != null) {
-
-                //Reset last logged time.
-                if (u.afk) {
-                    u.last_time_log = Time.currentTime();
-                    u.afk = false;
-                    Network.getInstance().chat.broadcastAFK(u.player, false);
-                }
-
-
-                //Switch the player to that server.
-                try {
-                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    DataOutputStream out = new DataOutputStream(stream);
-                    out.writeUTF("Connect");
-                    out.writeUTF(server);
-                    u.player.sendPluginMessage(instance, "BungeeCord", stream.toByteArray());
-                } catch (IOException e) {
-                    LOGGER.severe("IOException when attempting to switch player to another server.");
-                    return;
-                }
-
+                SwitchServer.switchServer(user.player, server);
             } else {
-
-                //Reset last logged time.
-                if (u.afk) {
-                    u.last_time_log = Time.currentTime();
-                    u.afk = false;
-                }
-
-                String uuid = u.player.getUniqueId().toString();
-
-                //Remove any outstanding invites that this player has sent.
-                instance.getPlotSQL().update("DELETE FROM plot_invites WHERE owner='" + uuid + "';");
-
-                //Remove any outstanding invites that this player has received.
-                instance.getPlotSQL().update("DELETE FROM plot_invites WHERE uuid='" + uuid + "';");
-
-                //Set last_online time in playerdata.
-                instance.getGlobalSQL().update("UPDATE player_data SET last_online=" + Time.currentTime() + " WHERE UUID='" + uuid + "';");
-
-                //Remove player from online_users.
-                //Since this closes the server tab does not need to be updated for these players.
-                instance.getGlobalSQL().update("DELETE FROM online_users WHERE uuid='" + uuid + "';");
-
-                //Log playercount in database
-                instance.getGlobalSQL().update("INSERT INTO player_count(log_time,players) VALUES(" + Time.currentTime() + "," +
-                        instance.getGlobalSQL().getInt("SELECT count(uuid) FROM online_users;") + ");");
-
-                //Kick the player.
-                u.player.kick(Component.text("The server is restarting!", NamedTextColor.RED));
-
-                //Send the disconnect messagein discord, since the standard leaveserver event has been blocked.
-                String name = Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
-                String player_skin = Network.getInstance().getGlobalSQL().getString("SELECT player_skin FROM player_data WHERE uuid='" + uuid + "';");
-
-                //Run disconnect message.
-                if (DISCORD_CHAT) {
-                    Component message = Component.text(TextureUtils.getAvatarUrl(u.player.getUniqueId(), player_skin) + " ")
-                            .append(LegacyComponentSerializer.legacyAmpersand().deserialize(Objects.requireNonNull(CONFIG.getString("chat.custom_messages.leave")).replace("%player%", name)));
-                    instance.chat.broadcastDiscordAnnouncement(message, "disconnect");
-                }
-
+                // Kick the player.
+                user.player.kick(Component.text("The server is restarting!", NamedTextColor.RED));
             }
-
-            //Update statistics
-            long time = Time.currentTime();
-            Statistics.save(u, Time.getDate(time), time);
-
         }
 
-        //Block movement and teleport listeners.
+        // Block movement and teleport listeners.
         instance.moveListener.block();
         instance.teleportListener.block();
 
-        //Remove users from list.
+        // Remove users from list.
         users.clear();
-
     }
 }

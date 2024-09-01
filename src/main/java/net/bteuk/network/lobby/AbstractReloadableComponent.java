@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public abstract class AbstractReloadableComponent {
+public abstract class AbstractReloadableComponent implements LobbyComponent {
 
     private boolean enabled = false;
 

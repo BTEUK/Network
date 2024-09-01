@@ -1,5 +1,6 @@
 package net.bteuk.network.gui.plotsystem;
 
+import com.destroystokyo.paper.profile.PlayerProfile;
 import lombok.Getter;
 import lombok.Setter;
 import net.bteuk.network.Network;
@@ -11,10 +12,14 @@ import net.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.util.HashMap;
+import java.util.UUID;
+import java.util.concurrent.Executors;
 
 /**
  * This Gui class allows the player to view accepted plots.
@@ -44,6 +49,8 @@ public class AcceptedPlotMenu extends Gui {
     @Setter
     private int page = 1;
 
+    private final NetworkUser user;
+
     public AcceptedPlotMenu(NetworkUser user) {
 
         super(45, Component.text("Accepted Plot Menu", NamedTextColor.AQUA, TextDecoration.BOLD));
@@ -54,11 +61,13 @@ public class AcceptedPlotMenu extends Gui {
         globalSQL = Network.getInstance().getGlobalSQL();
 
         filter = user.player.getUniqueId().toString();
-        createGui();
+
+        this.user = user;
+        createGuiAsync();
 
     }
 
-    private void createGui() {
+    private void createGuiAsync() {
 
         // Fetch accepted plots.
         HashMap<Integer, String> plots;
@@ -128,19 +137,18 @@ public class AcceptedPlotMenu extends Gui {
             }
 
             // The icon is the player head of the plot builder.
-            setItem(slot, Utils.createPlayerSkull(plots.get(plotID), 1,
-                            Utils.title("Plot " + plotID),
-                            Utils.line("Completed by: ").append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + plots.get(plotID) + "';"), NamedTextColor.GRAY)),
-                            Utils.line("Click to open the menu of this plot.")),
-                    u -> {
-                        //Switch to plot info.
-                        if (plotInfo != null) {
-                            plotInfo.deleteThis();
-                        }
-                        plotInfo = new PlotInfo(u, plotID);
-                        plotInfo.setAcceptedPlotMenu(this);
-                        plotInfo.open(u);
-                    });
+            // If the texture is not available, load the item async.
+            PlayerProfile profile = Bukkit.createProfile(UUID.fromString(plots.get(plotID)));
+            if (profile.hasTextures()) {
+                createPlayerHeadGuiItem(profile, plotID, plots.get(plotID), slot);
+            } else {
+                int finalSlot = slot;
+                Executors.newSingleThreadExecutor().submit(() -> {
+                    profile.complete();
+                    createPlayerHeadGuiItem(profile, plotID, plots.get(plotID), finalSlot);
+                });
+            }
+
 
             //Increase slot accordingly.
             if (slot % 9 == 7) {
@@ -168,12 +176,9 @@ public class AcceptedPlotMenu extends Gui {
     }
 
     public void refresh() {
-
         this.clearGui();
-        createGui();
-
+        createGuiAsync();
     }
-
 
     @Override
     public void delete() {
@@ -184,5 +189,22 @@ public class AcceptedPlotMenu extends Gui {
             plotInfo.deleteThis();
         }
         super.delete();
+    }
+
+    private void createPlayerHeadGuiItem(PlayerProfile profile, int plotID, String uuid, int slot) {
+        ItemStack guiItem = Utils.createPlayerSkull(profile, 1,
+                Utils.title("Plot " + plotID),
+                Utils.line("Completed by: ").append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';"), NamedTextColor.GRAY)),
+                Utils.line("Click to open the menu of this plot."));
+
+        setItem(slot, guiItem, u -> {
+            //Switch to plot info.
+            if (plotInfo != null) {
+                plotInfo.deleteThis();
+            }
+            plotInfo = new PlotInfo(u, plotID);
+            plotInfo.setAcceptedPlotMenu(this);
+            plotInfo.open(u);
+        });
     }
 }

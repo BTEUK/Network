@@ -4,6 +4,7 @@ import net.bteuk.network.Network;
 import net.bteuk.network.commands.navigation.Back;
 import net.bteuk.network.eventing.events.EventManager;
 import net.bteuk.network.gui.Gui;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.sql.RegionSQL;
 import net.bteuk.network.utils.SwitchServer;
@@ -142,7 +143,7 @@ public class ReviewRegionRequest extends Gui {
 
                         //Teleport player.
                         u.player.teleport(l);
-                        u.player.sendMessage(Utils.success("Teleported to region ")
+                        u.player.sendMessage(ChatUtils.success("Teleported to region ")
                                 .append(Component.text(request.region, NamedTextColor.DARK_AQUA)));
 
                     } else {

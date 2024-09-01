@@ -23,7 +23,6 @@ Features such as global chat and discord integration require a Velocity Proxy, r
 ## Dependencies
 - [WorldGuard](https://enginehub.org/worldguard)
 - [WorldEdit](https://enginehub.org/worldedit) or [FAWE](https://www.spigotmc.org/resources/fastasyncworldedit.13932/)
-- [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/)
 - [Protocollib](https://www.spigotmc.org/resources/protocollib.1997/)
 ## PlotSystem
 The Network plugin is the backbone of the [PlotSystem](https://github.com/BTEUK/Plotsystem), it adds the GUIs and cross-server compatibility that make the PlotSystem function on a multi-server Network.

@@ -2,7 +2,7 @@ package net.bteuk.network.commands.staff;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.commands.AbstractCommand;
-import net.bteuk.network.utils.Utils;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.progression.Progression;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -29,7 +29,7 @@ public class Exp extends AbstractCommand {
         if (args[0].equals("give")) {
             String uuid = Network.getInstance().getGlobalSQL().getString("SELECT uuid FROM player_data WHERE name='" + args[1] + "';");
             if (uuid == null) {
-                sender.sendMessage(Utils.error("Player " + args[1] + " could not be found."));
+                sender.sendMessage(ChatUtils.error("Player " + args[1] + " could not be found."));
             } else {
                 try {
                     int val = Integer.parseInt(args[2]);

@@ -6,6 +6,12 @@ import net.bteuk.network.Network;
 import net.bteuk.network.building_companion.BuildingCompanion;
 import net.bteuk.network.commands.Nightvision;
 import net.bteuk.network.gui.Gui;
+import net.bteuk.network.lib.dto.DirectMessage;
+import net.bteuk.network.lib.dto.FocusEvent;
+import net.bteuk.network.lib.dto.UserConnectReply;
+import net.bteuk.network.lib.dto.UserDisconnect;
+import net.bteuk.network.lib.enums.ChatChannels;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.regions.Region;
 import net.kyori.adventure.text.Component;
@@ -14,29 +20,41 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import static net.bteuk.network.utils.Constants.*;
+import java.util.HashSet;
+import java.util.Set;
+
+import static net.bteuk.network.lib.enums.ChatChannels.GLOBAL;
+import static net.bteuk.network.lib.enums.ChatChannels.REVIEWER;
+import static net.bteuk.network.lib.enums.ChatChannels.STAFF;
+import static net.bteuk.network.utils.Constants.EARTH_WORLD;
+import static net.bteuk.network.utils.Constants.REGIONS_ENABLED;
+import static net.bteuk.network.utils.Constants.SERVER_NAME;
+import static net.bteuk.network.utils.Constants.SERVER_TYPE;
 import static net.bteuk.network.utils.enums.ServerType.EARTH;
 import static net.bteuk.network.utils.enums.ServerType.PLOT;
 
 public class NetworkUser {
 
-    //Network instance.
+    // Network instance.
     private final Network instance;
 
-    //Player instance.
+    // Player instance.
     public final Player player;
 
-    //Main gui, includes everything that is part of the navigator.
+    // Main gui, includes everything that is part of the navigator.
     public Gui mainGui;
 
-    //Lights out, a gui game.
+    // Lights out, a gui game.
     public LightsOut lightsOut;
 
-    //Staff gui.
+    // Staff gui.
     public Gui staffGui;
 
-    //Staff chat
-    public boolean staffChat;
+    // The current active chat channel.
+    // The default is global.
+    @Getter
+    @Setter
+    private String chatChannel;
 
     //Region information.
     public boolean inRegion;
@@ -45,7 +63,17 @@ public class NetworkUser {
     public int dz;
 
     //Navigator in hotbar.
-    public boolean navigator;
+    @Getter
+    @Setter
+    private boolean navigatorEnabled;
+
+    @Getter
+    @Setter
+    private boolean teleportEnabled;
+
+    @Getter
+    @Setter
+    private boolean nightvisionEnabled;
 
     //If the player is switching server.
     public boolean switching;
@@ -54,15 +82,12 @@ public class NetworkUser {
     public boolean afk;
     public long last_movement;
 
-    //Information for online-time logging.
-    //Records when the player online-time was last logged.
-    public long last_time_log;
-    //Total active time in current session.
-    public long active_time;
-
     //If linked to discord.
     public boolean isLinked;
-    public long discord_id;
+
+    @Getter
+    @Setter
+    private long discordId;
 
     //If the player is currently in a portal,
     //This is to prevent continuous execution of portal events.
@@ -72,7 +97,7 @@ public class NetworkUser {
     //Should tips be displayed for the player.
     @Getter
     @Setter
-    private boolean tips_enabled;
+    private boolean tipsEnabled;
 
     //Building companion tool.
     @Getter
@@ -84,11 +109,25 @@ public class NetworkUser {
     @Setter
     private boolean hasMapItem;
 
-    public NetworkUser(Player player) {
+    @Getter
+    @Setter
+    private Role primaryRole;
+
+    @Getter
+    private boolean focusEnabled;
+
+    public NetworkUser(Player player, UserConnectReply reply) {
 
         this.instance = Network.getInstance();
 
         this.player = player;
+
+        navigatorEnabled = reply.isNavigatorEnabled();
+        teleportEnabled = reply.isTeleportEnabled();
+        nightvisionEnabled = reply.isNightvisionEnabled();
+        chatChannel = reply.getChatChannel();
+        tipsEnabled = reply.isTipsEnabled();
+        setFocusEnabled(reply.isFocusEnabled());
 
         switching = false;
         inPortal = false;
@@ -96,26 +135,17 @@ public class NetworkUser {
         afk = false;
         last_movement = Time.currentTime();
 
-        //Set tips based on database value.
-        tips_enabled = instance.getGlobalSQL().hasRow("SELECT tips_enabled FROM player_data WHERE uuid='" + player.getUniqueId() + "' AND tips_enabled=1;");
-
-        //Update builder role in database.
-        instance.getGlobalSQL().update("UPDATE player_data SET builder_role='" + Roles.builderRole(player) + "' WHERE uuid='" + player.getUniqueId() + "';");
-
-        //Load tab for the user.
-        loadTab();
+        primaryRole = Roles.getPrimaryRole(player);
 
         //Get discord linked status.
         //If they're linked get discord id.
         isLinked = instance.getGlobalSQL().hasRow("SELECT uuid FROM discord WHERE uuid='" + player.getUniqueId() + "';");
         if (isLinked) {
-            discord_id = instance.getGlobalSQL().getLong("SELECT discord_id FROM discord WHERE uuid='" + player.getUniqueId() + "';");
+            discordId = instance.getGlobalSQL().getLong("SELECT discord_id FROM discord WHERE uuid='" + player.getUniqueId() + "';");
         }
 
-        //Set navigator enabled/disabled.
-        navigator = instance.getGlobalSQL().hasRow("SELECT navigator FROM player_data WHERE uuid='" + player.getUniqueId() + "' AND navigator=1;");
         //If navigator is disabled, remove the navigator if in the inventory.
-        if (!navigator) {
+        if (!navigatorEnabled) {
 
             ItemStack slot8 = player.getInventory().getItem(8);
 
@@ -124,19 +154,6 @@ public class NetworkUser {
                     player.getInventory().setItem(8, null);
                 }
             }
-        }
-
-        //Set staff chat value, if user is no longer staff, auto-disable.
-        if (instance.getGlobalSQL().hasRow("SELECT uuid FROM player_data WHERE uuid='" + player.getUniqueId() + "' AND staff_chat=1;")) {
-            if (player.hasPermission("uknet.staff")) {
-                staffChat = true;
-            } else {
-                staffChat = false;
-                //And remove staff from database.
-                instance.getGlobalSQL().update("UPDATE player_data SET staff_chat=0 WHERE uuid='" + player.getUniqueId() + "';");
-            }
-        } else {
-            staffChat = false;
         }
 
         //Check if the player is in a region.
@@ -150,7 +167,7 @@ public class NetworkUser {
                     inRegion = true;
                 }
             } else if (SERVER_TYPE == PLOT) {
-                //Check if the player is in a buildable plot world and apply coordinate transform if true.
+                // Check if the player is in a buildable plot world and apply coordinate transform if true.
                 if (instance.getPlotSQL().hasRow("SELECT name FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';")) {
                     updateCoordinateTransform(instance.getPlotSQL(), player.getLocation());
 
@@ -162,11 +179,8 @@ public class NetworkUser {
 
         runEvents();
 
-        last_time_log = Time.currentTime();
-        active_time = 0;
-
         //Give the player nightvision if enabled or remove it if disabled.
-        if (instance.getGlobalSQL().hasRow("SELECT nightvision_enabled FROM player_data WHERE nightvision_enabled=1 AND uuid='" + player.getUniqueId() + "';")) {
+        if (nightvisionEnabled) {
 
             Nightvision.giveNightvision(player);
 
@@ -175,29 +189,23 @@ public class NetworkUser {
             Nightvision.removeNightvision(player);
 
         }
+
+        // If focus mode is enabled hide other players.
+        if (focusEnabled) {
+            hidePlayers();
+        }
     }
 
-    private void loadTab() {
-
-        //If this is the first player on the server, add all players from other servers to tab.
-        if (instance.getServer().getOnlinePlayers().size() == 1 && TAB) {
-            //Add all players from other servers to the fake players list, so they will show in tab when players connect.
-            for (String uuid : instance.getGlobalSQL().getStringList("SELECT uuid FROM online_users WHERE server<>'" + SERVER_NAME + "';")) {
-                instance.tab.addFakePlayer(uuid);
-            }
-        }
-
-        if (TAB) {
-            //Add the player to the fake players list for other servers.
-            instance.chat.broadcastMessage(Component.text("add " + player.getUniqueId()), "uknet:tab");
-
-            //Remove the player from the fake players list, if they are currently in it.
-            instance.tab.removeFakePlayer(player.getUniqueId().toString());
-
-            //Load tab for the player, this will add the fake players.
-            Bukkit.getScheduler().runTask(instance, () -> instance.tab.loadTab(player));
-        }
-
+    public UserDisconnect createDisconnectEvent() {
+        return new UserDisconnect(
+                player.getUniqueId().toString(),
+                SERVER_NAME,
+                isNavigatorEnabled(),
+                isTeleportEnabled(),
+                isNightvisionEnabled(),
+                getChatChannel(),
+                isTipsEnabled()
+        );
     }
 
     private void runEvents() {
@@ -256,16 +264,6 @@ public class NetworkUser {
     }
 
     /**
-     * Check if a user is online.
-     *
-     * @param uuid uuid of the user
-     * @return true if the user is online
-     */
-    public static boolean isOnline(String uuid) {
-        return Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "';");
-    }
-
-    /**
      * Get the name of a user.
      *
      * @param uuid uuid of the user
@@ -273,6 +271,28 @@ public class NetworkUser {
      */
     public static String getName(String uuid) {
         return Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
+    }
+
+    /**
+     * Get the chat channels to which this user has access.
+     *
+     * @param player the players to get the chat channels for
+     * @return {@link Set} set of {@link String} channels
+     */
+    public static Set<String> getChannels(Player player) {
+
+        Set<String> channels = new HashSet<>();
+        channels.add(GLOBAL.getChannelName());
+
+        if (player.hasPermission("uknet.staff")) {
+            channels.add(STAFF.getChannelName());
+        }
+
+        if (player.hasPermission("group.reviewer")) {
+            channels.add(REVIEWER.getChannelName());
+        }
+
+        return channels;
     }
 
     /**
@@ -287,10 +307,11 @@ public class NetworkUser {
      * Send the user an offline message. This also works for online players.
      *
      * @param uuid uuid of the user
-     * @param message the message to send using legacy ampersand format
+     * @param message the message to send
      */
-    public static void sendOfflineMessage(String uuid, String message) {
-        Network.getInstance().getGlobalSQL().update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','" + message + "');");
+    public static void sendOfflineMessage(String uuid, Component message) {
+        DirectMessage directMessage = new DirectMessage(ChatChannels.GLOBAL.getChannelName(), uuid, "server", message, true);
+        Network.getInstance().getChat().sendSocketMesage(directMessage);
     }
 
     public void updateCoordinateTransform(PlotSQL plotSQL, Location l) {
@@ -307,5 +328,45 @@ public class NetworkUser {
                 player.getLocation().getYaw(),
                 player.getLocation().getPitch()
         );
+    }
+
+    public void toggleFocus() {
+        setFocusEnabled(!isFocusEnabled());
+        if (isFocusEnabled()) {
+            player.sendMessage(ChatUtils.success("Enabled focus mode"));
+        } else {
+            player.sendMessage(ChatUtils.success("Disabled focus mode"));
+        }
+    }
+
+    private void setFocusEnabled(boolean enabled) {
+        focusEnabled = enabled;
+        if (focusEnabled) {
+            hidePlayers();
+        } else {
+            showPlayers();
+        }
+        FocusEvent focusEvent = new FocusEvent(player.getUniqueId().toString(), focusEnabled);
+        instance.getChat().sendSocketMesage(focusEvent);
+    }
+
+    public void hidePlayer(Player playerToHide) {
+        player.hidePlayer(instance, playerToHide);
+    }
+
+    private void hidePlayers() {
+        instance.getServer().getOnlinePlayers().forEach(serverPlayer -> {
+            if (player != serverPlayer) {
+                player.hidePlayer(instance, serverPlayer);
+            }
+        });
+    }
+
+    private void showPlayers() {
+        instance.getServer().getOnlinePlayers().forEach(serverPlayer -> {
+            if (player != serverPlayer) {
+                player.showPlayer(instance, serverPlayer);
+            }
+        });
     }
 }

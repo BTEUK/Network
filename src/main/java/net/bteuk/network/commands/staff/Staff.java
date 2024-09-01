@@ -1,11 +1,11 @@
 package net.bteuk.network.commands.staff;
 
+import net.bteuk.network.CustomChat;
 import net.bteuk.network.Network;
 import net.bteuk.network.gui.staff.StaffGui;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
-import net.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -13,7 +13,10 @@ import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import static net.bteuk.network.utils.Constants.*;
+import static net.bteuk.network.lib.enums.ChatChannels.GLOBAL;
+import static net.bteuk.network.lib.enums.ChatChannels.STAFF;
+import static net.bteuk.network.utils.Constants.LOGGER;
+import static net.bteuk.network.utils.Constants.STAFF_CHAT;
 
 public class Staff implements CommandExecutor {
 
@@ -39,7 +42,7 @@ public class Staff implements CommandExecutor {
         //Check if the sender is a player.
         if (!(sender instanceof Player p)) {
 
-            sender.sendMessage(Utils.error("This command can only be used by a player."));
+            sender.sendMessage(ChatUtils.error("This command can only be used by a player."));
             return true;
 
         }
@@ -47,7 +50,7 @@ public class Staff implements CommandExecutor {
         //Check if user is member of staff.
         if (!(p.hasPermission("uknet.staff"))) {
 
-            p.sendMessage(Utils.error("You do not have permission to use this command."));
+            p.sendMessage(ChatUtils.error("You do not have permission to use this command."));
             return true;
 
         }
@@ -60,21 +63,22 @@ public class Staff implements CommandExecutor {
         //If first arg is chat, switch the player to and from staff chat if enabled.
         if (args.length > 0 && STAFF_CHAT) {
             if (args[0].equalsIgnoreCase("chat")) {
-                if (u.staffChat) {
-                    u.player.sendMessage(Utils.success("Disabled staff chat."));
+                String channel = GLOBAL.getChannelName();
+                if (u.getChatChannel().equals(STAFF.getChannelName())) {
+                    u.player.sendMessage(ChatUtils.success("Disabled staff chat."));
                 } else {
-                    u.player.sendMessage(Utils.success("Enabled staff chat."));
+                    // Set the chat channel to staff.
+                    channel = STAFF.getChannelName();
+                    u.player.sendMessage(ChatUtils.success("Enabled staff chat."));
                 }
-                //Invert enabled/disabled of staff chat.
-                u.staffChat = !u.staffChat;
-                Network.getInstance().getGlobalSQL().update("UPDATE player_data SET staff_chat=1-staff_chat WHERE uuid='"+ p.getUniqueId() + "';");
+                // Set channel.
+                u.setChatChannel(channel);
+                Network.getInstance().getGlobalSQL().update("UPDATE player_data SET chat_channel='" + channel + "' WHERE uuid='"+ p.getUniqueId() + "';");
             } else {
-                //Send message in staff chat.
-                Network.getInstance().chat.broadcastPlayerMessage(p, Component.text(String.join(" ", args), NamedTextColor.WHITE), "uknet:staff");
-
-                if (DISCORD_CHAT) {
-                    Network.getInstance().chat.broadcastPlayerMessage(p, Component.text(String.join(" ", args), NamedTextColor.WHITE), "uknet:discord_staff");
-                }
+                // Send message in staff chat, by temporarily setting the players channel to staff.
+                u.setChatChannel(STAFF.getChannelName());
+                Network.getInstance().getChat().sendSocketMesage(CustomChat.getChatMessage(Component.text(String.join(" ", args)), u));
+                u.setChatChannel(GLOBAL.getChannelName());
             }
             return true;
         }

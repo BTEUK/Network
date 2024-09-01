@@ -63,9 +63,7 @@ public abstract class Gui implements GuiInterface {
     }
 
     public void setItem(int slot, ItemStack stack) {
-
         setItem(slot, stack, null);
-
     }
 
     public void setAction(int slot, guiAction action){

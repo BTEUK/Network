@@ -3,8 +3,8 @@ package net.bteuk.network.eventing.listeners.regions;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.bteuk.network.Network;
 import net.bteuk.network.gui.regions.RegionInfo;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
-import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.regions.Region;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -35,7 +35,7 @@ public class RegionTagListener implements Listener {
         task = Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
             //Send message to player telling them it's been timer out.
             if (p != null) {
-                p.sendMessage(Utils.error("'Set Region Tag' cancelled."));
+                p.sendMessage(ChatUtils.error("'Set Region Tag' cancelled."));
             }
             unregister();
         }, 1200L);
@@ -52,16 +52,16 @@ public class RegionTagListener implements Listener {
 
             //Check if message is under 64 character.
             if (PlainTextComponentSerializer.plainText().serialize(e.message()).length() > 64) {
-                e.getPlayer().sendMessage(Utils.error("The region tag can't be longer than 64 characters."));
+                e.getPlayer().sendMessage(ChatUtils.error("The region tag can't be longer than 64 characters."));
             } else {
 
                 //Set region tag.
                 region.setTag(p.getUniqueId().toString(), PlainTextComponentSerializer.plainText().serialize(e.message()));
 
                 //Send message to player.
-                p.sendMessage(Utils.success("Set tag for region ")
+                p.sendMessage(ChatUtils.success("Set tag for region ")
                         .append(Component.text(region.regionName(), NamedTextColor.DARK_AQUA))
-                        .append(Utils.success(" to "))
+                        .append(ChatUtils.success(" to "))
                         .append(e.message().color(NamedTextColor.DARK_AQUA)));
 
                 //Unregister listener and task.

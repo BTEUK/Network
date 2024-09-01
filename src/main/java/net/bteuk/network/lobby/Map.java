@@ -5,10 +5,10 @@ import io.papermc.lib.PaperLib;
 import net.bteuk.network.Network;
 import net.bteuk.network.eventing.events.EventManager;
 import net.bteuk.network.gui.navigation.LocationMenu;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.Holograms;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.SwitchServer;
-import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.enums.Category;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -49,7 +49,8 @@ public class Map extends AbstractReloadableComponent {
     /**
      * Coordinates of the map.
      */
-    private Location map_location;
+    private String mapWorld;
+    private Location mapLocation;
 
     /**
      * HashMap of the holograms
@@ -82,7 +83,6 @@ public class Map extends AbstractReloadableComponent {
         }
 
         // Get the server of the map, this is important in deciding which features to enable.
-        // If the server is not
         server = CONFIG.getString("map.server");
         if (server == null || !instance.getGlobalSQL().hasRow("SELECT * FROM server_data WHERE name='" + server + "';")) {
             setEnabled(false);
@@ -93,17 +93,17 @@ public class Map extends AbstractReloadableComponent {
         // Set the location of the map.
         // If the map is on this server the world must exist.
         // Set the coordinates of the location first, the server is not relevant for this part.
-        map_location = new Location(null, CONFIG.getDouble("map.location.x", 0), CONFIG.getDouble("map.location.y", 0),
+        mapLocation = new Location(null, CONFIG.getDouble("map.location.x", 0), CONFIG.getDouble("map.location.y", 0),
                 CONFIG.getDouble("map.location.z", 0), (float) CONFIG.getDouble("map.location.yaw", 0), (float) CONFIG.getDouble("map.location.pitch", 0));
+        mapWorld = CONFIG.getString("map.location.world");
         if (Objects.equals(SERVER_NAME, server)) {
-            String world = CONFIG.getString("map.location.world");
-            if (world == null || Bukkit.getWorld(world) == null) {
+            if (mapWorld == null || Bukkit.getWorld(mapWorld) == null) {
                 setEnabled(false);
                 LOGGER.warning("The map world does not exist on this server, disabling the map.");
                 return;
             }
             // Set the world, the coordinates have already been set.
-            map_location.setWorld(Bukkit.getWorld(world));
+            mapLocation.setWorld(Bukkit.getWorld(mapWorld));
 
             // Register the hologram click event.
             hologramClickEvent = new HologramClickEvent(instance, this);
@@ -117,7 +117,7 @@ public class Map extends AbstractReloadableComponent {
         }
 
         // Enable the map command.
-        new MapCommand(instance, this, "map");
+        new MapCommand(instance, this, server);
 
         setEnabled(true);
     }
@@ -146,11 +146,11 @@ public class Map extends AbstractReloadableComponent {
     protected void teleport(Player p) {
         // If the map is on this server teleport the player directly, else switch server first.
         if (Objects.equals(SERVER_NAME, server)) {
-            PaperLib.teleportAsync(p, map_location);
+            PaperLib.teleportAsync(p, mapLocation);
         } else {
             // Create teleport event.
-            EventManager.createTeleportEvent(true, p.getUniqueId().toString(), "network", String.format("teleport %f %f %f %f %f",
-                            map_location.getX(), map_location.getY(), map_location.getZ(), map_location.getYaw(), map_location.getPitch()),
+            EventManager.createTeleportEvent(true, p.getUniqueId().toString(), "network", String.format("teleport %s %f %f %f %f %f",
+                            mapWorld, mapLocation.getX(), mapLocation.getY(), mapLocation.getZ(), mapLocation.getYaw(), mapLocation.getPitch()),
                     "&aTeleporting to the map.", p.getLocation());
 
             // Switch server.
@@ -174,30 +174,30 @@ public class Map extends AbstractReloadableComponent {
         if (instance.getGlobalSQL().hasRow("SELECT location FROM location_data WHERE location='" + marker + "';")) {
             // Check if marker does not already exist.
             if (instance.getGlobalSQL().hasRow("SELECT location FROM location_marker WHERE location='" + marker + "';")) {
-                return Component.text(marker, NamedTextColor.DARK_RED).append(Utils.error(" already exists on the map."));
+                return Component.text(marker, NamedTextColor.DARK_RED).append(ChatUtils.error(" already exists on the map."));
             }
             // Create coordinate id.
             int coordinate_id = instance.getGlobalSQL().addCoordinate(marker_location);
             // Add marker.
             instance.getGlobalSQL().update("INSERT INTO location_marker(location,coordinate_id) VALUES('" + marker + "'," + coordinate_id + ");");
             reload();
-            return Utils.success("Added marker for location ").append(Component.text(marker, NamedTextColor.DARK_AQUA));
+            return ChatUtils.success("Added marker for location ").append(Component.text(marker, NamedTextColor.DARK_AQUA));
         } else {
             // Get the subcategory id.
             int subcategory_id = instance.getGlobalSQL().getInt("SELECT id FROM location_subcategory WHERE name='" + marker + "';");
             if (subcategory_id == 0) {
-                return Component.text(marker, NamedTextColor.DARK_RED).append(Utils.error(" is not a valid location or subcategory name."));
+                return Component.text(marker, NamedTextColor.DARK_RED).append(ChatUtils.error(" is not a valid location or subcategory name."));
             }
             // Check if marker does not already exist.
             if (instance.getGlobalSQL().hasRow("SELECT subcategory FROM location_marker WHERE subcategory='" + subcategory_id + "';")) {
-                return Component.text(marker, NamedTextColor.DARK_RED).append(Utils.error(" already exists on the map."));
+                return Component.text(marker, NamedTextColor.DARK_RED).append(ChatUtils.error(" already exists on the map."));
             }
             // Create coordinate id.
             int coordinate_id = instance.getGlobalSQL().addCoordinate(marker_location);
             // Add marker.
             instance.getGlobalSQL().update("INSERT INTO location_marker(subcategory,coordinate_id) VALUES('" + subcategory_id + "'," + coordinate_id + ");");
             reload();
-            return Utils.success("Added marker for subcategory ").append(Component.text(marker, NamedTextColor.DARK_AQUA));
+            return ChatUtils.success("Added marker for subcategory ").append(Component.text(marker, NamedTextColor.DARK_AQUA));
         }
     }
 
@@ -210,12 +210,12 @@ public class Map extends AbstractReloadableComponent {
             instance.getGlobalSQL().update("DELETE FROM location_marker WHERE location='" + marker + "';");
             instance.getGlobalSQL().update("DELETE FROM coordinates WHERE id=" + coordinate_id);
             reload();
-            return Utils.success("Removed marker for location ").append(Component.text(marker, NamedTextColor.DARK_AQUA));
+            return ChatUtils.success("Removed marker for location ").append(Component.text(marker, NamedTextColor.DARK_AQUA));
         } else {
             // Else check if it's a valid subcategory.
             int subcategory_id = instance.getGlobalSQL().getInt("SELECT id FROM location_subcategory WHERE name='" + marker + "';");
             if (subcategory_id == 0) {
-                return Component.text(marker, NamedTextColor.DARK_RED).append(Utils.error(" is not a valid marker."));
+                return Component.text(marker, NamedTextColor.DARK_RED).append(ChatUtils.error(" is not a valid marker."));
             }
             // Remove coordinate id.
             int coordinate_id = instance.getGlobalSQL().getInt("SELECT coordinate_id FROM location_marker WHERE subcategory=" + subcategory_id + ";");
@@ -223,7 +223,7 @@ public class Map extends AbstractReloadableComponent {
             instance.getGlobalSQL().update("DELETE FROM location_marker WHERE subcategory=" + subcategory_id + ";");
             instance.getGlobalSQL().update("DELETE FROM coordinates WHERE id=" + coordinate_id);
             reload();
-            return Utils.success("Removed marker for subcategory ").append(Component.text(marker, NamedTextColor.DARK_AQUA));
+            return ChatUtils.success("Removed marker for subcategory ").append(Component.text(marker, NamedTextColor.DARK_AQUA));
         }
     }
 
@@ -317,7 +317,7 @@ public class Map extends AbstractReloadableComponent {
         String server = instance.getGlobalSQL().getString("SELECT server FROM coordinates WHERE id=" + coordinate_id + ";");
 
         if (server == null) {
-            u.sendMessage(Utils.error("An error occurred, please contact a server administrator."));
+            u.sendMessage(ChatUtils.error("An error occurred, please contact a server administrator."));
             return;
         }
 
@@ -333,7 +333,7 @@ public class Map extends AbstractReloadableComponent {
         int id = instance.getGlobalSQL().getInt("SELECT id FROM location_subcategory WHERE name='" + subcategory + "';");
 
         if (id == 0) {
-            u.sendMessage(Utils.error("An error occurred, please contact a server administrator."));
+            u.sendMessage(ChatUtils.error("An error occurred, please contact a server administrator."));
             return;
         }
 

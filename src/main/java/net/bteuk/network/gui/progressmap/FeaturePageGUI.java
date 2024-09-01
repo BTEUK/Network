@@ -6,6 +6,7 @@ import net.bteuk.network.Network;
 import net.bteuk.network.eventing.listeners.progressmap.FeatureGeometryEditorListener;
 import net.bteuk.network.eventing.listeners.progressmap.FeaturePropertiesBookListener;
 import net.bteuk.network.gui.Gui;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
@@ -95,7 +96,7 @@ public class FeaturePageGUI extends Gui
             else
                 featureMenu.sendUpdate(plugin.getConfig().getString("ProgressMap.MapHubAPIKey"));
 
-            u.player.sendMessage(Utils.success("The progress map has been updated !"));
+            u.player.sendMessage(ChatUtils.success("The progress map has been updated !"));
 
             //Return to the local feature list
             //Delete this gui.
@@ -135,15 +136,15 @@ public class FeaturePageGUI extends Gui
         {
             case Title:
                 Utils.giveItem(u.player, book, "Title editor book");
-                u.player.sendMessage(Utils.success("Use the title editor book to change the title"));
+                u.player.sendMessage(ChatUtils.success("Use the title editor book to change the title"));
                 break;
             case Description:
                 Utils.giveItem(u.player, book, "Description editor book");
-                u.player.sendMessage(Utils.success("Use the description editor book to change the description"));
+                u.player.sendMessage(ChatUtils.success("Use the description editor book to change the description"));
                 break;
             case Media_url:
                 Utils.giveItem(u.player, book, "Media url editor book");
-                u.player.sendMessage(Utils.success("Use the media url editor book to change the media url"));
+                u.player.sendMessage(ChatUtils.success("Use the media url editor book to change the media url"));
                 break;
         }
 

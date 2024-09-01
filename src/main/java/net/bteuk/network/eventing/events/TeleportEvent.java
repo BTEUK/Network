@@ -2,8 +2,8 @@ package net.bteuk.network.eventing.events;
 
 import io.papermc.lib.PaperLib;
 import net.bteuk.network.Network;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.SwitchServer;
-import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.enums.ServerType;
 import net.bteuk.network.utils.regions.Region;
 import net.kyori.adventure.text.Component;
@@ -44,12 +44,12 @@ public class TeleportEvent extends AbstractEvent {
                 if (player != null) {
 
                     p.teleport(player.getLocation());
-                    p.sendMessage(Utils.success("Teleported to ")
+                    p.sendMessage(ChatUtils.success("Teleported to ")
                             .append(Component.text(Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + event[2] + "';"), NamedTextColor.DARK_AQUA)));
 
                 } else {
                     p.sendMessage(Component.text(Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + event[2] + "';"), NamedTextColor.DARK_RED)
-                            .append(Utils.error(" is not online.")));
+                            .append(ChatUtils.error(" is not online.")));
                 }
             }
 
@@ -60,7 +60,7 @@ public class TeleportEvent extends AbstractEvent {
 
                 //Check if a message is set.
                 if (message == null) {
-                    p.sendMessage(Utils.success("Teleported to previous location."));
+                    p.sendMessage(ChatUtils.success("Teleported to previous location."));
                 } else {
                     p.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(message));
                 }
@@ -98,7 +98,7 @@ public class TeleportEvent extends AbstractEvent {
                 }
 
                 p.teleport(l);
-                p.sendMessage(Utils.success("Teleported to ")
+                p.sendMessage(ChatUtils.success("Teleported to ")
                         .append(Component.text(location, NamedTextColor.DARK_AQUA)));
 
             }
@@ -109,14 +109,14 @@ public class TeleportEvent extends AbstractEvent {
                 Location l = Network.getInstance().getGlobalSQL().getLocation(region.getCoordinateID(uuid));
 
                 if (l == null) {
-                    p.sendMessage(Utils.error("An error occurred while fetching the location to teleport."));
+                    p.sendMessage(ChatUtils.error("An error occurred while fetching the location to teleport."));
                     Network.getInstance().getLogger().warning("Location is null for coodinate id " + region.getCoordinateID(uuid));
                     return;
                 }
 
                 //Teleport player.
                 p.teleport(l);
-                p.sendMessage(Utils.success("Teleported to region ")
+                p.sendMessage(ChatUtils.success("Teleported to region ")
                         .append(Component.text(region.getTag(uuid), NamedTextColor.DARK_AQUA)));
 
             }
@@ -128,7 +128,7 @@ public class TeleportEvent extends AbstractEvent {
                 //If server is Lobby, teleport to spawn.
                 if (SERVER_TYPE == ServerType.LOBBY) {
                     p.teleport(Network.getInstance().getLobby().spawn);
-                    p.sendMessage(Utils.success("Teleported to spawn."));
+                    p.sendMessage(ChatUtils.success("Teleported to spawn."));
                 } else {
 
                     //Set teleport event to go to spawn.
@@ -147,7 +147,7 @@ public class TeleportEvent extends AbstractEvent {
                 World world = Bukkit.getWorld(event[1]);
 
                 if (world == null) {
-                    p.sendMessage(Utils.error("World can not be found."));
+                    p.sendMessage(ChatUtils.error("World %s can not be found.", event[1]));
                     return;
                 }
 
@@ -190,7 +190,7 @@ public class TeleportEvent extends AbstractEvent {
 
                 //If the terrain has not been generated, let the player know it could take a while.
                 if (!PaperLib.isChunkGenerated(l)) {
-                    Utils.success("Location is generating, please wait a moment...");
+                    ChatUtils.success("Location is generating, please wait a moment...");
                 }
 
                 //Teleport player.
@@ -198,11 +198,11 @@ public class TeleportEvent extends AbstractEvent {
 
                 //If custom message is set, send that to player, else send default message.
                 if (message == null) {
-                    p.sendMessage(Utils.success("Teleported to ")
+                    p.sendMessage(ChatUtils.success("Teleported to ")
                             .append(Component.text(DECIMAL_FORMATTER.format(x), NamedTextColor.DARK_AQUA))
-                            .append(Utils.success(", "))
+                            .append(ChatUtils.success(", "))
                             .append(Component.text(y, NamedTextColor.DARK_AQUA))
-                            .append(Utils.success(", "))
+                            .append(ChatUtils.success(", "))
                             .append(Component.text(DECIMAL_FORMATTER.format(z), NamedTextColor.DARK_AQUA)));
                 } else {
                     p.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(message));

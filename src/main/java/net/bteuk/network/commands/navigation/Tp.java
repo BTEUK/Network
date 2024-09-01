@@ -2,20 +2,17 @@ package net.bteuk.network.commands.navigation;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.eventing.events.EventManager;
+import net.bteuk.network.lib.dto.OnlineUser;
+import net.bteuk.network.lib.utils.ChatUtils;
+import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.SwitchServer;
-import net.bteuk.network.utils.Utils;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.UUID;
-
-import static net.bteuk.network.utils.Constants.SERVER_NAME;
+import java.util.Optional;
 
 public class Tp implements CommandExecutor {
 
@@ -25,7 +22,7 @@ public class Tp implements CommandExecutor {
         //Sender must be a player.
         if (!(sender instanceof Player p)) {
 
-            sender.sendMessage(Utils.error("You must be a player to use this command."));
+            sender.sendMessage(ChatUtils.error("You must be a player to use this command."));
             return true;
 
         }
@@ -33,67 +30,46 @@ public class Tp implements CommandExecutor {
         //Check if args exist.
         if (args.length == 0) {
 
-            p.sendMessage(Utils.error("You must specify a player to teleport to."));
+            p.sendMessage(ChatUtils.error("You must specify a player to teleport to."));
             return true;
 
         }
 
-        //Check whether the first arg is a valid player.
-        if (Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM player_data WHERE name='" + args[0] + "';")) {
+        // Try and find the player by name.
+        Optional<OnlineUser> optionalOnlineUser = Network.getInstance().getOnlineUserByNameIgnoreCase(args[0]);
+        if (optionalOnlineUser.isPresent()) {
 
-            //Get the uuid of the player.
-            String uuid = Network.getInstance().getGlobalSQL().getString("SELECT uuid FROM player_data WHERE name='" + args[0] + "';");
+            OnlineUser onlineUser = optionalOnlineUser.get();
 
-            //Check if the player is online.
-            if (Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM online_users WHERE uuid='" + uuid + "';")) {
+            //Check if the player has teleport enabled/disabled.
+            //If disabled cancel teleport.
+            if (Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM player_data WHERE uuid='" + onlineUser.getUuid() + "' AND teleport_enabled=1;") || p.hasPermission("uknet.navigation.teleport.bypass")) {
 
-                //Check if the player has teleport enabled/disabled.
-                //If disabled cancel teleport.
-                if (Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM player_data WHERE uuid='" + uuid + "' AND teleport_enabled=1;") || p.hasPermission("uknet.navigation.teleport.bypass")) {
+                //If the player is on your server teleport.
+                //Else switch server and add teleport join event.
+                Optional<NetworkUser> optionalNetworkUser = Network.getInstance().getNetworkUserByUuid(onlineUser.getUuid());
+                if (optionalNetworkUser.isPresent()) {
 
-                    //If the player is on your server teleport.
-                    //Else switch server and add teleport join event.
-                    if (Network.getInstance().getGlobalSQL().getString("SELECT server FROM online_users WHERE uuid='" + uuid + "';").equals(SERVER_NAME)) {
+                    Player playerToTeleportTo = optionalNetworkUser.get().player;
 
-                        //Get player location.
-                        Player player = Bukkit.getPlayer(UUID.fromString(uuid));
+                    //Set current location for /back
+                    Back.setPreviousCoordinate(p.getUniqueId().toString(), p.getLocation());
 
-                        if (player != null) {
-
-                            //Set current location for /back
-                            Back.setPreviousCoordinate(p.getUniqueId().toString(), p.getLocation());
-
-                            p.teleport(player.getLocation());
-                            p.sendMessage(Utils.success("Teleported to ")
-                                    .append(Component.text(args[0], NamedTextColor.DARK_AQUA)));
-
-                        } else {
-                            p.sendMessage(Component.text(args[0], NamedTextColor.DARK_RED)
-                                    .append(Utils.error(" is no longer online.")));
-                        }
-
-                    } else {
-
-                        EventManager.createTeleportEvent(true, p.getUniqueId().toString(), "network", "teleport player " + uuid, p.getLocation());
-                        SwitchServer.switchServer(p, Network.getInstance().getGlobalSQL().getString("SELECT server FROM online_users WHERE uuid='" + uuid + "';"));
-
-                    }
-
+                    p.teleport(playerToTeleportTo.getLocation());
+                    p.sendMessage(ChatUtils.success("Teleported to %s", onlineUser.getName()));
 
                 } else {
-                    p.sendMessage(Component.text(args[0], NamedTextColor.DARK_RED)
-                            .append(Utils.error(" has teleport disabled.")));
+                    EventManager.createTeleportEvent(true, p.getUniqueId().toString(), "network", "teleport player " + onlineUser.getUuid(), p.getLocation());
+                    SwitchServer.switchServer(p, onlineUser.getServer());
                 }
-
             } else {
-                p.sendMessage(Component.text(args[0], NamedTextColor.DARK_RED)
-                        .append(Utils.error(" is not online.")));
+                p.sendMessage(ChatUtils.error("%s has teleport disabled.", onlineUser.getName()));
             }
 
         } else {
-            p.sendMessage(Component.text(args[0], NamedTextColor.DARK_RED)
-                    .append(Utils.error(" does not exist.")));
+            p.sendMessage(ChatUtils.error("%s is not online.", args[0]));
         }
+
         return true;
     }
 }

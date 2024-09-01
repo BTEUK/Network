@@ -1,7 +1,7 @@
 package net.bteuk.network.commands;
 
 import net.bteuk.network.Network;
-import net.bteuk.network.utils.Utils;
+import net.bteuk.network.lib.utils.ChatUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -15,7 +15,7 @@ public class Rules implements CommandExecutor {
 
         if (!(sender instanceof Player p)) {
 
-            sender.sendMessage(Utils.error("This command can only be used by a player."));
+            sender.sendMessage(ChatUtils.error("This command can only be used by a player."));
             return true;
 
         }

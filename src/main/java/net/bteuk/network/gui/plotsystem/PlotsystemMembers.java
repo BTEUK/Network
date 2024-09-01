@@ -3,6 +3,7 @@ package net.bteuk.network.gui.plotsystem;
 import net.bteuk.network.Network;
 import net.bteuk.network.eventing.events.EventManager;
 import net.bteuk.network.gui.Gui;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.Utils;
@@ -141,7 +142,7 @@ public class PlotsystemMembers extends Gui {
                                     u.mainGui.open(u);
 
                                 } else {
-                                    u.player.sendMessage(Utils.error("This player is not a member of your Plot."));
+                                    u.player.sendMessage(ChatUtils.error("This player is not a member of your Plot."));
                                 }
 
                             } else {
@@ -161,7 +162,7 @@ public class PlotsystemMembers extends Gui {
                                     u.mainGui.open(u);
 
                                 } else {
-                                    u.player.sendMessage(Utils.error("This player is not a member of your Zone."));
+                                    u.player.sendMessage(ChatUtils.error("This player is not a member of your Zone."));
                                 }
                             }
                         });

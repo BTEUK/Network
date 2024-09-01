@@ -6,13 +6,16 @@
 
     <groupId>net.bteuk</groupId>
     <artifactId>Network</artifactId>
-    <version>1.5.1</version>
+    <version>1.6.0</version>
     <packaging>jar</packaging>
 
     <name>Network</name>
 
     <properties>
-        <java.version>1.17</java.version>
+        <java.version>17</java.version>
+        <maven.compiler.release>17</maven.compiler.release>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -21,10 +24,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
-                <configuration>
-                    <release>17</release>
-                </configuration>
+                <version>3.11.0</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -73,10 +73,6 @@
             <url>https://oss.sonatype.org/content/groups/public/</url>
         </repository>
         <repository>
-            <id>placeholderapi</id>
-            <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
-        </repository>
-        <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
@@ -104,6 +100,7 @@
     </repositories>
 
     <dependencies>
+        <!-- Server api | scope provided -->
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
@@ -111,12 +108,7 @@
             <scope>provided</scope>
         </dependency>
 
-        <dependency>
-            <groupId>me.clip</groupId>
-            <artifactId>placeholderapi</artifactId>
-            <version>2.11.3</version>
-            <scope>provided</scope>
-        </dependency>
+        <!-- Plugin api | scope provided -->
         <dependency>
             <groupId>com.sk89q.worldguard</groupId>
             <artifactId>worldguard-bukkit</artifactId>
@@ -130,18 +122,24 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.28</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>com.github.decentsoftware-eu</groupId>
             <artifactId>decentholograms</artifactId>
             <version>2.8.6</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>net.luckperms</groupId>
+            <artifactId>api</artifactId>
+            <version>5.4</version>
+            <scope>provided</scope>
+        </dependency>
 
+        <!-- Utils -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.28</version>
+        </dependency>
         <dependency>
             <groupId>io.papermc</groupId>
             <artifactId>paperlib</artifactId>
@@ -158,7 +156,6 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.0</version>
         </dependency>
-
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
@@ -170,20 +167,29 @@
             <version>master-e92dc85e64-1</version>
         </dependency>
         <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>32.1.1-jre</version>
+        </dependency>
+
+        <!-- Internal libraries -->
+        <dependency>
             <groupId>com.github.BTEUK</groupId>
             <artifactId>ProgressMapper</artifactId>
             <version>2f3fc96c3</version>
         </dependency>
         <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>32.1.1-jre</version>
+            <groupId>com.github.BTEUK</groupId>
+            <artifactId>NetworkLib</artifactId>
+            <version>8ceed1741b</version>
         </dependency>
         <dependency>
             <groupId>com.github.BTEUK</groupId>
             <artifactId>TeachingTutorials</artifactId>
             <version>4a3b7d7139</version>
         </dependency>
+
+        <!-- Test dependencies -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>

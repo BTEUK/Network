@@ -2,6 +2,9 @@ package net.bteuk.network.gui.regions;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.gui.Gui;
+import net.bteuk.network.lib.dto.DirectMessage;
+import net.bteuk.network.lib.enums.ChatChannels;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.utils.Time;
 import net.bteuk.network.utils.Utils;
@@ -156,11 +159,14 @@ public class RegionMembers extends Gui {
                             region.updateRequests();
 
                             //Send message to user.
-                            u.player.sendMessage(Utils.success("Transferred ownership of the region to ")
+                            u.player.sendMessage(ChatUtils.success("Transferred ownership of the region to ")
                                     .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid ='" + region.getOwner() + "';"), NamedTextColor.DARK_AQUA)));
 
                             //Send message to new owner.
-                            globalSQL.update("INSERT INTO messages(recipient,message) VALUES('" + uuid + "','&aYou are now the owner of region &3" + region.getTag(uuid) + "');");
+                            DirectMessage directMessage = new DirectMessage(ChatChannels.GLOBAL.getChannelName(), uuid, "server",
+                                    ChatUtils.success("You are now the owner of region %s.", region.getTag(uuid)),
+                                    true);
+                            Network.getInstance().getChat().sendSocketMesage(directMessage);
 
                             //Return to region info.
                             this.delete();
@@ -180,11 +186,10 @@ public class RegionMembers extends Gui {
 
                         {
                             //Remove them from the region.
-                            region.leaveRegion(uuid, "&cYou have been kicked from region &4" + region.getTag(uuid));
+                            region.leaveRegion(uuid, ChatUtils.error("You have been kicked from region %s", region.getTag(uuid)));
 
                             //Send message to user.
-                            u.player.sendMessage(Utils.success("Kicked &3" +
-                                    globalSQL.getString("SELECT name FROM player_data WHERE uuid ='" + uuid + "';") + " &afrom the region"));
+                            u.player.sendMessage(ChatUtils.success("Kicked %s from the region", globalSQL.getString("SELECT name FROM player_data WHERE uuid ='" + uuid + "';")));
 
                             //Refresh the gui.
                             //Delay this action so the user can be kicked, even if on another server.

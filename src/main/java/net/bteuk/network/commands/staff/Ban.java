@@ -3,9 +3,8 @@ package net.bteuk.network.commands.staff;
 import net.bteuk.network.Network;
 import net.bteuk.network.exceptions.DurationFormatException;
 import net.bteuk.network.exceptions.NotBannedException;
-import net.bteuk.network.utils.staff.Moderation;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.Time;
-import net.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
@@ -18,8 +17,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 
 import static net.bteuk.network.utils.Constants.LOGGER;
+import static net.bteuk.network.utils.staff.Moderation.ban;
+import static net.bteuk.network.utils.staff.Moderation.getDuration;
 
-public class Ban extends Moderation implements CommandExecutor {
+public class Ban implements CommandExecutor {
 
     //Constructor to enable the command.
     public Ban(Network instance) {
@@ -43,26 +44,26 @@ public class Ban extends Moderation implements CommandExecutor {
         //Check if sender is player, then check permissions
         if (sender instanceof Player p) {
             if (!p.hasPermission("uknet.ban")) {
-                p.sendMessage(Utils.error("You do not have permission to use this command."));
+                p.sendMessage(ChatUtils.error("You do not have permission to use this command."));
                 return true;
             }
         }
 
         //Check args.
         if (args.length < 3) {
-            sender.sendMessage(Utils.error("/ban <player> <duration> <reason>"));
+            sender.sendMessage(ChatUtils.error("/ban <player> <duration> <reason>"));
             return true;
         }
 
         //Check player.
         //If uuid exists for name.
         if (!Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM player_data WHERE name='" + args[0] + "';")) {
-            sender.sendMessage(Component.text(args[0], NamedTextColor.DARK_RED)
-                    .append(Utils.error(" is not a valid player.")));
+            sender.sendMessage(ChatUtils.error("%s is not a valid player."));
             return true;
         }
 
         String uuid = Network.getInstance().getGlobalSQL().getString("SELECT uuid FROM player_data WHERE name='" + args[0] + "';");
+        String name = Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE name='" + args[0] + "';");
 
         //Get the duration of the ban.
         long time;
@@ -71,7 +72,7 @@ public class Ban extends Moderation implements CommandExecutor {
             time = getDuration(args[1]);
 
         } catch (DurationFormatException e) {
-            sender.sendMessage(Utils.error("Duration must be in ymdh format, for example 1y6m, which is 1 year and 6 months or 2d12h is 2 days and 12 hours."));
+            sender.sendMessage(ChatUtils.error("Duration must be in ymdh format, for example 1y6m, which is 1 year and 6 months or 2d12h is 2 days and 12 hours."));
             return true;
         }
 
@@ -81,7 +82,7 @@ public class Ban extends Moderation implements CommandExecutor {
         //Combine all remaining args to create a reason.
         String reason = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
 
-        sender.sendMessage(banPlayer(args[0], uuid, end_time, reason));
+        sender.sendMessage(banPlayer(name, uuid, end_time, reason));
         return true;
 
     }
@@ -106,14 +107,14 @@ public class Ban extends Moderation implements CommandExecutor {
             ban(uuid, end_time, reason);
         } catch (NotBannedException e) {
             e.printStackTrace();
-            return Utils.error("An error occurred while banning this player, please contact an admin for support.");
+            return ChatUtils.error("An error occurred while banning this player, please contact an admin for support.");
         }
 
-        return Utils.success("Banned ")
+        return ChatUtils.success("Banned ")
                 .append(Component.text(name, NamedTextColor.DARK_AQUA))
-                .append(Utils.success(" until "))
+                .append(ChatUtils.success(" until "))
                 .append(Component.text(Time.getDateTime(end_time), NamedTextColor.DARK_AQUA))
-                .append(Utils.success(" for reason: "))
+                .append(ChatUtils.success(" for reason: "))
                 .append(Component.text(reason, NamedTextColor.DARK_AQUA));
     }
 }

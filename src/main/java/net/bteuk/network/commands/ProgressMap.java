@@ -1,9 +1,8 @@
 package net.bteuk.network.commands;
 
 import net.bteuk.network.Network;
-import static net.bteuk.network.utils.Constants.PROGRESS_MAP;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
-import net.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -14,6 +13,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import static net.bteuk.network.utils.Constants.PROGRESS_MAP;
+
 public class ProgressMap implements CommandExecutor
 {
     @Override
@@ -22,7 +23,7 @@ public class ProgressMap implements CommandExecutor
         //Check if the sender is a player.
         if (!(commandSender instanceof Player p)) {
 
-            commandSender.sendMessage(Utils.error("This command can only be used by a player."));
+            commandSender.sendMessage(ChatUtils.error("This command can only be used by a player."));
             return true;
 
         }

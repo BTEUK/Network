@@ -1,30 +1,20 @@
 package net.bteuk.network;
 
 import lombok.Getter;
-import me.clip.placeholderapi.PlaceholderAPI;
 import net.bteuk.network.eventing.events.EventManager;
-import net.bteuk.network.eventing.listeners.Connect;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.utils.NetworkUser;
-import net.bteuk.network.utils.Roles;
-import net.bteuk.network.utils.Statistics;
 import net.bteuk.network.utils.Time;
 import net.bteuk.network.utils.regions.Inactivity;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
-import static net.bteuk.network.utils.Constants.DISCORD_LINKING;
+import static net.bteuk.network.commands.AFK.updateAfkStatus;
 import static net.bteuk.network.utils.Constants.LOGGER;
 import static net.bteuk.network.utils.Constants.REGIONS_ENABLED;
 import static net.bteuk.network.utils.Constants.SERVER_NAME;
-import static net.bteuk.network.utils.Constants.TAB;
 import static net.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public class Timers {
@@ -41,18 +31,9 @@ public class Timers {
     //SQL
     private final GlobalSQL globalSQL;
 
-    //Network connect.
-    private final Connect connect;
-
     //Server events
     private ArrayList<String[]> events;
     private boolean isBusy;
-
-    //Uuids
-    private ArrayList<String> uuids;
-
-    //Messages
-    private ArrayList<String> messages;
 
     //Navigator Check
     private ItemStack slot9;
@@ -65,22 +46,16 @@ public class Timers {
     //Afk time
     private final long afk;
 
-    //Discord roles
-    @Getter
-    private final HashMap<String, Long> roles;
-
     //Event manager
     @Getter
     private final EventManager eventManager;
 
-    public Timers(Network instance, GlobalSQL globalSQL, Connect connect) {
+    public Timers(Network instance, GlobalSQL globalSQL) {
 
         this.instance = instance;
         this.users = instance.getUsers();
 
         this.globalSQL = globalSQL;
-
-        this.connect = connect;
 
         this.timers = new ArrayList<>();
 
@@ -94,16 +69,6 @@ public class Timers {
         //Minutes * 60 seconds * 1000 milliseconds
         afk = CONFIG.getInt("afk") * 60L * 1000L;
 
-        //Get roles from config if discord linking is enabled.
-        roles = new HashMap<>();
-        if (DISCORD_LINKING) {
-            roles.put("reviewer", CONFIG.getLong("chat.global_chat.discord.linking.role_id.reviewer"));
-            roles.put("architect", CONFIG.getLong("chat.global_chat.discord.linking.role_id.architect"));
-            roles.put("builder", CONFIG.getLong("chat.global_chat.discord.linking.role_id.builder"));
-            roles.put("jrbuilder", CONFIG.getLong("chat.global_chat.discord.linking.role_id.jrbuilder"));
-            roles.put("apprentice", CONFIG.getLong("chat.global_chat.discord.linking.role_id.apprentice"));
-            roles.put("applicant", CONFIG.getLong("chat.global_chat.discord.linking.role_id.applicant"));
-        }
 
     }
 
@@ -145,41 +110,16 @@ public class Timers {
 
         }, 0L, 1L));
 
-        //1 second timer.
+        // 1-second timer.
         timers.add(instance.getServer().getScheduler().scheduleSyncRepeatingTask(instance, () -> {
 
             //Get current time.
             long time = Time.currentTime();
 
-            //Ping all players on this server to check their online status.
             for (NetworkUser user : users) {
 
-                //Update the last_ping and display name.
-                //Check if display name has actually changed.
-                if ((PlaceholderAPI.setPlaceholders(user.player, "%luckperms_prefix%") + " " + user.player.getName()).equals(
-                        globalSQL.getString("SELECT display_name FROM online_users WHERE uuid='" + user.player.getUniqueId() + "' AND server='" + SERVER_NAME + "';")
-                )) {
-
-                    //Update last ping
-                    globalSQL.update("UPDATE online_users SET last_ping=" + time + " WHERE uuid='" + user.player.getUniqueId() + "' AND server='" + SERVER_NAME + "';");
-
-                } else {
-
-                    //Update display name, primary role and last ping
-                    globalSQL.update("UPDATE online_users SET last_ping=" + time + ",display_name='" +
-                            PlaceholderAPI.setPlaceholders(user.player, "%luckperms_prefix%") + " " + user.player.getName() +
-                            "',primary_role='" + Roles.getPrimaryRole(user.player) + "' WHERE uuid='" + user.player.getUniqueId() + "' AND server='" + SERVER_NAME + "';");
-
-                    if (TAB) {
-                        //Update tab for all players to update display name.
-                        //This is done with the tab chat channel.
-                        instance.chat.broadcastMessage(Component.text("update " + user.player.getUniqueId()), "uknet:tab");
-                    }
-
-                }
-
                 //If navigator is enabled check if they have it in slot 9.
-                if (user.navigator) {
+                if (user.isNavigatorEnabled()) {
                     slot9 = user.player.getInventory().getItem(8);
 
                     if (slot9 == null) {
@@ -189,58 +129,20 @@ public class Timers {
                     }
                 }
 
-                //Check for messages that have been sent to this player.
-                if (globalSQL.hasRow("SELECT message FROM messages WHERE recipient='" + user.player.getUniqueId() + "';")) {
-
-                    //Get messages.
-                    messages = globalSQL.getStringList("SELECT message FROM messages WHERE recipient='" + user.player.getUniqueId() + "';");
-
-                    for (String message : messages) {
-
-                        user.player.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(message));
-
-                    }
-
-                    //Delete messages.
-                    globalSQL.update("DELETE FROM messages WHERE recipient='" + user.player.getUniqueId() + "'");
-                }
-
                 //Check if the player is afk.
                 if (user.last_movement < (time - afk) && !user.afk) {
 
                     //Set player as AFK
                     user.afk = true;
 
-                    //Save statistics.
-                    Statistics.save(user, Time.getDate(time), time);
-
                     //Send message to chat and discord.
-                    Network.getInstance().chat.broadcastAFK(user.player, true);
+                    updateAfkStatus(user, true);
 
                 }
             }
-
-            //Check for users switching to this server.
-            //If their switch time was greater than 10 seconds ago, disconnect them from the network, if not already.
-            uuids = globalSQL.getStringList("SELECT uuid FROM server_switch WHERE to_server='" + SERVER_NAME + "';");
-
-            //Iterate through uuids and check time.
-            for (String uuid : uuids) {
-
-                //If it's more than 10 seconds ago.
-                if (globalSQL.getLong("SELECT switch_time FROM server_switch WHERE uuid='" + uuid + "';") < time - (1000 * 10)) {
-
-                    //Run network disconnect and remove their entry.
-                    globalSQL.update("DELETE FROM server_switch WHERE uuid='" + uuid + "';");
-
-                    connect.networkLeaveEvent(Bukkit.getOfflinePlayer(UUID.fromString(uuid)));
-
-                }
-            }
-
         }, 0L, 20L));
 
-        //1 minute timer.
+        // 1-minute timer.
         timers.add(instance.getServer().getScheduler().scheduleSyncRepeatingTask(instance, () -> {
 
             //Check for inactive owners.
@@ -275,23 +177,6 @@ public class Timers {
                     }
                 }
             }
-
-            //For all online players sync the roles.
-            for (NetworkUser u : instance.getUsers()) {
-
-                if (u.isLinked && DISCORD_LINKING) {
-                    //Get the highest role for syncing and sync it, except for guest.
-                    String role = Roles.builderRole(u.player);
-                    discordSync(u.discord_id, role);
-                }
-
-                //Update role in online_players table.
-                globalSQL.update("UPDATE online_users SET primary_role='" + Roles.getPrimaryRole(u.player) + "' WHERE uuid='" + u.player.getUniqueId() + "';");
-            }
-
-            //Update online time of all players.
-            Statistics.saveAll();
-
         }, 0L, 1200L));
     }
 
@@ -302,18 +187,5 @@ public class Timers {
             Bukkit.getScheduler().cancelTask(timer);
         }
 
-    }
-
-    //TODO: Only run this on role add/remove as well as discord link/unlink.
-    public void discordSync(long discord_id, String role) {
-        //Remove all roles except current role.
-        for (Map.Entry<String, Long> entry : Network.getInstance().getTimers().getRoles().entrySet()) {
-
-            if (role.equals(entry.getKey())) {
-                instance.chat.broadcastMessage(Component.text("addrole " + discord_id + " " + entry.getValue()), "uknet:discord_linking");
-            } else {
-                instance.chat.broadcastMessage(Component.text("removerole " + discord_id + " " + entry.getValue()), "uknet:discord_linking");
-            }
-        }
     }
 }

@@ -1,5 +1,5 @@
 # Config version, do not update this manually as it could break the config.
-version: 1.5.0
+version: 1.6.0
 
 #MySQL is mandatory for this plugin.
 #Login information
@@ -7,40 +7,6 @@ host: localhost
 port: 3306
 username: root
 password: password
-
-#Promotion track for roles.
-#Assign custom names and colours.
-#Colours must be of &#000000 format, where the #000000 is the hex colour.
-#Prefix is for tab and chat before the player name.
-roles:
-  default:
-    name: 'Guest'
-    prefix: '[Guest]'
-    colour: '&#fffdf9'
-  applicant:
-    name: 'Applicant'
-    prefix: '[Applicant]'
-    colour: '&#ffe599'
-  apprentice:
-    name: 'Apprentice'
-    prefix: '[Apprentice]'
-    colour: '&#efb70c'
-  jrbuilder:
-    name: 'Jr.Builder'
-    prefix: '[Jr.Builder]'
-    colour: '&#d78426'
-  builder:
-    name: 'Builder'
-    prefix: '[Builder]'
-    colour: '&#f26868'
-  architect:
-    name: 'Architect'
-    prefix: '[Architect]'
-    colour: '&#ec2a2a'
-  reviewer:
-    name: 'Reviewer'
-    prefix: '[Reviewer]'
-    colour: '&#8be565'
 
 #Database names (doesn't require adjusting)
 database:
@@ -109,39 +75,12 @@ homes:
 
 #Chat Settings
 chat:
-  #Global allows for cross-server implementation of chat.
-  #This is required to enable discord compatibility.
-  #Requires the proxy-plugin which is built for Velocity.
-  global_chat:
-    enabled: true
-    socket:
-      IP: localhost
-      port: 30589
-    discord:
-      chat:
-        enabled: true
-      linking:
-        enabled: true
-        role_id:
-          reviewer: 815686457838272512
-          architect: 1050426152700878871
-          builder: 696773933256671373
-          jrbuilder: 837045714562973754
-          apprentice: 728017845652553799
-          applicant: 955520858577850458
-    #Custom tab menu
-    tab:
-      enabled: true
+  socket:
+    IP: localhost
+    port: 30589
+
   #Whether to announce role promotions in chat.
   announce_promotions: true
-
-  #Network messages
-  #%player% is a placeholder for the player name.
-  custom_messages:
-    enabled: true
-    join: '&e%player% has joined UKnet'
-    firstjoin: '&eWelcome to UKnet, %player%'
-    leave: '&e%player% has left UKnet'
 
   #Tips in chat
   #Whether to enable tips in chat and at what frequency they should display.
@@ -199,3 +138,14 @@ progression:
   announce_level-ups:
     overall: false
     seasonal: true
+
+# Scoreboard to display in sidebar.
+sidebar:
+  enabled: false
+  title: "BTE Games"
+  text:
+    - "BTE UK currently competing in the BTE Games!"
+    - "Please join event.buildtheearth.net"
+    - "Select BTE UK to choose our team."
+    - "You can not change your selection!"
+    - "Check our /discord for more information."

@@ -2,6 +2,7 @@ package net.bteuk.network.gui.staff;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.gui.Gui;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.regions.Region;
@@ -110,7 +111,7 @@ public class TransferOwner extends Gui {
                         region.updateRequests();
 
                         //Send message to user.
-                        u.player.sendMessage(Utils.success("Transferred ownership of the region to ")
+                        u.player.sendMessage(ChatUtils.success("Transferred ownership of the region to ")
                                 .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid ='" + region.getOwner() + "';"), NamedTextColor.DARK_AQUA)));
 
                         //Refresh the gui.

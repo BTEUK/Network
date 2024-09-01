@@ -1,5 +1,6 @@
 package net.bteuk.network.gui.plotsystem;
 
+import com.destroystokyo.paper.profile.PlayerProfile;
 import net.bteuk.network.Network;
 import net.bteuk.network.gui.Gui;
 import net.bteuk.network.sql.GlobalSQL;
@@ -9,13 +10,15 @@ import net.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.Executors;
 
 /**
  * This menu is an extension on the {@link AcceptedPlotMenu}
@@ -94,9 +97,7 @@ public class FilterMenu extends Gui {
                 setItem(26, Utils.createItem(Material.ARROW, 1,
                                 Utils.title("Next Page"),
                                 Utils.line("Open the next page of users.")),
-                        u ->
-
-                        {
+                        u -> {
 
                             //Update the gui.
                             page++;
@@ -118,25 +119,32 @@ public class FilterMenu extends Gui {
 
             // The icon is the player head of the user, the amount is the number of plots they've completed.
             // If this is the current filter, make it enchanted.
-            ItemStack item = StringUtils.isEmpty(uuid)
-                    ? Utils.createItem(Material.ENDER_CHEST, newMap.get(uuid),
-                    Utils.title("All Plots"),
-                    Utils.line("Click to set the filter"),
-                    Utils.line("to all completed plots."))
-                    : Utils.createPlayerSkull(uuid, newMap.get(uuid),
-                    Utils.title(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';")),
-                    Utils.line("Click to set the filter"),
-                    Utils.line("to this player."));
-            setItem(slot, item,
-                    u -> {
-                        // Set the filter and refresh the accepted plots menu at page 1.
-                        acceptedPlotMenu.setFilter(uuid);
-                        acceptedPlotMenu.setPage(1);
-                        acceptedPlotMenu.refresh();
+            if (StringUtils.isEmpty(uuid)) {
+                setItem(slot, Utils.createItem(Material.ENDER_CHEST, newMap.get(uuid),
+                                Utils.title("All Plots"),
+                                Utils.line("Click to set the filter"),
+                                Utils.line("to all completed plots.")),
+                        u -> {
+                            // Set the filter and refresh the accepted plots menu at page 1.
+                            acceptedPlotMenu.setFilter(uuid);
+                            acceptedPlotMenu.setPage(1);
+                            acceptedPlotMenu.refresh();
 
-                        // Return to the accepted plots menu.
-                        acceptedPlotMenu.open(u);
+                            // Return to the accepted plot menu.
+                            acceptedPlotMenu.open(u);
+                        });
+            } else {
+                PlayerProfile profile = Bukkit.createProfile(UUID.fromString(uuid));
+                if (profile.hasTextures()) {
+                    createPlayerHeadGuiItem(profile, newMap.get(uuid), uuid, slot);
+                } else {
+                    int finalSlot = slot;
+                    Executors.newSingleThreadExecutor().submit(() -> {
+                        profile.complete();
+                        createPlayerHeadGuiItem(profile, newMap.get(uuid), uuid, finalSlot);
                     });
+                }
+            }
 
             // Increase slot accordingly.
             if (slot % 9 == 7) {
@@ -171,5 +179,21 @@ public class FilterMenu extends Gui {
 
     public void deleteThis() {
         super.delete();
+    }
+
+    private void createPlayerHeadGuiItem(PlayerProfile profile, int amount, String uuid, int slot) {
+        setItem(slot, Utils.createPlayerSkull(profile, amount,
+                        Utils.title(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';")),
+                        Utils.line("Click to set the filter"),
+                        Utils.line("to this player.")),
+                u -> {
+                    // Set the filter and refresh the accepted plots menu at page 1.
+                    acceptedPlotMenu.setFilter(uuid);
+                    acceptedPlotMenu.setPage(1);
+                    acceptedPlotMenu.refresh();
+
+                    // Return to the accepted plot menu.
+                    acceptedPlotMenu.open(u);
+                });
     }
 }
