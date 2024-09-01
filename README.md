@@ -1,4 +1,4 @@
-# Network V1.4.0
+# Network V1.6.0
 Developed by: [@LM-Wolfert](https://www.github.com/LM-Wolfert)
 ___
 A general purpose Minecraft plugin for BTE-related server features.
@@ -19,7 +19,7 @@ A general purpose Minecraft plugin for BTE-related server features.
 <!-- end of the list -->
 For more details reference the [Wiki](https://github.com/BTEUK/Network/wiki) (incomplete).
 ## Proxy
-Features such as global chat and discord integration require a Velocity Proxy, running the [Proxy](https://github.com/BTEUK/Proxy) plugin. If you are planning to run multiple connected servers with the Network plugin it is highly advised to use this plugin.
+To use this plugin it is necessary to have a Velocity Proxy that is running the [Proxy](https://github.com/BTEUK/Proxy) plugin.
 ## Dependencies
 - [WorldGuard](https://enginehub.org/worldguard)
 - [WorldEdit](https://enginehub.org/worldedit) or [FAWE](https://www.spigotmc.org/resources/fastasyncworldedit.13932/)
