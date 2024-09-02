@@ -176,3 +176,6 @@ commands:
     aliases: [focusmode, fm]
     usage: /<command>
     description: Toggle focus mode, hides chat and players.
+  me:
+    usage: /<command>
+    description: Disabled

@@ -75,10 +75,6 @@ public class CommandPreProcess implements Listener {
             if (Bukkit.getServer().getPluginManager().getPlugin("skulls") != null) {
                 e.setMessage(e.getMessage().replace("/hdb", "/skulls"));
             }
-        } else if (isCommand(e.getMessage(), "/me")) {
-            // This command is not allowed.
-            e.setCancelled(true);
-            e.getPlayer().sendMessage(ChatUtils.error("You do not have permission to use this command."));
         }
     }
 
