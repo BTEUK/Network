@@ -3,6 +3,7 @@ package net.bteuk.network.commands;
 import net.bteuk.network.Network;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -55,8 +56,10 @@ public class Nightvision extends AbstractCommand {
 
     public static void giveNightvision(Player player) {
         // Remove any existing night vision first.
-        player.removePotionEffect(PotionEffectType.NIGHT_VISION);
-        player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 1, false, false));
+        Bukkit.getScheduler().runTask(Network.getInstance(), () -> {
+            player.removePotionEffect(PotionEffectType.NIGHT_VISION);
+            player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 1, false, false));
+        });
     }
 
     public static void removeNightvision(Player player) {

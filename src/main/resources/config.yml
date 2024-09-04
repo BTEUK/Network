@@ -1,5 +1,5 @@
 # Config version, do not update this manually as it could break the config.
-version: 1.6.0
+version: 1.6.2
 
 #MySQL is mandatory for this plugin.
 #Login information
@@ -76,8 +76,11 @@ homes:
 #Chat Settings
 chat:
   socket:
-    IP: localhost
-    port: 30589
+    input:
+      port: 30590
+    output:
+      IP: localhost
+      port: 30589
 
   #Whether to announce role promotions in chat.
   announce_promotions: true

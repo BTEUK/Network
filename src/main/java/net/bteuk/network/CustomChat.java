@@ -1,6 +1,5 @@
 package net.bteuk.network;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.bteuk.network.eventing.listeners.Connect;
 import net.bteuk.network.exceptions.NotMutedException;
@@ -18,7 +17,9 @@ import net.bteuk.network.lib.dto.UserConnectReply;
 import net.bteuk.network.lib.dto.UserRemove;
 import net.bteuk.network.lib.dto.UserUpdate;
 import net.bteuk.network.lib.enums.ChatChannels;
+import net.bteuk.network.lib.socket.InputSocket;
 import net.bteuk.network.lib.socket.OutputSocket;
+import net.bteuk.network.lib.socket.SocketHandler;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.Role;
@@ -31,10 +32,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.messaging.PluginMessageListener;
-import org.jetbrains.annotations.NotNull;
-
-import java.io.IOException;
 
 import static net.bteuk.network.commands.AFK.updateAfkStatus;
 import static net.bteuk.network.lib.enums.ChatChannels.STAFF;
@@ -43,11 +40,11 @@ import static net.bteuk.network.utils.NetworkConfig.CONFIG;
 import static net.bteuk.network.utils.staff.Moderation.getMutedComponent;
 import static net.bteuk.network.utils.staff.Moderation.isMuted;
 
-public class CustomChat implements Listener, PluginMessageListener {
+public class CustomChat implements Listener, SocketHandler {
 
     private final Network instance;
 
-    private OutputSocket outputSocket;
+    private final OutputSocket outputSocket;
 
     private static final String AFK = "%s is now afk";
     private static final String NOT_AFK = "%s is no longer afk";
@@ -60,12 +57,19 @@ public class CustomChat implements Listener, PluginMessageListener {
 
         // Set up the output socket.
         outputSocket = new OutputSocket(
-                CONFIG.getString("chat.socket.IP"),
-                CONFIG.getInt("chat.socket.port")
+                CONFIG.getString("chat.socket.output.IP"),
+                CONFIG.getInt("chat.socket.output.port")
         );
 
-        // Register channel for messages received from the proxy.
-        instance.getServer().getMessenger().registerIncomingPluginChannel(instance, "uknet:network", this);
+        // Register input socket for receiving messages from the proxy.
+        int inputSocketPort = CONFIG.getInt("chat.socket.input.port");
+        if (inputSocketPort == 0) {
+            LOGGER.severe("Input socket port is not set in config or is set to 0. Please set a valid port!");
+        } else {
+            // Create the input socket.
+            InputSocket inputSocket = new InputSocket(inputSocketPort);
+            inputSocket.start(this);
+        }
 
         // Request all online users in the Network.
         sendSocketMesage(new OnlineUsersRequest());
@@ -145,39 +149,30 @@ public class CustomChat implements Listener, PluginMessageListener {
         return new DirectMessage(channel.getChannelName(), recipientUuid, senderUuid, directMessageFormat(message, senderName, recipientName), false);
     }
 
-    //Receives a message from the chat socket in json format.
     @Override
-    public void onPluginMessageReceived(@NotNull String channel, @NotNull Player player, byte[] message) {
-
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            AbstractTransferObject object = mapper.readValue(message, AbstractTransferObject.class);
-
-            if (object instanceof DirectMessage directMessage) {
-                handleDirectMessage(directMessage);
-            } else if (object instanceof DiscordLinking discordLinking) {
-                handleDiscordLinking(discordLinking);
-            } else if (object instanceof AddTeamEvent addTeamEvent) {
-                instance.getTab().handle(addTeamEvent);
-            } else if (object instanceof UserConnectReply userConnectReply) {
-                Connect.handleUserConnectReply(userConnectReply);
-            } else if (object instanceof UserRemove userRemove) {
-                Connect.handleUserRemove(userRemove);
-            } else if (object instanceof UserUpdate userUpdate) {
-                handleUserUpdate(userUpdate);
-            } else if (object instanceof OnlineUsersReply onlineUsersReply) {
-                instance.handleOnlineUsersReply(onlineUsersReply);
-            } else if (object instanceof OnlineUserAdd onlineUserAdd) {
-                instance.handleOnlineUserAdd(onlineUserAdd);
-            } else if (object instanceof OnlineUserRemove onlineUserRemove) {
-                instance.handleOnlineUserRemove(onlineUserRemove);
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            // Ignored
-            LOGGER.severe("An error occurred while receiving message from proxy.");
+    public AbstractTransferObject handle(AbstractTransferObject abstractTransferObject) {
+        if (abstractTransferObject instanceof DirectMessage directMessage) {
+            handleDirectMessage(directMessage);
+        } else if (abstractTransferObject instanceof DiscordLinking discordLinking) {
+            handleDiscordLinking(discordLinking);
+        } else if (abstractTransferObject instanceof AddTeamEvent addTeamEvent) {
+            instance.getTab().handle(addTeamEvent);
+        } else if (abstractTransferObject instanceof UserConnectReply userConnectReply) {
+            Connect.handleUserConnectReply(userConnectReply);
+        } else if (abstractTransferObject instanceof UserRemove userRemove) {
+            Connect.handleUserRemove(userRemove);
+        } else if (abstractTransferObject instanceof UserUpdate userUpdate) {
+            handleUserUpdate(userUpdate);
+        } else if (abstractTransferObject instanceof OnlineUsersReply onlineUsersReply) {
+            instance.handleOnlineUsersReply(onlineUsersReply);
+        } else if (abstractTransferObject instanceof OnlineUserAdd onlineUserAdd) {
+            instance.handleOnlineUserAdd(onlineUserAdd);
+        } else if (abstractTransferObject instanceof OnlineUserRemove onlineUserRemove) {
+            instance.handleOnlineUserRemove(onlineUserRemove);
+        } else {
+            LOGGER.warning(String.format("Socket object has an unrecognised type %s", abstractTransferObject.getClass().getTypeName()));
         }
+        return null;
     }
 
     private void handleDirectMessage(DirectMessage message) {
