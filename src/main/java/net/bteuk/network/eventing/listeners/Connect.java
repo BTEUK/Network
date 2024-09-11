@@ -10,7 +10,6 @@ import net.bteuk.network.lib.dto.UserConnectReply;
 import net.bteuk.network.lib.dto.UserConnectRequest;
 import net.bteuk.network.lib.dto.UserDisconnect;
 import net.bteuk.network.lib.dto.UserRemove;
-import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.TextureUtils;
 import net.bteuk.network.utils.Time;
@@ -86,8 +85,11 @@ public class Connect implements Listener {
 
         //If u is null, cancel.
         if (user == null) {
-            LOGGER.severe("User " + e.getPlayer().getName() + " can not be found!");
-            e.getPlayer().sendMessage(ChatUtils.error("User can not be found, please relog!"));
+            LOGGER.warning("User " + e.getPlayer().getName() + " was not available on disconnect!");
+            UserDisconnect disconnectEvent = new UserDisconnect();
+            disconnectEvent.setUuid(e.getPlayer().getUniqueId().toString());
+            disconnectEvent.setServer(SERVER_NAME);
+            Bukkit.getScheduler().runTaskAsynchronously(Network.getInstance(), () -> Network.getInstance().getChat().sendSocketMesage(disconnectEvent));
             return;
         }
 
@@ -137,30 +139,33 @@ public class Connect implements Listener {
      */
     public static void handleUserConnectReply(UserConnectReply reply) {
 
-        // Find the player associated with the uuid.
-        Player player = Network.getInstance().getServer().getOnlinePlayers().stream().filter(p -> p.getUniqueId().toString().equals(reply.getUuid())).findFirst().orElse(null);
+        Bukkit.getScheduler().runTask(Network.getInstance(), () -> {
+            // Find the player associated with the uuid.
+            Player player = Network.getInstance().getServer().getOnlinePlayers().stream().filter(p -> p.getUniqueId().toString().equals(reply.getUuid())).findFirst().orElse(null);
 
-        if (player == null) {
-            LOGGER.warning("A UserConnectReply was received but no Player exists with their uuid, maybe they have already left?");
-            return;
-        }
-
-        LOGGER.info(String.format("User connect reply received from the proxy, creating NetworkUser for %s", player.getName()));
-        NetworkUser user = new NetworkUser(player, reply);
-        Network.getInstance().addUser(user);
-
-        // Hide this player for all players in focus mode.
-        Network.getInstance().getUsers().forEach(serverUser -> {
-            if (serverUser.isFocusEnabled()) {
-                serverUser.hidePlayer(player);
+            if (player == null) {
+                LOGGER.warning("A UserConnectReply was received but no Player exists with their uuid, maybe they have already left?");
+                return;
             }
+
+            LOGGER.info(String.format("User connect reply received from the proxy, creating NetworkUser for %s", player.getName()));
+            NetworkUser user = new NetworkUser(player, reply);
+            Network.getInstance().addUser(user);
+
+            // Hide this player for all players in focus mode.
+            Network.getInstance().getUsers().forEach(serverUser -> {
+                if (serverUser.isFocusEnabled()) {
+                    serverUser.hidePlayer(player);
+                }
+            });
+
+            // Send offline messages to the player.
+            reply.getMessages().forEach(player::sendMessage);
+
+            // Add the player to the scoreboard.
+            Network.getInstance().getTab().onPlayerJoin(player);
+            player.playSound(Sound.sound(Key.key("block.note_block.bell"), Sound.Source.PLAYER, 1f, 1f));
         });
-
-        // Send offline messages to the player.
-        reply.getMessages().forEach(player::sendMessage);
-
-        player.playSound(Sound.sound(Key.key("block.note_block.bell"), Sound.Source.PLAYER, 1f, 1f));
-
     }
 
     public static void handleUserRemove(UserRemove userRemove) {

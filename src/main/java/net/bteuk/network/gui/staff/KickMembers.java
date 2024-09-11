@@ -105,7 +105,7 @@ public class KickMembers extends Gui {
 
                         //Send message to user.
                         u.player.sendMessage(ChatUtils.success("Kicked ")
-                                .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid ='" + region.getOwner() + "';"), NamedTextColor.DARK_AQUA))
+                                .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid ='" + uuid + "';"), NamedTextColor.DARK_AQUA))
                                 .append(ChatUtils.success(" from the region")));
 
                         //Refresh the gui.

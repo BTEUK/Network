@@ -66,6 +66,7 @@ import net.bteuk.network.lib.dto.OnlineUser;
 import net.bteuk.network.lib.dto.OnlineUserAdd;
 import net.bteuk.network.lib.dto.OnlineUserRemove;
 import net.bteuk.network.lib.dto.OnlineUsersReply;
+import net.bteuk.network.lib.dto.ServerStartup;
 import net.bteuk.network.lobby.Lobby;
 import net.bteuk.network.lobby.LobbyCommand;
 import net.bteuk.network.sql.DatabaseInit;
@@ -344,9 +345,6 @@ public final class Network extends JavaPlugin {
         timers = new Timers(this, globalSQL);
         timers.startTimers();
 
-        //Create bungeecord channel
-        this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
-
         //Setup the lobby, most features are only enabled in the lobby server.
         lobby = new Lobby(this);
         //Create the rules book.
@@ -518,8 +516,8 @@ public final class Network extends JavaPlugin {
             }
         }
 
-        //Enable server in server table.
-        globalSQL.update("UPDATE server_data SET online=1 WHERE name='" + SERVER_NAME + "';");
+        // Let the Proxy know that the server is enabled.
+        instance.getChat().sendSocketMesage(new ServerStartup(SERVER_NAME));
 
     }
 
@@ -569,10 +567,6 @@ public final class Network extends JavaPlugin {
         if (TUTORIALS) {
             tutorialsDBConnection.disconnect();
         }
-
-        //Disable bungeecord channel.
-        instance.getServer().getMessenger().unregisterOutgoingPluginChannel(instance);
-
     }
 
     //Get user from player.

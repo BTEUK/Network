@@ -82,6 +82,11 @@ public class TabManager {
         addToTeam(addTeamEvent.getName(), addTeamEvent.getPrimaryGroup());
     }
 
+    public void onPlayerJoin(Player player) {
+        LOGGER.info(String.format("Scoreboard is null = %s", scoreboard == null));
+        player.setScoreboard(scoreboard);
+    }
+
     private void startTab() {
         createPacketListeners();
         pm.addPacketListener(pl);
@@ -93,7 +98,7 @@ public class TabManager {
     private void initTeams() {
 
         ScoreboardManager manager = Bukkit.getScoreboardManager();
-        scoreboard = manager.getMainScoreboard();
+        scoreboard = manager.getNewScoreboard();
 
         // Get all the roles.
         Set<Role> roles = Roles.getRoles();
@@ -142,14 +147,17 @@ public class TabManager {
      */
     public void addToTeam(String name, String primaryRole) {
 
-        // Get the team based on the primaryRole.
-        Team team = teams.get(primaryRole);
+        // Run this task synchronously.
+        instance.getServer().getScheduler().runTask(instance, () -> {
+            // Get the team based on the primaryRole.
+            Team team = teams.get(primaryRole);
 
-        if (team != null) {
-            team.addEntry(name);
-        } else {
-            LOGGER.warning(String.format("Player %s with primary role %s does not have a team.", name, primaryRole));
-        }
+            if (team != null) {
+                team.addEntry(name);
+            } else {
+                LOGGER.warning(String.format("Player %s with primary role %s does not have a team.", name, primaryRole));
+            }
+        });
     }
 
     /**

@@ -1,6 +1,7 @@
 package net.bteuk.network.eventing.listeners;
 
 import net.bteuk.network.Network;
+import net.bteuk.network.lib.dto.ServerShutdown;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.SwitchServer;
@@ -123,9 +124,6 @@ public class CommandPreProcess implements Listener {
     // It for the most part copies the methods.
     public void onServerClose(ArrayList<NetworkUser> users) {
 
-        // Disable server in server table.
-        instance.getGlobalSQL().update("UPDATE server_data SET online=0 WHERE name='" + SERVER_NAME + "';");
-
         // Check if another server is online,
         // If true then switch all the players to this server.
         // Always check the lobby and earth first.
@@ -163,5 +161,8 @@ public class CommandPreProcess implements Listener {
 
         // Remove users from list.
         users.clear();
+
+        // Let the Proxy know the server is closing.
+        instance.getChat().sendSocketMesage(new ServerShutdown(SERVER_NAME));
     }
 }

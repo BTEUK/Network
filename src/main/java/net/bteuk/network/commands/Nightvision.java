@@ -63,6 +63,8 @@ public class Nightvision extends AbstractCommand {
     }
 
     public static void removeNightvision(Player player) {
-        player.removePotionEffect(PotionEffectType.NIGHT_VISION);
+        Bukkit.getScheduler().runTask(Network.getInstance(), () -> {
+            player.removePotionEffect(PotionEffectType.NIGHT_VISION);
+        });
     }
 }
