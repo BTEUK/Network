@@ -16,6 +16,9 @@ import net.bteuk.network.utils.Roles;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Criteria;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.scoreboard.Team;
@@ -28,6 +31,9 @@ import java.util.Set;
 
 import static com.comphenix.protocol.wrappers.EnumWrappers.PlayerInfoAction.ADD_PLAYER;
 import static net.bteuk.network.utils.Constants.LOGGER;
+import static net.bteuk.network.utils.Constants.SIDEBAR_CONTENT;
+import static net.bteuk.network.utils.Constants.SIDEBAR_ENABLED;
+import static net.bteuk.network.utils.Constants.SIDEBAR_TITLE;
 
 public class TabManager {
 
@@ -118,6 +124,18 @@ public class TabManager {
                 j = 0;
             } else {
                 j++;
+            }
+        }
+
+        // Set sidebar if enabled.
+        if (SIDEBAR_ENABLED) {
+
+            Objective objective = scoreboard.registerNewObjective("sidebar", Criteria.DUMMY, Component.text(SIDEBAR_TITLE));
+            objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+            int score = SIDEBAR_CONTENT.size();
+            for (String sidebarText : SIDEBAR_CONTENT) {
+                score--;
+                objective.getScore(sidebarText).setScore(score);
             }
         }
     }

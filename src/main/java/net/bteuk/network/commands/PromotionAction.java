@@ -9,6 +9,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 /**
@@ -45,6 +46,6 @@ public abstract class PromotionAction extends AbstractCommand {
         }
 
         CompletableFuture<Component> resultFuture = Roles.alterRole(uuid, name, args[1], demote, false);
-        resultFuture.thenAcceptAsync(sender::sendMessage);
+        Executors.newSingleThreadExecutor().submit(() -> resultFuture.thenAcceptAsync(sender::sendMessage).join());
     }
 }

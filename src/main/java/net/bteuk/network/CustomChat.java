@@ -12,7 +12,6 @@ import net.bteuk.network.lib.dto.DiscordRole;
 import net.bteuk.network.lib.dto.OnlineUserAdd;
 import net.bteuk.network.lib.dto.OnlineUserRemove;
 import net.bteuk.network.lib.dto.OnlineUsersReply;
-import net.bteuk.network.lib.dto.OnlineUsersRequest;
 import net.bteuk.network.lib.dto.UserConnectReply;
 import net.bteuk.network.lib.dto.UserRemove;
 import net.bteuk.network.lib.dto.UserUpdate;
@@ -70,9 +69,6 @@ public class CustomChat implements Listener, SocketHandler {
             InputSocket inputSocket = new InputSocket(inputSocketPort);
             inputSocket.start(this);
         }
-
-        // Request all online users in the Network.
-        sendSocketMesage(new OnlineUsersRequest());
 
         LOGGER.info("Successfully enabled Chat!");
     }

@@ -80,18 +80,11 @@ import net.bteuk.network.utils.Tips;
 import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.enums.ServerType;
 import net.bteuk.network.utils.regions.RegionManager;
-import net.kyori.adventure.text.Component;
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scoreboard.Criteria;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.ScoreboardManager;
 import teachingtutorials.utils.DBConnection;
 
 import java.sql.SQLException;
@@ -103,9 +96,6 @@ import static net.bteuk.network.utils.Constants.PROGRESS_MAP;
 import static net.bteuk.network.utils.Constants.REGIONS_ENABLED;
 import static net.bteuk.network.utils.Constants.SERVER_NAME;
 import static net.bteuk.network.utils.Constants.SERVER_TYPE;
-import static net.bteuk.network.utils.Constants.SIDEBAR_CONTENT;
-import static net.bteuk.network.utils.Constants.SIDEBAR_ENABLED;
-import static net.bteuk.network.utils.Constants.SIDEBAR_TITLE;
 import static net.bteuk.network.utils.Constants.TIPS;
 import static net.bteuk.network.utils.Constants.TPLL_ENABLED;
 import static net.bteuk.network.utils.Constants.TUTORIALS;
@@ -496,25 +486,6 @@ public final class Network extends JavaPlugin {
         new Focus(this);
 
         new Me(this);
-
-        // Unregister sidebar.
-        ScoreboardManager manager = Bukkit.getScoreboardManager();
-        Scoreboard scoreboard = manager.getMainScoreboard();
-        Objective objective = scoreboard.getObjective("sidebar");
-        if (objective != null) {
-            objective.unregister();
-        }
-        // Set sidebar if enabled.
-        if (SIDEBAR_ENABLED) {
-
-            objective = scoreboard.registerNewObjective("sidebar", Criteria.DUMMY, Component.text(SIDEBAR_TITLE));
-            objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-            int score = SIDEBAR_CONTENT.size();
-            for (String sidebarText : SIDEBAR_CONTENT) {
-                score--;
-                objective.getScore(sidebarText).setScore(score);
-            }
-        }
 
         // Let the Proxy know that the server is enabled.
         instance.getChat().sendSocketMesage(new ServerStartup(SERVER_NAME));
