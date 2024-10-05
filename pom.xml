@@ -5,16 +5,16 @@
 
     <groupId>net.bteuk</groupId>
     <artifactId>Network</artifactId>
-    <version>1.6.3</version>
+    <version>1.7.0</version>
     <packaging>jar</packaging>
 
     <name>Network</name>
 
     <properties>
-        <java.version>17</java.version>
-        <maven.compiler.release>17</maven.compiler.release>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <java.version>21</java.version>
+        <maven.compiler.release>21</maven.compiler.release>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -103,7 +103,7 @@
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.20.1-R0.1-SNAPSHOT</version>
+            <version>1.21.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
@@ -111,19 +111,19 @@
         <dependency>
             <groupId>com.sk89q.worldguard</groupId>
             <artifactId>worldguard-bukkit</artifactId>
-            <version>7.0.9</version>
+            <version>7.0.12</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.comphenix.protocol</groupId>
+            <groupId>com.github.dmulloy2</groupId>
             <artifactId>ProtocolLib</artifactId>
-            <version>5.1.0</version>
+            <version>1e3fa2d36e</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.github.decentsoftware-eu</groupId>
             <artifactId>decentholograms</artifactId>
-            <version>2.8.6</version>
+            <version>2.8.11</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -137,7 +137,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.28</version>
+            <version>1.18.34</version>
         </dependency>
         <dependency>
             <groupId>io.papermc</groupId>
@@ -148,27 +148,27 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-dbcp2</artifactId>
-            <version>2.9.0</version>
+            <version>2.12.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.0</version>
+            <version>3.17.0</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.13.0</version>
+            <version>2.17.0</version>
         </dependency>
         <dependency>
-            <groupId>com.github.SmylerMC</groupId>
+            <groupId>com.github.BTEUK</groupId>
             <artifactId>terraminusminus</artifactId>
-            <version>master-e92dc85e64-1</version>
+            <version>22449a34bf</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>32.1.1-jre</version>
+            <version>33.3.1-jre</version>
         </dependency>
 
         <!-- Internal libraries -->
@@ -192,7 +192,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.9.2</version>
+            <version>5.11.2</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
