@@ -41,7 +41,7 @@ public class WorldguardPlotsystem {
         int zTransform = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + world.getName() + "';");
 
         //Apply to transform to each coordinate.
-        vector.forEach(bv -> newVector.add(BlockVector2.at(bv.getX() + xTransform, bv.getZ() + zTransform)));
+        vector.forEach(bv -> newVector.add(BlockVector2.at(bv.x() + xTransform, bv.z() + zTransform)));
 
         return newVector;
 
@@ -69,7 +69,7 @@ public class WorldguardPlotsystem {
 
         BlockVector2 bv = Point.getAveragePoint(region.getPoints());
 
-        return (new Location(world, bv.getX(), Utils.getHighestYAt(world, bv.getX(), bv.getZ()), bv.getZ()));
+        return (new Location(world, bv.x(), Utils.getHighestYAt(world, bv.x(), bv.z()), bv.z()));
 
     }
 

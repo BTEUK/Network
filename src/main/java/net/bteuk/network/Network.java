@@ -31,6 +31,7 @@ import net.bteuk.network.commands.give.GiveBarrier;
 import net.bteuk.network.commands.give.GiveDebugStick;
 import net.bteuk.network.commands.give.GiveLight;
 import net.bteuk.network.commands.ll;
+import net.bteuk.network.commands.navigation.BTEUK;
 import net.bteuk.network.commands.navigation.Back;
 import net.bteuk.network.commands.navigation.Delhome;
 import net.bteuk.network.commands.navigation.Home;
@@ -486,6 +487,8 @@ public final class Network extends JavaPlugin {
         new Focus(this);
 
         new Me(this);
+
+        new BTEUK(this);
 
         // Let the Proxy know that the server is enabled.
         instance.getChat().sendSocketMesage(new ServerStartup(SERVER_NAME));

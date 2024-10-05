@@ -1,5 +1,9 @@
 package net.bteuk.network.utils;
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
+import com.comphenix.protocol.events.PacketContainer;
 import net.bteuk.network.Network;
 import net.bteuk.network.lib.dto.SwitchServerEvent;
 import net.bteuk.network.lib.dto.UserDisconnect;
@@ -54,5 +58,19 @@ public class SwitchServer {
         UserDisconnect userDisconnect = user.createDisconnectEvent();
         SwitchServerEvent switchServerEvent = new SwitchServerEvent(p.getUniqueId().toString(), server, SERVER_NAME, userDisconnect);
         Network.getInstance().getChat().sendSocketMesage(switchServerEvent);
+    }
+
+    public static void switchToExternalServer(Player player) {
+
+        ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
+
+        PacketContainer serverTransfer = new PacketContainer(PacketType.Play.Server.TRANSFER);
+        serverTransfer.getStrings()
+                        .write(0, "bteuk.net");
+        serverTransfer.getIntegers()
+                        .write(0, 25565);
+
+        protocolManager.sendServerPacket(player, serverTransfer);
+
     }
 }

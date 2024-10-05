@@ -16,19 +16,16 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <junit.version>5.11.2</junit.version>
     </properties>
 
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
+                <version>3.6.0</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -36,7 +33,53 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <minimizeJar>true</minimizeJar>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/**</exclude>
+                                        <exclude>AUTHORS</exclude>
+                                        <exclude>LICENSE</exclude>
+                                        <exclude>README.md</exclude>
+                                        <exclude>Log4j-events.dtd</exclude>
+                                        <exclude>Log4j-events.xsd</exclude>
+                                        <exclude>Log4j-config.xsd</exclude>
+                                        <exclude>Log4j-levels.xsd</exclude>
+                                        <exclude>Log4j-charsets.properties</exclude>
+                                        <exclude>mozilla/public-suffix-list.txt</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>com.github.BTEUK:*</artifact>
+                                    <excludes>
+                                        <exclude>net/kyori/**</exclude>
+                                        <exclude>com/google/**</exclude>
+                                        <exclude>net/daporkchop/lib/binary/**</exclude>
+                                        <exclude>org/**</exclude>
+                                        <exclude>com/fasterxml/jackson/**</exclude>
+                                        <exclude>io/netty/**</exclude>
+                                        <exclude>config.yml</exclude>
+                                        <exclude>javax/annotation/**</exclude>
+                                        <exclude>LZMA/**</exclude>
+                                        <exclude>net/buildtheearth/**</exclude>
+                                        <exclude>it/unimi/dsi/fastutil/**</exclude>
+                                        <exclude>net/daporkchop/lib/**</exclude>
+                                        <exclude>SCL.lombok/**</exclude>
+                                        <exclude>plugin.yml</exclude>
+                                        <exclude>lombok/**</exclude>
+                                        <exclude>changelog.txt</exclude>
+                                        <exclude>latestchanges.html</exclude>
+                                        <exclude>release-timestamp.txt</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>com.github.BTEUK:ProgressMapper</artifact>
+                                    <excludes>
+                                        <exclude>me/bteuk/progressmapperbackend/**</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                         </configuration>
                     </execution>
                 </executions>
@@ -49,7 +92,7 @@
                     <dependency>
                         <groupId>org.junit.jupiter</groupId>
                         <artifactId>junit-jupiter-engine</artifactId>
-                        <version>5.9.2</version>
+                        <version>${junit.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -115,9 +158,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.dmulloy2</groupId>
+            <groupId>com.comphenix.protocol</groupId>
             <artifactId>ProtocolLib</artifactId>
-            <version>1e3fa2d36e</version>
+            <version>5.3.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -163,7 +206,13 @@
         <dependency>
             <groupId>com.github.BTEUK</groupId>
             <artifactId>terraminusminus</artifactId>
-            <version>22449a34bf</version>
+            <version>8f03ebe8a2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -180,7 +229,7 @@
         <dependency>
             <groupId>com.github.BTEUK</groupId>
             <artifactId>NetworkLib</artifactId>
-            <version>e53a43d801</version>
+            <version>723b185fc1</version>
         </dependency>
         <dependency>
             <groupId>com.github.BTEUK</groupId>
@@ -192,7 +241,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.11.2</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
