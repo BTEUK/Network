@@ -5,34 +5,25 @@ import net.bteuk.network.commands.AFK;
 import net.bteuk.network.commands.BuildingCompanionCommand;
 import net.bteuk.network.commands.Clear;
 import net.bteuk.network.commands.Demote;
-import net.bteuk.network.commands.Discord;
 import net.bteuk.network.commands.Focus;
 import net.bteuk.network.commands.Gamemode;
 import net.bteuk.network.commands.Hdb;
-import net.bteuk.network.commands.Help;
 import net.bteuk.network.commands.Me;
 import net.bteuk.network.commands.Msg;
-import net.bteuk.network.commands.Navigator;
-import net.bteuk.network.commands.Nightvision;
 import net.bteuk.network.commands.Phead;
-import net.bteuk.network.commands.Plot;
 import net.bteuk.network.commands.Pmute;
 import net.bteuk.network.commands.ProgressMap;
 import net.bteuk.network.commands.Promote;
 import net.bteuk.network.commands.Ptime;
 import net.bteuk.network.commands.Punmute;
-import net.bteuk.network.commands.RegionCommand;
 import net.bteuk.network.commands.Rules;
 import net.bteuk.network.commands.Season;
-import net.bteuk.network.commands.Speed;
 import net.bteuk.network.commands.TipsToggle;
 import net.bteuk.network.commands.Zone;
 import net.bteuk.network.commands.give.GiveBarrier;
 import net.bteuk.network.commands.give.GiveDebugStick;
 import net.bteuk.network.commands.give.GiveLight;
-import net.bteuk.network.commands.ll;
 import net.bteuk.network.commands.navigation.BTEUK;
-import net.bteuk.network.commands.navigation.Back;
 import net.bteuk.network.commands.navigation.Delhome;
 import net.bteuk.network.commands.navigation.Home;
 import net.bteuk.network.commands.navigation.Homes;
@@ -40,19 +31,14 @@ import net.bteuk.network.commands.navigation.Navigation;
 import net.bteuk.network.commands.navigation.Server;
 import net.bteuk.network.commands.navigation.Sethome;
 import net.bteuk.network.commands.navigation.Spawn;
-import net.bteuk.network.commands.navigation.Tp;
-import net.bteuk.network.commands.navigation.TpToggle;
 import net.bteuk.network.commands.navigation.Tpll;
-import net.bteuk.network.commands.navigation.Warp;
 import net.bteuk.network.commands.navigation.Warps;
 import net.bteuk.network.commands.staff.Ban;
 import net.bteuk.network.commands.staff.Exp;
 import net.bteuk.network.commands.staff.Kick;
 import net.bteuk.network.commands.staff.Mute;
-import net.bteuk.network.commands.staff.Staff;
 import net.bteuk.network.commands.staff.Unban;
 import net.bteuk.network.commands.staff.Unmute;
-import net.bteuk.network.commands.tabcompleters.LocationSelector;
 import net.bteuk.network.commands.tabcompleters.PlayerSelector;
 import net.bteuk.network.commands.tabcompleters.ServerSelector;
 import net.bteuk.network.eventing.listeners.CommandPreProcess;
@@ -83,6 +69,8 @@ import net.bteuk.network.utils.enums.ServerType;
 import net.bteuk.network.utils.regions.RegionManager;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Material;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -98,7 +86,6 @@ import static net.bteuk.network.utils.Constants.REGIONS_ENABLED;
 import static net.bteuk.network.utils.Constants.SERVER_NAME;
 import static net.bteuk.network.utils.Constants.SERVER_TYPE;
 import static net.bteuk.network.utils.Constants.TIPS;
-import static net.bteuk.network.utils.Constants.TPLL_ENABLED;
 import static net.bteuk.network.utils.Constants.TUTORIALS;
 import static net.bteuk.network.utils.NetworkConfig.CONFIG;
 
@@ -196,6 +183,7 @@ public final class Network extends JavaPlugin {
         allow_shutdown = true;
 
         //Sets the config if the file has not yet been created.
+        ConfigurationSerialization.registerClass(ConfigurationSerializable.class);
         saveDefaultConfig();
 
         //Update the config to the latest version if it's outdated.
@@ -217,29 +205,22 @@ public final class Network extends JavaPlugin {
         try {
 
             DatabaseInit init = new DatabaseInit();
-            boolean success;
 
             //Global Database
             String global_database = CONFIG.getString("database.global");
             BasicDataSource global_dataSource = init.mysqlSetup(global_database);
             globalSQL = new GlobalSQL(global_dataSource);
-            success = init.initDb(getClassLoader(), "dbsetup_global.sql", global_dataSource);
 
             //Region Database
             String region_database = CONFIG.getString("database.region");
             BasicDataSource region_dataSource = init.mysqlSetup(region_database);
             regionSQL = new RegionSQL(region_dataSource);
-            success = success && init.initDb(getClassLoader(), "dbsetup_regions.sql", region_dataSource);
 
             //Plot Database
             String plot_database = CONFIG.getString("database.plot");
             BasicDataSource plot_dataSource = init.mysqlSetup(plot_database);
             plotSQL = new PlotSQL(plot_dataSource);
-            success = success && init.initDb(getClassLoader(), "dbsetup_plots.sql", plot_dataSource);
 
-            if (!success) {
-                throw new RuntimeException("Error in database setup!");
-            }
 
         } catch (SQLException | RuntimeException e) {
             getLogger().severe("Failed to connect to the database, please check that you have set the config values correctly.");
@@ -357,43 +338,20 @@ public final class Network extends JavaPlugin {
         // Set up the map.
         lobby.reloadMap();
 
+        CommandManager.registerCommands(this);
+
         //Create lobby command, will run /spawn if not in the lobby server.
         new LobbyCommand(this, lobby);
 
-
-        //Setup tpll if enabled in config.
-        if (TPLL_ENABLED) {
-
-            tpll = new Tpll(this, CONFIG.getBoolean("requires_permission"));
-
-        }
-
         //Enable commands.
-        new Plot(this);
         getCommand("zone").setExecutor(new Zone());
-
-        getCommand("navigator").setExecutor(new Navigator());
 
         getCommand("server").setExecutor(new Server());
         getCommand("server").setTabCompleter(new ServerSelector());
 
-        getCommand("teleport").setExecutor(new Tp());
         getCommand("teleport").setTabCompleter(new PlayerSelector());
-        new TpToggle(instance);
 
-        getCommand("back").setExecutor(new Back());
 
-        new Discord(this);
-
-        new ll(this);
-
-        new Nightvision(this);
-        getCommand("speed").setExecutor(new Speed());
-
-        new Help(this);
-
-        getCommand("warp").setExecutor(new Warp());
-        getCommand("warp").setTabCompleter(new LocationSelector());
         getCommand("warps").setExecutor(new Warps());
 
         new Navigation(this);
@@ -435,9 +393,6 @@ public final class Network extends JavaPlugin {
             new Homes(this);
         }
 
-        //Staff command to open the staff gui and use staff chat.
-        new Staff(this);
-
         //Moderation commands.
         if (CONFIG.getBoolean("staff.moderation.enabled")) {
 
@@ -459,7 +414,6 @@ public final class Network extends JavaPlugin {
 
         //Register commandpreprocess to make sure /network:region runs and not that of another plugin.
         new CommandPreProcess(this);
-        getCommand("region").setExecutor(new RegionCommand());
 
         //Enable tips.
         if (TIPS) {

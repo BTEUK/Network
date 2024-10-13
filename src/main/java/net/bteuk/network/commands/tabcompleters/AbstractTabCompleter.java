@@ -1,6 +1,5 @@
 package net.bteuk.network.commands.tabcompleters;
 
-import org.bukkit.command.TabCompleter;
 import org.bukkit.util.StringUtil;
 
 import java.util.ArrayList;
@@ -17,14 +16,10 @@ public abstract class AbstractTabCompleter implements TabCompleter {
         List<String> returns = new ArrayList<>();
 
         if (inputArgs.length == (argIndex + 1)) {
-
             StringUtil.copyPartialMatches(inputArgs[argIndex], options, returns);
             return returns;
-
         } else {
-
             return null;
-
         }
     }
 }

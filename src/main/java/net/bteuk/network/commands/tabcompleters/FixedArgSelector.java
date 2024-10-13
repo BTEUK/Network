@@ -1,10 +1,9 @@
 package net.bteuk.network.commands.tabcompleters;
 
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -27,9 +26,7 @@ public class FixedArgSelector extends AbstractTabCompleter {
     }
 
     @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-
+    public Collection<String> onTabComplete(@NotNull CommandSender sender, @NotNull String[] args) {
         return onTabCompleteArg(args, options, argIndex);
-
     }
 }

@@ -1,6 +1,9 @@
 package net.bteuk.network.commands.navigation;
 
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.bteuk.network.Network;
+import net.bteuk.network.commands.AbstractCommand;
+import net.bteuk.network.commands.tabcompleters.LocationSelector;
 import net.bteuk.network.eventing.events.EventManager;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.SwitchServer;
@@ -8,9 +11,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,20 +18,24 @@ import java.util.Arrays;
 
 import static net.bteuk.network.utils.Constants.SERVER_NAME;
 
-public class Warp implements CommandExecutor {
+public class Warp extends AbstractCommand {
+
+    public Warp() {
+        setTabCompleter(new LocationSelector());
+    }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        //Check if sender is player.
-        if (!(sender instanceof Player p)) {
-            sender.sendMessage(ChatUtils.error("You must be a player to use this command."));
-            return true;
+        //Check if the sender is a player.
+        Player player = getPlayer(stack);
+        if (player == null) {
+            return;
         }
 
         if (args.length == 0) {
-            help(p);
-            return true;
+            help(player);
+            return;
         }
 
         //Get location name from all remaining args.
@@ -70,29 +74,27 @@ public class Warp implements CommandExecutor {
                 }
 
                 //Set current location for /back
-                Back.setPreviousCoordinate(p.getUniqueId().toString(), p.getLocation());
+                Back.setPreviousCoordinate(player.getUniqueId().toString(), player.getLocation());
 
                 //Teleport to location.
-                p.teleport(l);
-                p.sendMessage(ChatUtils.success("Teleported to ")
+                player.teleport(l);
+                player.sendMessage(ChatUtils.success("Teleported to ")
                         .append(Component.text(location, NamedTextColor.DARK_AQUA)));
 
             } else {
 
                 //Server is different.
-                EventManager.createTeleportEvent(true, p.getUniqueId().toString(), "network",
-                        "teleport location " + location, p.getLocation());
+                EventManager.createTeleportEvent(true, player.getUniqueId().toString(), "network",
+                        "teleport location " + location, player.getLocation());
 
-                SwitchServer.switchServer(p, server);
+                SwitchServer.switchServer(player, server);
             }
 
         } else {
-            p.sendMessage(ChatUtils.error("The location ")
+            player.sendMessage(ChatUtils.error("The location ")
                     .append(Component.text(location, NamedTextColor.DARK_RED))
                     .append(ChatUtils.error(" does not exist.")));
         }
-
-        return true;
     }
 
     private void help(Player p) {

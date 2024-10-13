@@ -1,14 +1,75 @@
 name: Network
 version: '${project.version}'
 main: net.bteuk.network.Network
-api-version: 1.21.1
-depend: [ WorldGuard, ProtocolLib, LuckPerms ]
+api-version: '1.21.1'
 
-softdepend:
-  - DecentHolograms
-  - TerraPlusMinus
+WorldGuard:
+  load: AFTER
+  required: true
+  join-classpath: true
+ProtocolLib:
+  load: AFTER
+  required: true
+  join-classpath: true
+LuckPerms:
+  load: AFTER
+  required: true
+  join-classpath: true
+DecentHolograms:
+  load: AFTER
+  required: false
+  join-classpath: true
 
 commands:
+  plot:
+    aliases: [ plots ]
+    usage: /<command>
+    description: Allows players to manipulate plots without using the gui.
+  tpll:
+    usage: /<command>
+    description: Teleport to coordinates.
+  ll:
+    aliases: [ location, where ]
+    usage: /<command>
+    description: Returns the coordinates where the player is standing with a link to google maps.
+  navigator:
+    aliases: [ nav, gui, menu, claim ]
+    usage: /<command>
+    description: Opens the main gui, will always return to the previous menu if possible.
+  staff:
+    aliases: [ st ]
+    usage: /<command>
+    description: Opens the Staff Menu.
+  region:
+    usage: /<command>
+    description: Allows players to manipulate regions without using the gui.
+  teleport:
+    aliases: [ tp ]
+    usage: /<command>
+    description: Teleport to any online player.
+  back:
+    usage: /<command>
+    description: Teleports the player to the previous teleported location.
+  teleporttoggle:
+    aliases: [ tptoggle, toggleteleport, toggletp ]
+    usage: /<command>
+    description: Enables/Disables the ability for other players to teleport to you.
+  discord:
+    usage: /<command>
+    description: Sends a link to our discord server.
+  nightvision:
+    aliases: [ nv ]
+    usage: /<command>
+    description: Toggle nightvision.
+  speed:
+    usage: /<command>
+    description: Sets the players speed, value up to 10.
+  help:
+    usage: /<command>
+    description: Help menu for information on commands and server features.
+  warp:
+    usage: /<command>
+    description: Warp to locations in the exploration menu.
   warps:
     usage: /<command>
     description: List all warps on the server, 16 per page.

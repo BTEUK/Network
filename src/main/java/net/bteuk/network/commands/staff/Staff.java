@@ -1,15 +1,13 @@
 package net.bteuk.network.commands.staff;
 
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.bteuk.network.CustomChat;
 import net.bteuk.network.Network;
+import net.bteuk.network.commands.AbstractCommand;
 import net.bteuk.network.gui.staff.StaffGui;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
 import net.kyori.adventure.text.Component;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,47 +16,30 @@ import static net.bteuk.network.lib.enums.ChatChannels.STAFF;
 import static net.bteuk.network.utils.Constants.LOGGER;
 import static net.bteuk.network.utils.Constants.STAFF_CHAT;
 
-public class Staff implements CommandExecutor {
+public class Staff extends AbstractCommand {
 
-    //Constructor to enable the command.
-    public Staff(Network instance) {
+    @Override
+    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        //Register command.
-        PluginCommand command = instance.getCommand("staff");
-
-        if (command == null) {
-            LOGGER.warning("Home command not added to plugin.yml, it will therefore not be enabled.");
+        //Check if the sender is a player.
+        Player p = getPlayer(stack);
+        if (p == null) {
             return;
         }
 
-        //Set executor.
-        command.setExecutor(this);
-
-    }
-
-    @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args) {
-
-        //Check if the sender is a player.
-        if (!(sender instanceof Player p)) {
-
-            sender.sendMessage(ChatUtils.error("This command can only be used by a player."));
-            return true;
-
-        }
-
         //Check if user is member of staff.
-        if (!(p.hasPermission("uknet.staff"))) {
-
-            p.sendMessage(ChatUtils.error("You do not have permission to use this command."));
-            return true;
-
+        if (!(hasPermission(p, "uknet.staff"))) {
+            return;
         }
 
-        //Get user.
         NetworkUser u = Network.getInstance().getUser(p);
 
-        if (u == null) {return true;}
+        //If u is null, cancel.
+        if (u == null) {
+            LOGGER.severe("User " + p.getName() + " can not be found!");
+            p.sendMessage(ChatUtils.error("User can not be found, please relog!"));
+            return;
+        }
 
         //If first arg is chat, switch the player to and from staff chat if enabled.
         if (args.length > 0 && STAFF_CHAT) {
@@ -80,13 +61,13 @@ public class Staff implements CommandExecutor {
                 Network.getInstance().getChat().sendSocketMesage(CustomChat.getChatMessage(Component.text(String.join(" ", args)), u));
                 u.setChatChannel(GLOBAL.getChannelName());
             }
-            return true;
+            return;
         }
 
         //If the player has a previous gui, open that.
         openStaffMenu(u);
 
-        return true;
+        return;
     }
 
     public static void openStaffMenu(NetworkUser u) {

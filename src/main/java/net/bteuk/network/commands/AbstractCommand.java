@@ -1,53 +1,48 @@
 package net.bteuk.network.commands;
 
+import io.papermc.paper.command.brigadier.BasicCommand;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import lombok.Setter;
+import net.bteuk.network.commands.tabcompleters.TabCompleter;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.kyori.adventure.text.Component;
-import org.apache.commons.lang3.StringUtils;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
-import static net.bteuk.network.utils.Constants.LOGGER;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Abstract class for registering a command.
  * The implementation of the commandExecutor happens in the extending class.
  */
-public abstract class AbstractCommand implements CommandExecutor {
+public abstract class AbstractCommand implements BasicCommand {
 
     protected static final Component COMMAND_ONLY_BY_PLAYER = ChatUtils.error("This command can only be run by a player.");
     protected static final Component NO_PERMISSION = ChatUtils.error("You do not have permission to use this command.");
 
-    protected PluginCommand command;
+    @Setter
+    protected TabCompleter tabCompleter;
 
-    //Constructor to enable the command.
-    protected AbstractCommand(JavaPlugin instance, String commandName) {
-
-        //Register command.
-        command = instance.getCommand(commandName);
-
-        if (command == null) {
-            LOGGER.warning(StringUtils.capitalize(commandName) + " command not added to plugin.yml, it will therefore not be enabled.");
-            return;
+    @Override
+    public Collection<String> suggest(CommandSourceStack commandSourceStack, String[] args) {
+        if (tabCompleter != null) {
+            return tabCompleter.onTabComplete(commandSourceStack.getSender(), args);
         }
-
-        //Set executor.
-        command.setExecutor(this);
-
+        return Collections.emptyList();
     }
 
     /**
      * Gets the {@link Player} from the server, if the sender is not a player send them a warning with
      * 'This command can only be run by a player.'
      *
-     * @param sender the command sender
+     * @param stack the command source stack
      * @return the {@link Player} instance, or null if not a player
      */
-    protected Player getPlayer(CommandSender sender) {
+    protected Player getPlayer(CommandSourceStack stack) {
 
         //Check if the sender is a player.
+        CommandSender sender = stack.getSender();
         if (!(sender instanceof Player p)) {
 
             sender.sendMessage(COMMAND_ONLY_BY_PLAYER);
