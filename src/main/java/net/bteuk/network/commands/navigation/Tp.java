@@ -3,6 +3,7 @@ package net.bteuk.network.commands.navigation;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.bteuk.network.Network;
 import net.bteuk.network.commands.AbstractCommand;
+import net.bteuk.network.commands.tabcompleters.PlayerSelector;
 import net.bteuk.network.eventing.events.EventManager;
 import net.bteuk.network.lib.dto.OnlineUser;
 import net.bteuk.network.lib.utils.ChatUtils;
@@ -14,6 +15,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Optional;
 
 public class Tp extends AbstractCommand {
+
+    public Tp() {
+        setTabCompleter(new PlayerSelector());
+    }
 
     @Override
     public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {

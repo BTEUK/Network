@@ -1,6 +1,8 @@
 package net.bteuk.network.commands.navigation;
 
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.bteuk.network.Network;
+import net.bteuk.network.commands.AbstractCommand;
 import net.bteuk.network.commands.tabcompleters.HomeSelector;
 import net.bteuk.network.eventing.events.EventManager;
 import net.bteuk.network.lib.utils.ChatUtils;
@@ -9,51 +11,35 @@ import net.bteuk.network.utils.SwitchServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Objects;
 
-import static net.bteuk.network.utils.Constants.LOGGER;
 import static net.bteuk.network.utils.Constants.SERVER_NAME;
 
-public class Home extends HomeSelector implements CommandExecutor {
+public class Home extends AbstractCommand {
 
     private final GlobalSQL globalSQL;
 
     //Constructor to enable the command.
-    public Home(Network instance, GlobalSQL globalSQL) {
+    public Home(Network instance) {
 
-        this.globalSQL = globalSQL;
-
-        //Register command.
-        PluginCommand command = instance.getCommand("home");
-
-        if (command == null) {
-            LOGGER.warning("Home command not added to plugin.yml, it will therefore not be enabled.");
-            return;
-        }
-
-        //Set executor.
-        command.setExecutor(this);
+        this.globalSQL = instance.getGlobalSQL();
 
         //Set tab completer.
-        command.setTabCompleter(this);
+        setTabCompleter(new HomeSelector());
 
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
         //Check if the sender is a player.
-        if (!(sender instanceof Player p)) {
-            sender.sendMessage(ChatUtils.error("This command can only be used by players."));
-            return true;
+        Player player = getPlayer(stack);
+        if (player == null) {
+            return;
         }
 
         //If no args teleport to default home, if exists.
@@ -62,14 +48,14 @@ public class Home extends HomeSelector implements CommandExecutor {
         if (args.length == 0) {
 
             //If a default home is set, teleport to it.
-            if (!globalSQL.hasRow("SELECT uuid FROM home WHERE uuid='" + p.getUniqueId() + "' AND name IS NULL;")) {
-                p.sendMessage(ChatUtils.error("You do not have a default home set, you can set it typing ")
+            if (!globalSQL.hasRow("SELECT uuid FROM home WHERE uuid='" + player.getUniqueId() + "' AND name IS NULL;")) {
+                player.sendMessage(ChatUtils.error("You do not have a default home set, you can set it typing ")
                         .append(Component.text("/sethome", NamedTextColor.DARK_RED)));
-                return true;
+                return;
             }
 
             //Get coordinate ID.
-            int coordinate_id = globalSQL.getInt("SELECT coordinate_id FROM home WHERE uuid='" + p.getUniqueId() + "' AND name IS NULL;");
+            int coordinate_id = globalSQL.getInt("SELECT coordinate_id FROM home WHERE uuid='" + player.getUniqueId() + "' AND name IS NULL;");
 
             //Get server.
             String server = globalSQL.getString("SELECT server FROM coordinates WHERE id=" + coordinate_id + ";");
@@ -81,42 +67,42 @@ public class Home extends HomeSelector implements CommandExecutor {
                 Location l = globalSQL.getLocation(coordinate_id);
 
                 //Teleport to the location.
-                p.teleport(l);
-                p.sendMessage(ChatUtils.success("Teleported to your default home."));
+                player.teleport(l);
+                player.sendMessage(ChatUtils.success("Teleported to your default home."));
 
             } else {
 
                 //Switch server with join event.
-                EventManager.createTeleportEvent(true, p.getUniqueId().toString(), "network",
+                EventManager.createTeleportEvent(true, player.getUniqueId().toString(), "network",
                         "teleport coordinateID " + coordinate_id,
                         "&aTeleported to your default home.",
-                        p.getLocation());
+                        player.getLocation());
 
                 //Switch server.
-                SwitchServer.switchServer(p, server);
+                SwitchServer.switchServer(player, server);
 
             }
         } else {
 
             //Check for permission.
-            if (!p.hasPermission("uknet.navigation.homes")) {
-                p.sendMessage(ChatUtils.error("You do not have permission to set multiple homes, you can only use your default home with ")
+            if (!player.hasPermission("uknet.navigation.homes")) {
+                player.sendMessage(ChatUtils.error("You do not have permission to set multiple homes, you can only use your default home with ")
                         .append(Component.text("/home", NamedTextColor.DARK_RED)));
-                return true;
+                return;
             }
 
             //Check if a home with this name already exists.
             String name = String.join(" ", Arrays.copyOfRange(args, 0, args.length));
 
             //Check if home with this name exists.
-            if (!globalSQL.hasRow("SELECT uuid FROM home WHERE uuid='" + p.getUniqueId() + "' AND name='" + name + "';")) {
-                p.sendMessage(ChatUtils.error("You do not have a home with the name ")
+            if (!globalSQL.hasRow("SELECT uuid FROM home WHERE uuid='" + player.getUniqueId() + "' AND name='" + name + "';")) {
+                player.sendMessage(ChatUtils.error("You do not have a home with the name ")
                         .append(Component.text(name, NamedTextColor.DARK_RED)));
-                return true;
+                return;
             }
 
             //Get coordinate ID.
-            int coordinate_id = globalSQL.getInt("SELECT coordinate_id FROM home WHERE uuid='" + p.getUniqueId() + "' AND name='" + name + "';");
+            int coordinate_id = globalSQL.getInt("SELECT coordinate_id FROM home WHERE uuid='" + player.getUniqueId() + "' AND name='" + name + "';");
 
             //Get server.
             String server = globalSQL.getString("SELECT server FROM coordinates WHERE id=" + coordinate_id + ";");
@@ -128,26 +114,22 @@ public class Home extends HomeSelector implements CommandExecutor {
                 Location l = globalSQL.getLocation(coordinate_id);
 
                 //Teleport to the location.
-                p.teleport(l);
-                p.sendMessage(ChatUtils.success("Teleported to your home ")
+                player.teleport(l);
+                player.sendMessage(ChatUtils.success("Teleported to your home ")
                         .append(Component.text(name, NamedTextColor.DARK_AQUA)));
 
             } else {
 
                 //Switch server with join event.
-                EventManager.createTeleportEvent(true, p.getUniqueId().toString(), "network",
+                EventManager.createTeleportEvent(true, player.getUniqueId().toString(), "network",
                         "teleport coordinateID " + coordinate_id,
                         "&aTeleported to your home &3" + name + "&a.",
-                        p.getLocation());
+                        player.getLocation());
 
                 //Switch server.
-                SwitchServer.switchServer(p, server);
+                SwitchServer.switchServer(player, server);
 
             }
-
         }
-
-        return true;
-
     }
 }

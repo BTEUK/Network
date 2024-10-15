@@ -2,12 +2,11 @@ package net.bteuk.network.commands.tabcompleters;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.lib.dto.OnlineUser;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,17 +17,27 @@ public class PlayerSelector extends AbstractTabCompleter {
 
     private final int argIndex;
 
+    private final boolean excludeSelf;
+
     public PlayerSelector() {
-        this.argIndex = 0;
+        this(0, true);
+    }
+
+    public PlayerSelector(boolean excludeSelf) {
+        this(0, excludeSelf);
     }
 
     public PlayerSelector(int argIndex) {
+        this(argIndex, true);
+    }
+
+    public PlayerSelector(int argIndex, boolean excludeSelf) {
         this.argIndex = argIndex;
+        this.excludeSelf = excludeSelf;
     }
 
     @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-
+    public Collection<String> onTabComplete(@NotNull CommandSender sender, @NotNull String[] args) {
         //Get array of online players, excluding yourself.
         List<String> names = Network.getInstance().getOnlineUsers().stream().map(OnlineUser::getName).collect(Collectors.toList());
         if (sender instanceof Player p) {

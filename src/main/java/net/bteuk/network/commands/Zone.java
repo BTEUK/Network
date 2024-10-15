@@ -1,30 +1,27 @@
 package net.bteuk.network.commands;
 
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.bteuk.network.Network;
 import net.bteuk.network.eventing.events.EventManager;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.PlotSQL;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class Zone implements CommandExecutor {
+public class Zone extends AbstractCommand {
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        if (!(sender instanceof Player p)) {
-
-            sender.sendMessage(ChatUtils.error("You must be a player to run this command."));
-            return true;
-
+        //Check if the sender is a player.
+        Player player = getPlayer(stack);
+        if (player == null) {
+            return;
         }
 
         if (args.length < 2) {
-            p.sendMessage(ChatUtils.error("/zone join <zoneID>"));
-            return true;
+            player.sendMessage(ChatUtils.error("/zone join <zoneID>"));
+            return;
         }
 
         int zoneID;
@@ -35,33 +32,30 @@ public class Zone implements CommandExecutor {
             zoneID = Integer.parseInt(args[1]);
 
         } catch (NumberFormatException e) {
-            p.sendMessage(ChatUtils.error("/zone join <plotID>"));
-            return true;
+            player.sendMessage(ChatUtils.error("/zone join <plotID>"));
+            return;
         }
 
         //Check if the first arg is 'join'
         if (!args[0].equals("join")) {
-            p.sendMessage(ChatUtils.error("/zone join <plotID>"));
-            return true;
+            player.sendMessage(ChatUtils.error("/zone join <plotID>"));
+            return;
         }
 
         PlotSQL plotSQL = Network.getInstance().getPlotSQL();
 
         //Check if they have an invite for this plot.
-        if (plotSQL.hasRow("SELECT id FROM zone_invites WHERE id=" + zoneID + " AND uuid='" + p.getUniqueId() + "';")) {
+        if (plotSQL.hasRow("SELECT id FROM zone_invites WHERE id=" + zoneID + " AND uuid='" + player.getUniqueId() + "';")) {
 
             //Add server event to join plot.
-            EventManager.createEvent(p.getUniqueId().toString(), "plotsystem", plotSQL.getString("SELECT server FROM location_data WHERE name='" +
+            EventManager.createEvent(player.getUniqueId().toString(), "plotsystem", plotSQL.getString("SELECT server FROM location_data WHERE name='" +
                     plotSQL.getString("SELECT location FROM zones WHERE id=" + zoneID + ";") + "';"), "join zone " + zoneID);
 
             //Remove invite.
-            plotSQL.update("DELETE FROM plot_invites WHERE id=" + zoneID + " AND uuid='" + p.getUniqueId() + "';");
-
-            return true;
+            plotSQL.update("DELETE FROM plot_invites WHERE id=" + zoneID + " AND uuid='" + player.getUniqueId() + "';");
 
         } else {
-            p.sendMessage(ChatUtils.error("You have not been invited to join this Zone."));
-            return true;
+            player.sendMessage(ChatUtils.error("You have not been invited to join this Zone."));
         }
     }
 }

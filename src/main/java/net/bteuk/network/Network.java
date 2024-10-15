@@ -1,46 +1,27 @@
 package net.bteuk.network;
 
 import lombok.Getter;
-import net.bteuk.network.commands.AFK;
 import net.bteuk.network.commands.BuildingCompanionCommand;
-import net.bteuk.network.commands.Clear;
 import net.bteuk.network.commands.Demote;
 import net.bteuk.network.commands.Focus;
-import net.bteuk.network.commands.Gamemode;
 import net.bteuk.network.commands.Hdb;
 import net.bteuk.network.commands.Me;
 import net.bteuk.network.commands.Msg;
-import net.bteuk.network.commands.Phead;
 import net.bteuk.network.commands.Pmute;
 import net.bteuk.network.commands.ProgressMap;
 import net.bteuk.network.commands.Promote;
 import net.bteuk.network.commands.Ptime;
 import net.bteuk.network.commands.Punmute;
-import net.bteuk.network.commands.Rules;
 import net.bteuk.network.commands.Season;
 import net.bteuk.network.commands.TipsToggle;
-import net.bteuk.network.commands.Zone;
-import net.bteuk.network.commands.give.GiveBarrier;
-import net.bteuk.network.commands.give.GiveDebugStick;
-import net.bteuk.network.commands.give.GiveLight;
 import net.bteuk.network.commands.navigation.BTEUK;
-import net.bteuk.network.commands.navigation.Delhome;
-import net.bteuk.network.commands.navigation.Home;
-import net.bteuk.network.commands.navigation.Homes;
-import net.bteuk.network.commands.navigation.Navigation;
-import net.bteuk.network.commands.navigation.Server;
-import net.bteuk.network.commands.navigation.Sethome;
-import net.bteuk.network.commands.navigation.Spawn;
 import net.bteuk.network.commands.navigation.Tpll;
-import net.bteuk.network.commands.navigation.Warps;
 import net.bteuk.network.commands.staff.Ban;
 import net.bteuk.network.commands.staff.Exp;
 import net.bteuk.network.commands.staff.Kick;
 import net.bteuk.network.commands.staff.Mute;
 import net.bteuk.network.commands.staff.Unban;
 import net.bteuk.network.commands.staff.Unmute;
-import net.bteuk.network.commands.tabcompleters.PlayerSelector;
-import net.bteuk.network.commands.tabcompleters.ServerSelector;
 import net.bteuk.network.eventing.listeners.CommandPreProcess;
 import net.bteuk.network.eventing.listeners.Connect;
 import net.bteuk.network.eventing.listeners.GuiListener;
@@ -55,7 +36,6 @@ import net.bteuk.network.lib.dto.OnlineUserRemove;
 import net.bteuk.network.lib.dto.OnlineUsersReply;
 import net.bteuk.network.lib.dto.ServerStartup;
 import net.bteuk.network.lobby.Lobby;
-import net.bteuk.network.lobby.LobbyCommand;
 import net.bteuk.network.sql.DatabaseInit;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.sql.PlotSQL;
@@ -321,8 +301,6 @@ public final class Network extends JavaPlugin {
         lobby = new Lobby(this);
         //Create the rules book.
         lobby.loadRules();
-        //Command to view the rules.
-        getCommand("rules").setExecutor(new Rules());
         if (SERVER_TYPE == ServerType.LOBBY) {
 
             // Set spawn location and enable auto-spawn teleport when falling in the void.
@@ -340,31 +318,7 @@ public final class Network extends JavaPlugin {
 
         CommandManager.registerCommands(this);
 
-        //Create lobby command, will run /spawn if not in the lobby server.
-        new LobbyCommand(this, lobby);
-
-        //Enable commands.
-        getCommand("zone").setExecutor(new Zone());
-
-        getCommand("server").setExecutor(new Server());
-        getCommand("server").setTabCompleter(new ServerSelector());
-
-        getCommand("teleport").setTabCompleter(new PlayerSelector());
-
-
-        getCommand("warps").setExecutor(new Warps());
-
-        new Navigation(this);
-
-        getCommand("afk").setExecutor(new AFK());
-
-        getCommand("clear").setExecutor(new Clear());
-
-        new GiveDebugStick(this);
-        new GiveLight(this);
-        new GiveBarrier(this);
-
-        getCommand("spawn").setExecutor(new Spawn());
+        //Enable commands
 
         //Enabled the progress map command if enabled
         if (PROGRESS_MAP) {
@@ -372,26 +326,12 @@ public final class Network extends JavaPlugin {
             getLogger().info("Enabled Progress map support");
         }
 
-        //Gamemode command.
-        new Gamemode(this);
-
-        //Phead command.
-        new Phead(this);
-
         // Pmute and unmute
         new Pmute(this);
         new Punmute(this);
 
         // msg, tell and w
         new Msg(this);
-
-        //Homes commands.
-        if (CONFIG.getBoolean("homes.enabled")) {
-            new Sethome(this, globalSQL);
-            new Home(this, globalSQL);
-            new Delhome(this, globalSQL);
-            new Homes(this);
-        }
 
         //Moderation commands.
         if (CONFIG.getBoolean("staff.moderation.enabled")) {

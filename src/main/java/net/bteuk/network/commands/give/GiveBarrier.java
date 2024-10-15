@@ -1,9 +1,7 @@
 package net.bteuk.network.commands.give;
 
-import net.bteuk.network.Network;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import org.bukkit.Material;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,15 +10,8 @@ import org.jetbrains.annotations.NotNull;
  * Extends GiveItem, which handles the actual giving of the item.
  */
 public class GiveBarrier extends GiveItem {
-
-    public GiveBarrier(Network instance) {
-        super(instance, "barrier");
-    }
-
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
-
-        return (onCommand(sender, "uknet.barrier", new ItemStack(Material.BARRIER), "Barrier"));
-
+    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
+        onCommand(stack, "uknet.barrier", new ItemStack(Material.BARRIER), "Barrier");
     }
 }

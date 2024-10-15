@@ -2,20 +2,17 @@ package net.bteuk.network.commands.tabcompleters;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.utils.enums.Category;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 public class NavigationTabCompleter extends AbstractTabCompleter {
 
     @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-
+    public Collection<String> onTabComplete(@NotNull CommandSender sender, @NotNull String[] args) {
         if (args.length > 0) {
             switch(args[0].toUpperCase()) {
 

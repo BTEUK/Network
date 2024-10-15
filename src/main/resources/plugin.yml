@@ -9,61 +9,9 @@ softdepend:
   - TerraPlusMinus
 
 commands:
-  warps:
-    usage: /<command>
-    description: List all warps on the server, 16 per page.
-  navigation:
-    usage: /<command>
-    description: Adds commands to do with navigation.
-  afk:
-    usage: /<command>
-    description: Toggles afk status.
-  lobby:
-    usage: /<command>
-    description: Command for all lobby management.
-  sethome:
-    usage: /<command>
-    description: Set a home to your current location.
-  home:
-    usage: /<command>
-    description: Teleport to your home.
-  delhome:
-    usage: /<command>
-    description: Delete a home.
-  rules:
-    usage: /<command>
-    description: Get rules book.
-  clear:
-    usage: /<command>
-    description: Clears your inventory.
-  debugstick:
-    usage: /<command>
-    description: Get the debug stick.
-  light:
-    usage: /<command>
-    description: Get a light block.
-  barrier:
-    usage: /<command>
-    description: Get a barrier block.
-  spawn:
-    usage: /<command>
-    description: Teleport to spawnpoint in lobby.
-  zone:
-    usage: /<command>
-    description: Zone command.
-  server:
-    usage: /<command>
-    description: Switch server by command.
-  gamemode:
-    aliases: [ gm ]
-    usage: /<command>
-    description: Switch gamemode.
   phead:
     usage: /<command>
     description: Get the player head of someone who has connected to the server.
-  homes:
-    usage: /<command>
-    description: Like warps, but for homes, shows all homes the player has set.
   ban:
     usage: /<command>
     description: Bans a player for a specific duration and reason.

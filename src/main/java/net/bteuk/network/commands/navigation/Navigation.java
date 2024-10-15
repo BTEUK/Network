@@ -1,5 +1,6 @@
 package net.bteuk.network.commands.navigation;
 
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.bteuk.network.Network;
 import net.bteuk.network.commands.AbstractCommand;
 import net.bteuk.network.commands.tabcompleters.NavigationTabCompleter;
@@ -10,8 +11,6 @@ import net.bteuk.network.utils.enums.AddLocationType;
 import net.bteuk.network.utils.enums.Category;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,57 +23,55 @@ public class Navigation extends AbstractCommand {
     private static final Component ERROR_SUBCATEGORY_ADD = ChatUtils.error("/navigation subcategory add [category] <subcategory>");
     private static final Component ERROR_SUBCATEGORY_REMOVE = ChatUtils.error("/navigation subcategory remove <subcategory>");
 
-    public Navigation(Network instance) {
-        super(instance, "navigation");
-        command.setTabCompleter(new NavigationTabCompleter());
+    public Navigation() {
+        setTabCompleter(new NavigationTabCompleter());
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        //This command can only be used by a player.
-        if (!(sender instanceof Player p)) {
-            sender.sendMessage(ChatUtils.error("This command can only be used by a player."));
-            return true;
+        //Check if the sender is a player.
+        Player player = getPlayer(stack);
+        if (player == null) {
+            return;
         }
 
+        NetworkUser user = Network.getInstance().getUser(player);
+
         //If u is null, cancel.
-        NetworkUser u = Network.getInstance().getUser(p);
-        if (u == null) {
-            LOGGER.severe("User " + p.getName() + " can not be found!");
-            p.sendMessage(ChatUtils.error("User can not be found, please relog!"));
-            return true;
+        if (user == null) {
+            LOGGER.severe("User " + player.getName() + " can not be found!");
+            player.sendMessage(ChatUtils.error("User can not be found, please relog!"));
+            return;
         }
 
         //Check if args is less than 1.
         if (args.length < 1) {
             //Send error message.
-            error(u);
-            return true;
+            error(user);
+            return;
         }
 
         //Add
         switch (args[0].toUpperCase()) {
 
             // Add location
-            case "ADD" -> addLocation(u);
+            case "ADD" -> addLocation(user);
 
             // Update location
-            case "UPDATE" -> updateLocation(u, args);
+            case "UPDATE" -> updateLocation(user, args);
 
             // Remove location
-            case "REMOVE" -> removeLocation(u, args);
+            case "REMOVE" -> removeLocation(user, args);
 
             // Suggested location
-            case "SUGGESTED" -> suggestedLocation(u, args);
+            case "SUGGESTED" -> suggestedLocation(user, args);
 
             // Subcategory subcommands
-            case "SUBCATEGORY" -> subcategoryCommand(u, args);
+            case "SUBCATEGORY" -> subcategoryCommand(user, args);
 
-            default -> error(u);
+            default -> error(user);
         }
-
-        return true;
     }
 
     private void addLocation(NetworkUser u) {

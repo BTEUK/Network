@@ -1,6 +1,7 @@
 package net.bteuk.network.commands;
 
-import net.bteuk.network.Network;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import net.bteuk.network.commands.tabcompleters.FixedArgSelector;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.enums.ServerType;
@@ -11,75 +12,44 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.GameMode;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.PluginCommand;
-import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
-import org.bukkit.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Locale;
 
-import static net.bteuk.network.utils.Constants.LOGGER;
 import static net.bteuk.network.utils.Constants.SERVER_TYPE;
 
-public class Gamemode implements CommandExecutor, TabCompleter {
+public class Gamemode extends AbstractCommand {
 
     //Gamemodes.
-    private final ArrayList<String> gamemodes;
+    private final ArrayList<String> gamemodes = new ArrayList<>(Arrays.asList("creative", "spectator", "adventure", "survival"));
 
     //Constructor to enable the command.
-    public Gamemode(Network instance) {
-
-        gamemodes = new ArrayList<>(Arrays.asList("creative", "spectator", "adventure", "survival"));
-
-        //Register command.
-        PluginCommand command = instance.getCommand("gamemode");
-
-        if (command == null) {
-            LOGGER.warning("Gamemode command not added to plugin.yml, it will therefore not be enabled.");
-            return;
-        }
-
-        //Set executor.
-        command.setExecutor(this);
-
+    public Gamemode() {
         //Set tab completer.
-        command.setTabCompleter(this);
-
+        setTabCompleter(new FixedArgSelector(gamemodes, 0));
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        //Check if sender is a player and that they have permission.
-        if (!(sender instanceof Player p)) {
-
-            sender.sendMessage(ChatUtils.error("This command can only be used by a player."));
-            return true;
-
+        //Check if the sender is a player.
+        Player player = getPlayer(stack);
+        if (player == null) {
+            return;
         }
 
         //Check allowed server type.
         if (SERVER_TYPE != ServerType.PLOT && SERVER_TYPE != ServerType.EARTH) {
-
-            p.sendMessage(ChatUtils.error("You do not have permission to use this command here."));
-            return true;
-
+            player.sendMessage(ChatUtils.error("You do not have permission to use this command here."));
+            return;
         }
 
         //Check if the player has permission.
-        if (!p.hasPermission("uknet.gamemode")) {
-
-            p.sendMessage(ChatUtils.error("You do not have permission to use this command."));
-            return true;
-
+        if (!hasPermission(player, "uknet.gamemode")) {
+            return;
         }
 
         //If no args are given, send a list of clickable gamemodes.
@@ -93,7 +63,7 @@ public class Gamemode implements CommandExecutor, TabCompleter {
                 Component gamemode;
 
                 //If the player is in the gamemode, highlight it.
-                if (p.getGameMode() == GameMode.valueOf(gamemodes.get(i).toUpperCase(Locale.ROOT))) {
+                if (player.getGameMode() == GameMode.valueOf(gamemodes.get(i).toUpperCase(Locale.ROOT))) {
                     gamemode = Component.text(StringUtils.capitalize(gamemodes.get(i)), TextColor.color(245, 173, 100));
                     gamemode = gamemode.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Utils.line("You are already in this gamemode.")));
                 } else {
@@ -111,7 +81,7 @@ public class Gamemode implements CommandExecutor, TabCompleter {
 
             }
 
-            p.sendMessage(message);
+            player.sendMessage(message);
 
         } else {
 
@@ -121,40 +91,15 @@ public class Gamemode implements CommandExecutor, TabCompleter {
                 Component error = Component.text(args[0], NamedTextColor.DARK_RED);
                 error = error.append(ChatUtils.error(" is not a valid gamemode"));
 
-                p.sendMessage(error);
-                return true;
+                player.sendMessage(error);
+                return;
 
             }
 
             //Set the player to this gamemode.
-            p.setGameMode(GameMode.valueOf(args[0].toUpperCase(Locale.ROOT)));
-            p.sendMessage(ChatUtils.success("Set gamemode to ").append(Component.text(StringUtils.capitalize(args[0].toLowerCase(Locale.ROOT)), NamedTextColor.DARK_AQUA)));
-
-        }
-
-        return true;
-    }
-
-    @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command
-            command, @NotNull String label, @NotNull String[] args) {
-
-        List<String> returns = new ArrayList<>();
-
-        if (args.length == 0) {
-
-            return gamemodes;
-
-        } else if (args.length == 1) {
-
-            StringUtil.copyPartialMatches(args[0].toLowerCase(Locale.ROOT), gamemodes, returns);
-            return returns;
-
-        } else {
-
-            return null;
+            player.setGameMode(GameMode.valueOf(args[0].toUpperCase(Locale.ROOT)));
+            player.sendMessage(ChatUtils.success("Set gamemode to ").append(Component.text(StringUtils.capitalize(args[0].toLowerCase(Locale.ROOT)), NamedTextColor.DARK_AQUA)));
 
         }
     }
-
 }

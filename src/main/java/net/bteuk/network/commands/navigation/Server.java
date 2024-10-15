@@ -1,6 +1,9 @@
 package net.bteuk.network.commands.navigation;
 
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.bteuk.network.Network;
+import net.bteuk.network.commands.AbstractCommand;
+import net.bteuk.network.commands.tabcompleters.ServerSelector;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.SwitchServer;
 import net.bteuk.network.utils.Utils;
@@ -9,9 +12,6 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,24 +20,24 @@ import java.util.Objects;
 
 import static net.bteuk.network.utils.Constants.SERVER_NAME;
 
-public class Server implements CommandExecutor {
+public class Server extends AbstractCommand {
+
+    public Server() {
+        setTabCompleter(new ServerSelector());
+    }
+
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        //Check if sender is a player and that they have permission.
-        if (!(sender instanceof Player p)) {
-
-            sender.sendMessage(ChatUtils.error("This command can only be used by a player."));
-            return true;
-
+        //Check if the sender is a player.
+        Player player = getPlayer(stack);
+        if (player == null) {
+            return;
         }
 
         //Check if the player has permission.
-        if (!p.hasPermission("uknet.navigation.server")) {
-
-            p.sendMessage(ChatUtils.error("You do not have permission to use this command."));
-            return true;
-
+        if (!hasPermission(player, "uknet.navigation.server")) {
+            return;
         }
 
         //If no args are given send a clickable list of servers.
@@ -74,9 +74,8 @@ public class Server implements CommandExecutor {
                 }
             }
 
-            p.sendMessage(message);
+            player.sendMessage(message);
 
-            return true;
         } else {
 
             //Teleport to the server of the first arg.
@@ -86,22 +85,19 @@ public class Server implements CommandExecutor {
                 //Check if the player is not already on this server.
                 if (Objects.equals(SERVER_NAME, args[0])) {
 
-                    p.sendMessage(ChatUtils.error("You are already on this server."));
+                    player.sendMessage(ChatUtils.error("You are already on this server."));
 
                 } else {
 
-                    SwitchServer.switchServer(p, args[0]);
+                    SwitchServer.switchServer(player, args[0]);
 
                 }
 
             } else {
 
-                p.sendMessage(ChatUtils.error("The server ").append(Component.text(args[0], NamedTextColor.DARK_RED).append(ChatUtils.error(" does not exist!"))));
+                player.sendMessage(ChatUtils.error("The server ").append(Component.text(args[0], NamedTextColor.DARK_RED).append(ChatUtils.error(" does not exist!"))));
 
             }
-
-            return true;
-
         }
     }
 }

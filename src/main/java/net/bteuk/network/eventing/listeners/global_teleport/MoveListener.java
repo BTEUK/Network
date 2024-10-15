@@ -18,7 +18,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-import static net.bteuk.network.commands.AFK.updateAfkStatus;
+import static net.bteuk.network.commands.Afk.updateAfkStatus;
 import static net.bteuk.network.utils.Constants.EARTH_WORLD;
 import static net.bteuk.network.utils.Constants.LOGGER;
 import static net.bteuk.network.utils.Constants.REGIONS_ENABLED;

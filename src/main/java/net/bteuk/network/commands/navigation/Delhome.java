@@ -1,54 +1,39 @@
 package net.bteuk.network.commands.navigation;
 
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.bteuk.network.Network;
+import net.bteuk.network.commands.AbstractCommand;
 import net.bteuk.network.commands.tabcompleters.HomeSelector;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.GlobalSQL;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
-import static net.bteuk.network.utils.Constants.LOGGER;
-
-public class Delhome extends HomeSelector implements CommandExecutor {
+public class Delhome extends AbstractCommand {
 
     private final GlobalSQL globalSQL;
 
     //Constructor to enable the command.
-    public Delhome(Network instance, GlobalSQL globalSQL) {
+    public Delhome(Network instance) {
 
-        this.globalSQL = globalSQL;
-
-        //Register command.
-        PluginCommand command = instance.getCommand("delhome");
-
-        if (command == null) {
-            LOGGER.warning("Delhome command not added to plugin.yml, it will therefore not be enabled.");
-            return;
-        }
-
-        //Set executor.
-        command.setExecutor(this);
+        this.globalSQL = instance.getGlobalSQL();
 
         //Set tab completer.
-        command.setTabCompleter(this);
+        setTabCompleter(new HomeSelector());
 
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
         //Check if the sender is a player.
-        if (!(sender instanceof Player p)) {
-            sender.sendMessage(ChatUtils.error("This command can only be used by players."));
-            return true;
+        Player player = getPlayer(stack);
+        if (player == null) {
+            return;
         }
 
         //If no args set default home.
@@ -57,18 +42,18 @@ public class Delhome extends HomeSelector implements CommandExecutor {
         if (args.length == 0) {
 
             //Check if the default home exists.
-            if (!globalSQL.hasRow("SELECT uuid FROM home WHERE uuid='" + p.getUniqueId() + "' AND name IS NULL;")) {
-                p.sendMessage(ChatUtils.error("You not have a default home set, set one with ")
+            if (!globalSQL.hasRow("SELECT uuid FROM home WHERE uuid='" + player.getUniqueId() + "' AND name IS NULL;")) {
+                player.sendMessage(ChatUtils.error("You not have a default home set, set one with ")
                         .append(Component.text("/sethome", NamedTextColor.DARK_RED)));
-                return true;
+                return;
             }
 
             //Get coordinate ID.
-            int coordinate_id = globalSQL.getInt("SELECT coordinate_id FROM home WHERE uuid='" + p.getUniqueId() + "' AND name IS NULL;");
+            int coordinate_id = globalSQL.getInt("SELECT coordinate_id FROM home WHERE uuid='" + player.getUniqueId() + "' AND name IS NULL;");
 
             //Delete default home.
-            globalSQL.update("DELETE FROM home WHERE uuid='" + p.getUniqueId() + "' AND name IS NULL;");
-            p.sendMessage(ChatUtils.success("Default home removed."));
+            globalSQL.update("DELETE FROM home WHERE uuid='" + player.getUniqueId() + "' AND name IS NULL;");
+            player.sendMessage(ChatUtils.success("Default home removed."));
 
             //Delete coordinate id.
             globalSQL.update("DELETE FROM coordinates WHERE id=" + coordinate_id + ";");
@@ -76,36 +61,33 @@ public class Delhome extends HomeSelector implements CommandExecutor {
         } else {
 
             //Check for permission.
-            if (!p.hasPermission("uknet.navigation.homes")) {
-                p.sendMessage(ChatUtils.error("You do not have permission to delete multiple homes, only to delete a default home using ")
+            if (!player.hasPermission("uknet.navigation.homes")) {
+                player.sendMessage(ChatUtils.error("You do not have permission to delete multiple homes, only to delete a default home using ")
                         .append(Component.text("/delhome", NamedTextColor.DARK_RED)));
-                return true;
+                return;
             }
 
             //Get the name.
             String name = String.join(" ", Arrays.copyOfRange(args, 0, args.length));
 
             //Get coordinate ID.
-            int coordinate_id = globalSQL.getInt("SELECT coordinate_id FROM home WHERE uuid='" + p.getUniqueId() + "' AND name='" + name + "';");
+            int coordinate_id = globalSQL.getInt("SELECT coordinate_id FROM home WHERE uuid='" + player.getUniqueId() + "' AND name='" + name + "';");
 
             //Check is home with this name exists.
-            if (!globalSQL.hasRow("SELECT uuid FROM home WHERE uuid='" + p.getUniqueId() + "' AND name='" + name + "';")) {
-                p.sendMessage(ChatUtils.error("You do not have a home set with the name ")
+            if (!globalSQL.hasRow("SELECT uuid FROM home WHERE uuid='" + player.getUniqueId() + "' AND name='" + name + "';")) {
+                player.sendMessage(ChatUtils.error("You do not have a home set with the name ")
                         .append(Component.text(name, NamedTextColor.DARK_RED)));
-                return true;
+                return;
             }
 
             //Delete home
-            globalSQL.update("DELETE FROM home WHERE uuid='" + p.getUniqueId() + "' AND name='" + name + "';");
-            p.sendMessage(Component.text(name, NamedTextColor.DARK_AQUA)
+            globalSQL.update("DELETE FROM home WHERE uuid='" + player.getUniqueId() + "' AND name='" + name + "';");
+            player.sendMessage(Component.text(name, NamedTextColor.DARK_AQUA)
                     .append(ChatUtils.success(" home removed.")));
 
             //Delete coordinate id.
             globalSQL.update("DELETE FROM coordinates WHERE id=" + coordinate_id + ";");
 
         }
-
-        return true;
-
     }
 }
