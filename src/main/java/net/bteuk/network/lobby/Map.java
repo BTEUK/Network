@@ -2,6 +2,9 @@ package net.bteuk.network.lobby;
 
 import eu.decentsoftware.holograms.api.holograms.Hologram;
 import io.papermc.lib.PaperLib;
+import io.papermc.paper.command.brigadier.Commands;
+import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.bteuk.network.Network;
 import net.bteuk.network.eventing.events.EventManager;
 import net.bteuk.network.gui.navigation.LocationMenu;
@@ -15,6 +18,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -117,7 +121,11 @@ public class Map extends AbstractReloadableComponent {
         }
 
         // Enable the map command.
-        new MapCommand(instance, this, server);
+        LifecycleEventManager<Plugin> manager = instance.getLifecycleManager();
+        manager.registerEventHandler(LifecycleEvents.COMMANDS, event -> {
+            final Commands commands = event.registrar();
+            commands.register("map", "Map command.", new MapCommand(this, server));
+        });
 
         setEnabled(true);
     }

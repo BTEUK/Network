@@ -4,22 +4,36 @@ import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.bteuk.network.commands.Afk;
+import net.bteuk.network.commands.BuildingCompanionCommand;
 import net.bteuk.network.commands.Clear;
+import net.bteuk.network.commands.Demote;
 import net.bteuk.network.commands.Discord;
+import net.bteuk.network.commands.Focus;
 import net.bteuk.network.commands.Gamemode;
+import net.bteuk.network.commands.Hdb;
 import net.bteuk.network.commands.Help;
+import net.bteuk.network.commands.Me;
+import net.bteuk.network.commands.Msg;
 import net.bteuk.network.commands.Navigator;
 import net.bteuk.network.commands.Nightvision;
 import net.bteuk.network.commands.Phead;
 import net.bteuk.network.commands.Plot;
+import net.bteuk.network.commands.Pmute;
+import net.bteuk.network.commands.ProgressMap;
+import net.bteuk.network.commands.Promote;
+import net.bteuk.network.commands.Ptime;
+import net.bteuk.network.commands.Punmute;
 import net.bteuk.network.commands.RegionCommand;
 import net.bteuk.network.commands.Rules;
+import net.bteuk.network.commands.Season;
 import net.bteuk.network.commands.Speed;
+import net.bteuk.network.commands.TipsToggle;
 import net.bteuk.network.commands.Where;
 import net.bteuk.network.commands.Zone;
 import net.bteuk.network.commands.give.GiveBarrier;
 import net.bteuk.network.commands.give.GiveDebugStick;
 import net.bteuk.network.commands.give.GiveLight;
+import net.bteuk.network.commands.navigation.BTEUK;
 import net.bteuk.network.commands.navigation.Back;
 import net.bteuk.network.commands.navigation.Delhome;
 import net.bteuk.network.commands.navigation.Home;
@@ -30,17 +44,18 @@ import net.bteuk.network.commands.navigation.Sethome;
 import net.bteuk.network.commands.navigation.Spawn;
 import net.bteuk.network.commands.navigation.Tp;
 import net.bteuk.network.commands.navigation.TpToggle;
-import net.bteuk.network.commands.navigation.Tpll;
 import net.bteuk.network.commands.navigation.Warp;
 import net.bteuk.network.commands.navigation.Warps;
+import net.bteuk.network.commands.staff.Exp;
 import net.bteuk.network.commands.staff.Staff;
 import net.bteuk.network.lobby.LobbyCommand;
-import net.buildtheearth.terraminusminus.TerraConfig;
 import org.bukkit.plugin.Plugin;
 
 import java.util.List;
 
 import static net.bteuk.network.utils.Constants.LL;
+import static net.bteuk.network.utils.Constants.PROGRESS_MAP;
+import static net.bteuk.network.utils.Constants.TIPS;
 import static net.bteuk.network.utils.Constants.TPLL_ENABLED;
 import static net.bteuk.network.utils.NetworkConfig.CONFIG;
 
@@ -56,8 +71,7 @@ public class CommandManager {
              * Navigation commands.
              */
             if (TPLL_ENABLED) {
-                TerraConfig.reducedConsoleMessages = true;
-                commands.register("tpll", "Teleport to coordinates", new Tpll(instance, CONFIG.getBoolean("requires_permission")));
+                commands.register("tpll", "Teleport to coordinates", instance.getTpll());
             }
             if (LL) {
                 commands.register("where", "Returns the coordinates where the player is standing with a link to google maps.", List.of("location", "ll"), new Where(instance));
@@ -77,6 +91,7 @@ public class CommandManager {
             commands.register("spawn", "Teleport to spawnpoint in lobby.", new Spawn());
             commands.register("server", "Switch server by command.", new Server());
 
+
             /*
              * Gui commands.
              */
@@ -89,6 +104,13 @@ public class CommandManager {
              * Staff commands.
              */
             commands.register("staff", "Opens the Staff Menu.", List.of("st"), new Staff());
+            if (CONFIG.getBoolean("staff.moderation.enabled")) {
+                commands.register("ban", "Bans a player for a specific duration and reason.", instance.getBan());
+                commands.register("mute", "Mutes a player for a specific duration and reason.", instance.getMute());
+                commands.register("kick", "Kick a player for the server.", instance.getKick());
+                commands.register("unban", "Unban a previously banned player.", instance.getUnban());
+                commands.register("unmute", "Unmute a previously muted player.", instance.getUnmute());
+            }
 
             /*
              * Utility commands.
@@ -106,7 +128,26 @@ public class CommandManager {
             commands.register("barrier", "Get a barrier block.", new GiveBarrier());
             commands.register("gamemode", "Switch gamemode.", List.of("gm"), new Gamemode());
             commands.register("phead", "Get the player head of someone who has connected to the server.", new Phead());
-        });
+            commands.register("hdb", "Added so it can be routed to /skulls", new Hdb());
+            if (PROGRESS_MAP) {
+                commands.register("progressmap", "Sends a link of the progress map", List.of("progress"), new ProgressMap());
+            }
+            if (TIPS) {
+                commands.register("tips", "Toggles tips in chat.", List.of("toggletips", "tipstoggle"), new TipsToggle());
+            }
+            commands.register("ptime", "Sets the time of day for the player", new Ptime());
+            commands.register("season", "Command for creating, starting and ending seasons.", List.of("seasons"), new Season());
+            commands.register("exp", "Test command for adding exp.", new Exp());
+            commands.register("buildingcompanion", "Toggle the building companion.", List.of("bc", "companion"), new BuildingCompanionCommand());
+            commands.register("pmute", "Mute a player", new Pmute(instance));
+            commands.register("punmute", "Unmute a player", new Punmute(instance));
+            commands.register("msg", "Sends a direct message to a player.", List.of("w, tell"), new Msg(instance));
+            commands.register("promote", "Add a role to a player.", new Promote(instance));
+            commands.register("demote", "Remove a role from a player.", new Demote(instance));
+            commands.register("focus", "Toggle focus mode, hides chat and players.", List.of("focusmode", "fm"), new Focus());
+            commands.register("me", "Disabled", new Me());
 
+            commands.register("bteuk", "Test", new BTEUK());
+        });
     }
 }

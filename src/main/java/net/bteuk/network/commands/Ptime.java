@@ -1,14 +1,12 @@
 package net.bteuk.network.commands;
 
-import net.bteuk.network.Network;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.bteuk.network.commands.tabcompleters.FixedArgSelector;
 import net.bteuk.network.exceptions.InvalidFormatException;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.enums.TimesOfDay;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,31 +20,29 @@ public class Ptime extends AbstractCommand {
     private static final Component SET_PLAYER_TIME = ChatUtils.success("Set player time to ");
     private static final Component INVALID_FORMAT = ChatUtils.error("Invalid time format, try using HH:mm or Minecraft ticks.");
 
-    public Ptime(Network instance) {
-        super(instance, "ptime");
-        command.setTabCompleter(new FixedArgSelector(Arrays.stream(TimesOfDay.values()).map(t -> t.label).toList(), 0));
+    public Ptime() {
+        setTabCompleter(new FixedArgSelector(Arrays.stream(TimesOfDay.values()).map(t -> t.label).toList(), 0));
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        Player p = getPlayer(sender);
-
-        if (p == null) {
-            return true;
+        //Check if the sender is a player.
+        Player player = getPlayer(stack);
+        if (player == null) {
+            return;
         }
 
         //Permission check.
-        if (!p.hasPermission("uknet.ptime")) {
-            p.sendMessage(NO_PERMISSION);
-            return true;
+        if (!hasPermission(player, "uknet.ptime")) {
+            return;
         }
 
         //No args implies setting the player time to the default (server time).
         if (args.length == 0) {
-            p.resetPlayerTime();
-            p.sendMessage(RESET_PLAYER_TIME);
-            return true;
+            player.resetPlayerTime();
+            player.sendMessage(RESET_PLAYER_TIME);
+            return;
         }
 
         int ticks;
@@ -109,15 +105,13 @@ public class Ptime extends AbstractCommand {
                 }
             }
         } catch (NumberFormatException | InvalidFormatException ex) {
-            p.sendMessage(INVALID_FORMAT);
-            return true;
+            player.sendMessage(INVALID_FORMAT);
+            return;
         }
 
         //Set time and send feedback.
-        p.setPlayerTime(ticks, false);
-        p.sendMessage(SET_PLAYER_TIME.append(Component.text(args[0] + " (" + ticks + ")", NamedTextColor.DARK_AQUA)));
-
-        return true;
+        player.setPlayerTime(ticks, false);
+        player.sendMessage(SET_PLAYER_TIME.append(Component.text(args[0] + " (" + ticks + ")", NamedTextColor.DARK_AQUA)));
     }
 
     private int convertHourToTicks(int hour) {

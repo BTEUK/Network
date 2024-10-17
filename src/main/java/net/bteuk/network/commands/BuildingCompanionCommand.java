@@ -1,5 +1,6 @@
 package net.bteuk.network.commands;
 
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.bteuk.network.Network;
 import net.bteuk.network.building_companion.BuildingCompanion;
 import net.bteuk.network.lib.utils.ChatUtils;
@@ -7,8 +8,6 @@ import net.bteuk.network.utils.NetworkUser;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,38 +15,28 @@ import static net.bteuk.network.utils.Constants.LOGGER;
 
 public class BuildingCompanionCommand extends AbstractCommand {
 
-    private final Network instance;
-
     private static final Component ERROR = ChatUtils.error("/buildingcompanion <clear>");
 
-    public BuildingCompanionCommand(Network instance) {
-        super(instance, "companion");
-        this.instance = instance;
-    }
-
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        Player p = getPlayer(sender);
-
-        if (p == null) {
-            return true;
+        //Check if the sender is a player.
+        Player player = getPlayer(stack);
+        if (player == null) {
+            return;
         }
 
-        // Permission check.
-        if (!p.hasPermission("uknet.companion")) {
-            p.sendMessage(NO_PERMISSION);
-            return true;
+        if (!hasPermission(player, "uknet.companion")) {
+            return;
         }
 
-        // Get the user, toggle the companion.
-        NetworkUser user = instance.getUser(p);
+        NetworkUser user = Network.getInstance().getUser(player);
 
-        // If u is null, cancel.
+        //If u is null, cancel.
         if (user == null) {
-            LOGGER.severe("User " + p.getName() + " can not be found!");
-            p.sendMessage(ChatUtils.error("User can not be found, please relog!"));
-            return true;
+            LOGGER.severe("User " + player.getName() + " can not be found!");
+            player.sendMessage(ChatUtils.error("User can not be found, please relog!"));
+            return;
         }
 
         // Without args, toggle companion.
@@ -63,7 +52,6 @@ public class BuildingCompanionCommand extends AbstractCommand {
                 default -> user.player.sendMessage(ERROR);
             }
         }
-        return true;
     }
 
     public static void toggleCompanion(NetworkUser user) {

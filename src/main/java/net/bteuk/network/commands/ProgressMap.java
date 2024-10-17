@@ -1,47 +1,32 @@
 package net.bteuk.network.commands;
 
-import net.bteuk.network.Network;
-import net.bteuk.network.lib.utils.ChatUtils;
-import net.bteuk.network.utils.NetworkUser;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
+import org.apache.logging.log4j.util.Strings;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import static net.bteuk.network.utils.Constants.PROGRESS_MAP;
+import static net.bteuk.network.utils.NetworkConfig.CONFIG;
 
-public class ProgressMap implements CommandExecutor
-{
+public class ProgressMap extends AbstractCommand {
     @Override
-    public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String label, @NotNull String[] args)
-    {
+    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
+
         //Check if the sender is a player.
-        if (!(commandSender instanceof Player p)) {
-
-            commandSender.sendMessage(ChatUtils.error("This command can only be used by a player."));
-            return true;
-
+        Player player = getPlayer(stack);
+        if (player == null) {
+            return;
         }
-
-        //Get user.
-        NetworkUser u = Network.getInstance().getUser(p);
-
-        if (u == null) {return true;}
 
         //Send them a link
-        if (PROGRESS_MAP)
-        {
+        if (PROGRESS_MAP) {
             TextComponent textComponent = Component.text("Click here to view a map of our progress!", NamedTextColor.AQUA);
-            textComponent = textComponent.clickEvent(ClickEvent.openUrl(Network.getInstance().getConfig().getString("ProgressMap.Link")));
-            u.player.sendMessage(textComponent);
+            textComponent = textComponent.clickEvent(ClickEvent.openUrl(CONFIG.getString("ProgressMap.Link", Strings.EMPTY)));
+            player.sendMessage(textComponent);
         }
-
-        return true;
     }
-
 }

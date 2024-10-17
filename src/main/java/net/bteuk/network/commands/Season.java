@@ -1,10 +1,10 @@
 package net.bteuk.network.commands;
 
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.bteuk.network.Network;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -15,19 +15,14 @@ public class Season extends AbstractCommand {
 
     private static final Component INVALID_COMMAND_ARGUMENTS = ChatUtils.error("/season create|start|end [season_name]");
 
-    public Season(Network instance) {
-        super(instance, "season");
-    }
-
-
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
+    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        //Get the player, this is only to check the permission, it is not necessary to use the command.
-        if (sender instanceof Player p) {
-            if (!p.hasPermission("uknet.season")) {
-                p.sendMessage(NO_PERMISSION);
-                return true;
+        //Check if sender is player, then check permissions
+        CommandSender sender = stack.getSender();
+        if (sender instanceof Player) {
+            if (!hasPermission(sender, "uknet.season")) {
+                return;
             }
         }
 
@@ -37,7 +32,7 @@ public class Season extends AbstractCommand {
             //Don't allow season command to alter the default season.
             if (args[1].equalsIgnoreCase("default")) {
                 sender.sendMessage(ChatUtils.error("The default season can not be modified!"));
-                return true;
+                return;
             }
 
             //Check first arg.
@@ -45,27 +40,25 @@ public class Season extends AbstractCommand {
 
                 //Create season with all remaining args as name.
                 sender.sendMessage(createSeason(args));
-                return true;
+                return;
 
             } else if (args[0].equalsIgnoreCase("start")) {
 
                 //Start season with all remaining args as name.
                 sender.sendMessage(startSeason(args));
-                return true;
+                return;
 
             } else if (args[0].equalsIgnoreCase("end")) {
 
                 //End season with all remaining args as name.
                 sender.sendMessage(endSeason(args));
-                return true;
+                return;
 
             }
         }
 
         //If the code reaches here then the command format was invalid.
         sender.sendMessage(INVALID_COMMAND_ARGUMENTS);
-        return true;
-
     }
 
     private Component createSeason(String[] args) {

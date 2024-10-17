@@ -1,12 +1,10 @@
 package net.bteuk.network.lobby;
 
-import net.bteuk.network.Network;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.bteuk.network.commands.AbstractCommand;
 import net.bteuk.network.commands.tabcompleters.LocationAndSubcategorySelector;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.kyori.adventure.text.Component;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,24 +25,24 @@ public class MapCommand extends AbstractCommand {
 
     private static final Component INVALID_USAGE = ChatUtils.error("/map [add/remove] [warp/subcategory]");
 
-    protected MapCommand(Network instance, Map map, String server) {
-        super(instance, "map");
+    protected MapCommand(Map map, String server) {
         this.map = map;
         this.server = server;
-        command.setTabCompleter(new LocationAndSubcategorySelector(1));
+        setTabCompleter(new LocationAndSubcategorySelector(1));
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
         if (!map.isEnabled()) {
-            sender.sendMessage(ChatUtils.error("The map is not enabled."));
-            return true;
+            stack.getSender().sendMessage(ChatUtils.error("The map is not enabled."));
+            return;
         }
 
-        Player p = getPlayer(sender);
-        if (p == null) {
-            return true;
+        //Check if the sender is a player.
+        Player player = getPlayer(stack);
+        if (player == null) {
+            return;
         }
 
         /*
@@ -52,25 +50,24 @@ public class MapCommand extends AbstractCommand {
         Will be executed if the player does not have sufficient permissions to use the subcommands,
         or if no arguments are given.
          */
-        if (!p.hasPermission("uknet.navigation.map") || args.length == 0) {
-            map.teleport(p);
-            return true;
+        if (!player.hasPermission("uknet.navigation.map") || args.length == 0) {
+            map.teleport(player);
+            return;
         } else if (args.length < 2) {
-            p.sendMessage(INVALID_USAGE);
-            return true;
+            player.sendMessage(INVALID_USAGE);
+            return;
         }
 
         if (Objects.equals(server, SERVER_NAME)) {
             switch (args[0]) {
                 case "add" ->
-                        p.sendMessage(map.addMarker(p.getLocation(), String.join(" ", Arrays.copyOfRange(args, 1, args.length))));
+                        player.sendMessage(map.addMarker(player.getLocation(), String.join(" ", Arrays.copyOfRange(args, 1, args.length))));
                 case "remove" ->
-                        p.sendMessage(map.removeMarker(String.join(" ", Arrays.copyOfRange(args, 1, args.length))));
-                default -> p.sendMessage(INVALID_USAGE);
+                        player.sendMessage(map.removeMarker(String.join(" ", Arrays.copyOfRange(args, 1, args.length))));
+                default -> player.sendMessage(INVALID_USAGE);
             }
         } else {
-            p.sendMessage(ChatUtils.error("Map markers can only be added/removed in the same server as the map."));
+            player.sendMessage(ChatUtils.error("Map markers can only be added/removed in the same server as the map."));
         }
-        return true;
     }
 }

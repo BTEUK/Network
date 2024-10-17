@@ -1,9 +1,9 @@
 package net.bteuk.network.commands;
 
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.bteuk.network.Network;
+import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,30 +14,24 @@ import static net.bteuk.network.utils.Constants.LOGGER;
  */
 public class Focus extends AbstractCommand {
 
-    private final Network instance;
-
-    public Focus(Network instance) {
-        super(instance, "focus");
-        this.instance = instance;
-    }
-
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        Player player = getPlayer(sender);
-
+        //Check if the sender is a player.
+        Player player = getPlayer(stack);
         if (player == null) {
-            return true;
+            return;
         }
 
-        NetworkUser user = instance.getUser(player);
+        NetworkUser user = Network.getInstance().getUser(player);
 
+        //If u is null, cancel.
         if (user == null) {
-            LOGGER.warning("NetworkUser for player " + player.getName() + " is null!");
-            return true;
+            LOGGER.severe("User " + player.getName() + " can not be found!");
+            player.sendMessage(ChatUtils.error("User can not be found, please relog!"));
+            return;
         }
 
         user.toggleFocus();
-        return true;
     }
 }

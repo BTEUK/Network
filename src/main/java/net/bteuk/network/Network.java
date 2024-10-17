@@ -1,23 +1,8 @@
 package net.bteuk.network;
 
 import lombok.Getter;
-import net.bteuk.network.commands.BuildingCompanionCommand;
-import net.bteuk.network.commands.Demote;
-import net.bteuk.network.commands.Focus;
-import net.bteuk.network.commands.Hdb;
-import net.bteuk.network.commands.Me;
-import net.bteuk.network.commands.Msg;
-import net.bteuk.network.commands.Pmute;
-import net.bteuk.network.commands.ProgressMap;
-import net.bteuk.network.commands.Promote;
-import net.bteuk.network.commands.Ptime;
-import net.bteuk.network.commands.Punmute;
-import net.bteuk.network.commands.Season;
-import net.bteuk.network.commands.TipsToggle;
-import net.bteuk.network.commands.navigation.BTEUK;
 import net.bteuk.network.commands.navigation.Tpll;
 import net.bteuk.network.commands.staff.Ban;
-import net.bteuk.network.commands.staff.Exp;
 import net.bteuk.network.commands.staff.Kick;
 import net.bteuk.network.commands.staff.Mute;
 import net.bteuk.network.commands.staff.Unban;
@@ -47,6 +32,7 @@ import net.bteuk.network.utils.Tips;
 import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.enums.ServerType;
 import net.bteuk.network.utils.regions.RegionManager;
+import net.buildtheearth.terraminusminus.TerraConfig;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
@@ -61,11 +47,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Optional;
 
-import static net.bteuk.network.utils.Constants.PROGRESS_MAP;
 import static net.bteuk.network.utils.Constants.REGIONS_ENABLED;
 import static net.bteuk.network.utils.Constants.SERVER_NAME;
 import static net.bteuk.network.utils.Constants.SERVER_TYPE;
 import static net.bteuk.network.utils.Constants.TIPS;
+import static net.bteuk.network.utils.Constants.TPLL_ENABLED;
 import static net.bteuk.network.utils.Constants.TUTORIALS;
 import static net.bteuk.network.utils.NetworkConfig.CONFIG;
 
@@ -316,73 +302,31 @@ public final class Network extends JavaPlugin {
         // Set up the map.
         lobby.reloadMap();
 
-        CommandManager.registerCommands(this);
-
         //Enable commands
-
-        //Enabled the progress map command if enabled
-        if (PROGRESS_MAP) {
-            getCommand("progressmap").setExecutor(new ProgressMap());
-            getLogger().info("Enabled Progress map support");
+        if (TPLL_ENABLED) {
+            TerraConfig.reducedConsoleMessages = true;
+            tpll = new Tpll(instance, CONFIG.getBoolean("requires_permission"));
         }
-
-        // Pmute and unmute
-        new Pmute(this);
-        new Punmute(this);
-
-        // msg, tell and w
-        new Msg(this);
-
-        //Moderation commands.
-        if (CONFIG.getBoolean("staff.moderation.enabled")) {
-
-            ban = new Ban(this);
-            unban = new Unban(this);
-
-            mute = new Mute(this);
-            unmute = new Unmute(this);
-
-            kick = new Kick(this);
-
-        }
-
-        //Enable ptime.
-        new Ptime(this);
-
-        //Route /hdb to /skulls
-        new Hdb(this);
+        kick = new Kick();
+        mute = new Mute();
+        unmute = new Unmute();
+        ban = new Ban();
+        unban = new Unban();
+        CommandManager.registerCommands(this);
 
         //Register commandpreprocess to make sure /network:region runs and not that of another plugin.
         new CommandPreProcess(this);
 
         //Enable tips.
         if (TIPS) {
-
-            //Enable the tips command.
-            new TipsToggle(this);
-
             //Enable tips in chat.
             new Tips();
         }
 
-        new Season(this);
         //Create default season if not exists.
         if (!globalSQL.hasRow("SELECT id FROM seasons WHERE id='default';")) {
             globalSQL.update("INSERT INTO seasons(id,active) VALUES('default',1);");
         }
-
-        new Exp(this);
-
-        new BuildingCompanionCommand(this);
-
-        new Promote(this);
-        new Demote(this);
-
-        new Focus(this);
-
-        new Me(this);
-
-        new BTEUK(this);
 
         // Let the Proxy know that the server is enabled.
         instance.getChat().sendSocketMesage(new ServerStartup(SERVER_NAME));

@@ -1,5 +1,6 @@
 package net.bteuk.network.commands;
 
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.bteuk.network.Network;
 import net.bteuk.network.commands.tabcompleters.PlayerSelector;
 import net.bteuk.network.exceptions.NotMutedException;
@@ -7,8 +8,6 @@ import net.bteuk.network.lib.dto.DirectMessage;
 import net.bteuk.network.lib.enums.ChatChannels;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.kyori.adventure.text.Component;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,24 +27,23 @@ public class Msg extends AbstractCommand {
     private final Network instance;
 
     public Msg(Network instance) {
-        super(instance, "msg");
         this.instance = instance;
-        command.setTabCompleter(new PlayerSelector());
+        setTabCompleter(new PlayerSelector());
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        // Send a direct message to the player, if not muted.
-        Player p = getPlayer(sender);
-        if (p == null) {
-            return true;
+        //Check if the sender is a player.
+        Player player = getPlayer(stack);
+        if (player == null) {
+            return;
         }
 
         // Get the uuid of the player.
         if (args.length < 2) {
-            p.sendMessage(ERROR);
-            return true;
+            player.sendMessage(ERROR);
+            return;
         }
 
         // Search for the uuid of the player.
@@ -53,15 +51,15 @@ public class Msg extends AbstractCommand {
         String uuid = instance.getGlobalSQL().getString("SELECT uuid FROM player_data WHERE name='" + args[0] + "';");
         String name = instance.getGlobalSQL().getString("SELECT name FROM player_data WHERE name='" + args[0] + "';");
         if (uuid == null) {
-            p.sendMessage(ERROR);
-            return true;
+            player.sendMessage(ERROR);
+            return;
         }
 
-        if (isMuted(p.getUniqueId().toString())) {
+        if (isMuted(player.getUniqueId().toString())) {
             try {
                 // Send message and cancel command.
-                p.sendMessage(getMutedComponent(p.getUniqueId().toString()));
-                return true;
+                player.sendMessage(getMutedComponent(player.getUniqueId().toString()));
+                return;
             } catch (NotMutedException ex) {
                 // Ignored
             }
@@ -69,9 +67,7 @@ public class Msg extends AbstractCommand {
 
         // Send direct message, the message is created using all other command arguments.
         String message = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
-        DirectMessage directMessage = getDirectMessage(message, p.getName(), p.getUniqueId().toString(), name, uuid, ChatChannels.GLOBAL);
+        DirectMessage directMessage = getDirectMessage(message, player.getName(), player.getUniqueId().toString(), name, uuid, ChatChannels.GLOBAL);
         instance.getChat().sendSocketMesage(directMessage);
-        return true;
-
     }
 }
