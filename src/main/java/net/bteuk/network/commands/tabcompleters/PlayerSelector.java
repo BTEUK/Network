@@ -27,20 +27,16 @@ public class PlayerSelector extends AbstractTabCompleter {
         this(0, excludeSelf);
     }
 
-    public PlayerSelector(int argIndex) {
-        this(argIndex, true);
-    }
-
     public PlayerSelector(int argIndex, boolean excludeSelf) {
         this.argIndex = argIndex;
         this.excludeSelf = excludeSelf;
     }
 
     @Override
-    public Collection<String> onTabComplete(@NotNull CommandSender sender, @NotNull String[] args) {
+    public @NotNull Collection<String> onTabComplete(@NotNull CommandSender sender, @NotNull String[] args) {
         //Get array of online players, excluding yourself.
         List<String> names = Network.getInstance().getOnlineUsers().stream().map(OnlineUser::getName).collect(Collectors.toList());
-        if (sender instanceof Player p) {
+        if (excludeSelf && (sender instanceof Player p)) {
             names.remove(p.getName());
         }
         return onTabCompleteArg(args, names, argIndex);

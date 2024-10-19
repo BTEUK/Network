@@ -18,7 +18,7 @@ public class LocationSelector extends AbstractTabCompleter {
     }
 
     @Override
-    public Collection<String> onTabComplete(@NotNull CommandSender sender, @NotNull String[] args) {
+    public @NotNull Collection<String> onTabComplete(@NotNull CommandSender sender, @NotNull String[] args) {
         return locationSelectorOnArg(args, 0);
     }
 }

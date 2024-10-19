@@ -26,7 +26,7 @@ public class FixedArgSelector extends AbstractTabCompleter {
     }
 
     @Override
-    public Collection<String> onTabComplete(@NotNull CommandSender sender, @NotNull String[] args) {
+    public @NotNull Collection<String> onTabComplete(@NotNull CommandSender sender, @NotNull String[] args) {
         return onTabCompleteArg(args, options, argIndex);
     }
 }

@@ -26,7 +26,7 @@ public abstract class PromotionAction extends AbstractCommand {
     protected PromotionAction(Network instance, Component error) {
         this.instance = instance;
         this.error = error;
-        setTabCompleter(new MultiArgSelector(List.of(new PlayerSelector(), new FixedArgSelector(Roles.getRoles().stream().map(Role::getId).collect(Collectors.toList()), 1))));
+        setTabCompleter(new MultiArgSelector(List.of(new PlayerSelector(false), new FixedArgSelector(Roles.getRoles().stream().map(Role::getId).collect(Collectors.toList()), 1))));
     }
 
     public void onCommand(CommandSender sender, String[] args, boolean demote) {

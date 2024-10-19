@@ -11,7 +11,7 @@ import java.util.List;
 public class HomeSelector extends AbstractTabCompleter {
 
     @Override
-    public Collection<String> onTabComplete(@NotNull CommandSender sender, @NotNull String[] args) {
+    public @NotNull Collection<String> onTabComplete(@NotNull CommandSender sender, @NotNull String[] args) {
         List<String> homes = Network.getInstance().getGlobalSQL().getStringList("SELECT name FROM home WHERE uuid='" + ((Player) sender).getUniqueId() + "' AND name IS NOT NULL;");
 
         return onTabCompleteArg(args, homes, 0);

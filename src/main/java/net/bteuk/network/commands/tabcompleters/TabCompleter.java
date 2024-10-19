@@ -8,6 +8,6 @@ import java.util.Collection;
 @FunctionalInterface
 public interface TabCompleter {
 
-    Collection<String> onTabComplete(@NotNull CommandSender sender, @NotNull String[] args);
+    @NotNull Collection<String> onTabComplete(@NotNull CommandSender sender, @NotNull String[] args);
 
 }

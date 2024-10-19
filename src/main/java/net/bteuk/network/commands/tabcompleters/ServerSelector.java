@@ -12,7 +12,7 @@ import static net.bteuk.network.utils.Constants.SERVER_NAME;
 public class ServerSelector extends AbstractTabCompleter {
 
     @Override
-    public Collection<String> onTabComplete(@NotNull CommandSender sender, @NotNull String[] args) {
+    public @NotNull Collection<String> onTabComplete(@NotNull CommandSender sender, @NotNull String[] args) {
         //Get array of online players, excluding yourself.
         ArrayList<String> servers = Network.getInstance().getGlobalSQL().getStringList("SELECT name FROM server_data WHERE server<>'" + SERVER_NAME + ";");
 

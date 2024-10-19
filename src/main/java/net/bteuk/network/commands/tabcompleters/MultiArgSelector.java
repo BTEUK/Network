@@ -3,6 +3,7 @@ package net.bteuk.network.commands.tabcompleters;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -15,13 +16,11 @@ public class MultiArgSelector extends AbstractTabCompleter {
     }
 
     @Override
-    public Collection<String> onTabComplete(@NotNull CommandSender sender, @NotNull String[] args) {
+    public @NotNull Collection<String> onTabComplete(@NotNull CommandSender sender, @NotNull String[] args) {
+        Collection<String> result = new ArrayList<>();
         for (AbstractTabCompleter tabCompleter : tabCompleters) {
-            Collection<String> result = tabCompleter.onTabComplete(sender, args);
-            if (result != null) {
-                return result;
-            }
+            result.addAll(tabCompleter.onTabComplete(sender, args));
         }
-        return null;
+        return result;
     }
 }

@@ -17,9 +17,9 @@ public abstract class AbstractTabCompleter implements TabCompleter {
 
         if (inputArgs.length == (argIndex + 1)) {
             StringUtil.copyPartialMatches(inputArgs[argIndex], options, returns);
-            return returns;
-        } else {
-            return null;
+        } else if (inputArgs.length == 0 && argIndex == 0) {
+            return options;
         }
+        return returns;
     }
 }
