@@ -33,7 +33,6 @@ import net.bteuk.network.commands.Zone;
 import net.bteuk.network.commands.give.GiveBarrier;
 import net.bteuk.network.commands.give.GiveDebugStick;
 import net.bteuk.network.commands.give.GiveLight;
-import net.bteuk.network.commands.navigation.BTEUK;
 import net.bteuk.network.commands.navigation.Back;
 import net.bteuk.network.commands.navigation.Delhome;
 import net.bteuk.network.commands.navigation.Home;
@@ -147,7 +146,7 @@ public class CommandManager {
             commands.register("focus", "Toggle focus mode, hides chat and players.", List.of("focusmode", "fm"), new Focus());
             commands.register("me", "Disabled", new Me());
 
-            commands.register("bteuk", "Test", new BTEUK());
+            //commands.register("bteuk", "Test", new BTEUK());
         });
     }
 }
