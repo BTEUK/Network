@@ -8,12 +8,15 @@ import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.enums.RegionStatus;
 import net.bteuk.network.utils.regions.Region;
+import net.bteuk.network.utils.regions.RegionMember;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class RegionMenu extends Gui {
 
@@ -40,17 +43,13 @@ public class RegionMenu extends Gui {
     private void createGui() {
 
         //Get regions you are owner or member of.
-        ArrayList<String> owner = regionSQL.getStringList("SELECT region FROM region_members WHERE uuid='" + user.player.getUniqueId() + "' AND is_owner=1;");
-        ArrayList<String> member = regionSQL.getStringList("SELECT region FROM region_members WHERE uuid='" + user.player.getUniqueId() + "' AND is_owner=0;");
+        List<RegionMember> regionMembers = regionSQL.getRegionMembers(user.player.getUniqueId().toString());
 
         //Slot count.
         int slot = 10;
 
         //Skip count.
         int skip = 21 * (page - 1);
-
-        //Total number of regions.
-        int total = owner.size() + member.size();
 
         //If page is greater than 1 add a previous page button.
         if (page > 1) {
@@ -70,9 +69,7 @@ public class RegionMenu extends Gui {
         }
 
         //Make a button for each plot.
-        for (int i = 0; i < total; i++) {
-
-            int finalI = i;
+        for (RegionMember regionMember : regionMembers) {
 
             //If skip is greater than 0, skip this iteration.
             if (skip > 0) {
@@ -102,92 +99,20 @@ public class RegionMenu extends Gui {
 
             }
 
-            //If i is less than owner.size it means that we are still iterating through the owners, else we are iterating through the members.
-            Region region;
-            if (i < owner.size()) {
+            Region region = Network.getInstance().getRegionManager().getRegion(regionMember.region());
+            RegionStatus status = region.status();
 
-                region = Network.getInstance().getRegionManager().getRegion(owner.get(i));
+            setItem(slot, getGuiItem(regionMember, status),
+                    u -> {
 
-                //If the region is inactive change the colour of the icon so the user knows it's inactive.
-                if (region.status() == RegionStatus.INACTIVE) {
-                    setItem(slot, Utils.createItem(Material.ORANGE_CONCRETE, 1,
-                                    Utils.title("Region " + region.getTag(user.player.getUniqueId().toString())),
-                                    Utils.line("You are the owner of this region."),
-                                    Utils.line("Click to open the menu of this region."),
-                                    Utils.line("This region is currently inactive."),
-                                    Utils.line("Enter this region to make it active again.")),
-                            u -> {
+                        //Delete this gui.
+                        this.delete();
 
-                                //Delete this gui.
-                                this.delete();
+                        //Switch to region info.
+                        u.mainGui = new RegionInfo(region, u.player.getUniqueId().toString());
+                        u.mainGui.open(u);
 
-                                //Switch to region info.
-                                u.mainGui = new RegionInfo(Network.getInstance().getRegionManager().getRegion(owner.get(finalI)), u.player.getUniqueId().toString());
-                                u.mainGui.open(u);
-
-                            });
-
-                } else {
-
-                    setItem(slot, Utils.createItem(Material.LIME_CONCRETE, 1,
-                                    Utils.title("Region " + region.getTag(user.player.getUniqueId().toString())),
-                                    Utils.line("You are the owner of this region."),
-                                    Utils.line("Click to open the menu of this region.")),
-                            u -> {
-
-                                //Delete this gui.
-                                this.delete();
-
-                                //Switch to region info.
-                                u.mainGui = new RegionInfo(Network.getInstance().getRegionManager().getRegion(owner.get(finalI)), u.player.getUniqueId().toString());
-                                u.mainGui.open(u);
-
-                            });
-                }
-
-            } else {
-
-                region = Network.getInstance().getRegionManager().getRegion(member.get((finalI - owner.size())));
-
-                //If the region is inactive change the colour of the icon so the user knows it's inactive.
-                if (region.status() == RegionStatus.INACTIVE) {
-
-                    setItem(slot, Utils.createItem(Material.LIME_CONCRETE, 1,
-                                    Utils.title("Region " + region.getTag(user.player.getUniqueId().toString())),
-                                    Utils.line("You are the owner of this region."),
-                                    Utils.line("Click to open the menu of this region."),
-                                    Utils.line("This region is currently inactive."),
-                                    Utils.line("Enter this region to make it active again."),
-                                    Utils.line("You will then become the region owner.")),
-                            u -> {
-
-                                //Delete this gui.
-                                this.delete();
-
-                                //Switch to region info.
-                                u.mainGui = new RegionInfo(Network.getInstance().getRegionManager().getRegion(member.get(finalI - owner.size())), u.player.getUniqueId().toString());
-                                u.mainGui.open(u);
-
-                            });
-                } else {
-
-                    setItem(slot, Utils.createItem(Material.YELLOW_CONCRETE, 1,
-                                    Utils.title("Region " + region.getTag(user.player.getUniqueId().toString())),
-                                    Utils.line("You are a member of this region."),
-                                    Utils.line("Click to open the menu of this plot.")),
-                            u -> {
-
-                                //Delete this gui.
-                                this.delete();
-
-                                //Switch to plot info.
-                                u.mainGui = new RegionInfo(Network.getInstance().getRegionManager().getRegion(member.get((finalI - owner.size()))), u.player.getUniqueId().toString());
-                                u.mainGui.open(u);
-
-                            });
-                }
-
-            }
+                    });
 
             //Increase slot accordingly.
             if (slot % 9 == 7) {
@@ -259,5 +184,47 @@ public class RegionMenu extends Gui {
         this.clearGui();
         createGui();
 
+    }
+
+    private static ItemStack getGuiItem(RegionMember regionMember, RegionStatus regionStatus) {
+        return Utils.createItem(getMaterial(regionMember, regionStatus), 1,
+                Utils.title("Region " + regionMember.getTag()),
+                getLines(regionMember, regionStatus));
+    }
+
+    private static Material getMaterial(RegionMember regionMember, RegionStatus regionStatus) {
+        Material material;
+        if (regionMember.pinned()) {
+            if (regionStatus == RegionStatus.INACTIVE) {
+                material = Material.ORANGE_STAINED_GLASS;
+            } else if (regionMember.isOwner()) {
+                material = Material.LIME_STAINED_GLASS;
+            } else {
+                material = Material.YELLOW_STAINED_GLASS;
+            }
+        } else {
+            if (regionStatus == RegionStatus.INACTIVE) {
+                material = Material.ORANGE_CONCRETE;
+            } else if (regionMember.isOwner()) {
+                material = Material.LIME_CONCRETE;
+            } else {
+                material = Material.YELLOW_CONCRETE;
+            }
+        }
+        return material;
+    }
+
+    private static Component[] getLines(RegionMember regionMember, RegionStatus regionStatus) {
+        List<Component> lines = new ArrayList<>();
+        lines.add(regionMember.isOwner() ? Utils.line("You are the owner of this region.") : Utils.line("You are a member of this region."));
+        lines.add(Utils.line("Click to open the menu of this region."));
+        if (regionStatus == RegionStatus.INACTIVE) {
+            lines.add(Utils.line("This region is currently inactive."));
+            lines.add(Utils.line("Enter this region to make it active again."));
+            if (!regionMember.isOwner()) {
+                lines.add(Utils.line("You will then become the region owner."));
+            }
+        }
+        return lines.toArray(new Component[0]);
     }
 }

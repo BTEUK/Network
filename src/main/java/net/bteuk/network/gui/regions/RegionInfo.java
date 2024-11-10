@@ -18,6 +18,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 import static net.bteuk.network.utils.Constants.SERVER_NAME;
 
@@ -29,6 +30,8 @@ public class RegionInfo extends Gui {
     private final GlobalSQL globalSQL;
 
     private RegionTagListener regionTagListener;
+
+    private boolean actionActive = false;
 
     public RegionInfo(Region region, String uuid) {
 
@@ -83,7 +86,7 @@ public class RegionInfo extends Gui {
                 });
 
         //Set region tag.
-        setItem(21, Utils.createItem(Material.WRITABLE_BOOK, 1,
+        setItem(20, Utils.createItem(Material.WRITABLE_BOOK, 1,
                         Utils.title("Set Region Tag"),
                         Utils.line("Click to give this region a custom name."),
                         Utils.line("You will be prompted to type a name in chat."),
@@ -105,8 +108,24 @@ public class RegionInfo extends Gui {
 
                 });
 
+        setItem(21, enchant(Utils.createItem(Material.LIGHTNING_ROD, 1,
+                    region.isPinned(uuid) ? Utils.title("Unpin Region") : Utils.title("Pin Region"),
+                    Utils.line("A pinned region will always show"),
+                    Utils.line("at the start of the region menu."))),
+                user -> {
+                    if (!actionActive) {
+                        actionActive = true;
+
+                        try {
+                            region.setPinned(uuid, !region.isPinned(uuid));
+                        } finally {
+                            this.refresh();
+                        }
+                    }
+                });
+
         //Teleport to region.
-        setItem(22, Utils.createItem(Material.ENDER_PEARL, 1,
+        setItem(23, Utils.createItem(Material.ENDER_PEARL, 1,
                         Utils.title("Teleport to Region"),
                         Utils.line("Teleports you to the region at the"),
                         Utils.line("current set location."),
@@ -140,7 +159,7 @@ public class RegionInfo extends Gui {
                 });
 
         //Set teleport location.
-        setItem(23, Utils.createItem(Material.ENDER_EYE, 1,
+        setItem(24, Utils.createItem(Material.ENDER_EYE, 1,
                         Utils.title("Set Location"),
                         Utils.line("Sets the teleport location of this region"),
                         Utils.line("to you current location."),
@@ -268,6 +287,14 @@ public class RegionInfo extends Gui {
 
         this.clearGui();
         createGui();
+        actionActive = false;
 
+    }
+
+    private ItemStack enchant(ItemStack itemStack) {
+        if (region.isPinned(uuid)) {
+            Utils.enchant(itemStack);
+        }
+        return itemStack;
     }
 }

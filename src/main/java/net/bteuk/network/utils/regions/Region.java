@@ -45,6 +45,16 @@ public record Region(String regionName, int x, int z) {
         return (Network.getInstance().regionSQL.hasRow("SELECT region FROM region_members WHERE region='" + regionName + "' AND uuid='" + uuid + "' AND tag IS NOT NULL;"));
     }
 
+    // Return whether the player has this region pinned.
+    public boolean isPinned(String uuid) {
+        return Network.getInstance().regionSQL.hasRow("SELECT region FROM region_members WHERE region='" + regionName + "' AND uuid='" + uuid + "' AND pinned=1;");
+    }
+
+    // Set the region to (un)pinned for a specific player.
+    public void setPinned(String uuid, boolean pin) {
+        Network.getInstance().regionSQL.update("UPDATE region_members SET pinned=" + (pin ? "1" : "0") + " WHERE region='" + regionName + "' AND uuid='" + uuid + "';");
+    }
+
     //Get the server of the region.
     public String getServer() {
         if (Network.getInstance().regionSQL.hasRow("SELECT region FROM regions WHERE region='" + regionName + "' AND status='plot'")) {
