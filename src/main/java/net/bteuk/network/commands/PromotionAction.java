@@ -2,12 +2,14 @@ package net.bteuk.network.commands;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.commands.tabcompleters.FixedArgSelector;
+import net.bteuk.network.commands.tabcompleters.MultiArgSelector;
 import net.bteuk.network.commands.tabcompleters.PlayerSelector;
 import net.bteuk.network.utils.Role;
 import net.bteuk.network.utils.Roles;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
@@ -21,12 +23,10 @@ public abstract class PromotionAction extends AbstractCommand {
 
     private final Network instance;
 
-    protected PromotionAction(Network instance, String commandName, Component error) {
-        super(instance, commandName);
+    protected PromotionAction(Network instance, Component error) {
         this.instance = instance;
         this.error = error;
-        command.setTabCompleter(new PlayerSelector());
-        command.setTabCompleter(new FixedArgSelector(Roles.getRoles().stream().map(Role::getId).collect(Collectors.toList()), 1));
+        setTabCompleter(new MultiArgSelector(List.of(new PlayerSelector(false), new FixedArgSelector(Roles.getRoles().stream().map(Role::getId).collect(Collectors.toList()), 1))));
     }
 
     public void onCommand(CommandSender sender, String[] args, boolean demote) {

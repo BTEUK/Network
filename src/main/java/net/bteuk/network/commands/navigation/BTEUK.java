@@ -1,30 +1,22 @@
 package net.bteuk.network.commands.navigation;
 
-import net.bteuk.network.Network;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.bteuk.network.commands.AbstractCommand;
 import net.bteuk.network.utils.SwitchServer;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class BTEUK extends AbstractCommand {
 
-    public BTEUK(Network instance) {
-        super(instance, "bteuk");
-    }
-
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        Player player = getPlayer(sender);
-
+        //Check if the sender is a player.
+        Player player = getPlayer(stack);
         if (player == null) {
-            return true;
+            return;
         }
 
         SwitchServer.switchToExternalServer(player);
-
-        return true;
     }
 }

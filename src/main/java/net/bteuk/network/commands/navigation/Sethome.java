@@ -1,51 +1,34 @@
 package net.bteuk.network.commands.navigation;
 
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.bteuk.network.Network;
+import net.bteuk.network.commands.AbstractCommand;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.GlobalSQL;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
-import static net.bteuk.network.utils.Constants.LOGGER;
-
-public class Sethome implements CommandExecutor {
+public class Sethome extends AbstractCommand {
 
     private final GlobalSQL globalSQL;
 
     //Constructor to enable the command.
-    public Sethome(Network instance, GlobalSQL globalSQL) {
-
-        this.globalSQL = globalSQL;
-
-        //Register command.
-        PluginCommand command = instance.getCommand("sethome");
-
-        if (command == null) {
-            LOGGER.warning("Sethome command not added to plugin.yml, it will therefore not be enabled.");
-            return;
-        }
-
-        //Set executor.
-        command.setExecutor(this);
-
+    public Sethome(Network instance) {
+        this.globalSQL = instance.getGlobalSQL();
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
         //Check if the sender is a player.
-        if (!(sender instanceof Player p)) {
-            sender.sendMessage(ChatUtils.error("This command can only be used by players."));
-            return true;
+        Player player = getPlayer(stack);
+        if (player == null) {
+            return;
         }
 
         //If no args set default home.
@@ -54,27 +37,27 @@ public class Sethome implements CommandExecutor {
         if (args.length == 0) {
 
             //If already has a default home set, the player first has to delete it.
-            if (globalSQL.hasRow("SELECT uuid FROM home WHERE uuid='" + p.getUniqueId() + "' AND name IS NULL;")) {
-                p.sendMessage(ChatUtils.error("You already have a default home set, to delete it type ")
+            if (globalSQL.hasRow("SELECT uuid FROM home WHERE uuid='" + player.getUniqueId() + "' AND name IS NULL;")) {
+                player.sendMessage(ChatUtils.error("You already have a default home set, to delete it type ")
                         .append(Component.text("/delhome", NamedTextColor.DARK_RED)));
-                return true;
+                return;
             }
 
             //Set home to current location.
-            int coordinate_id = getCoordinateID(p.getLocation());
+            int coordinate_id = getCoordinateID(player.getLocation());
 
-            globalSQL.update("INSERT INTO home(coordinate_id,uuid) VALUES(" + coordinate_id + ",'" + p.getUniqueId() + "');");
+            globalSQL.update("INSERT INTO home(coordinate_id,uuid) VALUES(" + coordinate_id + ",'" + player.getUniqueId() + "');");
 
-            p.sendMessage(ChatUtils.success("Default home set to current location, to teleport here type ")
+            player.sendMessage(ChatUtils.success("Default home set to current location, to teleport here type ")
                     .append(Component.text("/home", NamedTextColor.DARK_AQUA)));
 
         } else {
 
             //Check for permission.
-            if (!p.hasPermission("uknet.navigation.homes")) {
-                p.sendMessage(ChatUtils.error("You do not have permission to set multiple homes, only to set a default home using ")
+            if (!player.hasPermission("uknet.navigation.homes")) {
+                player.sendMessage(ChatUtils.error("You do not have permission to set multiple homes, only to set a default home using ")
                         .append(Component.text("/sethome", NamedTextColor.DARK_RED)));
-                return true;
+                return;
             }
 
             //Check if a home with this name already exists.
@@ -82,30 +65,27 @@ public class Sethome implements CommandExecutor {
 
             //Check name length.
             if (name.length() > 64) {
-                p.sendMessage(ChatUtils.error("The home name must be 64 characters or less."));
-                return true;
+                player.sendMessage(ChatUtils.error("The home name must be 64 characters or less."));
+                return;
             }
 
-            if (globalSQL.hasRow("SELECT uuid FROM home WHERE uuid='" + p.getUniqueId() + "' AND name='" + name + "';")) {
-                p.sendMessage(ChatUtils.error("You already have a home set with the name ")
+            if (globalSQL.hasRow("SELECT uuid FROM home WHERE uuid='" + player.getUniqueId() + "' AND name='" + name + "';")) {
+                player.sendMessage(ChatUtils.error("You already have a home set with the name ")
                         .append(Component.text(name, NamedTextColor.DARK_RED))
                         .append(ChatUtils.error(", you can delete it by typing "))
                         .append(Component.text("/delhome " + name, NamedTextColor.DARK_RED)));
-                return true;
+                return;
             }
 
             //Set home to current location.
-            int coordinate_id = getCoordinateID(p.getLocation());
+            int coordinate_id = getCoordinateID(player.getLocation());
 
-            globalSQL.update("INSERT INTO home(coordinate_id,uuid,name) VALUES(" + coordinate_id + ",'" + p.getUniqueId() + "','" + name + "');");
+            globalSQL.update("INSERT INTO home(coordinate_id,uuid,name) VALUES(" + coordinate_id + ",'" + player.getUniqueId() + "','" + name + "');");
 
-            p.sendMessage(ChatUtils.success("Home set to current location, to teleport here type ")
+            player.sendMessage(ChatUtils.success("Home set to current location, to teleport here type ")
                     .append(Component.text("/home " + name, NamedTextColor.DARK_AQUA)));
 
         }
-
-        return true;
-
     }
 
     private int getCoordinateID(Location l) {

@@ -1,57 +1,56 @@
 package net.bteuk.network.commands;
 
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.bteuk.network.Network;
 import net.bteuk.network.gui.BuildGui;
-import net.bteuk.network.gui.tutorials.TutorialsGui;
 import net.bteuk.network.gui.navigation.ExploreGui;
+import net.bteuk.network.gui.tutorials.TutorialsGui;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import static net.bteuk.network.utils.Constants.LOGGER;
 import static net.bteuk.network.utils.Constants.SERVER_TYPE;
 import static net.bteuk.network.utils.Constants.TUTORIALS;
 import static net.bteuk.network.utils.enums.ServerType.TUTORIAL;
 
-public class Navigator implements CommandExecutor {
+public class Navigator extends AbstractCommand {
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String[] args) {
+    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
         //Check if the sender is a player.
-        if (!(sender instanceof Player p)) {
-
-            sender.sendMessage(ChatUtils.error("This command can only be used by a player."));
-            return true;
-
+        Player player = getPlayer(stack);
+        if (player == null) {
+            return;
         }
 
-        //Get user.
-        NetworkUser u = Network.getInstance().getUser(p);
+        NetworkUser user = Network.getInstance().getUser(player);
 
-        if (u == null) {return true;}
+        //If u is null, cancel.
+        if (user == null) {
+            LOGGER.severe("User " + player.getName() + " can not be found!");
+            player.sendMessage(ChatUtils.error("User can not be found, please relog!"));
+            return;
+        }
 
         //Check args, allows the player to open a specific menu directly.
         if (args.length > 0) {
             switch (args[0]) {
 
-                case "explore" -> openExplore(u);
-                case "building" -> openBuilding(u);
-                case "tutorials" -> openTutorials(u);
-                default -> openNavigator(u);
+                case "explore" -> openExplore(user);
+                case "building" -> openBuilding(user);
+                case "tutorials" -> openTutorials(user);
+                default -> openNavigator(user);
 
             }
         } else {
 
             //If the player has a previous gui, open that.
-            openNavigator(u);
+            openNavigator(user);
 
         }
-
-        return true;
     }
 
     public static void openNavigator(NetworkUser u) {

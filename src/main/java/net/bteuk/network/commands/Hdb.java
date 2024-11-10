@@ -1,34 +1,10 @@
 package net.bteuk.network.commands;
 
-import net.bteuk.network.Network;
-import org.bukkit.command.*;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import org.jetbrains.annotations.NotNull;
 
-import static net.bteuk.network.utils.Constants.LOGGER;
-
-public class Hdb implements CommandExecutor {
-
-    //Constructor to enable the command.
-    public Hdb(Network instance) {
-
-        //Register command.
-        PluginCommand command = instance.getCommand("hdb");
-
-        if (command == null) {
-            LOGGER.warning("Hdb command not added to plugin.yml, it will therefore not be enabled.");
-            return;
-        }
-
-        //Set executor.
-        command.setExecutor(this);
-
-    }
+public class Hdb extends AbstractCommand {
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-
-        //Do nothing.
-        return true;
-
-    }
+    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {}
 }

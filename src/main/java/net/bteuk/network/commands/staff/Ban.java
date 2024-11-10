@@ -1,65 +1,47 @@
 package net.bteuk.network.commands.staff;
 
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.bteuk.network.Network;
+import net.bteuk.network.commands.AbstractCommand;
 import net.bteuk.network.exceptions.DurationFormatException;
 import net.bteuk.network.exceptions.NotBannedException;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.Time;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
-import static net.bteuk.network.utils.Constants.LOGGER;
 import static net.bteuk.network.utils.staff.Moderation.ban;
 import static net.bteuk.network.utils.staff.Moderation.getDuration;
 
-public class Ban implements CommandExecutor {
-
-    //Constructor to enable the command.
-    public Ban(Network instance) {
-
-        //Register command.
-        PluginCommand command = instance.getCommand("ban");
-
-        if (command == null) {
-            LOGGER.warning("Ban command not added to plugin.yml, it will therefore not be enabled.");
-            return;
-        }
-
-        //Set executor.
-        command.setExecutor(this);
-
-    }
+public class Ban extends AbstractCommand {
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
         //Check if sender is player, then check permissions
-        if (sender instanceof Player p) {
-            if (!p.hasPermission("uknet.ban")) {
-                p.sendMessage(ChatUtils.error("You do not have permission to use this command."));
-                return true;
+        CommandSender sender = stack.getSender();
+        if (sender instanceof Player) {
+            if (!hasPermission(sender, "uknet.ban")) {
+                return;
             }
         }
 
         //Check args.
         if (args.length < 3) {
             sender.sendMessage(ChatUtils.error("/ban <player> <duration> <reason>"));
-            return true;
+            return;
         }
 
         //Check player.
         //If uuid exists for name.
         if (!Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM player_data WHERE name='" + args[0] + "';")) {
             sender.sendMessage(ChatUtils.error("%s is not a valid player."));
-            return true;
+            return;
         }
 
         String uuid = Network.getInstance().getGlobalSQL().getString("SELECT uuid FROM player_data WHERE name='" + args[0] + "';");
@@ -73,7 +55,7 @@ public class Ban implements CommandExecutor {
 
         } catch (DurationFormatException e) {
             sender.sendMessage(ChatUtils.error("Duration must be in ymdh format, for example 1y6m, which is 1 year and 6 months or 2d12h is 2 days and 12 hours."));
-            return true;
+            return;
         }
 
         //Get end time of current time plus time.
@@ -83,8 +65,6 @@ public class Ban implements CommandExecutor {
         String reason = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
 
         sender.sendMessage(banPlayer(name, uuid, end_time, reason));
-        return true;
-
     }
 
     /**

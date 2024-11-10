@@ -1,54 +1,46 @@
 package net.bteuk.network.commands;
 
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.bteuk.network.Network;
 import net.bteuk.network.lib.dto.UserUpdate;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.Time;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import static net.bteuk.network.utils.Constants.LOGGER;
 
-public class AFK implements CommandExecutor {
+public class Afk extends AbstractCommand {
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
         //Check if the sender is a player.
-        if (!(sender instanceof Player p)) {
-
-            sender.sendMessage(ChatUtils.error("This command can only be run by a player."));
-            return true;
-
+        Player player = getPlayer(stack);
+        if (player == null) {
+            return;
         }
 
-        //Get user
-        NetworkUser u = Network.getInstance().getUser(p);
+        NetworkUser user = Network.getInstance().getUser(player);
 
         //If u is null, cancel.
-        if (u == null) {
-            LOGGER.severe("User " + p.getName() + " can not be found!");
-            p.sendMessage(ChatUtils.error("User can not be found, please relog!"));
-            return true;
+        if (user == null) {
+            LOGGER.severe("User " + player.getName() + " can not be found!");
+            player.sendMessage(ChatUtils.error("User can not be found, please relog!"));
+            return;
         }
 
         //Switch afk status.
-        if (u.afk) {
+        if (user.afk) {
             //Reset last logged time.
-            u.last_movement = Time.currentTime();
-            u.afk = false;
-            updateAfkStatus(u, false);
+            user.last_movement = Time.currentTime();
+            user.afk = false;
+            updateAfkStatus(user, false);
         } else {
-            u.afk = true;
-            updateAfkStatus(u, true);
+            user.afk = true;
+            updateAfkStatus(user, true);
         }
-
-        return true;
-
     }
 
     public static void updateAfkStatus(NetworkUser user, boolean afk) {

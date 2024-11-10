@@ -1,5 +1,6 @@
 package net.bteuk.network.commands;
 
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.bteuk.network.Network;
 import net.bteuk.network.commands.tabcompleters.FixedArgSelector;
 import net.bteuk.network.lib.dto.DiscordLinking;
@@ -11,8 +12,6 @@ import net.bteuk.network.utils.Roles;
 import net.bteuk.network.utils.Time;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,31 +23,28 @@ import static net.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public class Discord extends AbstractCommand {
 
-    public Discord(Network instance) {
-        super(instance, "discord");
-        command.setTabCompleter(new FixedArgSelector(Arrays.asList("link", "unlink"), 0));
+    public Discord() {
+        setTabCompleter(new FixedArgSelector(Arrays.asList("link", "unlink"), 0));
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        Player player = getPlayer(sender);
+        //Check if the sender is a player.
+        Player player = getPlayer(stack);
         if (player == null) {
-            return true;
+            return;
         }
 
         if (args.length > 0) {
 
-            //Get user.
             NetworkUser user = Network.getInstance().getUser(player);
 
-            //Check if user is null.
+            //If u is null, cancel.
             if (user == null) {
-                LOGGER.severe("User " + player.getName() + " is null, command " + command.getName() + " can't be executed!");
-                LOGGER.severe("This will also impact all other Network-related functions.");
-
-                player.sendMessage(ChatUtils.error("An error occurred, please contact a server admin!"));
-                return true;
+                LOGGER.severe("User " + player.getName() + " can not be found!");
+                player.sendMessage(ChatUtils.error("User can not be found, please relog!"));
+                return;
             }
 
             //If discord linking is enabled
@@ -57,7 +53,7 @@ public class Discord extends AbstractCommand {
                 //Check if account isn't already linked, send info to unlink.
                 if (user.isLinked) {
                     player.sendMessage(ChatUtils.error("You are already linked, to unlink do %s", "/discord unlink"));
-                    return true;
+                    return;
                 }
 
                 //Send random code in chat, this must be sent to the UK Bot to link your discord account.
@@ -72,14 +68,14 @@ public class Discord extends AbstractCommand {
                 Network.getInstance().getChat().sendSocketMesage(discordLinking);
 
                 player.sendMessage(ChatUtils.success("To link your Discord please DM the code %s to the UK Bot within the next 5 minutes.", token));
-                return true;
+                return;
 
             } else if (args[0].equalsIgnoreCase("unlink")) {
 
                 //Check if account is not linked, then ask user to link first.
                 if (!user.isLinked) {
                     player.sendMessage(ChatUtils.error("You are not linked, to link do %s", "/discord link"));
-                    return true;
+                    return;
                 }
 
                 // Remove linked roles from discord, then unlink.
@@ -88,7 +84,7 @@ public class Discord extends AbstractCommand {
                 // Remove the role in discord.
                 if (role == null) {
                     user.sendMessage(ChatUtils.error("You have an invalid role, please contact an administrator."));
-                    return true;
+                    return;
                 }
 
                 DiscordRole discordRole = new DiscordRole(user.player.getUniqueId().toString(), role.getId(), false);
@@ -102,16 +98,14 @@ public class Discord extends AbstractCommand {
 
                 user.isLinked = false;
                 player.sendMessage(ChatUtils.success("Unlinked your Discord."));
-                return true;
+                return;
 
             }
         }
 
         Component discord = ChatUtils.success("Join our discord: " + CONFIG.getString("discord"));
         discord = discord.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, Objects.requireNonNull(CONFIG.getString("discord"))));
-        sender.sendMessage(discord);
-
-        return true;
+        stack.getSender().sendMessage(discord);
 
     }
 }

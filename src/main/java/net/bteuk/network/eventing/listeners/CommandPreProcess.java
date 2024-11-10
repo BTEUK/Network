@@ -16,7 +16,7 @@ import org.bukkit.event.server.ServerCommandEvent;
 
 import java.util.ArrayList;
 
-import static net.bteuk.network.commands.AFK.updateAfkStatus;
+import static net.bteuk.network.commands.Afk.updateAfkStatus;
 import static net.bteuk.network.utils.Constants.LOGGER;
 import static net.bteuk.network.utils.Constants.REGIONS_ENABLED;
 import static net.bteuk.network.utils.Constants.SERVER_NAME;

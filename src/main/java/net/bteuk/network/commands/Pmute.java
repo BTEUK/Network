@@ -1,10 +1,9 @@
 package net.bteuk.network.commands;
 
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.bteuk.network.Network;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.kyori.adventure.text.Component;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -12,15 +11,14 @@ import org.jetbrains.annotations.NotNull;
  */
 public class Pmute extends PmuteAction {
 
-    private static Component ERROR = ChatUtils.error("/pmute [player]");
+    private static final Component ERROR = ChatUtils.error("/pmute [player]");
 
     public Pmute(Network instance) {
-        super(instance, "pmute", ERROR);
+        super(instance, ERROR);
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        onCommand(sender, args, true);
-        return true;
+    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
+        onCommand(stack, args, true);
     }
 }

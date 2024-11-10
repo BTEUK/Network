@@ -1,6 +1,6 @@
 package net.bteuk.network.commands;
 
-import net.bteuk.network.Network;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.bteuk.network.commands.tabcompleters.FixedArgSelector;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.Role;
@@ -9,8 +9,6 @@ import net.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,57 +18,50 @@ public class Help extends AbstractCommand {
 
     private static final Component ROLE_ERROR = ChatUtils.error("An error occurred while loading a role, please contact an administrator.");
 
-    public Help(Network instance) {
-        super(instance, "help");
-        command.setTabCompleter(new FixedArgSelector(Arrays.asList("building", "explore", "plots", "regions", "utils", "worldedit"), 0));
+    public Help() {
+        setTabCompleter(new FixedArgSelector(Arrays.asList("building", "explore", "plots", "regions", "utils", "worldedit"), 0));
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
         //Check if the sender is a player.
-        if (!(sender instanceof Player p)) {
-
-            sender.sendMessage(ChatUtils.error("This command can only be run by a player."));
-            return true;
-
+        Player player = getPlayer(stack);
+        if (player == null) {
+            return;
         }
 
         //Default message.
         if (args.length == 0) {
-
-            help(p);
-            return true;
-
+            help(player);
+            return;
         }
 
         //Check for first arg to determine message.
         switch (args[0]) {
 
             //Building
-            case "building" -> building(p);
+            case "building" -> building(player);
 
             //Exploring
-            case "explore" -> explore(p);
+            case "explore" -> explore(player);
 
             //Plots
-            case "plots" -> plots(p);
+            case "plots" -> plots(player);
 
             //Regions
-            case "regions" -> regions(p);
+            case "regions" -> regions(player);
 
             //Utilities
-            case "utils" -> utils(p);
+            case "utils" -> utils(player);
 
             //Worldedit
-            case "worldedit" -> worldedit(p);
+            case "worldedit" -> worldedit(player);
 
             //Default for any other arguments.
-            default -> help(p);
+            default -> help(player);
 
         }
-
-        return true;
     }
 
     private void help(Player p) {

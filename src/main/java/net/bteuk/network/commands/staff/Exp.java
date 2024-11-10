@@ -1,29 +1,29 @@
 package net.bteuk.network.commands.staff;
 
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.bteuk.network.Network;
 import net.bteuk.network.commands.AbstractCommand;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.progression.Progression;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class Exp extends AbstractCommand {
 
-    public Exp(Network instance) {
-        super(instance, "exp");
-    }
-
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
+        //Check if sender is player, then check permissions
+        CommandSender sender = stack.getSender();
         if (sender instanceof Player) {
-            return true;
+            if (!hasPermission(sender, "uknet.exp")) {
+                return;
+            }
         }
 
         if (args.length < 3) {
-            return true;
+            return;
         }
 
         if (args[0].equals("give")) {
@@ -35,11 +35,9 @@ public class Exp extends AbstractCommand {
                     int val = Integer.parseInt(args[2]);
                     Progression.addExp(uuid, val);
                 } catch (NumberFormatException ignored) {
-                    return true;
+                    return;
                 }
             }
         }
-
-        return true;
     }
 }

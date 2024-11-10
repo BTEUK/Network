@@ -32,7 +32,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
-import static net.bteuk.network.commands.AFK.updateAfkStatus;
+import static net.bteuk.network.commands.Afk.updateAfkStatus;
 import static net.bteuk.network.lib.enums.ChatChannels.STAFF;
 import static net.bteuk.network.utils.Constants.LOGGER;
 import static net.bteuk.network.utils.NetworkConfig.CONFIG;

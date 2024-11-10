@@ -1,11 +1,10 @@
 package net.bteuk.network.commands;
 
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.bteuk.network.Network;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -15,30 +14,25 @@ import static net.bteuk.network.utils.Constants.LOGGER;
 
 public class Nightvision extends AbstractCommand {
 
-    public Nightvision(Network instance) {
-        super(instance, "nightvision");
-    }
-
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        //Check for player
-        Player player = getPlayer(sender);
-
+        //Check if the sender is a player.
+        Player player = getPlayer(stack);
         if (player == null) {
-            return true;
+            return;
         }
 
-        //Get the NetworkUser for this player.
         NetworkUser user = Network.getInstance().getUser(player);
 
+        //If u is null, cancel.
         if (user == null) {
-            LOGGER.warning("NetworkUser for player " + player.getName() + " is null!");
-            return true;
+            LOGGER.severe("User " + player.getName() + " can not be found!");
+            player.sendMessage(ChatUtils.error("User can not be found, please relog!"));
+            return;
         }
 
         toggleNightvision(user);
-        return true;
 
     }
 

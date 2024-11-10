@@ -1,13 +1,11 @@
 package net.bteuk.network.commands.tabcompleters;
 
 import net.bteuk.network.Network;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 public class LocationAndSubcategorySelector extends AbstractTabCompleter {
 
@@ -23,7 +21,7 @@ public class LocationAndSubcategorySelector extends AbstractTabCompleter {
     }
 
     @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public @NotNull Collection<String> onTabComplete(@NotNull CommandSender sender, @NotNull String[] args) {
         // Get array of locations.
         ArrayList<String> locations = Network.getInstance().getGlobalSQL().getStringList("SELECT location FROM location_data;");
 

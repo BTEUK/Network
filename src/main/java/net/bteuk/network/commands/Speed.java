@@ -1,32 +1,28 @@
 package net.bteuk.network.commands;
 
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class Speed implements CommandExecutor {
+public class Speed extends AbstractCommand {
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
         //Check if the sender is a player.
-        if (!(sender instanceof Player p)) {
-
-            sender.sendMessage(ChatUtils.error("This command can only be run by a player."));
-            return true;
-
+        Player player = getPlayer(stack);
+        if (player == null) {
+            return;
         }
 
-        boolean isFly = p.isFlying();
+        boolean isFly = player.isFlying();
 
         if (args.length < 1) {
-            error(p);
-            return true;
+            error(player);
+            return;
         }
 
         float speed;
@@ -34,27 +30,25 @@ public class Speed implements CommandExecutor {
         try {
             speed = getMoveSpeed(args[0]);
         } catch (NumberFormatException e) {
-            error(p);
-            return true;
+            error(player);
+            return;
         }
 
         speed = getRealMoveSpeed(speed, isFly);
 
         if (isFly) {
 
-            p.setFlySpeed(speed);
-            p.sendMessage(ChatUtils.success("Set flying speed to ")
+            player.setFlySpeed(speed);
+            player.sendMessage(ChatUtils.success("Set flying speed to ")
                     .append(Component.text(args[0], NamedTextColor.DARK_AQUA)));
 
         } else {
 
-            p.setWalkSpeed(speed);
-            p.sendMessage(ChatUtils.success("Set walking speed to ")
+            player.setWalkSpeed(speed);
+            player.sendMessage(ChatUtils.success("Set walking speed to ")
                     .append(Component.text(args[0], NamedTextColor.DARK_AQUA)));
 
         }
-
-        return true;
     }
 
     //Returns the move speed from a string.

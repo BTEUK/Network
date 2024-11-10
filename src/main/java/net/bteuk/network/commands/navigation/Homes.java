@@ -1,6 +1,8 @@
 package net.bteuk.network.commands.navigation;
 
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.bteuk.network.Network;
+import net.bteuk.network.commands.AbstractCommand;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.Utils;
 import net.kyori.adventure.text.Component;
@@ -8,52 +10,25 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
-import static net.bteuk.network.utils.Constants.LOGGER;
+public class Homes extends AbstractCommand {
 
-public class Homes implements CommandExecutor {
+    @Override
+    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-    //Constructor to enable the command.
-    public Homes(Network instance) {
-
-        //Register command.
-        PluginCommand command = instance.getCommand("homes");
-
-        if (command == null) {
-            LOGGER.warning("Homes command not added to plugin.yml, it will therefore not be enabled.");
+        //Check if the sender is a player.
+        Player player = getPlayer(stack);
+        if (player == null) {
             return;
         }
 
-        //Set executor.
-        command.setExecutor(this);
-
-    }
-
-    @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-
-        //Check if sender is a player and that they have permission.
-        if (!(sender instanceof Player p)) {
-
-            sender.sendMessage(ChatUtils.error("This command can only be used by a player."));
-            return true;
-
-        }
-
         //Check if the player has permission.
-        if (!p.hasPermission("uknet.navigation.homes")) {
-
-            p.sendMessage(ChatUtils.error("You do not have permission to use this command."));
-            return true;
-
+        if (!hasPermission(player, "uknet.navigation.homes")) {
+            return;
         }
 
         //Set default page to 1.
@@ -71,12 +46,12 @@ public class Homes implements CommandExecutor {
         }
 
         //Get all homes in alphabetical order.
-        ArrayList<String> homes = Network.getInstance().getGlobalSQL().getStringList("SELECT name FROM home WHERE uuid='" + p.getUniqueId() + "' ORDER BY name ASC;");
+        ArrayList<String> homes = Network.getInstance().getGlobalSQL().getStringList("SELECT name FROM home WHERE uuid='" + player.getUniqueId() + "' ORDER BY name ASC;");
 
         //If there are no locations notify the user.
         if (homes.isEmpty()) {
-            p.sendMessage(ChatUtils.error("You don't have any homes set."));
-            return true;
+            player.sendMessage(ChatUtils.error("You don't have any homes set."));
+            return;
         }
 
         int pages = (((homes.size() - 1) / 16) + 1);
@@ -87,17 +62,15 @@ public class Homes implements CommandExecutor {
         if (((page - 1) * 16) >= homes.size()){
 
             if (homes.size() <= 16) {
-                p.sendMessage(ChatUtils.error("There is only ")
+                player.sendMessage(ChatUtils.error("There is only ")
                         .append(Component.text("1", NamedTextColor.DARK_RED))
                         .append(ChatUtils.error(" page of homes.")));
             } else {
-                p.sendMessage(ChatUtils.error("There are only ")
+                player.sendMessage(ChatUtils.error("There are only ")
                         .append(Component.text(pages, NamedTextColor.DARK_RED))
                         .append(ChatUtils.error(" pages of homes.")));
             }
-
-            return true;
-
+            return;
         }
 
         //Show this page of homes.
@@ -163,9 +136,7 @@ public class Homes implements CommandExecutor {
             }
         }
 
-        p.sendMessage(message);
-
-        return true;
+        player.sendMessage(message);
     }
 
     private Component createHome(String name) {

@@ -1,39 +1,36 @@
 package net.bteuk.network.commands;
 
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.bteuk.network.Network;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.regions.Region;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import static net.bteuk.network.utils.Constants.EARTH_WORLD;
 
-public class RegionCommand implements CommandExecutor {
+public class RegionCommand extends AbstractCommand {
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        if (!(sender instanceof Player p)) {
-
-            sender.sendMessage(ChatUtils.error("You must be a player to run this command."));
-            return true;
-
+        //Check if the sender is a player.
+        Player player = getPlayer(stack);
+        if (player == null) {
+            return;
         }
 
         if (args.length < 2) {
-            p.sendMessage(ChatUtils.error("/region join <region>"));
-            return true;
+            player.sendMessage(ChatUtils.error("/region join <region>"));
+            return;
         }
 
         //Check if the first arg is 'join'
         if (!args[0].equals("join")) {
-            p.sendMessage(ChatUtils.error("/region join <region>"));
-            return true;
+            player.sendMessage(ChatUtils.error("/region join <region>"));
+            return;
         }
 
         //Check if the region exists.
@@ -43,40 +40,36 @@ public class RegionCommand implements CommandExecutor {
             Region region = Network.getInstance().getRegionManager().getRegion(args[1]);
 
             //Check if they have an invite for this region.
-            if (region.hasInvite(p.getUniqueId().toString())) {
+            if (region.hasInvite(player.getUniqueId().toString())) {
 
                 //Check if the player has permission, else notify the player accordingly.
-                if (p.hasPermission("uknet.regions.join")) {
+                if (player.hasPermission("uknet.regions.join")) {
 
                     //Add server event to join plot.
-                    Network.getInstance().getGlobalSQL().update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + p.getUniqueId() + "'," + "'network'" + ",'" +
+                    Network.getInstance().getGlobalSQL().update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + player.getUniqueId() + "'," + "'network'" + ",'" +
                             EARTH_WORLD +
                             "','region join " + region.regionName() + "');");
 
                 } else {
 
                     //Send error.
-                    p.sendMessage(ChatUtils.error("You do not have permission to join regions."));
-                    p.sendMessage(ChatUtils.error("To join regions you need at least Jr.Builder."));
-                    p.sendMessage(ChatUtils.error("For more information type ")
+                    player.sendMessage(ChatUtils.error("You do not have permission to join regions."));
+                    player.sendMessage(ChatUtils.error("To join regions you need at least Jr.Builder."));
+                    player.sendMessage(ChatUtils.error("For more information type ")
                             .append(Component.text("/help building", NamedTextColor.DARK_RED)));
 
                 }
 
                 //Remove invite.
-                region.removeInvite(p.getUniqueId().toString());
+                region.removeInvite(player.getUniqueId().toString());
 
             } else {
-                p.sendMessage(ChatUtils.error("You have not been invited to join this region."));
+                player.sendMessage(ChatUtils.error("You have not been invited to join this region."));
             }
-            return true;
         } else {
-
-            p.sendMessage(ChatUtils.error("The region ")
+            player.sendMessage(ChatUtils.error("The region ")
                     .append(Component.text(args[1], NamedTextColor.DARK_RED))
                     .append(ChatUtils.error(" does not exist.")));
-            return true;
-
         }
     }
 }

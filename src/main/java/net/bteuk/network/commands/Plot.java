@@ -1,5 +1,6 @@
 package net.bteuk.network.commands;
 
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.bteuk.network.Network;
 import net.bteuk.network.commands.tabcompleters.FixedArgSelector;
 import net.bteuk.network.eventing.events.EventManager;
@@ -14,8 +15,6 @@ import net.kyori.adventure.inventory.Book;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,23 +29,23 @@ public class Plot extends AbstractCommand {
     private final PlotSQL plotSQL;
 
     public Plot(Network instance) {
-        super(instance, "plot");
         this.instance = instance;
         plotSQL = Network.getInstance().getPlotSQL();
-        command.setTabCompleter(new FixedArgSelector(Arrays.asList("info", "join"), 0));
+        setTabCompleter(new FixedArgSelector(Arrays.asList("info", "join"), 0));
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        Player p = getPlayer(sender);
-        if (p == null) {
-            return true;
+        //Check if the sender is a player.
+        Player player = getPlayer(stack);
+        if (player == null) {
+            return;
         }
 
         if (args.length < 1) {
-            error(p);
-            return true;
+            error(player);
+            return;
         }
 
         int plotID = -1;
@@ -55,20 +54,21 @@ public class Plot extends AbstractCommand {
             try {
                 plotID = Integer.parseInt(args[1]);
             } catch (NumberFormatException e) {
-                error(p);
-                return true;
+                error(player);
+                return;
             }
         }
 
         switch (args[0]) {
-            case "menu" -> menu(p);
-            case "info" -> info(p, plotID);
-            case "join" -> join(p, plotID);
-            case "feedback" -> feedback(p, plotID);
-            default -> error(p);
+            case "menu" -> menu(player);
+            case "info" -> info(player, plotID);
+            case "join" -> join(player, plotID);
+            case "feedback" -> feedback(player, plotID);
+            default -> error(player);
         }
-        return true;
     }
+
+
 
     private void menu(Player p) {
         // Get the user.

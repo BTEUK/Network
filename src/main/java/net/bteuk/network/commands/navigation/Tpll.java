@@ -1,6 +1,7 @@
 package net.bteuk.network.commands.navigation;
 
 import io.papermc.lib.PaperLib;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.bteuk.network.Network;
 import net.bteuk.network.commands.AbstractCommand;
 import net.bteuk.network.eventing.events.EventManager;
@@ -16,6 +17,7 @@ import net.bteuk.network.utils.regions.RegionManager;
 import net.buildtheearth.terraminusminus.dataset.IScalarDataset;
 import net.buildtheearth.terraminusminus.generator.EarthGeneratorPipelines;
 import net.buildtheearth.terraminusminus.generator.EarthGeneratorSettings;
+import net.buildtheearth.terraminusminus.generator.GeneratorDatasets;
 import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
 import net.buildtheearth.terraminusminus.util.geo.CoordinateParseUtils;
 import net.buildtheearth.terraminusminus.util.geo.LatLng;
@@ -23,8 +25,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -53,35 +53,31 @@ public class Tpll extends AbstractCommand {
     private static final Component USAGE = ChatUtils.error("/tpll <latitude> <longitude> [altitude]");
 
     public Tpll(Network instance, boolean requires_permission) {
-        super(instance, "tpll");
-
         this.requires_permission = requires_permission;
 
         regionManager = instance.getRegionManager();
         plotSQL = instance.getPlotSQL();
-
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
         //Check if the sender is a player.
         //Only players can use /tpll.
-        Player p = getPlayer(sender);
-        if (p == null) {
-            return true;
+        Player player = getPlayer(stack);
+        if (player == null) {
+            return;
         }
 
         //Check if permission is required.
         if (requires_permission) {
-            if (!p.hasPermission("uknet.navigation.tpll")) {
-                p.sendMessage(NO_PERMISSION);
-                return true;
+            if (!player.hasPermission("uknet.navigation.tpll")) {
+                player.sendMessage(NO_PERMISSION);
+                return;
             }
         }
 
-        tpll(p, args, false);
-        return true;
+        tpll(player, args, false);
     }
 
     public void tpll(Player p, String[] args, boolean fromEvent) {
@@ -285,7 +281,7 @@ public class Tpll extends AbstractCommand {
             //If the altitude was not specified, get it from the data.
             if (Double.isNaN(format.getAltitude())) {
                 try {
-                    altFuture = bteGeneratorSettings.datasets()
+                    altFuture = new GeneratorDatasets(bteGeneratorSettings)
                             .<IScalarDataset>getCustom(EarthGeneratorPipelines.KEY_DATASET_HEIGHTS)
                             .getAsync(format.getCoordinates().getLng(), format.getCoordinates().getLat())
                             .thenApply(a -> a + 1.0d);
