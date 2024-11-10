@@ -193,25 +193,13 @@ public class RegionMenu extends Gui {
     }
 
     private static Material getMaterial(RegionMember regionMember, RegionStatus regionStatus) {
-        Material material;
-        if (regionMember.pinned()) {
-            if (regionStatus == RegionStatus.INACTIVE) {
-                material = Material.ORANGE_STAINED_GLASS;
-            } else if (regionMember.isOwner()) {
-                material = Material.LIME_STAINED_GLASS;
-            } else {
-                material = Material.YELLOW_STAINED_GLASS;
-            }
+        if (regionStatus == RegionStatus.INACTIVE) {
+            return regionMember.pinned() ? Material.ORANGE_STAINED_GLASS : Material.ORANGE_CONCRETE;
+        } else if (regionMember.isOwner()) {
+            return regionMember.pinned() ? Material.LIME_STAINED_GLASS : Material.LIME_CONCRETE;
         } else {
-            if (regionStatus == RegionStatus.INACTIVE) {
-                material = Material.ORANGE_CONCRETE;
-            } else if (regionMember.isOwner()) {
-                material = Material.LIME_CONCRETE;
-            } else {
-                material = Material.YELLOW_CONCRETE;
-            }
+            return regionMember.pinned() ? Material.YELLOW_STAINED_GLASS : Material.YELLOW_CONCRETE;
         }
-        return material;
     }
 
     private static Component[] getLines(RegionMember regionMember, RegionStatus regionStatus) {
