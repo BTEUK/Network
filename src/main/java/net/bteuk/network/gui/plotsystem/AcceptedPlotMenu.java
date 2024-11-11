@@ -49,20 +49,16 @@ public class AcceptedPlotMenu extends Gui {
     @Setter
     private int page = 1;
 
-    private final NetworkUser user;
-
     public AcceptedPlotMenu(NetworkUser user) {
 
         super(45, Component.text("Accepted Plot Menu", NamedTextColor.AQUA, TextDecoration.BOLD));
 
+        filter = user.player.getUniqueId().toString();
         filterMenu = new FilterMenu(this, user);
 
         plotSQL = Network.getInstance().getPlotSQL();
         globalSQL = Network.getInstance().getGlobalSQL();
 
-        filter = user.player.getUniqueId().toString();
-
-        this.user = user;
         createGuiAsync();
 
     }

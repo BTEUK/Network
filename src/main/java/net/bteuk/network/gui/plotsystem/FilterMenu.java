@@ -12,7 +12,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.util.HashMap;
@@ -38,7 +37,7 @@ public class FilterMenu extends Gui {
 
     private final AcceptedPlotMenu acceptedPlotMenu;
 
-    private static final ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
+    private static final ExecutorService virtualThreadExecutor = Executors.newVirtualThreadPerTaskExecutor();
 
     public FilterMenu(AcceptedPlotMenu acceptedPlotMenu, NetworkUser user) {
         super(45, Component.text("Set Filter", NamedTextColor.AQUA, TextDecoration.BOLD));
@@ -124,15 +123,16 @@ public class FilterMenu extends Gui {
             // The icon is the player head of the user, the amount is the number of plots they've completed.
             // If this is the current filter, make it enchanted.
             if (StringUtils.isEmpty(uuid)) {
-                setItem(slot, enchant(Utils.createItem(Material.ENDER_CHEST, newMap.get(uuid),
+                setItem(slot, Utils.createItem(Material.ENDER_CHEST, newMap.get(uuid),
                                 Utils.title("All Plots"),
                                 Utils.line("Click to set the filter"),
-                                Utils.line("to all completed plots.")), uuid),
+                                Utils.line("to all completed plots.")),
                         u -> {
                             // Set the filter and refresh the accepted plots menu at page 1.
                             acceptedPlotMenu.setFilter(uuid);
                             acceptedPlotMenu.setPage(1);
                             acceptedPlotMenu.refresh();
+                            this.refresh();
 
                             // Return to the accepted plot menu.
                             acceptedPlotMenu.open(u);
@@ -143,7 +143,7 @@ public class FilterMenu extends Gui {
                     createPlayerHeadGuiItem(profile, newMap.get(uuid), uuid, slot);
                 } else {
                     int finalSlot = slot;
-                    singleThreadExecutor.submit(() -> {
+                    virtualThreadExecutor.submit(() -> {
                         profile.complete();
                         createPlayerHeadGuiItem(profile, newMap.get(uuid), uuid, finalSlot);
                     });
@@ -186,25 +186,19 @@ public class FilterMenu extends Gui {
     }
 
     private void createPlayerHeadGuiItem(PlayerProfile profile, int amount, String uuid, int slot) {
-        setItem(slot, enchant(Utils.createPlayerSkull(profile, amount,
+        setItem(slot, Utils.createPlayerSkull(profile, amount,
                         Utils.title(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';")),
                         Utils.line("Click to set the filter"),
-                        Utils.line("to this player.")), uuid),
+                        Utils.line("to this player.")),
                 u -> {
                     // Set the filter and refresh the accepted plots menu at page 1.
                     acceptedPlotMenu.setFilter(uuid);
                     acceptedPlotMenu.setPage(1);
                     acceptedPlotMenu.refresh();
+                    this.refresh();
 
                     // Return to the accepted plot menu.
                     acceptedPlotMenu.open(u);
                 });
-    }
-
-    private ItemStack enchant(ItemStack itemStack, String uuid) {
-        if (acceptedPlotMenu.getFilter().equals(uuid)) {
-            Utils.enchant(itemStack);
-        }
-        return itemStack;
     }
 }

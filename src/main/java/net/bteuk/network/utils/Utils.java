@@ -13,7 +13,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -331,6 +330,6 @@ public class Utils {
 
     public static void enchant(ItemStack itemStack) {
         itemStack.addUnsafeEnchantment(Enchantment.MENDING, 1);
-        itemStack.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        //itemStack.addItemFlags(ItemFlag.HIDE_ENCHANTS);
     }
 }
