@@ -150,8 +150,7 @@ public class Timers {
             //If the region has no members then set it inactive.
             if (REGIONS_ENABLED) {
                 inactive_owners.clear();
-                inactive_owners = instance.regionSQL.getInactives("SELECT region,uuid FROM region_members WHERE is_owner=1 AND last_enter<" + (Time.currentTime() - inactivity) + ";");
-
+                inactive_owners = instance.regionSQL.getInactives("SELECT rm.region,rm.uuid FROM region_members AS rm INNER JOIN regions AS r ON rm.region=r.region WHERE rm.is_owner=1 AND rm.last_enter<" + (Time.currentTime() - inactivity) + " AND r.status <> 'inactive';");
                 for (Inactivity inactive : inactive_owners) {
 
                     //Check if there is another member in this region, they must be active.

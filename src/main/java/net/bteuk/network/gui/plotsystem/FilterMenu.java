@@ -18,8 +18,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * This menu is an extension on the {@link AcceptedPlotMenu}
@@ -36,8 +34,6 @@ public class FilterMenu extends Gui {
     private final NetworkUser user;
 
     private final AcceptedPlotMenu acceptedPlotMenu;
-
-    private static final ExecutorService virtualThreadExecutor = Executors.newVirtualThreadPerTaskExecutor();
 
     public FilterMenu(AcceptedPlotMenu acceptedPlotMenu, NetworkUser user) {
         super(45, Component.text("Set Filter", NamedTextColor.AQUA, TextDecoration.BOLD));
@@ -142,11 +138,8 @@ public class FilterMenu extends Gui {
                 if (profile.hasTextures()) {
                     createPlayerHeadGuiItem(profile, newMap.get(uuid), uuid, slot);
                 } else {
-                    int finalSlot = slot;
-                    virtualThreadExecutor.submit(() -> {
-                        profile.complete();
-                        createPlayerHeadGuiItem(profile, newMap.get(uuid), uuid, finalSlot);
-                    });
+                    profile.complete();
+                    createPlayerHeadGuiItem(profile, newMap.get(uuid), uuid, slot);
                 }
             }
 
@@ -186,19 +179,21 @@ public class FilterMenu extends Gui {
     }
 
     private void createPlayerHeadGuiItem(PlayerProfile profile, int amount, String uuid, int slot) {
-        setItem(slot, Utils.createPlayerSkull(profile, amount,
-                        Utils.title(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';")),
-                        Utils.line("Click to set the filter"),
-                        Utils.line("to this player.")),
-                u -> {
-                    // Set the filter and refresh the accepted plots menu at page 1.
-                    acceptedPlotMenu.setFilter(uuid);
-                    acceptedPlotMenu.setPage(1);
-                    acceptedPlotMenu.refresh();
-                    this.refresh();
+        if (amount != 0) {
+            setItem(slot, Utils.createPlayerSkull(profile, amount,
+                            Utils.title(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';")),
+                            Utils.line("Click to set the filter"),
+                            Utils.line("to this player.")),
+                    u -> {
+                        // Set the filter and refresh the accepted plots menu at page 1.
+                        acceptedPlotMenu.setFilter(uuid);
+                        acceptedPlotMenu.setPage(1);
+                        acceptedPlotMenu.refresh();
+                        this.refresh();
 
-                    // Return to the accepted plot menu.
-                    acceptedPlotMenu.open(u);
-                });
+                        // Return to the accepted plot menu.
+                        acceptedPlotMenu.open(u);
+                    });
+        }
     }
 }
