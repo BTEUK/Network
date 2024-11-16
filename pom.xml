@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>me.bteuk</groupId>
+    <groupId>net.bteuk</groupId>
     <artifactId>Network</artifactId>
-    <version>1.4.3</version>
+    <version>1.7.0</version>
     <packaging>jar</packaging>
 
     <name>Network</name>
 
     <properties>
-        <java.version>1.17</java.version>
+        <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <junit.version>5.11.2</junit.version>
+        <maven.compiler.version>3.13.0</maven.compiler.version>
+        <maven.shade.version>3.6.0</maven.shade.version>
+        <maven.surefire.version>3.5.1</maven.surefire.version>
     </properties>
 
     <build>
@@ -21,15 +25,16 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>${maven.compiler.version}</version>
                 <configuration>
-                    <release>17</release>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
+                <version>${maven.shade.version}</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -37,7 +42,53 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <minimizeJar>true</minimizeJar>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/**</exclude>
+                                        <exclude>AUTHORS</exclude>
+                                        <exclude>LICENSE</exclude>
+                                        <exclude>README.md</exclude>
+                                        <exclude>Log4j-events.dtd</exclude>
+                                        <exclude>Log4j-events.xsd</exclude>
+                                        <exclude>Log4j-config.xsd</exclude>
+                                        <exclude>Log4j-levels.xsd</exclude>
+                                        <exclude>Log4j-charsets.properties</exclude>
+                                        <exclude>mozilla/public-suffix-list.txt</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>com.github.BTEUK:*</artifact>
+                                    <excludes>
+                                        <exclude>net/kyori/**</exclude>
+                                        <exclude>com/google/**</exclude>
+                                        <exclude>net/daporkchop/lib/binary/**</exclude>
+                                        <exclude>org/**</exclude>
+                                        <exclude>com/fasterxml/jackson/**</exclude>
+                                        <exclude>io/netty/**</exclude>
+                                        <exclude>config.yml</exclude>
+                                        <exclude>javax/annotation/**</exclude>
+                                        <exclude>LZMA/**</exclude>
+                                        <exclude>net/buildtheearth/**</exclude>
+                                        <exclude>it/unimi/dsi/fastutil/**</exclude>
+                                        <exclude>net/daporkchop/lib/**</exclude>
+                                        <exclude>SCL.lombok/**</exclude>
+                                        <exclude>plugin.yml</exclude>
+                                        <exclude>lombok/**</exclude>
+                                        <exclude>changelog.txt</exclude>
+                                        <exclude>latestchanges.html</exclude>
+                                        <exclude>release-timestamp.txt</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>com.github.BTEUK:ProgressMapper</artifact>
+                                    <excludes>
+                                        <exclude>me/bteuk/progressmapperbackend/**</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                         </configuration>
                     </execution>
                 </executions>
@@ -45,12 +96,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>${maven.surefire.version}</version>
                 <dependencies>
                     <dependency>
                         <groupId>org.junit.jupiter</groupId>
                         <artifactId>junit-jupiter-engine</artifactId>
-                        <version>5.9.2</version>
+                        <version>${junit.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -73,10 +124,6 @@
             <url>https://oss.sonatype.org/content/groups/public/</url>
         </repository>
         <repository>
-            <id>placeholderapi</id>
-            <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
-        </repository>
-        <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
@@ -96,16 +143,55 @@
             <id>dmulloy2-repo</id>
             <url>https://repo.dmulloy2.net/repository/public/</url>
         </repository>
+        <repository>
+            <id>codemc-repo</id>
+            <url>https://repo.codemc.io/repository/maven-public/</url>
+            <layout>default</layout>
+        </repository>
     </repositories>
 
     <dependencies>
+        <!-- Server api | scope provided -->
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.20.1-R0.1-SNAPSHOT</version>
+            <version>1.21.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
+        <!-- Plugin api | scope provided -->
+        <dependency>
+            <groupId>com.sk89q.worldguard</groupId>
+            <artifactId>worldguard-bukkit</artifactId>
+            <version>7.0.12</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.comphenix.protocol</groupId>
+            <artifactId>ProtocolLib</artifactId>
+            <version>5.3.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.decentsoftware-eu</groupId>
+            <artifactId>decentholograms</artifactId>
+            <version>2.8.11</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.luckperms</groupId>
+            <artifactId>api</artifactId>
+            <version>5.4</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Utils -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.34</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>io.papermc</groupId>
             <artifactId>paperlib</artifactId>
@@ -115,62 +201,57 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-dbcp2</artifactId>
-            <version>2.9.0</version>
+            <version>2.12.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.0</version>
+            <version>3.17.0</version>
         </dependency>
-
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.13.0</version>
-        </dependency>
-        <dependency>
-            <groupId>me.clip</groupId>
-            <artifactId>placeholderapi</artifactId>
-            <version>2.11.3</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.SmylerMC</groupId>
-            <artifactId>terraminusminus</artifactId>
-            <version>master-SNAPSHOT</version>
+            <version>2.17.0</version>
         </dependency>
         <dependency>
             <groupId>com.github.BTEUK</groupId>
-            <artifactId>ProgressMapper</artifactId>
-            <version>2f3fc96c3f</version>
+            <artifactId>terraminusminus</artifactId>
+            <version>feature~paper_1_21-5e925b8af2-1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>32.1.1-jre</version>
+            <version>33.3.1-jre</version>
+        </dependency>
+
+        <!-- Internal libraries -->
+        <dependency>
+            <groupId>com.github.BTEUK</groupId>
+            <artifactId>ProgressMapper</artifactId>
+            <version>2f3fc96c3</version>
         </dependency>
         <dependency>
-            <groupId>com.sk89q.worldguard</groupId>
-            <artifactId>worldguard-bukkit</artifactId>
-            <version>7.0.9</version>
-            <scope>provided</scope>
+            <groupId>com.github.BTEUK</groupId>
+            <artifactId>NetworkLib</artifactId>
+            <version>723b185fc1</version>
         </dependency>
         <dependency>
-            <groupId>com.comphenix.protocol</groupId>
-            <artifactId>ProtocolLib</artifactId>
-            <version>5.1.0</version>
-            <scope>provided</scope>
+            <groupId>com.github.BTEUK</groupId>
+            <artifactId>TeachingTutorials</artifactId>
+            <version>4a3b7d7139</version>
         </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.28</version>
-            <scope>provided</scope>
-        </dependency>
+
+        <!-- Test dependencies -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.9.2</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
