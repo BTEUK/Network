@@ -16,10 +16,11 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import teachingtutorials.guis.Event;
 import teachingtutorials.guis.EventType;
-import teachingtutorials.tutorials.Lesson;
-import teachingtutorials.tutorials.Tutorial;
+import teachingtutorials.tutorialobjects.Tutorial;
+import teachingtutorials.tutorialplaythrough.Lesson;
 import teachingtutorials.utils.User;
 
+import static net.bteuk.network.utils.Constants.LOGGER;
 import static net.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public class TutorialsGui extends Gui {
@@ -46,15 +47,15 @@ public class TutorialsGui extends Gui {
 
         //Gets the information about the Tutorials User
         User tutorialsUser = new User(this.user.player);
-        tutorialsUser.fetchDetailsByUUID(Network.getInstance().getTutorialsDBConnection());
+        tutorialsUser.fetchDetailsByUUID(Network.getInstance().getTutorialsDBConnection(), LOGGER);
         tutorialsUser.calculateRatings(Network.getInstance().getTutorialsDBConnection());
 
         //Initiates the current tutorial object
-        Tutorial currentTutorial = new Tutorial();
+        Tutorial currentTutorial = null;
 
         //Get compulsory tutorial ID
         int iCompulsoryTutorialID;
-        Tutorial[] compulsoryTutorials = Tutorial.fetchAll(true, true, Network.getInstance().getTutorialsDBConnection());
+        Tutorial[] compulsoryTutorials = Tutorial.fetchAll(true, true, null, Network.getInstance().getTutorialsDBConnection(), LOGGER);
         if (compulsoryTutorials.length == 0)
             iCompulsoryTutorialID = -1;
         else
@@ -63,27 +64,26 @@ public class TutorialsGui extends Gui {
 
         //Designs the 'Continue' menu button
         ItemStack continueLearning_CompulsoryComplete;
-        if (tutorialsUser.bInLesson) {
+        if (tutorialsUser.hasIncompleteLessons()) {
             //Get current lesson's tutorial ID and sets up the tutorial object from this
-            int iTutorialIDCurrentLesson = Lesson.getTutorialOfCurrentLessonOfPlayer(user.player.getUniqueId(), Network.getInstance().getTutorialsDBConnection());
+            int iTutorialIDCurrentLesson = Lesson.getTutorialOfCurrentLessonOfPlayer(user.player.getUniqueId(), Network.getInstance().getTutorialsDBConnection(), Network.getInstance());
             if (iTutorialIDCurrentLesson == -1) {
                 Bukkit.getConsoleSender().sendMessage(Utils.error("An error occurred. Player is in lesson but has no lesson in the database"));
             }
-            currentTutorial.setTutorialID(iTutorialIDCurrentLesson);
-            currentTutorial.fetchByTutorialID(Network.getInstance().getTutorialsDBConnection());
+            currentTutorial = Tutorial.fetchByTutorialID(iTutorialIDCurrentLesson, Network.getInstance().getTutorialsDBConnection(), LOGGER);
 
             //Sets up the menu icon with the name of the current tutorial
             continueLearning_CompulsoryComplete = Utils.createItem(Material.WRITABLE_BOOK, 1,
                     Utils.title("Resume Your Lesson"),
-                    Utils.line(currentTutorial.szTutorialName));
+                    Utils.line(currentTutorial.getTutorialName()));
         } else {
             //Sets up the menu icon with the new tutorial's name
 
             //Decides the next tutorial
-            Tutorial nextTutorial = Lesson.decideTutorial(tutorialsUser, Network.getInstance().getTutorialsDBConnection());
+            Tutorial nextTutorial = Lesson.decideTutorial(tutorialsUser, Network.getInstance().getTutorialsDBConnection(), LOGGER);
             continueLearning_CompulsoryComplete = Utils.createItem(Material.WRITABLE_BOOK, 1,
                     Utils.title("Start a new Tutorial:"),
-                    Utils.line(nextTutorial.szTutorialName));
+                    Utils.line(nextTutorial.getTutorialName()));
         }
 
         //Designs the tutorials library menu option
@@ -103,7 +103,7 @@ public class TutorialsGui extends Gui {
                 ItemStack compulsory;
 
                 //User is currently redoing the compulsory tutorial
-                if (tutorialsUser.bInLesson && (currentTutorial.getTutorialID() == iCompulsoryTutorialID)) {
+                if (currentTutorial != null && tutorialsUser.hasIncompleteLessons() && (currentTutorial.getTutorialID() == iCompulsoryTutorialID)) {
                     compulsory = Utils.createItem(Material.BOOK, 1,
                             Utils.title("Restart the Starter Tutorial"),
                             Utils.line("Restart the starter tutorial again"));
@@ -111,7 +111,7 @@ public class TutorialsGui extends Gui {
                     super.setItem(11 - 1, compulsory, new guiAction() {
                         @Override
                         public void click(NetworkUser user) {
-                            clickCompulsory();
+                            clickCompulsory(iCompulsoryTutorialID);
                             //Deletes this gui
                             delete();
                         }
@@ -119,16 +119,11 @@ public class TutorialsGui extends Gui {
                 }
 
                 //User is currently in a different tutorial
-                else if (tutorialsUser.bInLesson) {
+                else if (tutorialsUser.hasIncompleteLessons()) {
                     compulsory = Utils.createItem(Material.ENCHANTED_BOOK, 1,
                             Utils.title("Restart the Starter Tutorial"),
                             Utils.line("Finish your current lesson first!"));
-                    super.setItem(11 - 1, compulsory, new guiAction() {
-                        @Override
-                        public void click(NetworkUser user) {
-                            //Do nothing
-                        }
-                    });
+                    super.setItem(11 - 1, compulsory, null);
 
                 }
                 //User is not in any tutorial
@@ -137,34 +132,25 @@ public class TutorialsGui extends Gui {
                             Utils.title("Restart the Starter Tutorial"),
                             Utils.line("Refresh your essential knowledge"));
 
-                    super.setItem(11 - 1, compulsory, new guiAction() {
-                        @Override
-                        public void click(NetworkUser user) {
-                            clickCompulsory();
-                            //Deletes this gui
-                            delete();
-                        }
+                    super.setItem(11 - 1, compulsory, user -> {
+                        clickCompulsory(iCompulsoryTutorialID);
+                        //Deletes this gui
+                        delete();
                     });
                 }
 
                 //---------- Library Option ----------
-                super.setItem(14 - 1, tutorialLibrary, new guiAction() {
-                    @Override
-                    public void click(NetworkUser user) {
-                        clickLibrary();
-                        //Deletes this gui
-                        delete();
-                    }
+                super.setItem(14 - 1, tutorialLibrary, user -> {
+                    clickLibrary();
+                    //Deletes this gui
+                    delete();
                 });
 
                 //----- Continue Learning Option -----
-                super.setItem(17 - 1, continueLearning_CompulsoryComplete, new guiAction() {
-                    @Override
-                    public void click(NetworkUser user) {
-                        clickContinue();
-                        //Deletes this gui
-                        delete();
-                    }
+                super.setItem(17 - 1, continueLearning_CompulsoryComplete, user -> {
+                    clickContinue();
+                    //Deletes this gui
+                    delete();
                 });
 
 
@@ -178,9 +164,9 @@ public class TutorialsGui extends Gui {
 
                 //They are currently in the compulsory tutorial for the first time
                 //OR: The user was in another lesson and someone added a compulsory tutorial to the system
-                if (tutorialsUser.bInLesson) {
+                if (tutorialsUser.hasIncompleteLessons()) {
                     //Player is in a lesson other than the compulsory but hasn't started the compulsory (compulsory added to system)
-                    if (currentTutorial.getTutorialID() != iCompulsoryTutorialID) {
+                    if (currentTutorial != null && currentTutorial.getTutorialID() != iCompulsoryTutorialID) {
                         ItemStack erroneousTutorial = Utils.createItem(Material.BOOK, 1,
                                 Utils.title("Continue Your Tutorial"),
                                 Utils.line("You must then complete the starter tutorial"));
@@ -210,24 +196,16 @@ public class TutorialsGui extends Gui {
                                         .append(applicant == null ? Utils.line("Applicant") : applicant.getColouredRoleName())
                                         .append(ChatUtils.line("rank!")));
 
-                        super.setItem(12 - 1, restartCompulsory, new guiAction() {
-
-                            @Override
-                            public void click(NetworkUser user) {
-                                clickCompulsory();
-                                //Deletes this gui
-                                delete();
-                            }
+                        super.setItem(12 - 1, restartCompulsory, user -> {
+                            clickCompulsory(iCompulsoryTutorialID);
+                            //Deletes this gui
+                            delete();
                         });
 
-                        super.setItem(16 - 1, resumeCompulsory, new guiAction() {
-
-                            @Override
-                            public void click(NetworkUser user) {
-                                clickContinue();
-                                //Deletes this gui
-                                delete();
-                            }
+                        super.setItem(16 - 1, resumeCompulsory, user -> {
+                            clickContinue();
+                            //Deletes this gui
+                            delete();
                         });
                     }
                 } else // They have never started the compulsory tutorial
@@ -238,13 +216,10 @@ public class TutorialsGui extends Gui {
                                     .append(applicant == null ? Utils.line("Applicant") : applicant.getColouredRoleName())
                                     .append(ChatUtils.line("rank!")));
 
-                    super.setItem(14 - 1, beginCompulsory, new guiAction() {
-                        @Override
-                        public void click(NetworkUser user) {
-                            clickCompulsory();
-                            //Deletes this gui
-                            delete();
-                        }
+                    super.setItem(14 - 1, beginCompulsory, user -> {
+                        clickCompulsory(iCompulsoryTutorialID);
+                        //Deletes this gui
+                        delete();
                     });
                 }
 
@@ -255,24 +230,17 @@ public class TutorialsGui extends Gui {
         else {
 
             //Continue learning, compulsory complete
-            super.setItem(16 - 1, continueLearning_CompulsoryComplete, new guiAction() {
-                @Override
-                public void click(NetworkUser user) {
-                    clickContinue();
-                    //Deletes this gui
-                    delete();
-                }
+            super.setItem(16 - 1, continueLearning_CompulsoryComplete, user -> {
+                clickContinue();
+                //Deletes this gui
+                delete();
             });
 
             //Library
-            super.setItem(12 - 1, tutorialLibrary, new guiAction() {
-
-                @Override
-                public void click(NetworkUser user) {
-                    clickLibrary();
-                    //Deletes this gui
-                    delete();
-                }
+            super.setItem(12 - 1, tutorialLibrary, user -> {
+                clickLibrary();
+                //Deletes this gui
+                delete();
             });
 
         }
@@ -304,7 +272,7 @@ public class TutorialsGui extends Gui {
 
     private void clickContinue() {
         //Switch to the tutorial.
-        if (Event.addEvent(EventType.CONTINUE, user.player.getUniqueId(), 0, Network.getInstance().getTutorialsDBConnection()))
+        if (Event.addEvent(EventType.CONTINUE, user.player.getUniqueId(), 0, Network.getInstance().getTutorialsDBConnection(), LOGGER))
             switchServer(user);
         else
             user.sendMessage(Utils.error("A problem occurred, please let staff know"));
@@ -315,13 +283,13 @@ public class TutorialsGui extends Gui {
         this.delete();
 
         //Switch to tutorial library menu.
-        user.mainGui = new TutorialLibraryGui(user, Tutorial.getInUseTutorialsWithLocations(Network.getInstance().getTutorialsDBConnection()));
+        user.mainGui = new TutorialLibraryGui(user, Tutorial.getInUseTutorialsWithLocations(Network.getInstance().getTutorialsDBConnection(), LOGGER));
         user.mainGui.open(user);
     }
 
-    private void clickCompulsory() {
+    private void clickCompulsory(int iCompulsoryTutorialID) {
         //Switch to the tutorial.
-        if (Event.addEvent(EventType.COMPULSORY, user.player.getUniqueId(), 0, Network.getInstance().getTutorialsDBConnection()))
+        if (Event.addEvent(EventType.LIBRARY, user.player.getUniqueId(), iCompulsoryTutorialID, Network.getInstance().getTutorialsDBConnection(), LOGGER))
             switchServer(user);
         else
             user.sendMessage(Utils.error("A problem occurred, please let staff know"));
