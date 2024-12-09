@@ -244,7 +244,13 @@
         <dependency>
             <groupId>com.github.BTEUK</groupId>
             <artifactId>TeachingTutorials</artifactId>
-            <version>99bbd0da17</version>
+            <version>6aa1815200</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.BTEUK</groupId>
+            <artifactId>TeachingTutorialsAPI</artifactId>
+            <version>970d3dc3f7</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Test dependencies -->

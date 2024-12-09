@@ -2,10 +2,11 @@ package net.bteuk.network.services;
 
 import net.bteuk.network.utils.Role;
 import net.bteuk.network.utils.Roles;
+import net.bteuk.teachingtutorials.services.PromotionService;
 import org.bukkit.entity.Player;
-import teachingtutorials.services.PromotionService;
 
 public class NetworkPromotionService implements PromotionService {
+
     @Override
     public void promote(Player player) {
         // If the builder role is default, promote the user.

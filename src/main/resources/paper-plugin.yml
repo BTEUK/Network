@@ -22,6 +22,6 @@ dependencies:
       required: false
       join-classpath: true
     TeachingTutorials:
-      load: BEFORE
+      load: AFTER
       required: false
-      join-classpath: false
+      join-classpath: true
