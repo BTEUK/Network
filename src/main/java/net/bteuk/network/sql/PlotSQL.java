@@ -1,5 +1,7 @@
 package net.bteuk.network.sql;
 
+import net.bteuk.network.lib.enums.PlotDifficulties;
+import net.bteuk.network.lib.utils.Reviewing;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 import java.sql.Connection;
@@ -7,6 +9,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PlotSQL extends AbstractSQL {
 
@@ -129,5 +133,45 @@ public class PlotSQL extends AbstractSQL {
             return 0;
 
         }
+    }
+
+    public Double getReviewerReputation(String uuid) {
+        try (
+                Connection conn = conn();
+                PreparedStatement statement = conn.prepareStatement(
+                        "SELECT reputation FROM reviewers WHERE uuid=?;"
+                )
+        ) {
+            statement.setString(1, uuid);
+            ResultSet results = statement.executeQuery();
+
+            if (results.next()) {
+                return results.getDouble(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public List<Integer> getReviewablePlots(String uuid, boolean isArchitect, boolean isReviewer) {
+        List<PlotDifficulties> difficulties = Reviewing.getAvailablePlotDifficulties(isArchitect, isReviewer, getReviewerReputation(uuid));
+
+        List<Integer> submitted_plots = new ArrayList<>();
+
+        for (PlotDifficulties difficulty : difficulties) {
+            submitted_plots.addAll(getIntList("SELECT pd.id FROM plot_data AS pd INNER JOIN plot_submission AS ps ON pd.id=ps.id WHERE pd.status='submitted' AND pd.difficulty=" + difficulty.getValue() + " ORDER BY ps.submit_time ASC;"));
+        }
+
+        // Get all plots that the user is the owner or a member of, don't use those in the count.
+        List<Integer> member_plots = getIntList("SELECT id FROM plot_members WHERE uuid='" + uuid + "';");
+
+        submitted_plots.removeAll(member_plots);
+
+        return submitted_plots;
+    }
+
+    public int getReviewablePlotCount(String uuid, boolean isArchitect, boolean isReviewer) {
+        return getReviewablePlots(uuid, isArchitect, isReviewer).size();
     }
 }

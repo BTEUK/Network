@@ -21,27 +21,31 @@ public class Staff extends AbstractCommand {
     @Override
     public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        //Check if the sender is a player.
+        // Check if the sender is a player.
         Player p = getPlayer(stack);
         if (p == null) {
             return;
         }
 
-        //Check if user is member of staff.
+        NetworkUser u = Network.getInstance().getUser(p);
+
+        // Check if user is member of staff.
+        // Architects can open the menu, but not use the staff chat.
         if (!(hasPermission(p, "uknet.staff"))) {
+            if (hasPermission(p, "uknet.staff.menu")) {
+                openStaffMenu(u);
+            }
             return;
         }
 
-        NetworkUser u = Network.getInstance().getUser(p);
-
-        //If u is null, cancel.
+        // If u is null, cancel.
         if (u == null) {
             LOGGER.severe("User " + p.getName() + " can not be found!");
             p.sendMessage(ChatUtils.error("User can not be found, please relog!"));
             return;
         }
 
-        //If first arg is chat, switch the player to and from staff chat if enabled.
+        // If first arg is chat, switch the player to and from staff chat if enabled.
         if (args.length > 0 && STAFF_CHAT) {
             if (args[0].equalsIgnoreCase("chat")) {
                 String channel = GLOBAL.getChannelName();
@@ -54,7 +58,7 @@ public class Staff extends AbstractCommand {
                 }
                 // Set channel.
                 u.setChatChannel(channel);
-                Network.getInstance().getGlobalSQL().update("UPDATE player_data SET chat_channel='" + channel + "' WHERE uuid='"+ p.getUniqueId() + "';");
+                Network.getInstance().getGlobalSQL().update("UPDATE player_data SET chat_channel='" + channel + "' WHERE uuid='" + p.getUniqueId() + "';");
             } else {
                 // Send message in staff chat, by temporarily setting the players channel to staff.
                 u.setChatChannel(STAFF.getChannelName());
@@ -64,17 +68,15 @@ public class Staff extends AbstractCommand {
             return;
         }
 
-        //If the player has a previous gui, open that.
+        // If the player has a previous gui, open that.
         openStaffMenu(u);
-
-        return;
     }
 
     public static void openStaffMenu(NetworkUser u) {
 
-        //Check if the gui exists.
-        //If it does refresh and open it.
-        //If no gui exists open the staff menu.
+        // Check if the gui exists.
+        // If it does refresh and open it.
+        // If no gui exists open the staff menu.
 
         if (u.staffGui != null) {
 

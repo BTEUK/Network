@@ -12,7 +12,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import static net.bteuk.network.utils.Constants.SERVER_NAME;
 
@@ -163,7 +163,9 @@ public class StaffGui extends Gui {
 
         //Click to review plot.
         //Show review plot button in gui.
-        int plot_count = Network.getInstance().getPlotSQL().getInt("SELECT count(id) FROM plot_data WHERE status='submitted';");
+        boolean isArchitect = user.hasPermission("group.architect");
+        boolean isReviewer = user.hasPermission("group.reviewer");
+        int plot_count = Network.getInstance().getPlotSQL().getReviewablePlotCount(user.player.getUniqueId().toString(), isArchitect, isReviewer);
         Component message;
 
         if (plot_count == 1) {
@@ -182,14 +184,13 @@ public class StaffGui extends Gui {
                         message),
                 u -> {
 
-                    //Check if there is a plot available to review,
-                    //that you are not already the owner or member of.
+                    // Check if there is a plot available to review,
+                    // that you are not already the owner or member of.
                     if (Network.getInstance().getPlotSQL().hasRow("SELECT id FROM plot_data WHERE status='submitted';")) {
 
                         //Get arraylist of submitted plots.
                         //Order them by submit time, so the oldest submissions are reviewed first.
-                        ArrayList<Integer> nPlots = Network.getInstance().getPlotSQL().getIntList("SELECT pd.id FROM plot_data AS pd INNER JOIN plot_submissions AS ps ON pd.id=ps.id WHERE pd.status='submitted' ORDER BY ps.submit_time ASC;");
-
+                        List<Integer> nPlots = Network.getInstance().getPlotSQL().getReviewablePlots(u.player.getUniqueId().toString(), isArchitect, isReviewer);
                         int counter = 0;
 
                         //Iterate through all plots.
@@ -198,10 +199,11 @@ public class StaffGui extends Gui {
                             //Counter
                             counter++;
 
-                            //If you are not owner or member of the plot select it for the next review.
+                            // If you are not owner or member of the plot select it for the next review.
+                            // Additionally check that you can review a plot of this difficulty.
                             if (!Network.getInstance().getPlotSQL().hasRow("SELECT id FROM plot_members WHERE uuid='" + u.player.getUniqueId() + "' AND id=" + nPlot + ";")) {
 
-                                //Check if the player has permission to review a plot.
+                                // Check if the player has permission to review a plot.
                                 if (u.player.hasPermission("uknet.plots.review")) {
 
                                     //Get server of plot.
@@ -229,7 +231,7 @@ public class StaffGui extends Gui {
 
                                     }
                                 } else {
-                                    u.player.sendMessage(ChatUtils.error("You must be a reviewer to review plots."));
+                                    u.player.sendMessage(ChatUtils.error("You must be at least an architect to review plots."));
                                 }
 
                                 //Stop iterating.
@@ -238,7 +240,7 @@ public class StaffGui extends Gui {
 
                             //If counter is equal to the size of the array then all plots have been cycled through without result.
                             if (counter == nPlots.size()) {
-                                u.player.sendMessage(ChatUtils.error("You are the owner or a member of all remaining submitted plots."));
+                                u.player.sendMessage(ChatUtils.error("You are not able to review any of the remaining submitted plots."));
                             }
                         }
                     } else {
