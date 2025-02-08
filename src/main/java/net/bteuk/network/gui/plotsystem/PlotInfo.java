@@ -14,6 +14,7 @@ import net.bteuk.network.utils.SwitchServer;
 import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.enums.PlotStatus;
 import net.bteuk.network.utils.enums.RegionType;
+import net.bteuk.network.utils.enums.SubmittedStatus;
 import net.buildtheearth.terraminusminus.generator.EarthGeneratorSettings;
 import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
 import net.kyori.adventure.inventory.Book;
@@ -65,18 +66,21 @@ public class PlotInfo extends Gui {
 
         // Get the plot status.
         PlotStatus status = PlotStatus.fromDatabaseValue(plotSQL.getString("SELECT status FROM plot_data WHERE id=" + plotID + ";"));
+        SubmittedStatus submittedStatus = null;
         if (status == null) {
             user.player.sendMessage(ChatUtils.error("This plot has an invalid status, can't open the info menu."));
             return;
+        } else if (status == PlotStatus.SUBMITTED) {
+            submittedStatus = SubmittedStatus.fromDatabaseValue(plotSQL.getString("SELECT status FROM plot_submission WHERE plot_id=" + plotID + ";"));
         }
         // Get the plot owner.
-        if (status == PlotStatus.CLAIMED || status == PlotStatus.SUBMITTED || status == PlotStatus.REVIEWING) {
+        if (status == PlotStatus.CLAIMED || status == PlotStatus.SUBMITTED) {
             plot_owner = plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plotID + " AND is_owner=1;");
         } else if (status == PlotStatus.COMPLETED) {
             plot_owner = plotSQL.getString("SELECT uuid FROM accept_data WHERE id=" + plotID + ";");
         }
         // Determine the type of menu to create.
-        PLOT_INFO_TYPE plotInfoType = determineMenuType(status);
+        PLOT_INFO_TYPE plotInfoType = determineMenuType(status, submittedStatus);
         if (plotInfoType == null || plotInfoType == PLOT_INFO_TYPE.DELETED) {
             user.player.sendMessage(ChatUtils.error("This plot not longer exists, can't open the info menu."));
             return;
@@ -245,7 +249,8 @@ public class PlotInfo extends Gui {
                         });
             }
 
-            if (status == PlotStatus.SUBMITTED) {
+            // The plot can only be retracted if it is not yet under review.
+            if (status == PlotStatus.SUBMITTED && submittedStatus == SubmittedStatus.SUBMITTED) {
                 setItem(2, Utils.createItem(Material.ORANGE_CONCRETE, 1,
                                 Utils.title("Retract Submission"),
                                 Utils.line("Your plot will no longer be submitted.")),
@@ -262,7 +267,8 @@ public class PlotInfo extends Gui {
                         });
             }
 
-            if (status != PlotStatus.REVIEWING) {
+            // The plot can only be deleted if it is not yet submitted.
+            if (status != PlotStatus.SUBMITTED) {
                 setItem(6, Utils.createItem(Material.RED_CONCRETE, 1,
                                 Utils.title("Delete Plot"),
                                 Utils.line("Delete the plot and all its contents.")),
@@ -407,26 +413,11 @@ public class PlotInfo extends Gui {
         super.delete();
     }
 
-    private PLOT_INFO_TYPE determineMenuType(PlotStatus status) {
+    private PLOT_INFO_TYPE determineMenuType(PlotStatus status, SubmittedStatus submittedStatus) {
         return switch (status) {
             case UNCLAIMED -> PLOT_INFO_TYPE.UNCLAIMED;
             case CLAIMED -> claimedType();
-            case SUBMITTED -> {
-                if (user.hasPermission("uknet.plots.review") &&
-                        !plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plotID + " AND uuid='" + user.player.getUniqueId() + "';")) {
-                    yield PLOT_INFO_TYPE.SUBMITTED_REVIEWER;
-                } else {
-                    yield claimedType();
-                }
-            }
-            case REVIEWING -> {
-                if (user.hasPermission("uknet.plots.review") &&
-                        !plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plotID + " AND uuid='" + user.player.getUniqueId() + "';")) {
-                    yield PLOT_INFO_TYPE.REVIEWING_REVIEWER;
-                } else {
-                    yield claimedType();
-                }
-            }
+            case SUBMITTED -> determineMenuTypeSubmitted(submittedStatus);
             case COMPLETED -> {
                 if (Objects.equals(plot_owner, user.player.getUniqueId().toString())) {
                     yield PLOT_INFO_TYPE.ACCEPTED_OWNER;
@@ -436,6 +427,50 @@ public class PlotInfo extends Gui {
             }
             case DELETED -> PLOT_INFO_TYPE.DELETED;
         };
+    }
+
+    private PLOT_INFO_TYPE determineMenuTypeSubmitted(SubmittedStatus submittedStatus) {
+        return switch (submittedStatus) {
+            case SUBMITTED -> {
+                if (canReviewPlot()) {
+                    yield PLOT_INFO_TYPE.SUBMITTED_REVIEWER;
+                } else {
+                    yield claimedType();
+                }
+            }
+            case UNDER_REVIEW -> {
+                if (canReviewPlot()) {
+                    yield PLOT_INFO_TYPE.REVIEWING_REVIEWER;
+                } else {
+                    yield claimedType();
+                }
+            }
+            case AWAITING_VERIFICATION -> {
+                if (canVerifyPlot()) {
+                    yield PLOT_INFO_TYPE.REVIEWED_REVIEWER;
+                } else {
+                    yield claimedType();
+                }
+            }
+            case UNDER_VERIFICATION -> {
+                if (canVerifyPlot()) {
+                    yield PLOT_INFO_TYPE.VERIFYING_REVIEWER;
+                } else {
+                    yield claimedType();
+                }
+            }
+        };
+    }
+
+    private boolean canReviewPlot() {
+        boolean isArchitect = user.hasPermission("group.architect");
+        boolean isReviewer = user.hasPermission("group.reviewer");
+        return plotSQL.canReviewPlot(plotID, user.getUuid(), isArchitect, isReviewer);
+    }
+
+    private boolean canVerifyPlot() {
+        boolean isReviewer = user.hasPermission("group.reviewer");
+        return plotSQL.canVerifyPlot(plotID, user.getUuid(), isReviewer);
     }
 
     private PLOT_INFO_TYPE claimedType() {
@@ -450,7 +485,7 @@ public class PlotInfo extends Gui {
 
     private Component[] createPlotInfo(PlotStatus status, PLOT_INFO_TYPE plotInfoType) {
         List<Component> info = new ArrayList<>();
-        if (status == PlotStatus.CLAIMED || status == PlotStatus.SUBMITTED || status == PlotStatus.REVIEWING) {
+        if (status == PlotStatus.CLAIMED || status == PlotStatus.SUBMITTED) {
             info.add(Utils.line("Plot Owner: ")
                     .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
                             plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plotID + " AND is_owner=1;") + "';"), NamedTextColor.GRAY)));
@@ -521,6 +556,10 @@ public class PlotInfo extends Gui {
         SUBMITTED_REVIEWER,
 
         REVIEWING_REVIEWER,
+
+        REVIEWED_REVIEWER,
+
+        VERIFYING_REVIEWER,
 
         ACCEPTED_OWNER,
         ACCEPTED,

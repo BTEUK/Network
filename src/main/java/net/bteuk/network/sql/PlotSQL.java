@@ -195,4 +195,27 @@ public class PlotSQL extends AbstractSQL {
             update("INSERT INTO reviewers(uuid,reputation) VALUES('" + uuid + "'," + initialValue + ");");
         }
     }
+
+    /**
+     * Determines whether a specific player can review a specific plot.
+     * @param plotId the plot ID to check
+     * @param uuid the player uuid to check
+     * @param isArchitect if the player has architect permissions
+     * @param isReviewer if the player has reviewer permissions
+     * @return whether the player can review this plot
+     */
+    public boolean canReviewPlot(int plotId, String uuid, boolean isArchitect, boolean isReviewer) {
+        List<PlotDifficulties> difficulties = Reviewing.getAvailablePlotDifficulties(isArchitect, isReviewer, getReviewerReputation(uuid));
+        int plotDifficulty = getInt("SELECT difficulty FROM plot_data WHERE id=" + plotId + ";");
+
+        // Check if the user can review a plot with this difficulty.
+        // Check if the user is a member of the plot.
+        return (difficulties.stream().mapToInt(PlotDifficulties::getValue).anyMatch(difficulty -> difficulty == plotDifficulty) && !hasRow("SELECT id FROM plot_members WHERE id=" + plotId + " AND uuid='" + uuid + "';"));
+    }
+
+    public boolean canVerifyPlot(int plotId, String uuid, boolean isReviewer) {
+        // The player must be a reviewer, is not the reviewer of the plot and is not the owner or a member of the plot.
+        return (isReviewer && !hasRow("SELECT id FROM plot_review WHERE reviewer='" + uuid + "' AND plot_id=" + plotId + " AND completed=0") &&
+                !hasRow("SELECT id FROM plot_members WHERE id=" + plotId + " AND uuid='" + uuid + "';"));
+    }
 }

@@ -2,11 +2,13 @@ package net.bteuk.network.utils.enums;
 
 import java.util.Objects;
 
+/**
+ * Enum for the status of a plot as defined in the database.
+ */
 public enum PlotStatus {
     UNCLAIMED("unclaimed"),
     CLAIMED("claimed"),
     SUBMITTED("submitted"),
-    REVIEWING("reviewing"),
     COMPLETED("completed"),
     DELETED("deleted");
 

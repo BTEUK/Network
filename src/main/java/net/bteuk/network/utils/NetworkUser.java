@@ -330,6 +330,10 @@ public class NetworkUser {
         );
     }
 
+    public String getUuid() {
+        return player.getUniqueId().toString();
+    }
+
     public void toggleFocus() {
         setFocusEnabled(!isFocusEnabled());
         if (isFocusEnabled()) {
