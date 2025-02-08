@@ -247,6 +247,11 @@ public final class Roles {
                 userUpdate.setUuid(uuid);
                 userUpdate.setTabPlayer(tabPlayer);
                 Network.getInstance().getChat().sendSocketMesage(userUpdate);
+
+                // If the new primary role is architect or reviewer, and they were promoted add them to the reviewers database table.
+                if (!remove && (primaryRole.getId().equals("architect") || primaryRole.getId().equals("reviewer"))) {
+                    Network.getInstance().getPlotSQL().addOrUpdateReviewer(uuid, primaryRole.getId());
+                }
             }
 
             DiscordRole discordRole = new DiscordRole(uuid, roleId, !remove);

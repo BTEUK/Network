@@ -135,7 +135,7 @@ public class PlotSQL extends AbstractSQL {
         }
     }
 
-    public Double getReviewerReputation(String uuid) {
+    public double getReviewerReputation(String uuid) {
         try (
                 Connection conn = conn();
                 PreparedStatement statement = conn.prepareStatement(
@@ -151,7 +151,7 @@ public class PlotSQL extends AbstractSQL {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        return 0;
     }
 
     public List<Integer> getReviewablePlots(String uuid, boolean isArchitect, boolean isReviewer) {
@@ -173,5 +173,26 @@ public class PlotSQL extends AbstractSQL {
 
     public int getReviewablePlotCount(String uuid, boolean isArchitect, boolean isReviewer) {
         return getReviewablePlots(uuid, isArchitect, isReviewer).size();
+    }
+
+    public void addOrUpdateReviewer(String uuid, String roleId) {
+        // Check if the reviewer is already added to the table.
+        boolean hasRow = hasRow("SELECT uuid FROM reviewers FROM uuid'" + uuid + "';");
+
+        double initialValue = getReviewerReputation(uuid);
+
+        // Reviewer reputation must always start at 5. But don't decrease if already above 5.
+        if (roleId.equals("reviewer") && initialValue < 5) {
+            initialValue = 5;
+        }
+
+        // If an entry already exists, update it, if promoted to reviewer.
+        // If no entry exists, add a new entry.
+        // Else do nothing.
+        if (hasRow && roleId.equals("reviewer")) {
+            update("UPDATE reviewers SET reputation=" + initialValue + " WHERE uuid='" + uuid + "';");
+        } else if (!hasRow) {
+            update("INSERT INTO reviewers(uuid,reputation) VALUES('" + uuid + "'," + initialValue + ");");
+        }
     }
 }
