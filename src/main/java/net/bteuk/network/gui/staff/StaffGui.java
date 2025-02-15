@@ -1,6 +1,7 @@
 package net.bteuk.network.gui.staff;
 
 import net.bteuk.network.Network;
+import net.bteuk.network.eventing.events.EventManager;
 import net.bteuk.network.gui.Gui;
 import net.bteuk.network.gui.regions.ReviewRegionRequests;
 import net.bteuk.network.lib.utils.ChatUtils;
@@ -47,7 +48,7 @@ public class StaffGui extends Gui {
         }
 
         //Create item.
-        setItem(14, Utils.createItem(Material.ENDER_CHEST, 1,
+        setItem(15, Utils.createItem(Material.ENDER_CHEST, 1,
                         Utils.title("Location Requests"),
                         Utils.line("Opens a menu to view all location requests for navigation."),
                         lRequestString),
@@ -184,72 +185,80 @@ public class StaffGui extends Gui {
                         message),
                 u -> {
 
+                    //Get arraylist of submitted plots.
+                    //Order them by submit time, so the oldest submissions are reviewed first.
+                    List<Integer> nPlots = Network.getInstance().getPlotSQL().getReviewablePlots(u.player.getUniqueId().toString(), isArchitect, isReviewer);
+
                     // Check if there is a plot available to review,
                     // that you are not already the owner or member of.
-                    if (Network.getInstance().getPlotSQL().hasRow("SELECT id FROM plot_data WHERE status='submitted';")) {
+                    if (!nPlots.isEmpty()) {
 
-                        //Get arraylist of submitted plots.
-                        //Order them by submit time, so the oldest submissions are reviewed first.
-                        List<Integer> nPlots = Network.getInstance().getPlotSQL().getReviewablePlots(u.player.getUniqueId().toString(), isArchitect, isReviewer);
-                        int counter = 0;
+                        int plotID = nPlots.getFirst();
 
-                        //Iterate through all plots.
-                        for (int nPlot : nPlots) {
+                        //Get server of plot.
+                        String server = Network.getInstance().getPlotSQL().getString("SELECT server FROM location_data WHERE name='" +
+                                Network.getInstance().getPlotSQL().getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + "';");
 
-                            //Counter
-                            counter++;
+                        //If they are not in the same server as the plot teleport them to that server and start the reviewing process.
+                        if (server.equals(SERVER_NAME)) {
+                            u.player.closeInventory();
+                            EventManager.createEvent(u.getUuid(), "plotsystem", SERVER_NAME, "review plot " + plotID);
+                        } else {
+                            // Player is not on the current server.
+                            // Set the server join event.
+                            EventManager.createJoinEvent(u.getUuid(), "plotsystem", SERVER_NAME, "review plot " + plotID);
 
-                            // If you are not owner or member of the plot select it for the next review.
-                            // Additionally check that you can review a plot of this difficulty.
-                            if (!Network.getInstance().getPlotSQL().hasRow("SELECT id FROM plot_members WHERE uuid='" + u.player.getUniqueId() + "' AND id=" + nPlot + ";")) {
-
-                                // Check if the player has permission to review a plot.
-                                if (u.player.hasPermission("uknet.plots.review")) {
-
-                                    //Get server of plot.
-                                    String server = Network.getInstance().getPlotSQL().getString("SELECT server FROM location_data WHERE name='" +
-                                            Network.getInstance().getPlotSQL().getString("SELECT location FROM plot_data WHERE id=" + nPlot + ";") + "';");
-
-                                    //If they are not in the same server as the plot teleport them to that server and start the reviewing process.
-                                    if (server.equals(SERVER_NAME)) {
-
-                                        u.player.closeInventory();
-                                        Network.getInstance().getGlobalSQL().update("INSERT INTO server_events(uuid,type,server,event) VALUES('"
-                                                + u.player.getUniqueId() + "','plotsystem','" + SERVER_NAME + "','review plot " + nPlot + "');");
-
-                                    } else {
-
-                                        //Player is not on the current server.
-                                        //Set the server join event.
-                                        Network.getInstance().getGlobalSQL().update("INSERT INTO join_events(uuid,type,event) VALUES('"
-                                                + u.player.getUniqueId() + "','plotsystem',"
-                                                + "'review plot " + nPlot + "');");
-
-                                        //Teleport them to another server.
-                                        u.player.closeInventory();
-                                        SwitchServer.switchServer(u.player, server);
-
-                                    }
-                                } else {
-                                    u.player.sendMessage(ChatUtils.error("You must be at least an architect to review plots."));
-                                }
-
-                                //Stop iterating.
-                                break;
-                            }
-
-                            //If counter is equal to the size of the array then all plots have been cycled through without result.
-                            if (counter == nPlots.size()) {
-                                u.player.sendMessage(ChatUtils.error("You are not able to review any of the remaining submitted plots."));
-                            }
+                            //Teleport them to the server.
+                            u.player.closeInventory();
+                            SwitchServer.switchServer(u.player, server);
                         }
                     } else {
-                        u.player.sendMessage(ChatUtils.error("There are currently no submitted plots."));
+                        u.player.sendMessage(ChatUtils.error("There are currently no submitted plots that you can review.."));
+                    }
+                });
+
+        setItem(14, Utils.createItem(Material.WRITABLE_BOOK, 1,
+                        Utils.title("Verify Plot"),
+                        Utils.line("Click to verify a reviewed plot."),
+                        message),
+                u ->
+
+                {
+
+                    //Get arraylist of reviewed plots.
+                    //Order them by submit time, so the oldest submissions are verified first.
+                    List<Integer> nPlots = Network.getInstance().getPlotSQL().getVerifiablePlots(u.player.getUniqueId().toString(), isReviewer);
+
+                    // Check if there is a plot available to review,
+                    // that you are not already the owner or member of.
+                    if (!nPlots.isEmpty()) {
+
+                        int plotID = nPlots.getFirst();
+
+                        //Get server of plot.
+                        String server = Network.getInstance().getPlotSQL().getString("SELECT server FROM location_data WHERE name='" +
+                                Network.getInstance().getPlotSQL().getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + "';");
+
+                        //If they are not in the same server as the plot teleport them to that server and start the reviewing process.
+                        if (server.equals(SERVER_NAME)) {
+                            u.player.closeInventory();
+                            EventManager.createEvent(u.getUuid(), "plotsystem", SERVER_NAME, "verify plot " + plotID);
+                        } else {
+                            // Player is not on the current server.
+                            // Set the server join event.
+                            EventManager.createJoinEvent(u.getUuid(), "plotsystem", SERVER_NAME, "verify plot " + plotID);
+
+                            //Teleport them to the server.
+                            u.player.closeInventory();
+                            SwitchServer.switchServer(u.player, server);
+                        }
+                    } else {
+                        u.player.sendMessage(ChatUtils.error("There are currently no submitted plots that you can review.."));
                     }
                 });
 
         //Click to open moderation menu.
-        setItem(16, Utils.createItem(Material.REDSTONE_BLOCK, 1,
+        setItem(17, Utils.createItem(Material.REDSTONE_BLOCK, 1,
                         Utils.title("Moderation Menu"),
                         Utils.line("Opens the moderation menu to deal with wrongdoers.")),
                 u ->
