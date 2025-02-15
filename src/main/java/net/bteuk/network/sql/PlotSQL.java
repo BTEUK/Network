@@ -20,11 +20,7 @@ public class PlotSQL extends AbstractSQL {
 
     public int[][] getPlotCorners(int plotID) {
 
-        try (
-                Connection conn = conn();
-                PreparedStatement statement = conn.prepareStatement("SELECT COUNT(corner) FROM plot_corners WHERE id=" + plotID + ";");
-                ResultSet results = statement.executeQuery()
-        ) {
+        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement("SELECT COUNT(corner) FROM plot_corners WHERE id=" + plotID + ";"); ResultSet results = statement.executeQuery()) {
 
             results.next();
 
@@ -42,11 +38,7 @@ public class PlotSQL extends AbstractSQL {
 
     private int[][] getPlotCorners(int[][] corners, int plotID) {
 
-        try (
-                Connection conn = conn();
-                PreparedStatement statement = conn.prepareStatement("SELECT x,z FROM plot_corners WHERE id=" + plotID + ";");
-                ResultSet results = statement.executeQuery()
-        ) {
+        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement("SELECT x,z FROM plot_corners WHERE id=" + plotID + ";"); ResultSet results = statement.executeQuery()) {
 
             for (int i = 0; i < corners.length; i++) {
 
@@ -67,10 +59,7 @@ public class PlotSQL extends AbstractSQL {
     // Creates a new plot and returns the id of the plot.
     public int createPlot(int size, int difficulty, String location, int coordinate_id) {
 
-        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
-                "INSERT INTO plot_data(status, size, difficulty, location, coordinate_id) VALUES(?, ?, ?, ?, ?);",
-                Statement.RETURN_GENERATED_KEYS
-        )) {
+        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement("INSERT INTO plot_data(status, size, difficulty, location, coordinate_id) VALUES(?, ?, ?, ?, ?);", Statement.RETURN_GENERATED_KEYS)) {
 
             statement.setString(1, "unclaimed");
             statement.setInt(2, size);
@@ -104,10 +93,7 @@ public class PlotSQL extends AbstractSQL {
     // Creates a new plot and returns the id of the plot.
     public int createZone(String location, long expiration, boolean is_public) {
 
-        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
-                "INSERT INTO zones(location,expiration,is_public) VALUES(?, ?, ?);",
-                Statement.RETURN_GENERATED_KEYS
-        )) {
+        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement("INSERT INTO zones(location,expiration,is_public) VALUES(?, ?, ?);", Statement.RETURN_GENERATED_KEYS)) {
 
             statement.setString(1, location);
             statement.setLong(2, expiration);
@@ -136,12 +122,7 @@ public class PlotSQL extends AbstractSQL {
     }
 
     public double getReviewerReputation(String uuid) {
-        try (
-                Connection conn = conn();
-                PreparedStatement statement = conn.prepareStatement(
-                        "SELECT reputation FROM reviewers WHERE uuid=?;"
-                )
-        ) {
+        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement("SELECT reputation FROM reviewers WHERE uuid=?;")) {
             statement.setString(1, uuid);
             ResultSet results = statement.executeQuery();
 
@@ -214,8 +195,13 @@ public class PlotSQL extends AbstractSQL {
     }
 
     public boolean canVerifyPlot(int plotId, String uuid, boolean isReviewer) {
+        List<PlotDifficulties> difficulties = Reviewing.getAvailablePlotDifficulties(isReviewer, isReviewer, getReviewerReputation(uuid));
+        int plotDifficulty = getInt("SELECT difficulty FROM plot_data WHERE id=" + plotId + ";");
+
         // The player must be a reviewer, is not the reviewer of the plot and is not the owner or a member of the plot.
-        return (isReviewer && !hasRow("SELECT id FROM plot_review WHERE reviewer='" + uuid + "' AND plot_id=" + plotId + " AND completed=0") &&
-                !hasRow("SELECT id FROM plot_members WHERE id=" + plotId + " AND uuid='" + uuid + "';"));
+        // The reviewer must also be allowed to verify a plot of this difficulty.
+        return (isReviewer && difficulties.stream().mapToInt(PlotDifficulties::getValue).anyMatch(difficulty -> difficulty == plotDifficulty)
+                && !hasRow("SELECT id FROM plot_review WHERE reviewer='" + uuid + "' AND plot_id=" + plotId + " AND completed=0")
+                && !hasRow("SELECT id FROM plot_members WHERE id=" + plotId + " AND uuid='" + uuid + "';"));
     }
 }

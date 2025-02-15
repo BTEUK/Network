@@ -315,7 +315,9 @@ public class PlotInfo extends Gui {
 
         // If this plot has feedback, add feedback for the plot owner and members (Slot 22)
         // As well as for reviewers (Slot 22 while reviewing, slot 21 while submitted)
-        if ((plotInfoType == PLOT_INFO_TYPE.CLAIMED_OWNER || plotInfoType == PLOT_INFO_TYPE.CLAIMED_MEMBER || plotInfoType == PLOT_INFO_TYPE.REVIEWING_REVIEWER || plotInfoType == PLOT_INFO_TYPE.SUBMITTED_REVIEWER)
+        if ((plotInfoType == PLOT_INFO_TYPE.CLAIMED_OWNER || plotInfoType == PLOT_INFO_TYPE.CLAIMED_MEMBER ||
+                plotInfoType == PLOT_INFO_TYPE.REVIEWING_REVIEWER || plotInfoType == PLOT_INFO_TYPE.SUBMITTED_REVIEWER ||
+                plotInfoType == PLOT_INFO_TYPE.REVIEWED_REVIEWER || plotInfoType == PLOT_INFO_TYPE.VERIFYING_REVIEWER)
                 && plotSQL.hasRow("SELECT id FROM deny_data WHERE id=" + plotID + " AND uuid='" + plot_owner + "';")) {
             setItem(getFeedbackSlot(plotInfoType), Utils.createItem(Material.WRITABLE_BOOK, 1,
                             Utils.title("Plot Feedback"),
@@ -366,7 +368,7 @@ public class PlotInfo extends Gui {
                             Utils.line("Click to start reviewing this plot.")),
                     u -> {
                         // If you are not owner or member of the plot, start the review.
-                        if (!Network.getInstance().getPlotSQL().hasRow("SELECT id FROM plot_members WHERE uuid='" + u.player.getUniqueId() + "' AND id=" + plotID + ";")) {
+                        if (canReviewPlot()) {
                             //Get server of plot.
                             String server = Network.getInstance().getPlotSQL().getString("SELECT server FROM location_data WHERE name='" +
                                     Network.getInstance().getPlotSQL().getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + "';");
@@ -374,21 +376,46 @@ public class PlotInfo extends Gui {
                             //If they are not in the same server as the plot teleport them to that server and start the reviewing process.
                             if (server.equals(SERVER_NAME)) {
                                 u.player.closeInventory();
-                                Network.getInstance().getGlobalSQL().update("INSERT INTO server_events(uuid,type,server,event) VALUES('"
-                                        + u.player.getUniqueId() + "','plotsystem','" + SERVER_NAME + "','review plot " + plotID + "');");
+                                EventManager.createEvent(u.getUuid(), "plotsystem", SERVER_NAME, "review plot " + plotID);
                             } else {
                                 // Player is not on the current server.
                                 // Set the server join event.
-                                Network.getInstance().getGlobalSQL().update("INSERT INTO join_events(uuid,type,event) VALUES('"
-                                        + u.player.getUniqueId() + "','plotsystem',"
-                                        + "'review plot " + plotID + "');");
+                                EventManager.createJoinEvent(u.getUuid(), "plotsystem", SERVER_NAME, "review plot " + plotID);
 
                                 //Teleport them to the server.
                                 u.player.closeInventory();
                                 SwitchServer.switchServer(u.player, server);
                             }
                         } else {
-                            user.player.sendMessage(ChatUtils.error("You are not allowed to review this plot since you have contributed to it."));
+                            user.player.sendMessage(ChatUtils.error("You are not allowed to review this plot."));
+                        }
+                    });
+            // If the plot has been reviewed and must be verified add the start verifying option for reviewers. (Slot 20)
+        } else if (plotInfoType == PLOT_INFO_TYPE.REVIEWED_REVIEWER) {
+            setItem(20, Utils.createItem(Material.SPYGLASS, 1,
+                            Utils.title("Verify Plot"),
+                            Utils.line("Click to start verifying this plot.")),
+                    u -> {
+                        if (canVerifyPlot()) {
+                            //Get server of plot.
+                            String server = Network.getInstance().getPlotSQL().getString("SELECT server FROM location_data WHERE name='" +
+                                    Network.getInstance().getPlotSQL().getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + "';");
+
+                            //If they are not in the same server as the plot teleport them to that server and start the reviewing process.
+                            if (server.equals(SERVER_NAME)) {
+                                u.player.closeInventory();
+                                EventManager.createEvent(u.getUuid(), "plotsystem", SERVER_NAME, "verify plot " + plotID);
+                            } else {
+                                // Player is not on the current server.
+                                // Set the server join event.
+                                EventManager.createJoinEvent(u.getUuid(), "plotsystem", SERVER_NAME, "verify plot " + plotID);
+
+                                //Teleport them to the server.
+                                u.player.closeInventory();
+                                SwitchServer.switchServer(u.player, server);
+                            }
+                        } else {
+                            user.player.sendMessage(ChatUtils.error("You are not allowed to verify this plot."));
                         }
                     });
         }
@@ -539,9 +566,10 @@ public class PlotInfo extends Gui {
 
     private int getFeedbackSlot(PLOT_INFO_TYPE plotInfoType) {
         if (plotInfoType == PLOT_INFO_TYPE.CLAIMED_OWNER || plotInfoType == PLOT_INFO_TYPE.CLAIMED_MEMBER ||
-                plotInfoType == PLOT_INFO_TYPE.REVIEWING_REVIEWER || plotInfoType == PLOT_INFO_TYPE.ACCEPTED_OWNER) {
+                plotInfoType == PLOT_INFO_TYPE.REVIEWING_REVIEWER || plotInfoType == PLOT_INFO_TYPE.ACCEPTED_OWNER ||
+                plotInfoType == PLOT_INFO_TYPE.VERIFYING_REVIEWER) {
             return 22;
-        } else if (plotInfoType == PLOT_INFO_TYPE.SUBMITTED_REVIEWER) {
+        } else if (plotInfoType == PLOT_INFO_TYPE.SUBMITTED_REVIEWER || plotInfoType == PLOT_INFO_TYPE.REVIEWED_REVIEWER) {
             return 21;
         } else {
             return -1;
