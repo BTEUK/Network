@@ -65,7 +65,7 @@ public class Connect implements Listener {
         UserConnectRequest userConnectRequest = new UserConnectRequest(
                 SERVER_NAME, e.getPlayer().getUniqueId().toString(), e.getPlayer().getName(),
                 TextureUtils.getTexture(e.getPlayer().getPlayerProfile()), channels, tabPlayer,
-                e.getPlayer().hasPermission("group.reviewer")
+                e.getPlayer().hasPermission("group.architect"), e.getPlayer().hasPermission("group.reviewer")
         );
         Bukkit.getScheduler().runTaskAsynchronously(Network.getInstance(), () -> Network.getInstance().getChat().sendSocketMesage(userConnectRequest));
         LOGGER.info(String.format("%s connected to the server, sent request to proxy to add player as NetworkUser", e.getPlayer().getName()));
