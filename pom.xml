@@ -216,7 +216,7 @@
         <dependency>
             <groupId>com.github.BTEUK</groupId>
             <artifactId>terraminusminus</artifactId>
-            <version>feature~paper_1_21-5e925b8af2-1</version>
+            <version>41d3843a79</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.fasterxml.jackson.core</groupId>
