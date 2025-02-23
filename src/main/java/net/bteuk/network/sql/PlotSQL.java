@@ -225,4 +225,82 @@ public class PlotSQL extends AbstractSQL {
                 && !hasRow("SELECT id FROM plot_review WHERE reviewer='" + uuid + "' AND plot_id=" + plotId + " AND completed=0")
                 && !hasRow("SELECT id FROM plot_members WHERE id=" + plotId + " AND uuid='" + uuid + "';"));
     }
+
+    /**
+     * Creates a new plot review and the return the generated ID.
+     *
+     * @param plotId the plot id
+     * @param plotOwner the plot owner
+     * @param reviewer the reviewer
+     * @param accepted true if the plot should be accepted, false if denied
+     * @param completed trie if the review is complete, false if a verification is required
+     * @return the review id
+     */
+    public int createReview(int plotId, String plotOwner, String reviewer, boolean accepted, boolean completed) {
+        try (
+                Connection conn = conn();
+                PreparedStatement statement = conn.prepareStatement("INSERT INTO plot_review(plot_id,uuid,reviewer,attempt,review_time,accepted,completed) VALUES(?, ?, ?, ?, ?, ?, ?);", Statement.RETURN_GENERATED_KEYS)
+        ) {
+
+            statement.setInt(1, plotId);
+            statement.setString(2, plotOwner);
+            statement.setString(3, reviewer);
+            statement.setInt(4, (1 + getLatestAttempt(plotId, plotOwner)));
+            statement.setLong(5, System.currentTimeMillis());
+            statement.setBoolean(6, accepted);
+            statement.setBoolean(7, completed);
+            statement.executeUpdate();
+
+            // If the id does not exist return 0.
+            try (ResultSet results = statement.getGeneratedKeys()) {
+                if (results.next()) {
+                    return results.getInt(1);
+                } else {
+                    return 0;
+                }
+            }
+        } catch (SQLException sql) {
+            sql.printStackTrace();
+            return 0;
+        }
+    }
+
+    private int getLatestAttempt(int plotId, String plotOwner) {
+        try (
+                Connection conn = conn();
+                PreparedStatement statement = conn.prepareStatement("SELECT COUNT(1) FROM plot_review WHERE plot_id=? AND uuid=?;")
+        ) {
+            statement.setInt(1, plotId);
+            statement.setString(2, plotOwner);
+
+            ResultSet results = statement.executeQuery();
+            if (results.next()) {
+                return results.getInt(1);
+            }
+        } catch (SQLException e) {
+            // Assume that no previous attempts have been made.
+        }
+        return 0;
+    }
+
+    public void savePlotReviewCategoryFeedback(int reviewId, String category, String selection) {
+        this.savePlotReviewCategoryFeedback(reviewId, category, selection, 0);
+    }
+
+    public void savePlotReviewCategoryFeedback(int reviewId, String category, String selection, int bookId) {
+        try (
+                Connection conn = conn();
+                PreparedStatement statement = conn.prepareStatement("INSERT INTO plot_category_feedback(review_id,category,selection,book_id) VALUES(?, ?, ?, ?);")
+        ) {
+
+            statement.setInt(1, reviewId);
+            statement.setString(2, category);
+            statement.setString(3, selection);
+            statement.setInt(4, bookId);
+            statement.executeUpdate();
+
+        } catch (SQLException sql) {
+            sql.printStackTrace();
+        }
+    }
 }
