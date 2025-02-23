@@ -23,6 +23,7 @@ import net.bteuk.network.commands.ProgressMap;
 import net.bteuk.network.commands.Promote;
 import net.bteuk.network.commands.Ptime;
 import net.bteuk.network.commands.Punmute;
+import net.bteuk.network.commands.Pweather;
 import net.bteuk.network.commands.RegionCommand;
 import net.bteuk.network.commands.Rules;
 import net.bteuk.network.commands.Season;
@@ -135,12 +136,16 @@ public class CommandManager {
                 commands.register("tips", "Toggles tips in chat.", List.of("toggletips", "tipstoggle"), new TipsToggle());
             }
             commands.register("ptime", "Sets the time of day for the player", new Ptime());
+            commands.register("pweather", "Sets the weather for the player", new Pweather());
             commands.register("season", "Command for creating, starting and ending seasons.", List.of("seasons"), new Season());
             commands.register("exp", "Test command for adding exp.", new Exp());
             commands.register("buildingcompanion", "Toggle the building companion.", List.of("bc", "companion"), new BuildingCompanionCommand());
             commands.register("pmute", "Mute a player", new Pmute(instance));
             commands.register("punmute", "Unmute a player", new Punmute(instance));
-            commands.register("msg", "Sends a direct message to a player.", List.of("w, tell"), new Msg(instance));
+            Msg msgCommand = new Msg(instance);
+            commands.register("msg", "Sends a direct message to a player.", msgCommand);
+            commands.register("w", "Sends a direct message to a player.", msgCommand);
+            commands.register("tell", "Sends a direct message to a player.", msgCommand);
             commands.register("promote", "Add a role to a player.", new Promote(instance));
             commands.register("demote", "Remove a role from a player.", new Demote(instance));
             commands.register("focus", "Toggle focus mode, hides chat and players.", List.of("focusmode", "fm"), new Focus());

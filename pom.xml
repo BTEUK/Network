@@ -5,7 +5,7 @@
 
     <groupId>net.bteuk</groupId>
     <artifactId>Network</artifactId>
-    <version>1.7.0</version>
+    <version>1.7.1</version>
     <packaging>jar</packaging>
 
     <name>Network</name>
@@ -244,7 +244,13 @@
         <dependency>
             <groupId>com.github.BTEUK</groupId>
             <artifactId>TeachingTutorials</artifactId>
-            <version>4a3b7d7139</version>
+            <version>26a38d21d3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.BTEUK</groupId>
+            <artifactId>TeachingTutorialsAPI</artifactId>
+            <version>970d3dc3f7</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Test dependencies -->

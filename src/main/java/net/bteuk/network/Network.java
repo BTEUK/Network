@@ -21,6 +21,7 @@ import net.bteuk.network.lib.dto.OnlineUserRemove;
 import net.bteuk.network.lib.dto.OnlineUsersReply;
 import net.bteuk.network.lib.dto.ServerStartup;
 import net.bteuk.network.lobby.Lobby;
+import net.bteuk.network.services.NetworkPromotionService;
 import net.bteuk.network.sql.DatabaseInit;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.sql.PlotSQL;
@@ -32,6 +33,7 @@ import net.bteuk.network.utils.Tips;
 import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.enums.ServerType;
 import net.bteuk.network.utils.regions.RegionManager;
+import net.bteuk.teachingtutorials.services.PromotionService;
 import net.buildtheearth.terraminusminus.TerraConfig;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Material;
@@ -39,6 +41,7 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import teachingtutorials.utils.DBConnection;
 
@@ -47,6 +50,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Optional;
 
+import static net.bteuk.network.utils.Constants.LOGGER;
 import static net.bteuk.network.utils.Constants.REGIONS_ENABLED;
 import static net.bteuk.network.utils.Constants.SERVER_NAME;
 import static net.bteuk.network.utils.Constants.SERVER_TYPE;
@@ -326,6 +330,16 @@ public final class Network extends JavaPlugin {
         //Create default season if not exists.
         if (!globalSQL.hasRow("SELECT id FROM seasons WHERE id='default';")) {
             globalSQL.update("INSERT INTO seasons(id,active) VALUES('default',1);");
+        }
+
+        // Register Promotion Service.
+        try {
+            Class.forName("net.bteuk.teachingtutorials.services.PromotionService");
+            PromotionService promotionService = new NetworkPromotionService();
+            this.getServer().getServicesManager().register(PromotionService.class, promotionService, this, ServicePriority.High);
+            LOGGER.info("Registered Network Promotion Service");
+        } catch (ClassNotFoundException e) {
+            // Only load the PromotionService is the class exists.
         }
 
         // Let the Proxy know that the server is enabled.
