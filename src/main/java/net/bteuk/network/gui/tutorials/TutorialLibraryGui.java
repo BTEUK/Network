@@ -68,9 +68,9 @@ public class TutorialLibraryGui extends Gui {
         User tutorialsUser = new User(this.user.player);
         tutorialsUser.fetchDetailsByUUID(Network.getInstance().getTutorialsDBConnection(), LOGGER);
 
-        if (tutorialsUser.hasIncompleteLessons()) {
+        if (tutorialsUser.hasIncompleteLessons(Network.getInstance().getTutorialsDBConnection(), LOGGER)) {
             //Get current lesson's tutorial ID and sets up the tutorial object from this
-            int iTutorialIDCurrentLesson = Lesson.getTutorialOfCurrentLessonOfPlayer(user.player.getUniqueId(), Network.getInstance().getTutorialsDBConnection(), Network.getInstance());
+            int iTutorialIDCurrentLesson = Lesson.getTutorialOfCurrentLessonOfPlayer(user.player.getUniqueId(), Network.getInstance().getTutorialsDBConnection(), LOGGER);
             if (iTutorialIDCurrentLesson == -1) {
                 Bukkit.getConsoleSender().sendMessage(Utils.error("An error occurred. Player is in lesson but has no lesson in the database"));
             }
@@ -83,7 +83,7 @@ public class TutorialLibraryGui extends Gui {
                 setAction(iSlot, user -> {
                     Bukkit.getConsoleSender().sendMessage("Current TutorialID: " + currentTutorial.getTutorialID());
                     Bukkit.getConsoleSender().sendMessage("TutorialID of slot: " + inUseTutorials[iSlot].getTutorialID());
-                    if (tutorialsUser.hasIncompleteLessons() && (currentTutorial.getTutorialID() != inUseTutorials[iSlot].getTutorialID())) {
+                    if (tutorialsUser.hasIncompleteLessons(Network.getInstance().getTutorialsDBConnection(), LOGGER) && (currentTutorial.getTutorialID() != inUseTutorials[iSlot].getTutorialID())) {
                         user.sendMessage(Utils.error("You cannot start a new tutorial before you finish your current one"));
                     } else {
                         if (Event.addEvent(EventType.LIBRARY, user.player.getUniqueId(), inUseTutorials[iSlot].getTutorialID(), Network.getInstance().getTutorialsDBConnection(), LOGGER))
