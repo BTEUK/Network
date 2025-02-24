@@ -239,7 +239,7 @@
         <dependency>
             <groupId>com.github.BTEUK</groupId>
             <artifactId>NetworkLib</artifactId>
-            <version>1bdef05ad5</version>
+            <version>524b2deb55</version>
         </dependency>
         <dependency>
             <groupId>com.github.BTEUK</groupId>

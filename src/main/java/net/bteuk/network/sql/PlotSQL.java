@@ -283,10 +283,6 @@ public class PlotSQL extends AbstractSQL {
         return 0;
     }
 
-    public void savePlotReviewCategoryFeedback(int reviewId, String category, String selection) {
-        this.savePlotReviewCategoryFeedback(reviewId, category, selection, 0);
-    }
-
     public void savePlotReviewCategoryFeedback(int reviewId, String category, String selection, int bookId) {
         try (
                 Connection conn = conn();
