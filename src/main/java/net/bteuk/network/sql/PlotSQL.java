@@ -299,4 +299,23 @@ public class PlotSQL extends AbstractSQL {
             sql.printStackTrace();
         }
     }
+
+    public void savePlotVerificationFeedback(int reviewId, String category, String verifierUuid, String selectionOld, String selectionNew, int bookOld, int bookNew) {
+        try (
+                Connection conn = conn();
+                PreparedStatement statement = conn.prepareStatement("INSERT INTO plot_verification_feedback(review_id,category,verifier,selection_old,selection_new,book_id_old,book_id_new) VALUES(?, ?, ?, ?, ?, ?, ?);")
+        ) {
+            statement.setInt(1, reviewId);
+            statement.setString(2, category);
+            statement.setString(3, verifierUuid);
+            statement.setString(4, selectionOld);
+            statement.setString(5, selectionNew);
+            statement.setInt(6, bookOld);
+            statement.setInt(7, bookNew);
+            statement.executeUpdate();
+
+        } catch (SQLException sql) {
+            sql.printStackTrace();
+        }
+    }
 }
