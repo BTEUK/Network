@@ -147,7 +147,7 @@ public class Plot extends AbstractCommand {
 
         // Find the latest attempt.
         String uuid = plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plot + " AND is_owner=1;");
-        int latestAttempt = plotSQL.getInt("SELECT MAX(attempt) FROM deny_data WHERE id=" + plot + " AND uuid='" + uuid + "';");
+        int latestAttempt = plotSQL.getInt("SELECT MAX(attempt) FROM plot_review WHERE plot_id=" + plot + " AND uuid='" + uuid + "' AND accepted=0 AND completed=1;");
 
         if (latestAttempt == 0) {
             player.sendMessage(Utils.error("There is no feedback available for this plot."));
@@ -163,8 +163,9 @@ public class Plot extends AbstractCommand {
         //Create book.
         Component title = Component.text("Plot " + plot + " Attempt " + latestAttempt, NamedTextColor.AQUA, TextDecoration.BOLD);
         Component author = Component.text(instance.getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" +
-                plotSQL.getString("SELECT reviewer FROM deny_data WHERE id=" + plot + " AND uuid='" + uuid + "' AND attempt=" + latestAttempt + ";") + "';"));
+                plotSQL.getString("SELECT reviewer FROM plot_review WHERE plot_id=" + plot + " AND uuid='" + uuid + "' AND attempt=" + latestAttempt + ";") + "';"));
 
+        // TODO: Construct feedback book.
         //Get pages of the book.
         ArrayList<String> sPages = plotSQL.getStringList("SELECT contents FROM book_data WHERE id="
                 + plotSQL.getInt("SELECT book_id FROM deny_data WHERE id=" + plot + " AND uuid='" + uuid + "' AND attempt=" + latestAttempt + ";") + ";");

@@ -77,7 +77,7 @@ public class PlotInfo extends Gui {
         if (status == PlotStatus.CLAIMED || status == PlotStatus.SUBMITTED) {
             plot_owner = plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plotID + " AND is_owner=1;");
         } else if (status == PlotStatus.COMPLETED) {
-            plot_owner = plotSQL.getString("SELECT uuid FROM accept_data WHERE id=" + plotID + ";");
+            plot_owner = plotSQL.getString("SELECT uuid FROM plot_review WHERE id=" + plotID + " AND accepted=1 AND completed=1;");
         }
         // Determine the type of menu to create.
         PLOT_INFO_TYPE plotInfoType = determineMenuType(status, submittedStatus);
@@ -108,7 +108,7 @@ public class PlotInfo extends Gui {
         // Plot Info
         setItem(4, Utils.createItem(Material.BOOK, 1,
                 Utils.title("Plot " + plotID),
-                createPlotInfo(status, plotInfoType)));
+                createPlotInfo(status)));
 
         // Plot Teleport (Always in slot 24).
         setItem(24, Utils.createItem(Material.ENDER_PEARL, 1,
@@ -318,7 +318,7 @@ public class PlotInfo extends Gui {
         if ((plotInfoType == PLOT_INFO_TYPE.CLAIMED_OWNER || plotInfoType == PLOT_INFO_TYPE.CLAIMED_MEMBER ||
                 plotInfoType == PLOT_INFO_TYPE.REVIEWING_REVIEWER || plotInfoType == PLOT_INFO_TYPE.SUBMITTED_REVIEWER ||
                 plotInfoType == PLOT_INFO_TYPE.REVIEWED_REVIEWER || plotInfoType == PLOT_INFO_TYPE.VERIFYING_REVIEWER)
-                && plotSQL.hasRow("SELECT id FROM deny_data WHERE id=" + plotID + " AND uuid='" + plot_owner + "';")) {
+                && plotSQL.hasRow("SELECT id FROM plot_review WHERE plot_id=" + plotID + " AND uuid='" + plot_owner + "' AND accepted=0 AND completed=1;")) {
             setItem(getFeedbackSlot(plotInfoType), Utils.createItem(Material.WRITABLE_BOOK, 1,
                             Utils.title("Plot Feedback"),
                             Utils.line("Click to show feedback for this plot.")),
@@ -334,19 +334,20 @@ public class PlotInfo extends Gui {
 
                     });
             // If the plot is accepted and has feedback show for the owner (Slot 22)
-        } else if (plotInfoType == PLOT_INFO_TYPE.ACCEPTED_OWNER && plotSQL.hasRow("SELECT id FROM accept_data WHERE id=" + plotID + " AND book_id <> 0;")) {
+        } else if (plotInfoType == PLOT_INFO_TYPE.ACCEPTED_OWNER && plotSQL.hasRow("SELECT 1 FROM plot_category_feedback WHERE review_id=( SELECT id FROM plot_review WHERE id=" + plotID + " AND accepted=1 AND completed=1 );")) {
             setItem(getFeedbackSlot(plotInfoType), Utils.createItem(Material.WRITABLE_BOOK, 1,
                             Utils.title("Plot Feedback"),
                             Utils.line("Click to show feedback for this plot.")),
                     u -> {
+                        // TODO: Create feedback book.
                         //Create book.
                         Component title = Component.text("Plot " + plotID, NamedTextColor.AQUA, TextDecoration.BOLD);
                         Component author = Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
-                                plotSQL.getString("SELECT reviewer FROM accept_data WHERE id=" + plotID + ";") + "';"));
+                                plotSQL.getString("SELECT reviewer FROM plot_review WHERE plot_id=" + plotID + " AND accepted=1 AND completed=1;") + "';"));
 
                         //Get pages of the book.
                         ArrayList<String> sPages = plotSQL.getStringList("SELECT contents FROM book_data WHERE id="
-                                + plotSQL.getInt("SELECT book_id FROM accept_data WHERE id=" + plotID + ";") + ";");
+                                + plotSQL.getInt("SELECT book_id FROM plot_review WHERE plot_id=" + plotID + " AND accepted=1 AND completed=1;") + ";");
 
                         //Create a list of components from the list of strings.
                         ArrayList<Component> pages = new ArrayList<>();
@@ -510,7 +511,7 @@ public class PlotInfo extends Gui {
         }
     }
 
-    private Component[] createPlotInfo(PlotStatus status, PLOT_INFO_TYPE plotInfoType) {
+    private Component[] createPlotInfo(PlotStatus status) {
         List<Component> info = new ArrayList<>();
         if (status == PlotStatus.CLAIMED || status == PlotStatus.SUBMITTED) {
             info.add(Utils.line("Plot Owner: ")
@@ -520,10 +521,10 @@ public class PlotInfo extends Gui {
                     .append(Component.text(plotSQL.getInt("SELECT COUNT(uuid) FROM plot_members WHERE id=" + plotID + " AND is_owner=0;"), NamedTextColor.GRAY)));
         } else if (status == PlotStatus.COMPLETED) {
             info.add(Utils.line("Completed by: ").append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='"
-                    + plotSQL.getString("SELECT uuid FROM accept_data WHERE id=" + plotID + ";") + "';"), NamedTextColor.GRAY)));
+                    + plotSQL.getString("SELECT uuid FROM plot_review WHERE plot_id=" + plotID + " AND accepted=1 AND completed=1;") + "';"), NamedTextColor.GRAY)));
             info.add(Utils.line("Accepted by: ")
                     .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='"
-                            + plotSQL.getString("SELECT reviewer FROM accept_data WHERE id=" + plotID + ";") + "';"), NamedTextColor.GRAY)));
+                            + plotSQL.getString("SELECT reviewer FROM plot_review WHERE plot_id=" + plotID + " AND accepted=1 AND completed=1;") + "';"), NamedTextColor.GRAY)));
         } else if (status == PlotStatus.UNCLAIMED) {
             info.add(Utils.line("This plot is unclaimed!"));
         }
@@ -533,18 +534,6 @@ public class PlotInfo extends Gui {
                 .append(Component.text(PlotValues.difficultyName(plotSQL.getInt("SELECT difficulty FROM plot_data WHERE id=" + plotID + ";")), NamedTextColor.GRAY)));
         info.add(Utils.line("Size: ")
                 .append(Component.text(PlotValues.sizeName(plotSQL.getInt("SELECT size FROM plot_data WHERE id=" + plotID + ";")), NamedTextColor.GRAY)));
-
-        // If accepted, and the builder opens de menu, show the accuracy and quality ratings.
-        if (plotInfoType == PLOT_INFO_TYPE.ACCEPTED_OWNER) {
-            info.add(Utils.line("Accuracy: ")
-                    .append(Utils.greyText(String.valueOf(plotSQL.getInt("SELECT accuracy FROM accept_data WHERE id=" + plotID + ";"))))
-                    .append(Utils.line("/"))
-                    .append(Utils.greyText("5")));
-            info.add(Utils.line("Quality: ")
-                    .append(Utils.greyText(String.valueOf(plotSQL.getInt("SELECT quality FROM accept_data WHERE id=" + plotID + ";"))))
-                    .append(Utils.line("/"))
-                    .append(Utils.greyText("5")));
-        }
 
         // If accepted, add a disclaimer that the actual plot may have changed since it was accepted.
         if (status == PlotStatus.COMPLETED) {
