@@ -66,9 +66,7 @@ public class DeniedPlotFeedback extends Gui {
                                     .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='"
                                             + plotSQL.getString("SELECT reviewer FROM plot_review WHERE plot_id=" + plotID + " AND uuid='" + uuid + "' AND attempt=" + i + ";") + "';"), NamedTextColor.GRAY))),
 
-                    u ->
-
-                    {
+                    u -> {
 
                         //Close the inventory.
                         u.player.closeInventory();

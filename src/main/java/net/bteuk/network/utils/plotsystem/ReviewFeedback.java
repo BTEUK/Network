@@ -15,16 +15,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ReviewFeedback {
+/**
+ * Utility class to construct a feedback book based on a plot review.
+ */
+public final class ReviewFeedback {
 
     private static final Component REVIEW_BOOK_TITLE = ChatUtils.title("Review Book");
 
     private static final Component GOTO_FEEDBACK = Component.text("[Feedback]", NamedTextColor.GRAY).hoverEvent(HoverEvent.showText(Component.text("Click to go to category feedback.")));
 
+    private ReviewFeedback() {
+        // Private constructor.
+    }
+
     /**
      * Create the feedback book for a plot review.
      *
-     * @return the book
+     * @param reviewId the id of the plot review
+     * @return the feedback book for the plot review
      */
     public static Book createFeedbackBook(int reviewId) {
 
@@ -43,10 +51,14 @@ public class ReviewFeedback {
         Map<ReviewCategory, ReviewCategoryFeedback> reviewCategoryFeedback = getReviewCategoryFeedback(reviewId);
         for (ReviewCategory category : ReviewCategory.values()) {
             ReviewCategoryFeedback categoryFeedback = reviewCategoryFeedback.get(category);
+            // Add an extra line break before the general category, if it is not the only one.
+            if (categoryFeedback.category() == ReviewCategory.GENERAL && reviewCategoryFeedback.size() > 1) {
+                firstPage = firstPage.appendNewline();
+            }
             if (categoryFeedback.selection() != ReviewSelection.NONE) {
                 // Add the category to the book.
                 firstPage = firstPage.appendNewline();
-                firstPage = addCategoryToFeedbackBook(categoryFeedback, pages);
+                firstPage = firstPage.append(addCategoryToFeedbackBook(categoryFeedback, pages));
             }
         }
 
@@ -100,5 +112,4 @@ public class ReviewFeedback {
     private static ClickEvent getGotoFeedbackClickEvent(int page) {
         return ClickEvent.clickEvent(ClickEvent.Action.CHANGE_PAGE, String.valueOf(page));
     }
-
 }

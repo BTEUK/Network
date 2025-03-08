@@ -15,9 +15,9 @@ import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.enums.PlotStatus;
 import net.bteuk.network.utils.enums.RegionType;
 import net.bteuk.network.utils.enums.SubmittedStatus;
+import net.bteuk.network.utils.plotsystem.ReviewFeedback;
 import net.buildtheearth.terraminusminus.generator.EarthGeneratorSettings;
 import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
-import net.kyori.adventure.inventory.Book;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -339,26 +339,10 @@ public class PlotInfo extends Gui {
                             Utils.title("Plot Feedback"),
                             Utils.line("Click to show feedback for this plot.")),
                     u -> {
-                        // TODO: Create feedback book.
-                        //Create book.
-                        Component title = Component.text("Plot " + plotID, NamedTextColor.AQUA, TextDecoration.BOLD);
-                        Component author = Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
-                                plotSQL.getString("SELECT reviewer FROM plot_review WHERE plot_id=" + plotID + " AND accepted=1 AND completed=1;") + "';"));
+                        int reviewId = plotSQL.getInt("SELECT id FROM plot_review WHERE uuid='" + u.getUuid() + "' AND plot_id=" + plotID + " AND accepted=1 AND completed=1;");
 
-                        //Get pages of the book.
-                        ArrayList<String> sPages = plotSQL.getStringList("SELECT contents FROM book_data WHERE id="
-                                + plotSQL.getInt("SELECT book_id FROM plot_review WHERE plot_id=" + plotID + " AND accepted=1 AND completed=1;") + ";");
-
-                        //Create a list of components from the list of strings.
-                        ArrayList<Component> pages = new ArrayList<>();
-                        for (String page : sPages) {
-                            pages.add(Component.text(page));
-                        }
-
-                        Book book = Book.book(title, author, pages);
-
-                        //Open the book.
-                        u.player.openBook(book);
+                        // Open the feedback book.
+                        u.player.openBook(ReviewFeedback.createFeedbackBook(reviewId));
                     });
         }
 

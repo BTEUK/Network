@@ -4,13 +4,14 @@ import lombok.Getter;
 
 @Getter
 public enum ReviewCategory {
-    GENERAL("General"),
+
     OUTLINES("Outlines"),
     FEATURES("Features"),
     ROOF("Roof"),
     GARDEN("Garden"),
     TEXTURES("Textures"),
-    DETAILS("Details");
+    DETAILS("Details"),
+    GENERAL("General");
 
     private final String displayName;
 
