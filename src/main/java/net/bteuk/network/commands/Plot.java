@@ -11,14 +11,10 @@ import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.enums.PlotStatus;
-import net.kyori.adventure.inventory.Book;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
+import net.bteuk.network.utils.plotsystem.ReviewFeedback;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import static net.bteuk.network.utils.Constants.LOGGER;
@@ -159,27 +155,11 @@ public class Plot extends AbstractCommand {
             user.mainGui = new PlotInfo(user, plot);
         }
 
-        // Open the feedback, if it exists.
-        //Create book.
-        Component title = Component.text("Plot " + plot + " Attempt " + latestAttempt, NamedTextColor.AQUA, TextDecoration.BOLD);
-        Component author = Component.text(instance.getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" +
-                plotSQL.getString("SELECT reviewer FROM plot_review WHERE plot_id=" + plot + " AND uuid='" + uuid + "' AND attempt=" + latestAttempt + ";") + "';"));
+        // Create book.
+        int reviewId = plotSQL.getInt("SELECT id FROM plot_review WHERE plot_id=" + plot + " AND uuid='" + uuid + "' AND attempt=" + latestAttempt + ";");
 
-        // TODO: Construct feedback book.
-        //Get pages of the book.
-        ArrayList<String> sPages = plotSQL.getStringList("SELECT contents FROM book_data WHERE id="
-                + plotSQL.getInt("SELECT book_id FROM deny_data WHERE id=" + plot + " AND uuid='" + uuid + "' AND attempt=" + latestAttempt + ";") + ";");
-
-        //Create a list of components from the list of strings.
-        ArrayList<Component> pages = new ArrayList<>();
-        for (String page : sPages) {
-            pages.add(Component.text(page));
-        }
-
-        Book book = Book.book(title, author, pages);
-
-        //Open the book.
-        player.openBook(book);
+        // Open the book.
+        player.openBook(ReviewFeedback.createFeedbackBook(reviewId));
     }
 
     private void error(Player p) {

@@ -68,13 +68,13 @@ public class DeniedPlotFeedback extends Gui {
 
                     u -> {
 
-                        //Close the inventory.
+                        // Close the inventory.
                         u.player.closeInventory();
 
                         // Create book.
                         int reviewId = plotSQL.getInt("SELECT id FROM plot_review WHERE plot_id=" + plotID + " AND uuid='" + uuid + "' AND attempt=" + finalI + ";");
 
-                        //Open the book.
+                        // Open the book.
                         u.player.openBook(ReviewFeedback.createFeedbackBook(reviewId));
 
                     });

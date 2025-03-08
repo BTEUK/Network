@@ -68,9 +68,9 @@ public class AcceptedPlotMenu extends Gui {
         // Fetch accepted plots.
         HashMap<Integer, String> plots;
         if (StringUtils.isEmpty(filter)) {
-            plots = plotSQL.getIntStringMap("SELECT id,uuid FROM plot_review WHERE accepted=1 AND completed=1 ORDER BY accept_time DESC;");
+            plots = plotSQL.getIntStringMap("SELECT id,uuid FROM plot_review WHERE accepted=1 AND completed=1 ORDER BY review_time DESC;");
         } else {
-            plots = plotSQL.getIntStringMap("SELECT id,uuid FROM plot_review WHERE accepted=1 AND completed=1 AND uuid='" + filter + "' ORDER BY accept_time DESC;");
+            plots = plotSQL.getIntStringMap("SELECT id,uuid FROM plot_review WHERE accepted=1 AND completed=1 AND uuid='" + filter + "' ORDER BY review_time DESC;");
         }
 
         // Set the filter.
