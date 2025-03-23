@@ -282,7 +282,7 @@ public class Navigation extends AbstractCommand {
 
         //If the player has permission for any of the commands send them the error.
         //Else tell them they don't have permission.
-        if (u.hasAnyPermission(new String[]{"uknet.navigation.request", "uknet.navigation.update", "uknet.navigation.remove", "uknet.navigation.suggested", "uknet.navigation.subcategory"})) {
+        if (u.hasAnyPermission("uknet.navigation.request", "uknet.navigation.update", "uknet.navigation.remove", "uknet.navigation.suggested", "uknet.navigation.subcategory")) {
             if (u.hasPermission("uknet.navigation.request")) {
                 u.sendMessage(ChatUtils.error("/navigation add"));
             }

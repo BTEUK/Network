@@ -251,7 +251,7 @@ public class NetworkUser {
      * @param permission_nodes array of permission nodes.
      * @return whether the {@link NetworkUser} has any of the permission nodes.
      */
-    public boolean hasAnyPermission(String[] permission_nodes) {
+    public boolean hasAnyPermission(String... permission_nodes) {
 
         for (String permission_node : permission_nodes) {
             if (hasPermission(permission_node)) {

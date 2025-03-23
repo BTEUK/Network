@@ -87,7 +87,7 @@ public class StaffGui extends Gui {
         //If player is in a region show manage region, else show no region.
         if (user.inRegion) {
 
-            setItem(10, Utils.createItem(Material.ANVIL, 1,
+            setItem(9, Utils.createItem(Material.ANVIL, 1,
                             Utils.title("Manage Region " + user.region.regionName()),
                             Utils.line("Opens a menu to manage details of the region you are currently in.")),
                     u ->
@@ -114,7 +114,7 @@ public class StaffGui extends Gui {
                     });
         } else {
 
-            setItem(10, Utils.createItem(Material.STRUCTURE_VOID, 1,
+            setItem(9, Utils.createItem(Material.STRUCTURE_VOID, 1,
                     Utils.title("No Region"),
                     Utils.line("You are currently not standing in a valid region."),
                     Utils.line("This is likely due to being in a lobby.")));
@@ -137,7 +137,7 @@ public class StaffGui extends Gui {
                     .append(Utils.line(" region join requests by Jr.Builders."));
         }
 
-        setItem(11, Utils.createItem(Material.CHEST_MINECART, 1,
+        setItem(10, Utils.createItem(Material.CHEST_MINECART, 1,
                         Utils.title("Review Region Requests"),
                         Utils.line("Opens a menu to review active region join requests by Jr.Builders."),
                         rRequestString),
@@ -179,7 +179,7 @@ public class StaffGui extends Gui {
                     .append(Utils.line(" submitted plots."));
         }
 
-        setItem(13, Utils.createItem(Material.WRITABLE_BOOK, 1,
+        setItem(12, Utils.createItem(Material.WRITABLE_BOOK, 1,
                         Utils.title("Review Plot"),
                         Utils.line("Click to review a submitted plot."),
                         message),
@@ -217,7 +217,7 @@ public class StaffGui extends Gui {
                     }
                 });
 
-        setItem(14, Utils.createItem(Material.WRITABLE_BOOK, 1,
+        setItem(13, Utils.createItem(Material.KNOWLEDGE_BOOK, 1,
                         Utils.title("Verify Plot"),
                         Utils.line("Click to verify a reviewed plot."),
                         message),
@@ -266,7 +266,7 @@ public class StaffGui extends Gui {
                 {
 
                     //Check if the NetworkUser has any of the following permissions.
-                    if (u.hasAnyPermission(new String[]{"uknet.ban", "uknet.mute", "uknet.kick"})) {
+                    if (u.hasAnyPermission("uknet.ban", "uknet.mute", "uknet.kick")) {
 
                         this.delete();
 

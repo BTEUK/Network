@@ -27,7 +27,7 @@ public class LobbyCommand extends AbstractCommand {
 
         //Check permission if player, or if the server is the lobby.
         CommandSender sender = stack.getSender();
-        if (!hasPermission(sender, "uknet.lobby.reload") || SERVER_TYPE != ServerType.LOBBY) {
+        if (!sender.hasPermission("uknet.lobby.reload") || SERVER_TYPE != ServerType.LOBBY) {
             if (sender instanceof Player p) {
                 p.performCommand("spawn");
             }
