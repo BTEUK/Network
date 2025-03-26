@@ -255,7 +255,7 @@ public class Navigation extends AbstractCommand {
 
         // Check if a valid subcategory is listed.
         String name = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
-        int subcategory_id = Network.getInstance().getGlobalSQL().getInt("SELECT name FROM location_subcategory WHERE name='" + name + "';");
+        int subcategory_id = Network.getInstance().getGlobalSQL().getInt("SELECT id FROM location_subcategory WHERE name='" + name + "';");
 
         if (subcategory_id == 0) {
             u.sendMessage(ChatUtils.error("Subcategory ").append(Component.text(name, NamedTextColor.DARK_RED)).append(ChatUtils.error(" does not exist.")));

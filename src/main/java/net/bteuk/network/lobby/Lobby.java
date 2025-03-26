@@ -249,7 +249,7 @@ public class Lobby {
             map = new Map(instance);
         }
         map.reload();
-
+        map.registerMapCommand();
     }
 
     public void setSpawn() {

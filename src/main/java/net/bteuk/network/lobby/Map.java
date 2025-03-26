@@ -120,14 +120,16 @@ public class Map extends AbstractReloadableComponent {
             }
         }
 
+        setEnabled(true);
+    }
+
+    public void registerMapCommand() {
         // Enable the map command.
         LifecycleEventManager<Plugin> manager = instance.getLifecycleManager();
         manager.registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             final Commands commands = event.registrar();
             commands.register("map", "Map command.", new MapCommand(this, server));
         });
-
-        setEnabled(true);
     }
 
     /**
