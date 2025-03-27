@@ -234,7 +234,7 @@
         <dependency>
             <groupId>com.github.BTEUK</groupId>
             <artifactId>ProgressMapper</artifactId>
-            <version>2f3fc96c3</version>
+            <version>231624865f</version>
         </dependency>
         <dependency>
             <groupId>com.github.BTEUK</groupId>

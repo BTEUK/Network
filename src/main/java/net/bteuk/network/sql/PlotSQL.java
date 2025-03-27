@@ -165,7 +165,7 @@ public class PlotSQL extends AbstractSQL {
         List<Integer> member_plots = getIntList("SELECT id FROM plot_members WHERE uuid='" + uuid + "';");
 
         // Get all plots that the user has reviewed, don't use those in the count.
-        List<Integer> reviewed_plots = getIntList("SELECT id FROM plot_review WHERE reviewer='" + uuid + "' AND completed=0;");
+        List<Integer> reviewed_plots = getIntList("SELECT plot_id FROM plot_review WHERE reviewer='" + uuid + "' AND completed=0;");
 
         plots_awaiting_verification.removeAll(member_plots);
         plots_awaiting_verification.removeAll(reviewed_plots);
@@ -179,7 +179,7 @@ public class PlotSQL extends AbstractSQL {
 
     public void addOrUpdateReviewer(String uuid, String roleId) {
         // Check if the reviewer is already added to the table.
-        boolean hasRow = hasRow("SELECT uuid FROM reviewers FROM uuid'" + uuid + "';");
+        boolean hasRow = hasRow("SELECT uuid FROM reviewers FROM uuid='" + uuid + "';");
 
         double initialValue = getReviewerReputation(uuid);
 
@@ -222,8 +222,8 @@ public class PlotSQL extends AbstractSQL {
         // The player must be a reviewer, is not the reviewer of the plot and is not the owner or a member of the plot.
         // The reviewer must also be allowed to verify a plot of this difficulty.
         return (isReviewer && difficulties.stream().mapToInt(PlotDifficulties::getValue).anyMatch(difficulty -> difficulty == plotDifficulty)
-                && !hasRow("SELECT id FROM plot_review WHERE reviewer='" + uuid + "' AND plot_id=" + plotId + " AND completed=0")
-                && !hasRow("SELECT id FROM plot_members WHERE id=" + plotId + " AND uuid='" + uuid + "';"));
+                && !hasRow("SELECT 1 FROM plot_review WHERE reviewer='" + uuid + "' AND plot_id=" + plotId + " AND completed=0")
+                && !hasRow("SELECT 1 FROM plot_members WHERE id=" + plotId + " AND uuid='" + uuid + "';"));
     }
 
     /**

@@ -95,7 +95,7 @@ public final class ReviewFeedback {
 
             category = category.clickEvent(getGotoFeedbackClickEvent(pages.size() + 2))
                     .hoverEvent(HoverEvent.showText(Component.text(String.format("Click to go view %s feedback.", categoryFeedback.category().getDisplayName()))));
-            category = category.color(NamedTextColor.DARK_BLUE); // Blue colour to indicate that you can navigate to the feedback.
+            category = category.color(NamedTextColor.DARK_BLUE).decorate(TextDecoration.UNDERLINED); // Blue colour underlined to indicate that you can navigate to the feedback.
             pages.addAll(sPages.stream().map(Component::text).toList());
 
             if (categoryFeedback.selection() != ReviewSelection.NONE) {
