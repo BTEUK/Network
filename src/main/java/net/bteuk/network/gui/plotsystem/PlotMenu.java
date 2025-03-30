@@ -70,7 +70,7 @@ public class PlotMenu extends Gui {
         }
 
         // Verified review menu.
-        if (plotSQL.hasRow("SELECT 1 FROM plot_verification_feedback WHERE review_id IN (SELECT review_id FROM plot_review WHERE reviewer='" + user.getUuid() + "');")) {
+        if (plotSQL.hasRow("SELECT 1 FROM plot_verification WHERE review_id IN (SELECT review_id FROM plot_review WHERE reviewer='" + user.getUuid() + "');")) {
             setItem(4, Utils.createItem(Material.LECTERN, 1,
                             Utils.title("Verified Reviews"),
                             Utils.line("Click to view all verifications"),

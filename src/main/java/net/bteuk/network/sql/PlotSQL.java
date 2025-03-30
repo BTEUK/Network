@@ -179,7 +179,7 @@ public class PlotSQL extends AbstractSQL {
 
     public void addOrUpdateReviewer(String uuid, String roleId) {
         // Check if the reviewer is already added to the table.
-        boolean hasRow = hasRow("SELECT uuid FROM reviewers FROM uuid='" + uuid + "';");
+        boolean hasRow = hasRow("SELECT uuid FROM reviewers WHERE uuid='" + uuid + "';");
 
         double initialValue = getReviewerReputation(uuid);
 
