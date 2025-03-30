@@ -1,6 +1,5 @@
 package net.bteuk.network.gui.plotsystem;
 
-import lombok.Setter;
 import net.bteuk.network.Network;
 import net.bteuk.network.eventing.events.EventManager;
 import net.bteuk.network.gui.Gui;
@@ -22,9 +21,6 @@ public class VerificationInfo extends Gui {
 
     private final PlotSQL plotSQL;
     private final GlobalSQL globalSQL;
-
-    @Setter
-    private AcceptedPlotMenu acceptedPlotMenu;
 
     public VerificationInfo(int verificationId) {
 
