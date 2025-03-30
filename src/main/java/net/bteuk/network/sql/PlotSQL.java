@@ -68,7 +68,7 @@ public class PlotSQL extends AbstractSQL {
             statement.setInt(5, coordinate_id);
             statement.executeUpdate();
 
-            //If the id does not exist return 0.
+            // If the id does not exist return 0.
             try (ResultSet results = statement.getGeneratedKeys()) {
                 if (results.next()) {
 
@@ -100,7 +100,7 @@ public class PlotSQL extends AbstractSQL {
             statement.setBoolean(3, is_public);
             statement.executeUpdate();
 
-            //If the id does not exist return 0.
+            // If the id does not exist return 0.
             try (ResultSet results = statement.getGeneratedKeys()) {
                 if (results.next()) {
 
@@ -200,10 +200,11 @@ public class PlotSQL extends AbstractSQL {
 
     /**
      * Determines whether a specific player can review a specific plot.
-     * @param plotId the plot ID to check
-     * @param uuid the player uuid to check
+     *
+     * @param plotId      the plot ID to check
+     * @param uuid        the player uuid to check
      * @param isArchitect if the player has architect permissions
-     * @param isReviewer if the player has reviewer permissions
+     * @param isReviewer  if the player has reviewer permissions
      * @return whether the player can review this plot
      */
     public boolean canReviewPlot(int plotId, String uuid, boolean isArchitect, boolean isReviewer) {
@@ -229,10 +230,10 @@ public class PlotSQL extends AbstractSQL {
     /**
      * Creates a new plot review and the return the generated ID.
      *
-     * @param plotId the plot id
+     * @param plotId    the plot id
      * @param plotOwner the plot owner
-     * @param reviewer the reviewer
-     * @param accepted true if the plot should be accepted, false if denied
+     * @param reviewer  the reviewer
+     * @param accepted  true if the plot should be accepted, false if denied
      * @param completed trie if the review is complete, false if a verification is required
      * @return the review id
      */
@@ -300,20 +301,62 @@ public class PlotSQL extends AbstractSQL {
         }
     }
 
-    public void savePlotVerificationFeedback(int reviewId, String category, String verifierUuid, String selectionOld, String selectionNew, int bookOld, int bookNew) {
+    /**
+     * Creates a new plot verification and the return the generated ID.
+     *
+     * @param reviewId    the review id
+     * @param verifier    the review verifier
+     * @param acceptedOld true if the reviewer accepted the plot
+     * @param acceptedNew true if the verifier accepted the plot
+     * @return the verification id
+     */
+    public int createVerification(int reviewId, String verifier, boolean acceptedOld, boolean acceptedNew) {
         try (
                 Connection conn = conn();
-                PreparedStatement statement = conn.prepareStatement("INSERT INTO plot_verification_feedback(review_id,category,verifier,selection_old,selection_new,book_id_old,book_id_new) VALUES(?, ?, ?, ?, ?, ?, ?);")
+                PreparedStatement statement = conn.prepareStatement("INSERT INTO plot_verification(review_id,verifier,accepted_old,accepted_new) VALUES(?, ?, ?, ?);", Statement.RETURN_GENERATED_KEYS)
         ) {
             statement.setInt(1, reviewId);
-            statement.setString(2, category);
-            statement.setString(3, verifierUuid);
-            statement.setString(4, selectionOld);
-            statement.setString(5, selectionNew);
-            statement.setInt(6, bookOld);
-            statement.setInt(7, bookNew);
+            statement.setString(2, verifier);
+            statement.setBoolean(3, acceptedOld);
+            statement.setBoolean(4, acceptedNew);
             statement.executeUpdate();
 
+            // If the id does not exist return 0.
+            try (ResultSet results = statement.getGeneratedKeys()) {
+                if (results.next()) {
+                    return results.getInt(1);
+                } else {
+                    return 0;
+                }
+            }
+        } catch (SQLException sql) {
+            sql.printStackTrace();
+            return 0;
+        }
+    }
+
+    /**
+     * Save a plot verification category, if the verifier edited the feedback in any way.
+     *
+     * @param verificationId the id of the verification
+     * @param category       the category that was altered
+     * @param selectionOld   the selection the reviewer made
+     * @param selectionNew   the selection the verifier made
+     * @param bookOld        the book id of the reviewers feedback
+     * @param bookNew        the book id of the verifiers feedback
+     */
+    public void savePlotVerificationCategory(int verificationId, String category, String selectionOld, String selectionNew, int bookOld, int bookNew) {
+        try (
+                Connection conn = conn();
+                PreparedStatement statement = conn.prepareStatement("INSERT INTO plot_verification_category(verification_id,category,selection_old,selection_new,book_id_old,book_id_new) VALUES(?, ?, ?, ?, ?, ?);")
+        ) {
+            statement.setInt(1, verificationId);
+            statement.setString(2, category);
+            statement.setString(3, selectionOld);
+            statement.setString(4, selectionNew);
+            statement.setInt(5, bookOld);
+            statement.setInt(6, bookNew);
+            statement.executeUpdate();
         } catch (SQLException sql) {
             sql.printStackTrace();
         }

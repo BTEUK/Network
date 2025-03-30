@@ -66,6 +66,40 @@ public final class ReviewFeedback {
         return Book.book(REVIEW_BOOK_TITLE, ChatUtils.line(reviewer), pages);
     }
 
+    /**
+     * Create the feedback book for a plot verification.
+     *
+     * @param verificationId the id of the plot verification
+     * @param old            true if the before view should be created
+     * @return the feedback book for the plot verification
+     */
+    public static Book createVerificationFeedbackBook(int verificationId, boolean old) {
+
+        Component firstPage = Component.empty();
+
+        // Title
+        firstPage = firstPage.append(Component.text("Feedback").decorate(TextDecoration.UNDERLINED).decorate(TextDecoration.BOLD).appendNewline().appendNewline());
+
+        List<Component> pages = new ArrayList<>();
+
+        // Add each category that has a selection.
+        Map<ReviewCategory, ReviewCategoryFeedback> verificationCategoryFeedback = getVerificationCategoryFeedback(verificationId, old);
+        for (ReviewCategory category : ReviewCategory.values()) {
+            ReviewCategoryFeedback categoryFeedback = verificationCategoryFeedback.get(category);
+            if (categoryFeedback == null) {
+                continue;
+            }
+            firstPage = firstPage.appendNewline();
+            // Add the category to the book.
+            firstPage = firstPage.append(addCategoryToFeedbackBook(categoryFeedback, pages));
+        }
+
+        // Insert the first page of the book at the start.
+        pages.addFirst(firstPage);
+
+        return Book.book(REVIEW_BOOK_TITLE, Component.empty(), pages);
+    }
+
     private static Map<ReviewCategory, ReviewCategoryFeedback> getReviewCategoryFeedback(int reviewId) {
 
         Map<ReviewCategory, ReviewCategoryFeedback> reviewCategoryFeedbackMap = new HashMap<>();
@@ -78,6 +112,31 @@ public final class ReviewFeedback {
                     ReviewSelection.valueOf(Network.getInstance().getPlotSQL().getString("SELECT selection FROM plot_category_feedback WHERE review_id=" + reviewId + " AND category='" + category + "';")),
                     Network.getInstance().getPlotSQL().getInt("SELECT book_id FROM plot_category_feedback WHERE review_id=" + reviewId + " AND category='" + category + "';")
             ));
+        }
+
+        return reviewCategoryFeedbackMap;
+    }
+
+    private static Map<ReviewCategory, ReviewCategoryFeedback> getVerificationCategoryFeedback(int verificationId, boolean old) {
+
+        Map<ReviewCategory, ReviewCategoryFeedback> reviewCategoryFeedbackMap = new HashMap<>();
+
+        // Get the feedback for the review.
+        List<String> verificationCategories = Network.getInstance().getPlotSQL().getStringList("SELECT category FROM plot_verification_category WHERE verification_id=" + verificationId + ";");
+        for (String category : verificationCategories) {
+            if (old) {
+                reviewCategoryFeedbackMap.put(ReviewCategory.valueOf(category), new ReviewCategoryFeedback(
+                        ReviewCategory.valueOf(category),
+                        ReviewSelection.valueOf(Network.getInstance().getPlotSQL().getString("SELECT selection_old FROM plot_verification_category WHERE verification_id=" + verificationId + " AND category='" + category + "';")),
+                        Network.getInstance().getPlotSQL().getInt("SELECT book_id_old FROM plot_verification_category WHERE verification_id=" + verificationId + " AND category='" + category + "';")
+                ));
+            } else {
+                reviewCategoryFeedbackMap.put(ReviewCategory.valueOf(category), new ReviewCategoryFeedback(
+                        ReviewCategory.valueOf(category),
+                        ReviewSelection.valueOf(Network.getInstance().getPlotSQL().getString("SELECT selection_new FROM plot_verification_category WHERE verification_id=" + verificationId + " AND category='" + category + "';")),
+                        Network.getInstance().getPlotSQL().getInt("SELECT book_id_new FROM plot_verification_category WHERE verification_id=" + verificationId + " AND category='" + category + "';")
+                ));
+            }
         }
 
         return reviewCategoryFeedbackMap;
