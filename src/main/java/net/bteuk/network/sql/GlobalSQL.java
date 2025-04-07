@@ -140,6 +140,36 @@ public class GlobalSQL extends AbstractSQL {
 
     }
 
+    public ArrayList<Location> getBuildingCoords(String condition)
+    {
+        try (
+                Connection conn = conn();
+                PreparedStatement statement = conn.prepareStatement(
+                        "SELECT world,x,y,z,yaw,pitch FROM buildings INNER JOIN coordinates ON buildings.coordinate_id = coordinates.id " + condition + ";"
+                );
+                ResultSet results = statement.executeQuery()
+        ) {
+            ArrayList<Location> coords = new ArrayList<Location>();
+
+            while(results.next()) {
+                coords.add(new Location(Bukkit.getWorld(results.getString("world")),
+                        results.getDouble("x"),
+                        results.getDouble("y"),
+                        results.getDouble("z"),
+                        results.getFloat("yaw"),
+                        results.getFloat("pitch")));
+            }
+            return coords;
+
+        } catch (SQLException sql) {
+
+            sql.printStackTrace();
+            return null;
+
+        }
+
+    }
+
     //Get coordinate from database by id.
     //World must be on this server else this will throw a null pointer exception.
     public Location getLocation(int coordinateID) {
