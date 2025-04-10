@@ -22,14 +22,14 @@ public class ConfirmationListener implements Listener {
     @EventHandler
     public void chatEvent(AsyncChatEvent e)
     {
-        e.getHandlers().unregister(this);
-        e.setCancelled(true);
-        if (((net.kyori.adventure.text.TextComponent) e.message()).content().equals("y")) {
-            instancefrom.addBuildingToDataBase(e.getPlayer());
-        }
-        else
-        {
-            e.getPlayer().sendMessage(ChatUtils.error("No building added"));
+        if(e.getPlayer().getUniqueId() == instancefrom.player.getUniqueId()) {
+            e.getHandlers().unregister(this);
+            e.setCancelled(true);
+            if (((net.kyori.adventure.text.TextComponent) e.message()).content().equals("y")) {
+                instancefrom.addBuildingToDataBase(e.getPlayer());
+            } else {
+                e.getPlayer().sendMessage(ChatUtils.error("No building added"));
+            }
         }
     }
 

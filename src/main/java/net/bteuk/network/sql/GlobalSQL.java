@@ -1,5 +1,6 @@
 package net.bteuk.network.sql;
 
+import net.bteuk.network.building_counter.Building;
 import net.bteuk.network.utils.Coordinate;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Bukkit;
@@ -140,24 +141,27 @@ public class GlobalSQL extends AbstractSQL {
 
     }
 
-    public ArrayList<Location> getBuildingCoords(String condition)
+    public ArrayList<Building> getBuildings(String condition)
     {
         try (
                 Connection conn = conn();
                 PreparedStatement statement = conn.prepareStatement(
-                        "SELECT world,x,y,z,yaw,pitch FROM buildings INNER JOIN coordinates ON buildings.coordinate_id = coordinates.id " + condition + ";"
+                        "SELECT * FROM buildings INNER JOIN coordinates ON buildings.coordinate_id = coordinates.id " + condition + ";"
                 );
                 ResultSet results = statement.executeQuery()
         ) {
-            ArrayList<Location> coords = new ArrayList<Location>();
+            ArrayList<Building> coords = new ArrayList<Building>();
 
             while(results.next()) {
-                coords.add(new Location(Bukkit.getWorld(results.getString("world")),
+
+
+                        Location temp = new Location(Bukkit.getWorld(results.getString("world")),
                         results.getDouble("x"),
                         results.getDouble("y"),
                         results.getDouble("z"),
                         results.getFloat("yaw"),
-                        results.getFloat("pitch")));
+                        results.getFloat("pitch"));
+                coords.add(new Building(results.getInt("building_id"),temp,results.getString("player_id"),results.getInt("coordinate_id")));
             }
             return coords;
 
@@ -229,4 +233,30 @@ public class GlobalSQL extends AbstractSQL {
 
         }
     }
+
+    public void deleteBuilding(Building b) {
+        String deleteBuildingSQL = "DELETE FROM buildings WHERE building_id = ?";
+        String deleteCoordinatesSQL = "DELETE FROM coordinates WHERE id = ?";
+
+        try (
+                Connection conn = conn();
+                PreparedStatement deleteBuildingStmt = conn.prepareStatement(deleteBuildingSQL);
+                PreparedStatement deleteCoordinatesStmt = conn.prepareStatement(deleteCoordinatesSQL)
+        ) {
+            conn.setAutoCommit(false); // Start transaction
+
+            deleteBuildingStmt.setInt(1, b.buildingId);
+            deleteBuildingStmt.executeUpdate();
+
+            deleteCoordinatesStmt.setInt(1, b.coordinateId);
+            deleteCoordinatesStmt.executeUpdate();
+
+            conn.commit(); // Commit if both deletions succeed
+
+        } catch (SQLException sql) {
+            sql.printStackTrace();
+        }
+    }
+
+
 }
