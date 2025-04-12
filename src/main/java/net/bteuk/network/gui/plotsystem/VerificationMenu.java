@@ -33,7 +33,7 @@ public class VerificationMenu extends Gui {
     private void createGui() {
 
         ArrayList<Integer> verifications = plotSQL.getIntList("SELECT id FROM plot_verification WHERE review_id IN " +
-                "(SELECT review_id FROM plot_review WHERE reviewer='" + user.getUuid() + "') ORDER BY id ASC;");
+                "(SELECT id FROM plot_review WHERE reviewer='" + user.getUuid() + "') ORDER BY id ASC;");
 
         // Slot count.
         int slot = 10;
