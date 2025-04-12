@@ -8,6 +8,7 @@ public class Point {
 
     /**
      * Get the average point from a list of 2d points.
+     *
      * @param points list of {@link BlockVector2}
      * @return the average point as {@link BlockVector2}
      */
@@ -23,10 +24,10 @@ public class Point {
         }
 
         return (BlockVector2.at(x, z));
-
     }
 
-    /** Get the distance between point 1 and point 2.
+    /**
+     * Get the distance between point 1 and point 2.
      *
      * @param p1 point 1
      * @param p2 point 2

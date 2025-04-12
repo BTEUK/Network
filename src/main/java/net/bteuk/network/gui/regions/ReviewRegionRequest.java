@@ -36,7 +36,6 @@ public class ReviewRegionRequest extends Gui {
         this.staff = staff;
 
         createGui();
-
     }
 
     private void createGui() {
@@ -44,7 +43,8 @@ public class ReviewRegionRequest extends Gui {
         setItem(4, Utils.createItem(Material.BOOK, 1,
                 Utils.title("Region " + request.region),
                 Utils.line("Requested by ")
-                        .append(Component.text(Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" +
+                        .append(Component.text(Network.getInstance().getGlobalSQL().getString("SELECT name FROM " +
+                                "player_data WHERE uuid='" +
                                 request.uuid + "';"), NamedTextColor.GRAY))));
 
         setItem(11, Utils.createItem(Material.LIME_CONCRETE, 1,
@@ -54,18 +54,20 @@ public class ReviewRegionRequest extends Gui {
 
                 {
 
-                    //Create event to accept request.
-                    EventManager.createEvent(u.player.getUniqueId().toString(), "network", Network.getInstance().getGlobalSQL().getString("SELECT name FROM server_data WHERE type='EARTH';"),
+                    // Create event to accept request.
+                    EventManager.createEvent(u.player.getUniqueId().toString(), "network",
+                            Network.getInstance().getGlobalSQL().getString("SELECT name FROM server_data WHERE " +
+                                    "type='EARTH';"),
                             "region request accept " + request.region + " " + request.uuid);
 
-                    //Return to request menu.
+                    // Return to request menu.
                     this.delete();
 
                     if (staff) {
 
                         u.staffGui = null;
 
-                        //Delay opening to make sure request was dealt with.
+                        // Delay opening to make sure request was dealt with.
                         Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
                             u.staffGui = new ReviewRegionRequests(true, u.player.getUniqueId().toString());
                             u.staffGui.open(u);
@@ -74,14 +76,12 @@ public class ReviewRegionRequest extends Gui {
 
                         u.mainGui = null;
 
-                        //Delay opening to make sure request was dealt with.
+                        // Delay opening to make sure request was dealt with.
                         Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
                             u.mainGui = new ReviewRegionRequests(false, u.player.getUniqueId().toString());
                             u.mainGui.open(u);
                         }, 20L);
                     }
-
-
                 });
 
         setItem(15, Utils.createItem(Material.RED_CONCRETE, 1,
@@ -91,18 +91,20 @@ public class ReviewRegionRequest extends Gui {
 
                 {
 
-                    //Create event to deny request.
-                    EventManager.createEvent(u.player.getUniqueId().toString(), "network", Network.getInstance().getGlobalSQL().getString("SELECT name FROM server_data WHERE type='EARTH';"),
+                    // Create event to deny request.
+                    EventManager.createEvent(u.player.getUniqueId().toString(), "network",
+                            Network.getInstance().getGlobalSQL().getString("SELECT name FROM server_data WHERE " +
+                                    "type='EARTH';"),
                             "region request deny " + request.region + " " + request.uuid);
 
-                    //Return to request menu.
+                    // Return to request menu.
                     this.delete();
 
                     if (staff) {
 
                         u.staffGui = null;
 
-                        //Delay opening to make sure request was dealt with.
+                        // Delay opening to make sure request was dealt with.
                         Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
                             u.staffGui = new ReviewRegionRequests(true, u.player.getUniqueId().toString());
                             u.staffGui.open(u);
@@ -111,13 +113,12 @@ public class ReviewRegionRequest extends Gui {
 
                         u.mainGui = null;
 
-                        //Delay opening to make sure request was dealt with.
+                        // Delay opening to make sure request was dealt with.
                         Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
                             u.mainGui = new ReviewRegionRequests(false, u.player.getUniqueId().toString());
                             u.mainGui.open(u);
                         }, 20L);
                     }
-
                 });
 
         setItem(22, Utils.createItem(Material.ENDER_PEARL, 1,
@@ -129,35 +130,35 @@ public class ReviewRegionRequest extends Gui {
 
                     GlobalSQL globalSQL = Network.getInstance().getGlobalSQL();
 
-                    //Get coordinate.
-                    Location l = globalSQL.getLocation(regionSQL.getInt("SELECT coordinate_id FROM region_requests WHERE region='" + request.region + "' AND uuid='" + request.uuid + "';"));
+                    // Get coordinate.
+                    Location l = globalSQL.getLocation(regionSQL.getInt("SELECT coordinate_id FROM region_requests " +
+                            "WHERE region='" + request.region + "' AND uuid='" + request.uuid + "';"));
 
-                    //If the player is on the earth server get the coordinate.
+                    // If the player is on the earth server get the coordinate.
                     if (SERVER_NAME.equals(globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';"))) {
 
-                        //Close inventory.
+                        // Close inventory.
                         u.player.closeInventory();
 
-                        //Set current location for /back
+                        // Set current location for /back
                         Back.setPreviousCoordinate(u.player.getUniqueId().toString(), u.player.getLocation());
 
-                        //Teleport player.
+                        // Teleport player.
                         u.player.teleport(l);
                         u.player.sendMessage(ChatUtils.success("Teleported to region ")
                                 .append(Component.text(request.region, NamedTextColor.DARK_AQUA)));
-
                     } else {
 
-                        //Create teleport event.
-                        EventManager.createTeleportEvent(true, u.player.getUniqueId().toString(), "network", "teleport " +
-                                EARTH_WORLD + " " + l.getX() + " " + l.getZ() + " " +
-                                l.getYaw() + " " + l.getPitch(), u.player.getLocation());
+                        // Create teleport event.
+                        EventManager.createTeleportEvent(true, u.player.getUniqueId().toString(), "network",
+                                "teleport " +
+                                        EARTH_WORLD + " " + l.getX() + " " + l.getZ() + " " +
+                                        l.getYaw() + " " + l.getPitch(), u.player.getLocation());
 
-                        //Switch server.
-                        SwitchServer.switchServer(u.player, globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH'"));
-
+                        // Switch server.
+                        SwitchServer.switchServer(u.player, globalSQL.getString("SELECT name FROM server_data WHERE " +
+                                "type='EARTH'"));
                     }
-
                 });
 
         setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
@@ -167,14 +168,14 @@ public class ReviewRegionRequest extends Gui {
 
                 {
 
-                    //Return to request menu.
+                    // Return to request menu.
                     this.delete();
 
                     if (staff) {
 
                         u.staffGui = null;
 
-                        //Delay opening to make sure request was dealt with.
+                        // Delay opening to make sure request was dealt with.
                         Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
                             u.staffGui = new ReviewRegionRequests(true, u.player.getUniqueId().toString());
                             u.staffGui.open(u);
@@ -183,13 +184,12 @@ public class ReviewRegionRequest extends Gui {
 
                         u.mainGui = null;
 
-                        //Delay opening to make sure request was dealt with.
+                        // Delay opening to make sure request was dealt with.
                         Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
                             u.mainGui = new ReviewRegionRequests(false, u.player.getUniqueId().toString());
                             u.mainGui.open(u);
                         }, 20L);
                     }
-
                 });
     }
 
@@ -197,6 +197,5 @@ public class ReviewRegionRequest extends Gui {
 
         this.clearGui();
         createGui();
-
     }
 }

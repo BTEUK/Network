@@ -21,10 +21,10 @@ public class InviteEvent extends AbstractEvent {
         switch (event[1]) {
             case "plot" -> {
 
-                //Get player.
+                // Get player.
                 Player p = Bukkit.getPlayer(UUID.fromString(uuid));
 
-                //Send the player a message telling them the command to join the plot.
+                // Send the player a message telling them the command to join the plot.
                 if (p != null) {
 
                     GlobalSQL globalSQL = Network.getInstance().getGlobalSQL();
@@ -36,20 +36,21 @@ public class InviteEvent extends AbstractEvent {
                             .append(Component.text(event[2], NamedTextColor.DARK_AQUA))
                             .append(ChatUtils.success(" by "))
                             .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
-                                    plotSQL.getString("SELECT owner FROM plot_invites WHERE id=" + id + ";") + "';"), NamedTextColor.DARK_AQUA)));
+                                            plotSQL.getString("SELECT owner FROM plot_invites WHERE id=" + id + ";") + "';"),
+                                    NamedTextColor.DARK_AQUA)));
 
                     Component message = ChatUtils.success("To join the plot click here!");
-                    message = message.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/plot join " + event[2]));
+                    message = message.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND,
+                            "/plot join " + event[2]));
                     p.sendMessage(message);
-
                 }
             }
             case "zone" -> {
 
-                //Get player.
+                // Get player.
                 Player p = Bukkit.getPlayer(UUID.fromString(uuid));
 
-                //Send the player a message telling them the command to join the plot.
+                // Send the player a message telling them the command to join the plot.
                 if (p != null) {
 
                     GlobalSQL globalSQL = Network.getInstance().getGlobalSQL();
@@ -61,20 +62,21 @@ public class InviteEvent extends AbstractEvent {
                             .append(Component.text(event[2], NamedTextColor.DARK_AQUA))
                             .append(ChatUtils.success(" by "))
                             .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" +
-                                    plotSQL.getString("SELECT owner FROM zone_invites WHERE id=" + id + ";") + "';"), NamedTextColor.DARK_AQUA)));
+                                            plotSQL.getString("SELECT owner FROM zone_invites WHERE id=" + id + ";") + "';"),
+                                    NamedTextColor.DARK_AQUA)));
 
                     Component message = ChatUtils.success("To join the zone click here!");
-                    message = message.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/zone join " + event[2]));
+                    message = message.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND,
+                            "/zone join " + event[2]));
                     p.sendMessage(message);
-
                 }
             }
             case "region" -> {
 
-                //Get player.
+                // Get player.
                 Player p = Bukkit.getPlayer(UUID.fromString(uuid));
 
-                //Send the player a message telling them the command to join the plot.
+                // Send the player a message telling them the command to join the plot.
                 if (p != null) {
 
                     GlobalSQL globalSQL = Network.getInstance().getGlobalSQL();
@@ -84,12 +86,14 @@ public class InviteEvent extends AbstractEvent {
                             .append(Component.text(event[2], NamedTextColor.DARK_AQUA))
                             .append(ChatUtils.success(" by "))
                             .append(Component.text(
-                                    globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + region.getOwner() + "';"), NamedTextColor.DARK_AQUA)));
+                                    globalSQL.getString(
+                                            "SELECT name FROM player_data WHERE uuid='" + region.getOwner() + "';"),
+                                    NamedTextColor.DARK_AQUA)));
 
                     Component message = ChatUtils.success("To join the region click here!");
-                    message = message.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/region join " + event[2]));
+                    message = message.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND,
+                            "/region join " + event[2]));
                     p.sendMessage(message);
-
                 }
             }
         }

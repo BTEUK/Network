@@ -39,7 +39,8 @@ public class WorldguardManager {
         RegionManager regionManager = container.get(BukkitAdapter.adapt(world));
 
         if (regionManager == null) {
-            throw new RegionManagerNotFoundException(String.format("No region manager found for World %s", world.getName()));
+            throw new RegionManagerNotFoundException(String.format("No region manager found for World %s",
+                    world.getName()));
         }
         return regionManager;
     }

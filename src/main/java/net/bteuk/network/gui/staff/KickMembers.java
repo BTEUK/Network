@@ -15,11 +15,9 @@ import java.util.ArrayList;
 
 public class KickMembers extends Gui {
 
-    private int page;
-
     private final Region region;
-
     private final GlobalSQL globalSQL;
+    private int page;
 
     public KickMembers(Region region) {
 
@@ -32,21 +30,20 @@ public class KickMembers extends Gui {
         globalSQL = Network.getInstance().getGlobalSQL();
 
         createGui();
-
     }
 
     private void createGui() {
 
-        //Get all members of the region.
+        // Get all members of the region.
         ArrayList<String> region_members = region.getMembers();
 
-        //Slot count.
+        // Slot count.
         int slot = 10;
 
-        //Skip count.
+        // Skip count.
         int skip = 21 * (page - 1);
 
-        //If page is greater than 1 add a previous page button.
+        // If page is greater than 1 add a previous page button.
         if (page > 1) {
             setItem(18, Utils.createItem(Material.ARROW, 1,
                             Utils.title("Previous Page"),
@@ -55,18 +52,17 @@ public class KickMembers extends Gui {
 
                     {
 
-                        //Update the gui.
+                        // Update the gui.
                         page--;
                         this.refresh();
                         u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
-
                     });
         }
 
-        //Iterate through all online players.
+        // Iterate through all online players.
         for (String uuid : region_members) {
 
-            //If the slot is greater than the number that fit in a page, create a new page.
+            // If the slot is greater than the number that fit in a page, create a new page.
             if (slot > 34) {
 
                 setItem(26, Utils.createItem(Material.ARROW, 1,
@@ -76,55 +72,55 @@ public class KickMembers extends Gui {
 
                         {
 
-                            //Update the gui.
+                            // Update the gui.
                             page++;
                             this.refresh();
-                            u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
-
+                            u.player.getOpenInventory().getTopInventory()
+                                    .setContents(this.getInventory().getContents());
                         });
 
-                //Stop iterating.
+                // Stop iterating.
                 break;
-
             }
 
-            //If skip is greater than 0, skip this iteration.
+            // If skip is greater than 0, skip this iteration.
             if (skip > 0) {
                 skip--;
                 continue;
             }
 
-            //Add player to gui.
+            // Add player to gui.
             setItem(slot, Utils.createPlayerSkull(uuid, 1,
-                            Utils.title("Kick " + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " from the region.")),
+                            Utils.title("Kick " + globalSQL.getString(
+                                    "SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " from the region.")),
                     u ->
 
                     {
-                        //Remove them from the region.
-                        region.leaveRegion(uuid, ChatUtils.error("You have been kicked from region %s", region.getTag(uuid)));
+                        // Remove them from the region.
+                        region.leaveRegion(uuid, ChatUtils.error("You have been kicked from region %s",
+                                region.getTag(uuid)));
 
-                        //Send message to user.
+                        // Send message to user.
                         u.player.sendMessage(ChatUtils.success("Kicked ")
-                                .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid ='" + uuid + "';"), NamedTextColor.DARK_AQUA))
+                                .append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid " +
+                                        "='" + uuid + "';"), NamedTextColor.DARK_AQUA))
                                 .append(ChatUtils.success(" from the region")));
 
-                        //Refresh the gui.
+                        // Refresh the gui.
                         this.refresh();
-
                     });
 
-
-            //Increase slot accordingly.
+            // Increase slot accordingly.
             if (slot % 9 == 7) {
-                //Increase row, basically add 3.
+                // Increase row, basically add 3.
                 slot += 3;
             } else {
-                //Increase value by 1.
+                // Increase value by 1.
                 slot++;
             }
         }
 
-        //Return to plot info menu.
+        // Return to plot info menu.
         setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
                         Utils.title("Return"),
                         Utils.line("Return to manage region ")
@@ -133,14 +129,13 @@ public class KickMembers extends Gui {
 
                 {
 
-                    //Delete this gui.
+                    // Delete this gui.
                     this.delete();
                     u.staffGui = null;
 
-                    //Switch back to plot info.
+                    // Switch back to plot info.
                     u.staffGui = new ManageRegion(u, region);
                     u.staffGui.open(u);
-
                 });
     }
 
@@ -148,6 +143,5 @@ public class KickMembers extends Gui {
 
         this.clearGui();
         createGui();
-
     }
 }

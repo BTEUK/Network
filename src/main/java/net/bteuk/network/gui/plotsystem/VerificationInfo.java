@@ -36,7 +36,6 @@ public class VerificationInfo extends Gui {
         globalSQL = Network.getInstance().getGlobalSQL();
 
         createGui();
-
     }
 
     public void createGui() {
@@ -52,14 +51,25 @@ public class VerificationInfo extends Gui {
                 }
         );
 
-        String verifier = globalSQL.getString("SELECT name FROM player_data WHERE uuid='(SELECT verifier FROM plot_verification WHERE id=" + verificationId + ")';");
+        String verifierUuid =
+                plotSQL.getString("SELECT verifier FROM plot_verification WHERE id=" + verificationId + ";");
+        String verifier = globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + verifierUuid + "';");
 
-        int plotId = plotSQL.getInt("SELECT plot_id WHERE id=(SELECT review_id FROM plot_verification WHERE id=" + verificationId + ");");
-        boolean feedbackChanged = plotSQL.hasRow("SELECT 1 FROM plot_verification_category WHERE verification_id=" + verificationId + " AND book_id_old <> book_id_new;");
-        boolean selectionChanged = plotSQL.hasRow("SELECT 1 FROM plot_verification_category WHERE verification_id=" + verificationId + " AND selection_old <> selection_old;");
+        int plotId = plotSQL.getInt("SELECT plot_id FROM plot_review WHERE id=(SELECT review_id FROM " +
+                "plot_verification WHERE id=" + verificationId + ");");
+        boolean feedbackChanged =
+                plotSQL.hasRow("SELECT 1 FROM plot_verification_category WHERE verification_id=" + verificationId +
+                        " AND book_id_old <> book_id_new;");
+        boolean selectionChanged =
+                plotSQL.hasRow("SELECT 1 FROM plot_verification_category WHERE verification_id=" + verificationId +
+                        " AND selection_old <> selection_old;");
 
-        String outcomeOld = plotSQL.getBoolean("SELECT accepted_old FROM plot_verification WHERE id=" + verificationId + ";") ? "Accepted" : "Denied";
-        String outcomeNew = plotSQL.getBoolean("SELECT accepted_new FROM plot_verification WHERE id=" + verificationId + ";") ? "Accepted" : "Denied";
+        String outcomeOld =
+                plotSQL.getBoolean("SELECT accepted_old FROM plot_verification WHERE id=" + verificationId + ";") ?
+                        "Accepted" : "Denied";
+        String outcomeNew =
+                plotSQL.getBoolean("SELECT accepted_new FROM plot_verification WHERE id=" + verificationId + ";") ?
+                        "Accepted" : "Denied";
 
         Component[] description;
         if (!outcomeOld.equals(outcomeNew)) {
@@ -75,7 +85,7 @@ public class VerificationInfo extends Gui {
                     Utils.line("Plot " + plotId),
                     Utils.line("Verified by " + verifier),
                     Utils.line("The selection of at least one"),
-                    Utils.line("category was altered check"),
+                    Utils.line("category was altered, check"),
                     Utils.line("the books to see the changes.")
             };
         } else if (feedbackChanged) {
@@ -83,7 +93,7 @@ public class VerificationInfo extends Gui {
                     Utils.line("Plot " + plotId),
                     Utils.line("Verified by " + verifier),
                     Utils.line("The feedback of at least one"),
-                    Utils.line("category was altered check"),
+                    Utils.line("category was altered, check"),
                     Utils.line("the books to see the changes.")
             };
         } else {
@@ -99,7 +109,7 @@ public class VerificationInfo extends Gui {
                 description));
 
         // If the selection or feedback was changed show the before and after books.
-        setItem(22, Utils.createItem(Material.WRITABLE_BOOK, 1,
+        setItem(20, Utils.createItem(Material.WRITABLE_BOOK, 1,
                         Utils.title("Initial Feedback"),
                         Utils.line("Click to show initial feedback"),
                         Utils.line("for categories that were"),
@@ -110,37 +120,39 @@ public class VerificationInfo extends Gui {
                 });
 
         // If the selection or feedback was changed show the before and after books.
-        setItem(26, Utils.createItem(Material.WRITABLE_BOOK, 1,
+        setItem(24, Utils.createItem(Material.WRITABLE_BOOK, 1,
                         Utils.title("Altered Feedback"),
                         Utils.line("Click to show altered feedback"),
                         Utils.line("for categories that were"),
                         Utils.line("altered by the verifier.")),
                 u -> {
                     // Open the feedback book.
-                    u.player.openBook(ReviewFeedback.createVerificationFeedbackBook(verificationId, true));
+                    u.player.openBook(ReviewFeedback.createVerificationFeedbackBook(verificationId, false));
                 });
 
         // Teleport to the plot.
-        setItem(24, Utils.createItem(Material.ENDER_PEARL, 1,
+        setItem(22, Utils.createItem(Material.ENDER_PEARL, 1,
                         Utils.title("Teleport to Plot"),
                         Utils.line("Click to teleport to this plot.")),
                 u -> {
                     u.player.closeInventory();
 
-                    //Get the server of the plot.
+                    // Get the server of the plot.
                     String server = plotSQL.getString("SELECT server FROM location_data WHERE name='"
                             + plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotId + ";")
                             + "';");
 
-                    //If the plot is on the current server teleport them directly.
-                    //Else teleport them to the correct server and them teleport them to the plot.
+                    // If the plot is on the current server teleport them directly.
+                    // Else teleport them to the correct server and them teleport them to the plot.
                     if (server.equals(SERVER_NAME)) {
-                        EventManager.createTeleportEvent(false, u.player.getUniqueId().toString(), "plotsystem", "teleport plot " + plotId, u.player.getLocation());
+                        EventManager.createTeleportEvent(false, u.player.getUniqueId().toString(), "plotsystem",
+                                "teleport plot " + plotId, u.player.getLocation());
                     } else {
-                        //Set the server join event.
-                        EventManager.createTeleportEvent(true, u.player.getUniqueId().toString(), "plotsystem", "teleport plot " + plotId, u.player.getLocation());
+                        // Set the server join event.
+                        EventManager.createTeleportEvent(true, u.player.getUniqueId().toString(), "plotsystem",
+                                "teleport plot " + plotId, u.player.getLocation());
 
-                        //Teleport them to another server.
+                        // Teleport them to another server.
                         SwitchServer.switchServer(u.player, server);
                     }
                 });

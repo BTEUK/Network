@@ -14,7 +14,7 @@ public class TakeBookEvent implements Listener {
 
     @EventHandler
     public void playerTakeLecternBook(PlayerTakeLecternBookEvent e) {
-        //Always cancel, as there shouldn't be any other lecterns in the lobby.
+        // Always cancel, as there shouldn't be any other lecterns in the lobby.
         e.setCancelled(true);
     }
 }

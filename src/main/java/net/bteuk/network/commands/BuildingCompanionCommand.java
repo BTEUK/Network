@@ -17,10 +17,24 @@ public class BuildingCompanionCommand extends AbstractCommand {
 
     private static final Component ERROR = ChatUtils.error("/buildingcompanion <clear>");
 
+    public static void toggleCompanion(NetworkUser user) {
+        // Toggle the building companion.
+        BuildingCompanion companion = user.getCompanion();
+        if (companion == null) {
+            user.setCompanion(new BuildingCompanion(user));
+            user.player.sendMessage(ChatUtils.success("Building Companion enabled"));
+        } else {
+            // Disable the building companion.
+            companion.disable();
+            user.setCompanion(null);
+            user.player.sendMessage(ChatUtils.success("Building Companion disabled"));
+        }
+    }
+
     @Override
     public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        //Check if the sender is a player.
+        // Check if the sender is a player.
         Player player = getPlayer(stack);
         if (player == null) {
             return;
@@ -32,7 +46,7 @@ public class BuildingCompanionCommand extends AbstractCommand {
 
         NetworkUser user = Network.getInstance().getUser(player);
 
-        //If u is null, cancel.
+        // If u is null, cancel.
         if (user == null) {
             LOGGER.severe("User " + player.getName() + " can not be found!");
             player.sendMessage(ChatUtils.error("User can not be found, please relog!"));
@@ -51,20 +65,6 @@ public class BuildingCompanionCommand extends AbstractCommand {
                 case "walls" -> createWalls(user, args);
                 default -> user.player.sendMessage(ERROR);
             }
-        }
-    }
-
-    public static void toggleCompanion(NetworkUser user) {
-        // Toggle the building companion.
-        BuildingCompanion companion = user.getCompanion();
-        if (companion == null) {
-            user.setCompanion(new BuildingCompanion(user));
-            user.player.sendMessage(ChatUtils.success("Building Companion enabled"));
-        } else {
-            // Disable the building companion.
-            companion.disable();
-            user.setCompanion(null);
-            user.player.sendMessage(ChatUtils.success("Building Companion disabled"));
         }
     }
 

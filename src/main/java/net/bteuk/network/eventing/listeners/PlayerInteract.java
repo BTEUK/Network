@@ -25,7 +25,6 @@ public class PlayerInteract implements Listener {
 
         this.instance = instance;
         Bukkit.getServer().getPluginManager().registerEvents(this, instance);
-
     }
 
     @EventHandler
@@ -33,7 +32,7 @@ public class PlayerInteract implements Listener {
 
         NetworkUser u = instance.getUser(e.getPlayer());
 
-        //If u is null, cancel.
+        // If u is null, cancel.
         if (u == null) {
             LOGGER.severe("User " + e.getPlayer().getName() + " can not be found!");
             e.getPlayer().sendMessage(ChatUtils.error("User can not be found, please relog!"));
@@ -43,13 +42,13 @@ public class PlayerInteract implements Listener {
         if (e.getItem() != null) {
             if (e.getItem().equals(instance.navigator)) {
                 e.setCancelled(true);
-                //Open navigator.
+                // Open navigator.
                 Navigator.openNavigator(u);
             }
         }
     }
 
-    //If the player clicks on the navigator in their inventory, open the gui.
+    // If the player clicks on the navigator in their inventory, open the gui.
     @EventHandler
     public void onClick(InventoryClickEvent e) {
 
@@ -59,18 +58,18 @@ public class PlayerInteract implements Listener {
 
         NetworkUser u = instance.getUser((Player) e.getWhoClicked());
 
-        //If u is null, cancel.
+        // If u is null, cancel.
         if (u == null) {
             LOGGER.severe("User " + e.getWhoClicked().getName() + " can not be found!");
             e.getWhoClicked().sendMessage(ChatUtils.error("User can not be found, please relog!"));
             return;
         }
 
-        //If item is navigator then open it.
+        // If item is navigator then open it.
         if (e.getCurrentItem().equals(instance.navigator)) {
             e.setCancelled(true);
 
-            //If item is not in slot 8, delete it.
+            // If item is not in slot 8, delete it.
             if (e.getSlot() != 8) {
                 u.player.getInventory().clear(e.getSlot());
                 return;
@@ -107,7 +106,6 @@ public class PlayerInteract implements Listener {
         if (e.getItemDrop().getItemStack().equals(instance.navigator)) {
             e.setCancelled(true);
         }
-
     }
 
     @EventHandler
@@ -115,7 +113,6 @@ public class PlayerInteract implements Listener {
         if (e.getItem().equals(instance.navigator)) {
             e.setCancelled(true);
         }
-
     }
 
     @EventHandler

@@ -19,7 +19,7 @@ public class Kick extends AbstractCommand {
     @Override
     public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        //Check if sender is player, then check permissions
+        // Check if sender is player, then check permissions
         CommandSender sender = stack.getSender();
         if (sender instanceof Player) {
             if (!hasPermission(sender, "uknet.kick")) {
@@ -27,31 +27,36 @@ public class Kick extends AbstractCommand {
             }
         }
 
-        //Check args.
+        // Check args.
         if (args.length < 2) {
             sender.sendMessage(ChatUtils.error("/kick <player> <reason>"));
             return;
         }
 
-        //Check player.
-        //If uuid exists for name.
-        if (!Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM player_data WHERE name='" + args[0] + "';")) {
+        // Check player.
+        // If uuid exists for name.
+        if (!Network.getInstance().getGlobalSQL()
+                .hasRow("SELECT uuid FROM player_data WHERE name='" + args[0] + "';")) {
             sender.sendMessage(Component.text(args[0], NamedTextColor.DARK_RED)
                     .append(ChatUtils.error(" is not a valid player.")));
             return;
         }
 
-        String uuid = Network.getInstance().getGlobalSQL().getString("SELECT uuid FROM player_data WHERE name='" + args[0] + "';");
-        String name = Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE name='" + args[0] + "';");
+        String uuid =
+                Network.getInstance().getGlobalSQL()
+                        .getString("SELECT uuid FROM player_data WHERE name='" + args[0] + "';");
+        String name =
+                Network.getInstance().getGlobalSQL()
+                        .getString("SELECT name FROM player_data WHERE name='" + args[0] + "';");
 
-        //Check if player is online.
+        // Check if player is online.
         if (!Network.getInstance().isOnlineOnNetwork(uuid)) {
             sender.sendMessage(Component.text(name, NamedTextColor.DARK_RED)
                     .append(ChatUtils.error(" is not online.")));
             return;
         }
 
-        //Combine all remaining args to create a reason.
+        // Combine all remaining args to create a reason.
         String reason = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
 
         sender.sendMessage(kickPlayer(name, uuid, reason));
@@ -65,6 +70,5 @@ public class Kick extends AbstractCommand {
                 .append(Component.text(name, NamedTextColor.DARK_AQUA))
                 .append(ChatUtils.success(" for reason: "))
                 .append(Component.text(reason, NamedTextColor.DARK_AQUA)));
-
     }
 }

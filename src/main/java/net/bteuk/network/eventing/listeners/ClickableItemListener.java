@@ -34,11 +34,6 @@ public class ClickableItemListener implements Listener {
         this.item = item;
         this.clickAction = action;
         Bukkit.getServer().getPluginManager().registerEvents(this, instance);
-
-    }
-
-    public interface ClickItemAction {
-        void click(NetworkUser u);
     }
 
     public void unregister() {
@@ -63,7 +58,7 @@ public class ClickableItemListener implements Listener {
 
         if (item.isSimilar(clickedItem)) {
             cancellableEvent.setCancelled(true);
-            //Run click action if user not null.
+            // Run click action if user not null.
             if (user != null) {
                 clickAction.click(user);
             }
@@ -110,5 +105,9 @@ public class ClickableItemListener implements Listener {
         if (!e.isCancelled()) {
             clickActionIfCorrectItem(e, (Player) e.getWhoClicked(), e.getCursor());
         }
+    }
+
+    public interface ClickItemAction {
+        void click(NetworkUser u);
     }
 }

@@ -18,20 +18,17 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-
-public class FeatureGeometryEditorListener extends Gui implements Listener
-{
-    private Network plugin;
-    private FeaturePageGUI featurePageGUI;
-    private NetworkUser user;
-    private ItemStack blazeRod;
+public class FeatureGeometryEditorListener extends Gui implements Listener {
+    private final Network plugin;
+    private final FeaturePageGUI featurePageGUI;
+    private final NetworkUser user;
+    private final ItemStack blazeRod;
+    // Used for controlling editions to the geometry of the feature, also has access to the feature itself
+    private final GeometryEditor geometryEditor;
     private int iTaskID;
 
-    //Used for controlling editions to the geometry of the feature, also has access to the feature itself
-    private GeometryEditor geometryEditor;
-
-    public FeatureGeometryEditorListener(Network plugin, FeaturePageGUI featurePageGUI, GeometryEditor geometryEditor, NetworkUser user, ItemStack blazeRod)
-    {
+    public FeatureGeometryEditorListener(Network plugin, FeaturePageGUI featurePageGUI, GeometryEditor geometryEditor
+            , NetworkUser user, ItemStack blazeRod) {
         super(geometryEditor.getGUI());
         this.plugin = plugin;
         this.featurePageGUI = featurePageGUI;
@@ -40,8 +37,7 @@ public class FeatureGeometryEditorListener extends Gui implements Listener
         this.blazeRod = blazeRod;
     }
 
-    private void setActions()
-    {
+    private void setActions() {
         setAction(2, u ->
         {
             selectionCancel();
@@ -53,12 +49,11 @@ public class FeatureGeometryEditorListener extends Gui implements Listener
         });
     }
 
-    public void register()
-    {
-        //Registers the selection listener
+    public void register() {
+        // Registers the selection listener
         Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
 
-        //Sets up the outline view entity spawn schedule
+        // Sets up the outline view entity spawn schedule
         this.iTaskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () ->
         {
             geometryEditor.updateView();
@@ -66,8 +61,7 @@ public class FeatureGeometryEditorListener extends Gui implements Listener
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void BlockHitWithBlazeRodEvent(PlayerInteractEvent e)
-    {
+    public void BlockHitWithBlazeRodEvent(PlayerInteractEvent e) {
         if (!e.hasBlock())
             return;
         if (!e.getPlayer().getUniqueId().equals(this.user.player.getUniqueId()))
@@ -77,77 +71,71 @@ public class FeatureGeometryEditorListener extends Gui implements Listener
 
         e.setCancelled(true);
 
-        //Stores the clicked block in a local variable
+        // Stores the clicked block in a local variable
         Block clickedBlock = e.getClickedBlock();
 
-        //Now we can determine the plugin action
-        if (e.getAction().isLeftClick())
-        {
+        // Now we can determine the plugin action
+        if (e.getAction().isLeftClick()) {
             geometryEditor.leftClick(clickedBlock.getX(), clickedBlock.getZ());
             user.player.sendMessage(Component.text("Area restarted", NamedTextColor.AQUA));
-        }
-        else if (e.getAction().isRightClick())
-        {
+        } else if (e.getAction().isRightClick()) {
             geometryEditor.rightClick(clickedBlock.getX(), clickedBlock.getZ());
             user.player.sendMessage(Component.text("Corner added to shape", NamedTextColor.AQUA));
         }
     }
 
-    public void selectionConfirm()
-    {
-        //Saves the Feature's geometry
+    public void selectionConfirm() {
+        // Saves the Feature's geometry
         geometryEditor.confirmGeometry();
 
-        //Deletes this gui
+        // Deletes this gui
         this.delete();
 
-        //Reopen the feature menu
-        featurePageGUI.refresh(); //Refresh will redo the GUI item texts
+        // Reopen the feature menu
+        featurePageGUI.refresh(); // Refresh will redo the GUI item texts
         user.mainGui = featurePageGUI;
         user.mainGui.open(user);
 
-        //Unregisters the selection listener and cancels the outline view
+        // Unregisters the selection listener and cancels the outline view
         unregister();
     }
 
-    public void selectionCancel()
-    {
-        //Deletes this gui
+    public void selectionCancel() {
+        // Deletes this gui
         this.delete();
 
-        //Reset the mc blocks of the area selection to be that of the current area on the progress map (or more accurately as saved locally in the feature object)
+        // Reset the mc blocks of the area selection to be that of the current area on the progress map (or more
+        // accurately as saved locally in the feature object)
         geometryEditor.convertFeatureGeometryIntoBlockCoordinates();
 
-        //Reopen the feature menu
-        featurePageGUI.refresh(); //Refresh will redo the GUI item texts
+        // Reopen the feature menu
+        featurePageGUI.refresh(); // Refresh will redo the GUI item texts
         user.mainGui = featurePageGUI;
         user.mainGui.open(user);
 
-        //Unregisters the selection listener and cancels the outline view
+        // Unregisters the selection listener and cancels the outline view
         unregister();
     }
 
-    private void unregister()
-    {
-        //Unregisters the selection listener
+    private void unregister() {
+        // Unregisters the selection listener
         HandlerList.unregisterAll(this);
 
-        //Cancels the outline view
+        // Cancels the outline view
         Bukkit.getScheduler().cancelTask(iTaskID);
 
-        //Removes the blaze rod
+        // Removes the blaze rod
         blazeRod.setAmount(0);
     }
 
     @Override
-    public void refresh()
-    {
-        //Refresh icons
+    public void refresh() {
+        // Refresh icons
         this.clearGui();
         Inventory inventory = geometryEditor.getGUI();
         this.getInventory().setContents(inventory.getContents());
 
-        //Refresh actions
+        // Refresh actions
         setActions();
     }
 }

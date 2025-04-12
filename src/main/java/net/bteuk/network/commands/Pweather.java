@@ -15,19 +15,20 @@ public class Pweather extends AbstractCommand {
     private static final Component HELP_MESSAGE = Utils.error("/pweather <clear|downfall>");
 
     public Pweather() {
-        setTabCompleter(new FixedArgSelector(Arrays.stream(WeatherType.values()).map(value -> value.toString().toLowerCase()).toList(), 0));
+        setTabCompleter(new FixedArgSelector(
+                Arrays.stream(WeatherType.values()).map(value -> value.toString().toLowerCase()).toList(), 0));
     }
 
     @Override
     public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        //Check if the sender is a player.
+        // Check if the sender is a player.
         Player player = getPlayer(stack);
         if (player == null) {
             return;
         }
 
-        //Permission check.
+        // Permission check.
         if (!hasPermission(player, "uknet.pweather")) {
             return;
         }

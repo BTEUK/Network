@@ -18,7 +18,8 @@ public class Ptime extends AbstractCommand {
 
     private static final Component RESET_PLAYER_TIME = ChatUtils.success("Reset player time, using server time.");
     private static final Component SET_PLAYER_TIME = ChatUtils.success("Set player time to ");
-    private static final Component INVALID_FORMAT = ChatUtils.error("Invalid time format, try using HH:mm or Minecraft ticks.");
+    private static final Component INVALID_FORMAT = ChatUtils.error("Invalid time format, try using HH:mm or " +
+            "Minecraft ticks.");
 
     public Ptime() {
         setTabCompleter(new FixedArgSelector(Arrays.stream(TimesOfDay.values()).map(t -> t.label).toList(), 0));
@@ -27,18 +28,18 @@ public class Ptime extends AbstractCommand {
     @Override
     public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        //Check if the sender is a player.
+        // Check if the sender is a player.
         Player player = getPlayer(stack);
         if (player == null) {
             return;
         }
 
-        //Permission check.
+        // Permission check.
         if (!hasPermission(player, "uknet.ptime")) {
             return;
         }
 
-        //No args implies setting the player time to the default (server time).
+        // No args implies setting the player time to the default (server time).
         if (args.length == 0) {
             player.resetPlayerTime();
             player.sendMessage(RESET_PLAYER_TIME);
@@ -47,20 +48,21 @@ public class Ptime extends AbstractCommand {
 
         int ticks;
 
-        //Check arguments.
-        //There are multiple accepted formats.
-        //First check for written times, supported times are "sunrise", "day", "morning", "noon", "afternoon", "sunset", "night", "midnight".
+        // Check arguments.
+        // There are multiple accepted formats.
+        // First check for written times, supported times are "sunrise", "day", "morning", "noon", "afternoon",
+        // "sunset", "night", "midnight".
         try {
             if (Arrays.stream(TimesOfDay.values()).map(t -> t.label).anyMatch(t -> args[0].equalsIgnoreCase(t))) {
 
                 ticks = TimesOfDay.valueOf(args[0].toUpperCase()).ticks;
 
-                //Check if the argument contains AM or PM get the number before that and convert it to Minecraft time.
+                // Check if the argument contains AM or PM get the number before that and convert it to Minecraft time.
             } else if (args[0].toLowerCase().contains("pm")) {
 
                 String[] firstArg = args[0].toLowerCase().split("pm");
 
-                //Try parsing the first arg as a number.
+                // Try parsing the first arg as a number.
                 int time = Integer.parseInt(firstArg[0]);
 
                 if (time > 0 && time <= 12) {
@@ -72,7 +74,7 @@ public class Ptime extends AbstractCommand {
 
                 String[] firstArg = args[0].toLowerCase().split("am");
 
-                //Try parsing the first arg as a number.
+                // Try parsing the first arg as a number.
                 int time = Integer.parseInt(firstArg[0]);
 
                 if (time > 0 && time <= 12) {
@@ -80,7 +82,7 @@ public class Ptime extends AbstractCommand {
                 } else {
                     throw new InvalidFormatException("Invalid time format");
                 }
-                //If the argument contains : use a 24-hour clock and include minutes.
+                // If the argument contains : use a 24-hour clock and include minutes.
             } else if (args[0].contains(":")) {
 
                 String[] firstArg = args[0].split(":");
@@ -93,9 +95,8 @@ public class Ptime extends AbstractCommand {
                 }
 
                 ticks = convertHourToTicks(hours) + convertMinutesToTicks(minutes);
-
             } else {
-                //If the arguments is between 3-5 numbers then use Minecraft time directly.
+                // If the arguments is between 3-5 numbers then use Minecraft time directly.
                 int minecraftTicks = Integer.parseInt(args[0]);
 
                 if (minecraftTicks > 0) {
@@ -109,9 +110,10 @@ public class Ptime extends AbstractCommand {
             return;
         }
 
-        //Set time and send feedback.
+        // Set time and send feedback.
         player.setPlayerTime(ticks, false);
-        player.sendMessage(SET_PLAYER_TIME.append(Component.text(args[0] + " (" + ticks + ")", NamedTextColor.DARK_AQUA)));
+        player.sendMessage(SET_PLAYER_TIME.append(Component.text(args[0] + " (" + ticks + ")",
+                NamedTextColor.DARK_AQUA)));
     }
 
     private int convertHourToTicks(int hour) {

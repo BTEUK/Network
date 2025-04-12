@@ -26,12 +26,13 @@ public class PlotMenu extends Gui {
         plotSQL = Network.getInstance().getPlotSQL();
 
         createGui();
-
     }
 
     private void createGui() {
 
-        ArrayList<Integer> plots = plotSQL.getIntList("SELECT id FROM plot_members WHERE uuid='" + user.player.getUniqueId() + "' ORDER BY last_enter DESC;");
+        ArrayList<Integer> plots =
+                plotSQL.getIntList("SELECT id FROM plot_members WHERE uuid='" + user.player.getUniqueId() + "' ORDER " +
+                        "BY last_enter DESC;");
 
         // Slot count.
         int slot = 10;
@@ -44,7 +45,11 @@ public class PlotMenu extends Gui {
             // Change the colour of the material for plot owners/members.
             // Lime for owners, yellow for members.
             setItem(slot, Utils.createItem(
-                            (plotSQL.hasRow("SELECT uuid FROM plot_members WHERE uuid='" + user.player.getUniqueId() + "' AND id=" + plots.get(i) + " AND is_owner=1;") ? Material.LIME_CONCRETE : Material.YELLOW_CONCRETE),
+                            (plotSQL.hasRow(
+                                    "SELECT uuid FROM plot_members WHERE uuid='" + user.player.getUniqueId() + "' AND" +
+                                            " id=" + plots.get(
+                                            i) + " AND is_owner=1;") ? Material.LIME_CONCRETE :
+                                    Material.YELLOW_CONCRETE),
                             1,
                             Utils.title("Plot " + plots.get(i)),
                             Utils.line("Click to open the menu of this plot.")),
@@ -66,11 +71,11 @@ public class PlotMenu extends Gui {
                 // Increase value by 1.
                 slot++;
             }
-
         }
 
         // Verified review menu.
-        if (plotSQL.hasRow("SELECT 1 FROM plot_verification WHERE review_id IN (SELECT review_id FROM plot_review WHERE reviewer='" + user.getUuid() + "');")) {
+        if (plotSQL.hasRow("SELECT 1 FROM plot_verification WHERE review_id IN (SELECT review_id FROM plot_review " +
+                "WHERE reviewer='" + user.getUuid() + "');")) {
             setItem(4, Utils.createItem(Material.LECTERN, 1,
                             Utils.title("Verified Reviews"),
                             Utils.line("Click to view all verifications"),
@@ -118,6 +123,5 @@ public class PlotMenu extends Gui {
 
         this.clearGui();
         createGui();
-
     }
 }

@@ -9,5 +9,4 @@ import java.util.Collection;
 public interface TabCompleter {
 
     @NotNull Collection<String> onTabComplete(@NotNull CommandSender sender, @NotNull String[] args);
-
 }

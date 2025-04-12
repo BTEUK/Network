@@ -33,7 +33,7 @@ public class Plot extends AbstractCommand {
     @Override
     public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        //Check if the sender is a player.
+        // Check if the sender is a player.
         Player player = getPlayer(stack);
         if (player == null) {
             return;
@@ -46,7 +46,7 @@ public class Plot extends AbstractCommand {
 
         int plotID = -1;
         if (args.length > 1) {
-            //Check if the plotID is an actual number.
+            // Check if the plotID is an actual number.
             try {
                 plotID = Integer.parseInt(args[1]);
             } catch (NumberFormatException e) {
@@ -63,8 +63,6 @@ public class Plot extends AbstractCommand {
             default -> error(player);
         }
     }
-
-
 
     private void menu(Player p) {
         // Get the user.
@@ -88,7 +86,8 @@ public class Plot extends AbstractCommand {
             return;
         }
         // Check if the plot exists and is not deleted.
-        PlotStatus status = PlotStatus.fromDatabaseValue(plotSQL.getString("SELECT status FROM plot_data WHERE id=" + plot + ";"));
+        PlotStatus status =
+                PlotStatus.fromDatabaseValue(plotSQL.getString("SELECT status FROM plot_data WHERE id=" + plot + ";"));
         if (status == null || status == PlotStatus.DELETED) {
             p.sendMessage(ChatUtils.error("This plot does not exist."));
             return;
@@ -114,14 +113,16 @@ public class Plot extends AbstractCommand {
             return;
         }
 
-        //Check if they have an invite for this plot.
+        // Check if they have an invite for this plot.
         if (plotSQL.hasRow("SELECT id FROM plot_invites WHERE id=" + plot + " AND uuid='" + p.getUniqueId() + "';")) {
 
-            //Add server event to join plot.
-            EventManager.createEvent(p.getUniqueId().toString(), "plotsystem", plotSQL.getString("SELECT server FROM location_data WHERE name='" +
-                    plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plot + ";") + "';"), "join plot " + plot);
+            // Add server event to join plot.
+            EventManager.createEvent(p.getUniqueId().toString(), "plotsystem", plotSQL.getString("SELECT server FROM " +
+                            "location_data WHERE name='" +
+                            plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plot + ";") + "';"),
+                    "join plot " + plot);
 
-            //Remove invite.
+            // Remove invite.
             plotSQL.update("DELETE FROM plot_invites WHERE id=" + plot + " AND uuid='" + p.getUniqueId() + "';");
         } else {
             p.sendMessage(ChatUtils.error("You have not been invited to join this plot."));
@@ -136,14 +137,16 @@ public class Plot extends AbstractCommand {
         // Check if the player is the owner of a member of the plot.
         // Then open the latest feedback.
         // And set their Main gui to the plot info of this plot.
-        if (!plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plot + " AND uuid='" + player.getUniqueId() + "';")) {
+        if (!plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plot + " AND uuid='" + player.getUniqueId() +
+                "';")) {
             player.sendMessage(ChatUtils.error("You are no longer the owner or a member of this plot."));
             return;
         }
 
         // Find the latest attempt.
         String uuid = plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plot + " AND is_owner=1;");
-        int latestAttempt = plotSQL.getInt("SELECT MAX(attempt) FROM plot_review WHERE plot_id=" + plot + " AND uuid='" + uuid + "' AND accepted=0 AND completed=1;");
+        int latestAttempt = plotSQL.getInt("SELECT MAX(attempt) FROM plot_review WHERE plot_id=" + plot + " AND " +
+                "uuid='" + uuid + "' AND accepted=0 AND completed=1;");
 
         if (latestAttempt == 0) {
             player.sendMessage(Utils.error("There is no feedback available for this plot."));
@@ -156,7 +159,8 @@ public class Plot extends AbstractCommand {
         }
 
         // Create book.
-        int reviewId = plotSQL.getInt("SELECT id FROM plot_review WHERE plot_id=" + plot + " AND uuid='" + uuid + "' AND attempt=" + latestAttempt + ";");
+        int reviewId = plotSQL.getInt("SELECT id FROM plot_review WHERE plot_id=" + plot + " AND uuid='" + uuid + "' " +
+                "AND attempt=" + latestAttempt + ";");
 
         // Open the book.
         player.openBook(ReviewFeedback.createFeedbackBook(reviewId));

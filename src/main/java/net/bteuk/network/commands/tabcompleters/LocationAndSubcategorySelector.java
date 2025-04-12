@@ -23,7 +23,8 @@ public class LocationAndSubcategorySelector extends AbstractTabCompleter {
     @Override
     public @NotNull Collection<String> onTabComplete(@NotNull CommandSender sender, @NotNull String[] args) {
         // Get array of locations.
-        ArrayList<String> locations = Network.getInstance().getGlobalSQL().getStringList("SELECT location FROM location_data;");
+        ArrayList<String> locations = Network.getInstance().getGlobalSQL().getStringList("SELECT location FROM " +
+                "location_data;");
 
         // Add subcategories.
         locations.addAll(Network.getInstance().getGlobalSQL().getStringList("SELECT name FROM location_subcategory"));

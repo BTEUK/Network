@@ -23,7 +23,7 @@ public class Mute extends AbstractCommand {
     @Override
     public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        //Check if sender is player, then check permissions
+        // Check if sender is player, then check permissions
         CommandSender sender = stack.getSender();
         if (sender instanceof Player) {
             if (!hasPermission(sender, "uknet.mute")) {
@@ -31,38 +31,43 @@ public class Mute extends AbstractCommand {
             }
         }
 
-        //Check args.
+        // Check args.
         if (args.length < 3) {
             sender.sendMessage(ChatUtils.error("/mute <player> <duration> <reason>"));
             return;
         }
 
-        //Check player.
-        //If uuid exists for name.
-        if (!Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM player_data WHERE name='" + args[0] + "';")) {
+        // Check player.
+        // If uuid exists for name.
+        if (!Network.getInstance().getGlobalSQL()
+                .hasRow("SELECT uuid FROM player_data WHERE name='" + args[0] + "';")) {
             sender.sendMessage(Component.text(args[0], NamedTextColor.DARK_RED)
                     .append(ChatUtils.error(" is not a valid player.")));
             return;
         }
 
-        String uuid = Network.getInstance().getGlobalSQL().getString("SELECT uuid FROM player_data WHERE name='" + args[0] + "';");
-        String name = Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE name='" + args[0] + "';");
+        String uuid =
+                Network.getInstance().getGlobalSQL()
+                        .getString("SELECT uuid FROM player_data WHERE name='" + args[0] + "';");
+        String name =
+                Network.getInstance().getGlobalSQL()
+                        .getString("SELECT name FROM player_data WHERE name='" + args[0] + "';");
 
-        //Get the duration of the ban.
+        // Get the duration of the ban.
         long time;
         try {
 
             time = getDuration(args[1]);
-
         } catch (DurationFormatException e) {
-            sender.sendMessage(ChatUtils.error("Duration must be in ymdh format, for example 1y6m, which is 1 year and 6 months or 2d12h is 2 days and 12 hours."));
+            sender.sendMessage(ChatUtils.error("Duration must be in ymdh format, for example 1y6m, which is 1 year " +
+                    "and 6 months or 2d12h is 2 days and 12 hours."));
             return;
         }
 
-        //Get end time of current time plus time.
+        // Get end time of current time plus time.
         long end_time = Time.currentTime() + time;
 
-        //Combine all remaining args to create a reason.
+        // Combine all remaining args to create a reason.
         String reason = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
 
         sender.sendMessage(mutePlayer(name, uuid, end_time, reason));
@@ -71,16 +76,11 @@ public class Mute extends AbstractCommand {
     /**
      * Mute the player and return the feedback so the executor can be notified of success/failure.
      *
-     * @param name
-     * Name of the player to mute.
-     * @param uuid
-     * Uuid of the player to mute.
-     * @param end_time
-     * Time for the mute to end in milliseconds.
-     * @param reason
-     * Reason for muting the player.
-     * @return
-     * The Component to display to the executor.
+     * @param name     Name of the player to mute.
+     * @param uuid     Uuid of the player to mute.
+     * @param end_time Time for the mute to end in milliseconds.
+     * @param reason   Reason for muting the player.
+     * @return The Component to display to the executor.
      */
     public Component mutePlayer(String name, String uuid, long end_time, String reason) {
 

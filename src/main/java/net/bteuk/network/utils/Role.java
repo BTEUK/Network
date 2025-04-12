@@ -23,6 +23,7 @@ public class Role implements Comparable<Role> {
 
     /**
      * Get the prefix with the colour for the role.
+     *
      * @return the {@link Component} prefix
      */
     public Component getColouredPrefix() {
@@ -37,5 +38,4 @@ public class Role implements Comparable<Role> {
     public int compareTo(Role o) {
         return o.getWeight() - weight;
     }
-
 }

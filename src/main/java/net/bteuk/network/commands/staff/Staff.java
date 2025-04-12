@@ -18,6 +18,23 @@ import static net.bteuk.network.utils.Constants.STAFF_CHAT;
 
 public class Staff extends AbstractCommand {
 
+    public static void openStaffMenu(NetworkUser u) {
+
+        // Check if the gui exists.
+        // If it does refresh and open it.
+        // If no gui exists open the staff menu.
+
+        if (u.staffGui != null) {
+
+            u.staffGui.refresh();
+            u.staffGui.open(u);
+        } else {
+
+            u.staffGui = new StaffGui(u);
+            u.staffGui.open(u);
+        }
+    }
+
     @Override
     public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
@@ -58,11 +75,13 @@ public class Staff extends AbstractCommand {
                 }
                 // Set channel.
                 u.setChatChannel(channel);
-                Network.getInstance().getGlobalSQL().update("UPDATE player_data SET chat_channel='" + channel + "' WHERE uuid='" + p.getUniqueId() + "';");
+                Network.getInstance().getGlobalSQL().update("UPDATE player_data SET chat_channel='" + channel + "' " +
+                        "WHERE uuid='" + p.getUniqueId() + "';");
             } else {
                 // Send message in staff chat, by temporarily setting the players channel to staff.
                 u.setChatChannel(STAFF.getChannelName());
-                Network.getInstance().getChat().sendSocketMesage(CustomChat.getChatMessage(Component.text(String.join(" ", args)), u));
+                Network.getInstance().getChat()
+                        .sendSocketMesage(CustomChat.getChatMessage(Component.text(String.join(" ", args)), u));
                 u.setChatChannel(GLOBAL.getChannelName());
             }
             return;
@@ -70,24 +89,5 @@ public class Staff extends AbstractCommand {
 
         // If the player has a previous gui, open that.
         openStaffMenu(u);
-    }
-
-    public static void openStaffMenu(NetworkUser u) {
-
-        // Check if the gui exists.
-        // If it does refresh and open it.
-        // If no gui exists open the staff menu.
-
-        if (u.staffGui != null) {
-
-            u.staffGui.refresh();
-            u.staffGui.open(u);
-
-        } else {
-
-            u.staffGui = new StaffGui(u);
-            u.staffGui.open(u);
-
-        }
     }
 }

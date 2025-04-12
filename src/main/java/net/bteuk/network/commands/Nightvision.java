@@ -14,28 +14,6 @@ import static net.bteuk.network.utils.Constants.LOGGER;
 
 public class Nightvision extends AbstractCommand {
 
-    @Override
-    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
-
-        //Check if the sender is a player.
-        Player player = getPlayer(stack);
-        if (player == null) {
-            return;
-        }
-
-        NetworkUser user = Network.getInstance().getUser(player);
-
-        //If u is null, cancel.
-        if (user == null) {
-            LOGGER.severe("User " + player.getName() + " can not be found!");
-            player.sendMessage(ChatUtils.error("User can not be found, please relog!"));
-            return;
-        }
-
-        toggleNightvision(user);
-
-    }
-
     public static void toggleNightvision(NetworkUser user) {
         if (user.isNightvisionEnabled()) {
             removeNightvision(user.player);
@@ -60,5 +38,26 @@ public class Nightvision extends AbstractCommand {
         Bukkit.getScheduler().runTask(Network.getInstance(), () -> {
             player.removePotionEffect(PotionEffectType.NIGHT_VISION);
         });
+    }
+
+    @Override
+    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
+
+        // Check if the sender is a player.
+        Player player = getPlayer(stack);
+        if (player == null) {
+            return;
+        }
+
+        NetworkUser user = Network.getInstance().getUser(player);
+
+        // If u is null, cancel.
+        if (user == null) {
+            LOGGER.severe("User " + player.getName() + " can not be found!");
+            player.sendMessage(ChatUtils.error("User can not be found, please relog!"));
+            return;
+        }
+
+        toggleNightvision(user);
     }
 }

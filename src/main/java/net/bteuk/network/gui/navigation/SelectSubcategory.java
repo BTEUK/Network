@@ -24,23 +24,22 @@ public class SelectSubcategory extends Gui {
 
         this.addLocation = addLocation;
         createGui();
-
     }
 
     private void createGui() {
 
-        //Iterate through subcatories, starting with 'None'.
-        List<String> subcategories = Network.getInstance().getGlobalSQL().getStringList("SELECT name FROM location_subcategory WHERE category='" + addLocation.getCategory() + "' ORDER BY name ASC;");
+        // Iterate through subcatories, starting with 'None'.
+        List<String> subcategories = Network.getInstance().getGlobalSQL().getStringList("SELECT name FROM " +
+                "location_subcategory WHERE category='" + addLocation.getCategory() + "' ORDER BY name ASC;");
         subcategories.add(0, "None");
 
-
-        //If page > 1 set number of iterations that must be skipped.
+        // If page > 1 set number of iterations that must be skipped.
         int skip = (page - 1) * 21;
 
-        //Slot count.
+        // Slot count.
         int slot = 10;
 
-        //If page is greater than 1 add a previous page button.
+        // If page is greater than 1 add a previous page button.
         if (page > 1) {
             setItem(18, Utils.createItem(Material.ARROW, 1,
                             Utils.title("Previous Page"),
@@ -48,7 +47,7 @@ public class SelectSubcategory extends Gui {
                     u ->
 
                     {
-                        //Update the gui.
+                        // Update the gui.
                         page--;
                         this.refresh();
                         u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
@@ -57,7 +56,7 @@ public class SelectSubcategory extends Gui {
 
         for (String subcategory : subcategories) {
 
-            //Skip iterations if skip > 0.
+            // Skip iterations if skip > 0.
             if (skip > 0) {
                 skip--;
                 continue;
@@ -68,12 +67,12 @@ public class SelectSubcategory extends Gui {
                             Utils.line("Click to select this subcategory.")),
 
                     u -> {
-                        //Set the county.
+                        // Set the county.
                         addLocation.setSubcategory(subcategory);
                         returnToAddLocation(u);
                     });
 
-            //If the slot is greater than the number that fit in a page, create a new page.
+            // If the slot is greater than the number that fit in a page, create a new page.
             if (slot > 34) {
 
                 setItem(26, Utils.createItem(Material.ARROW, 1,
@@ -83,28 +82,28 @@ public class SelectSubcategory extends Gui {
 
                         {
 
-                            //Update the gui.
+                            // Update the gui.
                             page++;
                             this.refresh();
-                            u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
-
+                            u.player.getOpenInventory().getTopInventory()
+                                    .setContents(this.getInventory().getContents());
                         });
 
-                //Stop iterating.
+                // Stop iterating.
                 break;
             }
 
-            //Increase slot accordingly.
+            // Increase slot accordingly.
             if (slot % 9 == 7) {
-                //Increase row, basically add 3.
+                // Increase row, basically add 3.
                 slot += 3;
             } else {
-                //Increase value by 1.
+                // Increase value by 1.
                 slot++;
             }
         }
 
-        //Return
+        // Return
         setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
                         Utils.title("Return"),
                         Utils.line("Open the previous menu.")),
@@ -115,15 +114,14 @@ public class SelectSubcategory extends Gui {
 
         this.createGui();
         createGui();
-
     }
 
     private void returnToAddLocation(NetworkUser u) {
-        //Delete this gui.
+        // Delete this gui.
         this.delete();
         addLocation.selectSubcategory = null;
 
-        //Return to addlocation.
+        // Return to addlocation.
         if (addLocation.getType() == AddLocationType.ADD) {
             u.mainGui.refresh();
             u.mainGui.open(u);

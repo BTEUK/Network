@@ -37,7 +37,8 @@ public class Utils {
     private static final Pattern PATTERN = Pattern.compile("%s");
 
     public static Component title(String message) {
-        return Component.text(message, NamedTextColor.AQUA, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false);
+        return Component.text(message, NamedTextColor.AQUA, TextDecoration.BOLD).decoration(TextDecoration.ITALIC,
+                false);
     }
 
     public static Component line(String message) {
@@ -57,7 +58,7 @@ public class Utils {
      * The colour of the message is RED, with the vars highlighted with DARK_RED.
      *
      * @param message the message, using %s as placeholder for the vars.
-     * @param vars the vars to add to the placeholders, must equal the number of placeholder symbols.
+     * @param vars    the vars to add to the placeholders, must equal the number of placeholder symbols.
      * @return the {@link Component} with the message, or null if the number of vars is incorrect.
      */
     public static Component error(String message, String... vars) {
@@ -73,14 +74,15 @@ public class Utils {
      * The colour of the message is GREEN, with the vars highlighted with DARK_AQUA.
      *
      * @param message the message, using %s as placeholder for the vars.
-     * @param vars the vars to add to the placeholders, must equal the number of placeholder symbols.
+     * @param vars    the vars to add to the placeholders, must equal the number of placeholder symbols.
      * @return the {@link Component} with the message, or null if the number of vars is incorrect.
      */
     public static Component success(String message, String... vars) {
         return varMessage(NamedTextColor.GREEN, NamedTextColor.DARK_AQUA, message, vars);
     }
 
-    private static Component varMessage(NamedTextColor textColour, NamedTextColor varColour, String message, String... vars) {
+    private static Component varMessage(NamedTextColor textColour, NamedTextColor varColour, String message,
+                                        String... vars) {
         Component component = Component.empty();
         // Find the number of vars needed.
         int lastIdx = 0;
@@ -114,7 +116,6 @@ public class Utils {
      * Adds the prefix to a tip message.
      *
      * @param tip the tip to add a prefix to
-     *
      * @return Component of the tip with the prefix
      */
     public static Component tip(String tip) {
@@ -136,10 +137,10 @@ public class Utils {
         item.setItemMeta(meta);
 
         return item;
-
     }
 
-    public static ItemStack createCustomSkullWithFallback(String texture, Material fallback, int amount, Component displayName, Component... loreString) {
+    public static ItemStack createCustomSkullWithFallback(String texture, Material fallback, int amount,
+                                                          Component displayName, Component... loreString) {
 
         ItemStack item;
 
@@ -154,7 +155,7 @@ public class Utils {
 
             SkullMeta meta = (SkullMeta) item.getItemMeta();
 
-            //Create playerprofile.
+            // Create playerprofile.
             PlayerProfile profile = Network.getInstance().getServer().createProfile(UUID.randomUUID());
 
             PlayerTextures textures = profile.getTextures();
@@ -165,7 +166,6 @@ public class Utils {
             meta.setPlayerProfile(profile);
 
             item.setItemMeta(meta);
-
         } catch (Exception e) {
             item = new ItemStack(fallback);
         }
@@ -179,7 +179,6 @@ public class Utils {
         item.setItemMeta(meta);
 
         return item;
-
     }
 
     public static ItemStack createPlayerSkull(String uuid, int amount, Component displayName, Component... loreString) {
@@ -200,10 +199,10 @@ public class Utils {
         item.setItemMeta(meta);
 
         return item;
-
     }
 
-    public static ItemStack createPlayerSkull(PlayerProfile profile, int amount, Component displayName, Component... loreString) {
+    public static ItemStack createPlayerSkull(PlayerProfile profile, int amount, Component displayName,
+                                              Component... loreString) {
 
         ItemStack item;
 
@@ -218,10 +217,10 @@ public class Utils {
         item.setItemMeta(meta);
 
         return item;
-
     }
 
-    public static ItemStack createPotion(Material material, PotionEffectType effect, int amount, Component displayName, Component... loreString) {
+    public static ItemStack createPotion(Material material, PotionEffectType effect, int amount,
+                                         Component displayName, Component... loreString) {
 
         ItemStack item;
 
@@ -237,7 +236,6 @@ public class Utils {
         item.setItemMeta(meta);
 
         return item;
-
     }
 
     public static int getHighestYAt(World w, int x, int z) {
@@ -247,17 +245,17 @@ public class Utils {
                 return i + 1;
             }
         }
-        //Return 65 as the default y.
+        // Return 65 as the default y.
         return 65;
     }
 
-    //Gives a player an item, it will be set in their main hand, if it does not already exist there.
+    // Gives a player an item, it will be set in their main hand, if it does not already exist there.
 
-    //If the main hand is empty, set it there.
-    //If then main hand is slot 8 and includes the navigator, find the first empty slot available and set it there.
-    //If no empty slots are available set it to slot 7.
-    //If the main hand has an item swap the current item to an empty slot in the inventory.
-    //If no empty slots are available overwrite it.
+    // If the main hand is empty, set it there.
+    // If then main hand is slot 8 and includes the navigator, find the first empty slot available and set it there.
+    // If no empty slots are available set it to slot 7.
+    // If the main hand has an item swap the current item to an empty slot in the inventory.
+    // If no empty slots are available overwrite it.
 
     public static void giveItem(Player p, ItemStack item, String name) {
 
@@ -265,53 +263,55 @@ public class Utils {
 
         int emptySlot = getEmptyHotbarSlot(p);
 
-        boolean hasNavigator = (p.getInventory().getHeldItemSlot() == 8 && currentItem.equals(Network.getInstance().navigator));
+        boolean hasNavigator =
+                (p.getInventory().getHeldItemSlot() == 8 && currentItem.equals(Network.getInstance().navigator));
         boolean hasItemAlready = p.getInventory().containsAtLeast(item, 1);
 
-        //If we already have the item switch to current slot.
+        // If we already have the item switch to current slot.
         if (hasItemAlready) {
 
-            //Switch item to current slot.
+            // Switch item to current slot.
             int slot = p.getInventory().first(item);
 
             if (hasNavigator) {
 
                 p.getInventory().setItem(slot, p.getInventory().getItem(7));
                 p.getInventory().setItem(7, item);
-                p.sendMessage(ChatUtils.success("Set ").append(Component.text(name, NamedTextColor.DARK_AQUA).append(ChatUtils.success(" to slot 8"))));
-
+                p.sendMessage(ChatUtils.success("Set ").append(Component.text(name, NamedTextColor.DARK_AQUA)
+                        .append(ChatUtils.success(" to slot 8"))));
             } else {
 
                 p.getInventory().setItem(slot, p.getInventory().getItemInMainHand());
                 p.getInventory().setItemInMainHand(item);
-                p.sendMessage(ChatUtils.success("Set ").append(Component.text(name, NamedTextColor.DARK_AQUA).append(ChatUtils.success(" to main hand."))));
-
+                p.sendMessage(ChatUtils.success("Set ").append(Component.text(name, NamedTextColor.DARK_AQUA)
+                        .append(ChatUtils.success(" to main hand."))));
             }
         } else if (emptySlot >= 0) {
-            //The current slot is empty. This also implies no navigator, and thus the item does not yet exist in the inventory.
-            //Set item to empty slot.
+            // The current slot is empty. This also implies no navigator, and thus the item does not yet exist in the
+            // inventory.
+            // Set item to empty slot.
             p.getInventory().setItem(emptySlot, item);
-            p.sendMessage(ChatUtils.success("Set ").append(Component.text(name, NamedTextColor.DARK_AQUA).append(ChatUtils.success(" to slot " + (emptySlot + 1)))));
-
+            p.sendMessage(ChatUtils.success("Set ").append(Component.text(name, NamedTextColor.DARK_AQUA)
+                    .append(ChatUtils.success(" to slot " + (emptySlot + 1)))));
         } else {
 
-            //Player has no empty slots and is holding the navigator, set to item to slot 7.
+            // Player has no empty slots and is holding the navigator, set to item to slot 7.
             p.getInventory().setItem(7, item);
-            p.sendMessage(ChatUtils.success("Set ").append(Component.text(name, NamedTextColor.DARK_AQUA).append(ChatUtils.success(" to slot 8"))));
-
+            p.sendMessage(ChatUtils.success("Set ")
+                    .append(Component.text(name, NamedTextColor.DARK_AQUA).append(ChatUtils.success(" to slot 8"))));
         }
     }
 
-    //Return an empty hotbar slot, if no empty slot exists return -1.
+    // Return an empty hotbar slot, if no empty slot exists return -1.
     public static int getEmptyHotbarSlot(Player p) {
 
-        //If main hand is empty return that slot.
+        // If main hand is empty return that slot.
         ItemStack heldItem = p.getInventory().getItemInMainHand();
         if (heldItem.getType() == Material.AIR) {
             return p.getInventory().getHeldItemSlot();
         }
 
-        //Check if hotbar has an empty slot.
+        // Check if hotbar has an empty slot.
         for (int i = 0; i < 9; i++) {
 
             ItemStack item = p.getInventory().getItem(i);
@@ -324,12 +324,12 @@ public class Utils {
             }
         }
 
-        //No slot could be found, return -1.
+        // No slot could be found, return -1.
         return -1;
     }
 
     public static void enchant(ItemStack itemStack) {
         itemStack.addUnsafeEnchantment(Enchantment.MENDING, 1);
-        //itemStack.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        // itemStack.addItemFlags(ItemFlag.HIDE_ENCHANTS);
     }
 }

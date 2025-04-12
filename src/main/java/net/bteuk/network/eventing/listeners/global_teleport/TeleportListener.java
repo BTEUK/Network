@@ -26,10 +26,8 @@ import static net.bteuk.network.utils.enums.ServerType.EARTH;
 public class TeleportListener implements Listener {
 
     private final RegionManager regionManager;
-
-    private boolean blocked;
-
     private final PlotSQL plotSQL;
+    private boolean blocked;
 
     public TeleportListener(Network instance) {
 
@@ -40,7 +38,6 @@ public class TeleportListener implements Listener {
         blocked = false;
 
         plotSQL = instance.getPlotSQL();
-
     }
 
     public void block() {
@@ -54,7 +51,8 @@ public class TeleportListener implements Listener {
         if (blocked || e.getCause() == PlayerTeleportEvent.TeleportCause.SPECTATE) {
             e.setCancelled(true);
             if (e.getCause() == PlayerTeleportEvent.TeleportCause.SPECTATE) {
-                e.getPlayer().sendMessage(ChatUtils.error("Teleporting via the spectator menu is disabled, please use /tp <player>"));
+                e.getPlayer().sendMessage(ChatUtils.error("Teleporting via the spectator menu is disabled, please use" +
+                        " /tp <player>"));
             }
             return;
         }
@@ -62,7 +60,7 @@ public class TeleportListener implements Listener {
         Player p = e.getPlayer();
         NetworkUser u = Network.getInstance().getUser(p);
 
-        //If u is null, cancel.
+        // If u is null, cancel.
         if (u == null) {
             LOGGER.severe("User " + p.getName() + " can not be found!");
             p.sendMessage(ChatUtils.error("User can not be found, please relog!"));
@@ -70,269 +68,270 @@ public class TeleportListener implements Listener {
             return;
         }
 
-
-        //Cancel event if player is switching server.
+        // Cancel event if player is switching server.
         if (u.switching) {
             e.setCancelled(true);
             return;
         }
 
-        //If building companion is enabled, check if the player changed world.
+        // If building companion is enabled, check if the player changed world.
         if (u.getCompanion() != null) {
             u.getCompanion().checkChangeWorld(e.getTo().getWorld());
         }
 
-        //If regions are enabled, check for movement between regions.
+        // If regions are enabled, check for movement between regions.
         if (REGIONS_ENABLED) {
 
-            //Check whether the player is teleporting to a server and world that uses regions.
-            //If the player is on the earth server check if they are teleporting to the earth world.
+            // Check whether the player is teleporting to a server and world that uses regions.
+            // If the player is on the earth server check if they are teleporting to the earth world.
             if (SERVER_TYPE == EARTH) {
                 if (e.getTo().getWorld().getName().equals(EARTH_WORLD)) {
 
-                    //Get region.
+                    // Get region.
                     Region region = regionManager.getRegion(e.getTo());
 
-                    //Player is teleport to earth world on earth server.
-                    //Check if are teleporting to a new region, if currently in one.
+                    // Player is teleport to earth world on earth server.
+                    // Check if are teleporting to a new region, if currently in one.
                     if (u.inRegion) {
 
-                        //If the regions are not equal
+                        // If the regions are not equal
                         if (!u.region.equals(region)) {
 
-                            //Check if the player can enter the region.
+                            // Check if the player can enter the region.
                             if (region.inDatabase() || p.hasPermission("group.jrbuilder")) {
 
-                                //Add region to database if not exists.
+                                // Add region to database if not exists.
                                 region.addToDatabase();
 
-                                //If the player is the region owner update last enter and tell set the message.
+                                // If the player is the region owner update last enter and tell set the message.
                                 if (region.isOwner(p.getUniqueId().toString())) {
 
                                     p.sendActionBar(
                                             ChatUtils.success("You have entered ")
-                                                    .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                                    .append(Component.text(region.getTag(p.getUniqueId().toString()),
+                                                            NamedTextColor.DARK_AQUA))
                                                     .append(ChatUtils.success(" and left "))
-                                                    .append(Component.text(u.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                                    .append(Component.text(u.region.getTag(p.getUniqueId().toString()),
+                                                            NamedTextColor.DARK_AQUA))
                                                     .append(ChatUtils.success(", you are the owner of this region.")));
                                     region.setLastEnter(p.getUniqueId().toString());
 
-                                    //If the region is inactive, set it to active.
+                                    // If the region is inactive, set it to active.
                                     if (region.status() == RegionStatus.INACTIVE) {
                                         region.setDefault();
-                                        p.sendMessage(ChatUtils.success("This region is no longer \"Inactive\", it has been set back to default settings."));
+                                        p.sendMessage(ChatUtils.success("This region is no longer \"Inactive\", it " +
+                                                "has been set back to default settings."));
                                     }
 
-                                    //Check if the player is a region members.
+                                    // Check if the player is a region members.
                                 } else if (region.isMember(p.getUniqueId().toString())) {
 
                                     p.sendActionBar(
                                             ChatUtils.success("You have entered ")
-                                                    .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                                    .append(Component.text(region.getTag(p.getUniqueId().toString()),
+                                                            NamedTextColor.DARK_AQUA))
                                                     .append(ChatUtils.success(" and left "))
-                                                    .append(Component.text(u.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                                    .append(Component.text(u.region.getTag(p.getUniqueId().toString()),
+                                                            NamedTextColor.DARK_AQUA))
                                                     .append(ChatUtils.success(", you are a member of this region.")));
                                     region.setLastEnter(p.getUniqueId().toString());
 
-                                    //If the region is inactive, make this member to owner.
+                                    // If the region is inactive, make this member to owner.
                                     if (region.status() == RegionStatus.INACTIVE) {
-                                        //Make the previous owner a member.
+                                        // Make the previous owner a member.
                                         region.makeMember();
 
-                                        //Give the new player ownership.
+                                        // Give the new player ownership.
                                         region.makeOwner(p.getUniqueId().toString());
 
-                                        //Update any requests to take into account the new region owner.
+                                        // Update any requests to take into account the new region owner.
                                         region.updateRequests();
 
-                                        p.sendMessage(ChatUtils.success("This region is no longer \"Inactive\", it has been set back to default settings."));
+                                        p.sendMessage(ChatUtils.success("This region is no longer \"Inactive\", it " +
+                                                "has been set back to default settings."));
                                         p.sendMessage(ChatUtils.success("You have been made the new region owner."));
-
                                     }
 
-                                    //Check if the region is open and the player is at least jr.builder.
+                                    // Check if the region is open and the player is at least jr.builder.
                                 } else if (region.status() == RegionStatus.OPEN && p.hasPermission("group.jrbuilder")) {
 
                                     p.sendActionBar(
                                             ChatUtils.success("You have entered ")
-                                                    .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                                    .append(Component.text(region.getTag(p.getUniqueId().toString()),
+                                                            NamedTextColor.DARK_AQUA))
                                                     .append(ChatUtils.success(" and left "))
-                                                    .append(Component.text(u.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                                    .append(Component.text(u.region.getTag(p.getUniqueId().toString()),
+                                                            NamedTextColor.DARK_AQUA))
                                                     .append(ChatUtils.success(", you can build in this region.")));
-
                                 } else {
 
-                                    //Send default enter message.
+                                    // Send default enter message.
                                     p.sendActionBar(
                                             ChatUtils.success("You have entered ")
-                                                    .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                                    .append(Component.text(region.getTag(p.getUniqueId().toString()),
+                                                            NamedTextColor.DARK_AQUA))
                                                     .append(ChatUtils.success(" and left "))
-                                                    .append(Component.text(u.region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA)));
-
+                                                    .append(Component.text(u.region.getTag(p.getUniqueId().toString()),
+                                                            NamedTextColor.DARK_AQUA)));
                                 }
 
-                                //Update the region the player is in.
+                                // Update the region the player is in.
                                 u.region = region;
-
                             } else {
 
-                                //You can't enter this region.
-                                p.sendMessage(ChatUtils.error("The terrain for this region has not been generated, you must be at least Jr.Builder to load new terrain."));
+                                // You can't enter this region.
+                                p.sendMessage(ChatUtils.error("The terrain for this region has not been generated, " +
+                                        "you must be at least Jr.Builder to load new terrain."));
                                 e.setCancelled(true);
                             }
-
                         }
                     } else {
 
-                        //Check if the player can enter the region.
+                        // Check if the player can enter the region.
                         if (region.inDatabase() || p.hasPermission("group.jrbuilder")) {
 
-                            //Add region to database if not exists.
+                            // Add region to database if not exists.
                             region.addToDatabase();
 
-                            //If the player is the region owner update last enter and tell set the message.
+                            // If the player is the region owner update last enter and tell set the message.
                             if (region.isOwner(p.getUniqueId().toString())) {
 
                                 p.sendActionBar(
                                         ChatUtils.success("You have entered ")
-                                                .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                                .append(Component.text(region.getTag(p.getUniqueId().toString()),
+                                                        NamedTextColor.DARK_AQUA))
                                                 .append(ChatUtils.success(", you are the owner of this region.")));
                                 region.setLastEnter(p.getUniqueId().toString());
 
-                                //If the region is inactive, set it to active.
+                                // If the region is inactive, set it to active.
                                 if (region.status() == RegionStatus.INACTIVE) {
                                     region.setDefault();
-                                    p.sendMessage(ChatUtils.success("This region is no longer \"Inactive\", it has been set back to default settings."));
+                                    p.sendMessage(ChatUtils.success("This region is no longer \"Inactive\", it has " +
+                                            "been set back to default settings."));
                                 }
 
-                                //Check if the player is a region members.
+                                // Check if the player is a region members.
                             } else if (region.isMember(p.getUniqueId().toString())) {
 
                                 p.sendActionBar(
                                         ChatUtils.success("You have entered ")
-                                                .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                                .append(Component.text(region.getTag(p.getUniqueId().toString()),
+                                                        NamedTextColor.DARK_AQUA))
                                                 .append(ChatUtils.success(", you are a member of this region.")));
                                 region.setLastEnter(p.getUniqueId().toString());
 
-                                //If the region is inactive, make this member to owner.
+                                // If the region is inactive, make this member to owner.
                                 if (region.status() == RegionStatus.INACTIVE) {
-                                    //Make the previous owner a member.
+                                    // Make the previous owner a member.
                                     region.makeMember();
 
-                                    //Give the new player ownership.
+                                    // Give the new player ownership.
                                     region.makeOwner(p.getUniqueId().toString());
 
-                                    //Update any requests to take into account the new region owner.
+                                    // Update any requests to take into account the new region owner.
                                     region.updateRequests();
 
-                                    p.sendMessage(ChatUtils.success("This region is no longer \"Inactive\", it has been set back to default settings."));
+                                    p.sendMessage(ChatUtils.success("This region is no longer \"Inactive\", it has " +
+                                            "been set back to default settings."));
                                     p.sendMessage(ChatUtils.success("You have been made the new region owner."));
-
                                 }
 
-                                //Check if the region is open and the player is at least jr.builder.
+                                // Check if the region is open and the player is at least jr.builder.
                             } else if (region.status() == RegionStatus.OPEN && p.hasPermission("group.jrbuilder")) {
 
                                 p.sendActionBar(
                                         ChatUtils.success("You have entered ")
-                                                .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA))
+                                                .append(Component.text(region.getTag(p.getUniqueId().toString()),
+                                                        NamedTextColor.DARK_AQUA))
                                                 .append(ChatUtils.success(", you can build in this region.")));
-
                             } else {
 
-                                //Send default enter message.
+                                // Send default enter message.
                                 p.sendActionBar(
                                         ChatUtils.success("You have entered ")
-                                                .append(Component.text(region.getTag(p.getUniqueId().toString()), NamedTextColor.DARK_AQUA)));
-
+                                                .append(Component.text(region.getTag(p.getUniqueId().toString()),
+                                                        NamedTextColor.DARK_AQUA)));
                             }
 
-                            //Update the region the player is in.
+                            // Update the region the player is in.
                             u.region = region;
                             u.inRegion = true;
-
                         } else {
 
-                            //You can't enter this region.
-                            p.sendMessage(ChatUtils.error("The terrain for this region has not been generated, you must be at least Jr.Builder to load new terrain."));
+                            // You can't enter this region.
+                            p.sendMessage(ChatUtils.error("The terrain for this region has not been generated, you " +
+                                    "must be at least Jr.Builder to load new terrain."));
                             e.setCancelled(true);
                         }
-
                     }
-
                 } else if (u.inRegion) {
 
-                    //Send default leave message.
+                    // Send default leave message.
                     p.sendActionBar(
                             ChatUtils.success("You have left ")
                                     .append(Component.text(u.region.regionName(), NamedTextColor.DARK_AQUA)));
 
-                    //Set inRegion to false.
+                    // Set inRegion to false.
                     u.inRegion = false;
-
                 }
             } else if (SERVER_TYPE == ServerType.PLOT) {
 
-                //Check if the player is teleporting to a buildable world in the plot system.
-                if (plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + e.getTo().getWorld().getName() + "';")) {
+                // Check if the player is teleporting to a buildable world in the plot system.
+                if (plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + e.getTo().getWorld().getName() +
+                        "';")) {
 
-                    //Get negative coordinate transform of new location.
+                    // Get negative coordinate transform of new location.
                     Location l = e.getTo().clone();
                     u.updateCoordinateTransform(plotSQL, l);
 
-                    //Alter location to add necessary coordinate transformation.
+                    // Alter location to add necessary coordinate transformation.
                     l.setX(l.getX() + u.dx);
                     l.setZ(l.getZ() + u.dz);
 
-                    //Get region.
+                    // Get region.
                     Region region = regionManager.getRegion(l);
 
-                    //Check if you are teleporting to a new region, if currently in one.
+                    // Check if you are teleporting to a new region, if currently in one.
                     if (u.inRegion) {
 
-                        //If the regions are not equal
+                        // If the regions are not equal
                         if (!u.region.equals(region)) {
 
-                            //Send default enter message.
+                            // Send default enter message.
                             p.sendActionBar(
                                     ChatUtils.success("You have entered ")
                                             .append(Component.text(region.regionName(), NamedTextColor.DARK_AQUA))
                                             .append(ChatUtils.success(" and left "))
                                             .append(Component.text(u.region.regionName(), NamedTextColor.DARK_AQUA)));
 
-                            //Update the region the player is in.
+                            // Update the region the player is in.
                             u.region = region;
                         }
-
                     } else {
 
-                        //Send default enter message.
+                        // Send default enter message.
                         p.sendActionBar(
                                 ChatUtils.success("You have entered ")
                                         .append(Component.text(region.regionName(), NamedTextColor.DARK_AQUA)));
 
-                        //Update the region the player is in.
+                        // Update the region the player is in.
                         u.region = region;
                         u.inRegion = true;
-
                     }
-
                 } else if (u.inRegion) {
 
-                    //Send default leave message.
+                    // Send default leave message.
                     p.sendActionBar(
                             ChatUtils.success("You have left ")
                                     .append(Component.text(u.region.regionName(), NamedTextColor.DARK_AQUA)));
 
-                    //Set inRegion to false.
+                    // Set inRegion to false.
                     u.inRegion = false;
-
                 }
-
             }
         }
 
-        //Network.getInstance().getLogger().info("Teleport: " + e.getTo().getX() + "," + e.getTo().getZ());
+        // Network.getInstance().getLogger().info("Teleport: " + e.getTo().getX() + "," + e.getTo().getZ());
 
     }
 }

@@ -37,42 +37,37 @@ public class Lobby {
     private final Network instance;
 
     private final ArrayList<Portal> portals;
-    private int portalTask;
-
-    private Book rulesBook;
-
     public Location spawn;
-
+    private int portalTask;
+    private Book rulesBook;
     private Map map;
 
     public Lobby(Network instance) {
 
         this.instance = instance;
         portals = new ArrayList<>();
-
     }
 
-    //A public method to reload portals from the portals.yml file.
-    //This method is run when using the specific reload command.
-    //It saves having to restart the server when portals are edited.
+    // A public method to reload portals from the portals.yml file.
+    // This method is run when using the specific reload command.
+    // It saves having to restart the server when portals are edited.
     public void reloadPortals() {
 
-        //Clear the portals arrayList and stop the portals from running.
+        // Clear the portals arrayList and stop the portals from running.
         if (portalTask != 0) {
             Bukkit.getScheduler().cancelTask(portalTask);
         }
         portals.clear();
 
-        //Load the portals from config.
+        // Load the portals from config.
         loadPortals();
-
     }
 
-    //Reads the portals from portals.yml
+    // Reads the portals from portals.yml
     private void loadPortals() {
 
-        //Create portals.yml if not exists.
-        //The data folder should already exist since the plugin will always create config.yml first.
+        // Create portals.yml if not exists.
+        // The data folder should already exist since the plugin will always create config.yml first.
         File portalsFile = new File(instance.getDataFolder(), "portals.yml");
         if (!portalsFile.exists()) {
             instance.saveResource("portals.yml", false);
@@ -80,20 +75,21 @@ public class Lobby {
 
         FileConfiguration portalsConfig = YamlConfiguration.loadConfiguration(portalsFile);
 
-        //Gets all the portal names from the config.
-        //This will allow us to query the config for portals.
+        // Gets all the portal names from the config.
+        // This will allow us to query the config for portals.
         ConfigurationSection section = portalsConfig.getConfigurationSection("portals");
-        //No portals have yet been added.
+        // No portals have yet been added.
         if (section == null) {
             return;
         }
 
-        Set<String> portalNames = Objects.requireNonNull(portalsConfig.getConfigurationSection("portals")).getKeys(false);
+        Set<String> portalNames =
+                Objects.requireNonNull(portalsConfig.getConfigurationSection("portals")).getKeys(false);
 
-        //Create the portal from the config.
+        // Create the portal from the config.
         for (String portalName : portalNames) {
 
-            //Create new portal with given values from config.
+            // Create new portal with given values from config.
             try {
 
                 portals.add(new Portal(
@@ -103,25 +99,26 @@ public class Lobby {
                         portalsConfig.getInt("portals." + portalName + ".max.x"),
                         portalsConfig.getInt("portals." + portalName + ".max.y"),
                         portalsConfig.getInt("portals." + portalName + ".max.z"),
-                        Objects.requireNonNull(portalsConfig.getString("portals." + portalName + ".executes")).split(",")
+                        Objects.requireNonNull(portalsConfig.getString("portals." + portalName + ".executes")).split(
+                                ",")
                 ));
-
             } catch (Exception e) {
-                Network.getInstance().getLogger().warning("Portal " + portalName + " configured incorrectly, please check the portals.yml file.");
+                Network.getInstance().getLogger().warning("Portal " + portalName + " configured incorrectly, please " +
+                        "check the portals.yml file.");
             }
         }
 
-        //Once the portals have been loaded, start running them.
+        // Once the portals have been loaded, start running them.
         runPortals();
     }
 
-    //Runs the events set to the portals.
-    //Events will run each second in order of how they are in the portals.yml file.
+    // Runs the events set to the portals.
+    // Events will run each second in order of how they are in the portals.yml file.
     private void runPortals() {
 
         portalTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(Network.getInstance(), () -> {
 
-            //Check if any players are in the area of the portal.
+            // Check if any players are in the area of the portal.
             for (NetworkUser user : instance.getUsers()) {
 
                 user.inPortal = false;
@@ -132,12 +129,11 @@ public class Lobby {
                         user.inPortal = true;
                         if (!user.wasInPortal) {
 
-                            //Set user to in portal.
+                            // Set user to in portal.
                             user.wasInPortal = true;
 
-                            //If they are run the portal events.
+                            // If they are run the portal events.
                             portal.event(user.player);
-
                         }
                         break;
                     }
@@ -145,21 +141,19 @@ public class Lobby {
 
                 if (user.wasInPortal && !user.inPortal) {
 
-                    //Set user to not in portal.
+                    // Set user to not in portal.
                     user.wasInPortal = false;
-
                 }
             }
-
         }, 0L, 1L);
     }
 
-    //Load the rules.
-    //The rules are stored in rules.yml.
+    // Load the rules.
+    // The rules are stored in rules.yml.
     public void loadRules() {
 
-        //Create rules.yml if not exists.
-        //The data folder should already exist since the plugin will always create config.yml first.
+        // Create rules.yml if not exists.
+        // The data folder should already exist since the plugin will always create config.yml first.
         File rulesFile = new File(instance.getDataFolder(), "rules.yml");
         if (!rulesFile.exists()) {
             instance.saveResource("rules.yml", false);
@@ -167,17 +161,17 @@ public class Lobby {
 
         FileConfiguration rulesConfig = YamlConfiguration.loadConfiguration(rulesFile);
 
-        //Gets all the portal names from the config.
-        //This will allow us to query the config for portals.
+        // Gets all the portal names from the config.
+        // This will allow us to query the config for portals.
         ConfigurationSection section = rulesConfig.getConfigurationSection("rules");
-        //No portals have yet been added.
+        // No portals have yet been added.
         if (section == null) {
             return;
         }
 
         Set<String> rules = Objects.requireNonNull(rulesConfig.getConfigurationSection("rules")).getKeys(false);
 
-        //Create book.
+        // Create book.
         Component title = Component.text("Rules", NamedTextColor.AQUA, TextDecoration.BOLD);
         Component author = Component.text("Unknown");
 
@@ -186,22 +180,22 @@ public class Lobby {
             author = Component.text(sAuthor);
         }
 
-        //Set pages of the book.
+        // Set pages of the book.
         ArrayList<Component> pages = new ArrayList<>();
         rules.forEach(str -> pages.add(Component.text(Objects.requireNonNull(rulesConfig.getString("rules." + str)))));
 
         rulesBook = Book.book(title, author, pages);
-
     }
 
     public Book getRules() {
         return rulesBook;
     }
 
-    //Set the lectern with the rules in the world.
+    // Set the lectern with the rules in the world.
     public void setLectern() {
 
-        //Load rules.yml, it is guaranteed to exist since that is check in loadRules(), which has to be run before this.
+        // Load rules.yml, it is guaranteed to exist since that is check in loadRules(), which has to be run before
+        // this.
         File rulesFile = new File(instance.getDataFolder(), "rules.yml");
         FileConfiguration rulesConfig = YamlConfiguration.loadConfiguration(rulesFile);
 
@@ -222,21 +216,19 @@ public class Lobby {
         Location l = new Location(world, rulesConfig.getInt("location.x"),
                 rulesConfig.getInt("location.y"), rulesConfig.getInt("location.z"));
 
-        //Check if plot is lectern.
+        // Check if plot is lectern.
         if (!(world.getType(l) == Material.LECTERN)) {
             instance.getLogger().warning("There is no lectern at the specified coordinates in rules.yml.");
             return;
         }
 
-        //Add listener
+        // Add listener
         new TakeBookEvent(instance);
-
     }
 
     private void runLeaderboards() {
 
     }
-
 
     /**
      * Reloads the map, this will be run when the plugin is enabled.
@@ -255,11 +247,13 @@ public class Lobby {
     public void setSpawn() {
 
         try {
-            spawn = new Location(Bukkit.getWorld(Objects.requireNonNull(CONFIG.getString("spawn.world"))), CONFIG.getDouble("spawn.x"), CONFIG.getDouble("spawn.y"),
-                    CONFIG.getDouble("spawn.z"), (float) CONFIG.getDouble("spawn.yaw"), (float) CONFIG.getDouble("spawn.pitch"));
+            spawn = new Location(Bukkit.getWorld(Objects.requireNonNull(CONFIG.getString("spawn.world"))),
+                    CONFIG.getDouble("spawn.x"), CONFIG.getDouble("spawn.y"),
+                    CONFIG.getDouble("spawn.z"), (float) CONFIG.getDouble("spawn.yaw"), (float) CONFIG.getDouble(
+                    "spawn.pitch"));
         } catch (Exception e) {
             instance.getLogger().warning("Spawn location could not be set!");
-            //Set default spawn.
+            // Set default spawn.
             spawn = new Location(Bukkit.getWorlds().get(0), 0.0, 65.0, 0.0, 0, 0);
         }
     }

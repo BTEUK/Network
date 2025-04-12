@@ -15,7 +15,8 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 /**
- * Implementation of promote and denmote. The only difference between the 2 is the boolean that indicates whether it's a promotion or demotion.
+ * Implementation of promote and denmote. The only difference between the 2 is the boolean that indicates whether
+ * it's a promotion or demotion.
  */
 public abstract class PromotionAction extends AbstractCommand {
 
@@ -26,7 +27,8 @@ public abstract class PromotionAction extends AbstractCommand {
     protected PromotionAction(Network instance, Component error) {
         this.instance = instance;
         this.error = error;
-        setTabCompleter(new MultiArgSelector(List.of(new PlayerSelector(false), new FixedArgSelector(Roles.getRoles().stream().map(Role::getId).collect(Collectors.toList()), 1))));
+        setTabCompleter(new MultiArgSelector(List.of(new PlayerSelector(false),
+                new FixedArgSelector(Roles.getRoles().stream().map(Role::getId).collect(Collectors.toList()), 1))));
     }
 
     public void onCommand(CommandSender sender, String[] args, boolean demote) {

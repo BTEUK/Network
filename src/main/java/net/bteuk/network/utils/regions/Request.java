@@ -9,6 +9,5 @@ public class Request {
 
         this.region = region;
         this.uuid = uuid;
-
     }
 }

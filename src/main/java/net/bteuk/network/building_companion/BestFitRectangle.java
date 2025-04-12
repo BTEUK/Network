@@ -11,14 +11,11 @@ import java.util.Arrays;
  */
 public class BestFitRectangle {
 
+    private static final double ALPHA = 0.05;
+    private static final double ADDITIVE = 0.01;
     private final double[][] input;
-
     @Getter
     private double[][] output;
-
-    private static final double ALPHA = 0.05;
-
-    private static final double ADDITIVE = 0.01;
 
     public BestFitRectangle(double[][] input) {
         this.input = input;
@@ -166,8 +163,9 @@ public class BestFitRectangle {
 
     private double getAverageAngle(double[] angles) {
         // To take an average we need to make sure all angles are relatively near each other.
-        // If an angle is at 1 degree and 179 degrees they are in reality close together but when taking an average it'll make a complete mess.
-        assert(angles.length == 4);
+        // If an angle is at 1 degree and 179 degrees they are in reality close together but when taking an average
+        // it'll make a complete mess.
+        assert (angles.length == 4);
         Arrays.sort(angles);
         double min = angles[0];
         double max = angles[3];
@@ -218,14 +216,16 @@ public class BestFitRectangle {
         double improve = 0;
         double tempImprove = ALPHA;
         // First try improving in the positive direction.
-        while (canImprove(improve + tempImprove, points[pointIdxLeft], points[pointIdxRight], lines[lineIndex], lines[lineIdxLeft], lines[lineIdxRight])) {
+        while (canImprove(improve + tempImprove, points[pointIdxLeft], points[pointIdxRight], lines[lineIndex],
+                lines[lineIdxLeft], lines[lineIdxRight])) {
             improve += tempImprove;
             tempImprove *= 2;
         }
         // Reset tempImprove
         tempImprove = ALPHA;
         // Then try improving in the negative direction, if not yet improved.
-        while (canImprove(improve - tempImprove, points[pointIdxLeft], points[pointIdxRight], lines[lineIndex], lines[lineIdxLeft], lines[lineIdxRight])) {
+        while (canImprove(improve - tempImprove, points[pointIdxLeft], points[pointIdxRight], lines[lineIndex],
+                lines[lineIdxLeft], lines[lineIdxRight])) {
             improve -= tempImprove;
             tempImprove *= 2;
         }
@@ -249,7 +249,8 @@ public class BestFitRectangle {
         double[] newIntersectA = Line.getIntersect(newMain, left);
         double[] newIntersectB = Line.getIntersect(newMain, right);
 
-        return getSummedDistance(intersectA, pointA, intersectB, pointB) > getSummedDistance(newIntersectA, pointA, newIntersectB, pointB);
+        return getSummedDistance(intersectA, pointA, intersectB, pointB) > getSummedDistance(newIntersectA, pointA,
+                newIntersectB, pointB);
     }
 
     private void improve(double improvement, Line main) {

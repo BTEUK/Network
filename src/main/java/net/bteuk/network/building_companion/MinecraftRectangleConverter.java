@@ -42,10 +42,13 @@ public class MinecraftRectangleConverter {
      */
     public static int[][] optimiseForBlockSize(int[][] input) {
         // Subtract 1 block from the edges on the higher x and z.
-        // Remove 1x from the highest 2 x values, unless the 2nd highest is equal to the 3d highest, then only remove from the first.
+        // Remove 1x from the highest 2 x values, unless the 2nd highest is equal to the 3d highest, then only remove
+        // from the first.
         // Do the same for the z values.
-        List<Integer> x_sorted = Arrays.stream(input).map(coord -> coord[0]).sorted(Collections.reverseOrder()).toList();
-        List<Integer> z_sorted = Arrays.stream(input).map(coord -> coord[1]).sorted(Collections.reverseOrder()).toList();
+        List<Integer> x_sorted =
+                Arrays.stream(input).map(coord -> coord[0]).sorted(Collections.reverseOrder()).toList();
+        List<Integer> z_sorted =
+                Arrays.stream(input).map(coord -> coord[1]).sorted(Collections.reverseOrder()).toList();
         boolean checkX = false;
         boolean checkZ = false;
         // Create a clone that doesn't reference values of the input array.
@@ -115,12 +118,14 @@ public class MinecraftRectangleConverter {
                 ((cornerA[0] - cornerC[0]) == (cornerB[0] - cornerD[0])) && ((cornerA[1] - cornerC[1]) == (cornerB[1] - cornerD[1]));
     }
 
-    private static double getSummedDistance(double[][] input, int[] cornerA, int[] cornerB, int[] cornerC, int[] cornerD) {
+    private static double getSummedDistance(double[][] input, int[] cornerA, int[] cornerB, int[] cornerC,
+                                            int[] cornerD) {
         return distanceBetween(cornerA, input[0]) + distanceBetween(cornerB, input[1])
                 + distanceBetween(cornerC, input[2]) + distanceBetween(cornerD, input[3]);
     }
 
     private static double distanceBetween(int[] pointA, double[] pointB) {
-        return Math.sqrt((pointA[0] - pointB[0]) * (pointA[0] - pointB[0]) + (pointA[1] - pointB[1]) * (pointA[1] - pointB[1]));
+        return Math.sqrt(
+                (pointA[0] - pointB[0]) * (pointA[0] - pointB[0]) + (pointA[1] - pointB[1]) * (pointA[1] - pointB[1]));
     }
 }

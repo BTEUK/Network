@@ -19,7 +19,6 @@ public class TextureUtils {
         String textureProperty = getTextureProperty(profile.getProperties());
 
         return getTexture(textureProperty);
-
     }
 
     public static String getTexture(String textureProperty) {

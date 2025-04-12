@@ -2,7 +2,7 @@ package net.bteuk.network.utils;
 
 public class PlotValues {
 
-    //Returns the plot difficulty name.
+    // Returns the plot difficulty name.
     public static String difficultyName(int difficulty) {
 
         return switch (difficulty) {
@@ -13,7 +13,7 @@ public class PlotValues {
         };
     }
 
-    //Returns the plot size name.
+    // Returns the plot size name.
     public static String sizeName(int size) {
 
         return switch (size) {

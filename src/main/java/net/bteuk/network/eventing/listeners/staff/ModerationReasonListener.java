@@ -31,43 +31,42 @@ public class ModerationReasonListener implements Listener {
 
         Bukkit.getServer().getPluginManager().registerEvents(this, Network.getInstance());
 
-        //Start timer to automatically close the listener.
+        // Start timer to automatically close the listener.
         task = Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
-            //Send message to player telling them it's been timer out.
+            // Send message to player telling them it's been timer out.
             if (u.player != null) {
-                u.player.sendMessage(ChatUtils.error("'Set " + gui.getType().label.toLowerCase(Locale.ROOT) + " reason' cancelled."));
+                u.player.sendMessage(ChatUtils.error("'Set " + gui.getType().label.toLowerCase(Locale.ROOT) + " " +
+                        "reason' cancelled."));
             }
             unregister();
         }, 1200L);
-
     }
 
     @EventHandler
     public void ChatEvent(AsyncChatEvent e) {
 
-        //Check if this is the correct player.
+        // Check if this is the correct player.
         if (e.getPlayer().equals(u.player)) {
 
             e.setCancelled(true);
 
-            //Check if message is 256 characters or less.
+            // Check if message is 256 characters or less.
             if (PlainTextComponentSerializer.plainText().serialize(e.message()).length() > 64) {
 
-                e.getPlayer().sendMessage(ChatUtils.error("The region tag can't be longer than 256 characters, please try again."));
-
+                e.getPlayer().sendMessage(ChatUtils.error("The region tag can't be longer than 256 characters, please" +
+                        " try again."));
             } else {
 
-                //Set the reason.
+                // Set the reason.
                 gui.setReason(PlainTextComponentSerializer.plainText().serialize(e.message()));
                 e.getPlayer().sendMessage(ChatUtils.success("Set reason to: ")
                         .append(e.message().color(DARK_AQUA)));
 
-                //Refresh and reopen the gui.
-                //This also cancels the task and unregisters the listener.
+                // Refresh and reopen the gui.
+                // This also cancels the task and unregisters the listener.
                 gui.refresh();
 
                 Bukkit.getScheduler().runTask(Network.getInstance(), () -> gui.open(u));
-
             }
         }
     }

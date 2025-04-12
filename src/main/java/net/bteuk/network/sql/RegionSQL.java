@@ -33,9 +33,7 @@ public class RegionSQL extends AbstractSQL {
             while (results.next()) {
 
                 list.add(new Request(results.getString(1), results.getString(2)));
-
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
@@ -60,9 +58,7 @@ public class RegionSQL extends AbstractSQL {
                 region = Network.getInstance().getRegionManager().getRegion(results.getString(1));
 
                 list.add(new Inactivity(region, results.getString(2)));
-
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
@@ -77,7 +73,9 @@ public class RegionSQL extends AbstractSQL {
 
         try (
                 Connection conn = conn();
-                PreparedStatement statement = conn.prepareStatement("SELECT region,uuid,is_owner,last_enter,tag,coordinate_id,pinned FROM region_members WHERE uuid=? ORDER BY pinned DESC, is_owner DESC, region ASC");
+                PreparedStatement statement = conn.prepareStatement("SELECT region,uuid,is_owner,last_enter,tag," +
+                        "coordinate_id,pinned FROM region_members WHERE uuid=? ORDER BY pinned DESC, is_owner DESC, " +
+                        "region ASC")
         ) {
 
             statement.setString(1, uuid);
@@ -95,7 +93,8 @@ public class RegionSQL extends AbstractSQL {
                 ));
             }
         } catch (SQLException e) {
-            Constants.LOGGER.severe(String.format("An error occurred while fetching the region_members entries for %s", uuid));
+            Constants.LOGGER.severe(String.format("An error occurred while fetching the region_members entries for " +
+                    "%s", uuid));
         }
         return list;
     }

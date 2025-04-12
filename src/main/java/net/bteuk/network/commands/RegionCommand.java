@@ -16,7 +16,7 @@ public class RegionCommand extends AbstractCommand {
     @Override
     public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        //Check if the sender is a player.
+        // Check if the sender is a player.
         Player player = getPlayer(stack);
         if (player == null) {
             return;
@@ -27,42 +27,40 @@ public class RegionCommand extends AbstractCommand {
             return;
         }
 
-        //Check if the first arg is 'join'
+        // Check if the first arg is 'join'
         if (!args[0].equals("join")) {
             player.sendMessage(ChatUtils.error("/region join <region>"));
             return;
         }
 
-        //Check if the region exists.
+        // Check if the region exists.
         if (Network.getInstance().getRegionManager().exists(args[1])) {
 
-            //Get the region.
+            // Get the region.
             Region region = Network.getInstance().getRegionManager().getRegion(args[1]);
 
-            //Check if they have an invite for this region.
+            // Check if they have an invite for this region.
             if (region.hasInvite(player.getUniqueId().toString())) {
 
-                //Check if the player has permission, else notify the player accordingly.
+                // Check if the player has permission, else notify the player accordingly.
                 if (player.hasPermission("uknet.regions.join")) {
 
-                    //Add server event to join plot.
-                    Network.getInstance().getGlobalSQL().update("INSERT INTO server_events(uuid,type,server,event) VALUES('" + player.getUniqueId() + "'," + "'network'" + ",'" +
+                    // Add server event to join plot.
+                    Network.getInstance().getGlobalSQL().update("INSERT INTO server_events(uuid,type,server,event) " +
+                            "VALUES('" + player.getUniqueId() + "'," + "'network'" + ",'" +
                             EARTH_WORLD +
                             "','region join " + region.regionName() + "');");
-
                 } else {
 
-                    //Send error.
+                    // Send error.
                     player.sendMessage(ChatUtils.error("You do not have permission to join regions."));
                     player.sendMessage(ChatUtils.error("To join regions you need at least Jr.Builder."));
                     player.sendMessage(ChatUtils.error("For more information type ")
                             .append(Component.text("/help building", NamedTextColor.DARK_RED)));
-
                 }
 
-                //Remove invite.
+                // Remove invite.
                 region.removeInvite(player.getUniqueId().toString());
-
             } else {
                 player.sendMessage(ChatUtils.error("You have not been invited to join this region."));
             }

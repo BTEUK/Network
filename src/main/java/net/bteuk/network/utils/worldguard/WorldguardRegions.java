@@ -13,26 +13,25 @@ public class WorldguardRegions {
 
     public static boolean delete(String regionName, World world) throws RegionManagerNotFoundException {
 
-        //Get instance of WorldGuard.
+        // Get instance of WorldGuard.
         WorldGuard wg = WorldGuard.getInstance();
 
-        //Get regions.
+        // Get regions.
         RegionContainer container = wg.getPlatform().getRegionContainer();
         RegionManager buildRegions = container.get(BukkitAdapter.adapt(world));
 
         if (buildRegions == null) {
 
             throw new RegionManagerNotFoundException("RegionManager for world " + world.getName() + " is null!");
-
         }
 
-        //Get the region to remove the outlines.
+        // Get the region to remove the outlines.
         ProtectedRegion region = buildRegions.getRegion(regionName);
 
-        //Attempt to remove the plot.
+        // Attempt to remove the plot.
         buildRegions.removeRegion(regionName);
 
-        //Save the changes
+        // Save the changes
         try {
             buildRegions.saveChanges();
             return true;
