@@ -56,11 +56,8 @@ public class BuildingCompanion {
 
     // The player that this building companion is for.
     private final NetworkUser user;
-
-    private World world;
-
     private final HashMap<UUID, SavedOutline> saved_outlines;
-
+    private World world;
     private boolean asyncActive = false;
 
     public BuildingCompanion(NetworkUser user) {
@@ -73,7 +70,15 @@ public class BuildingCompanion {
         // Enable the tpll listener.
         listeners = new HashSet<>();
         listeners.add(new TpllListener(this));
+    }
 
+    private static boolean contains(Set<double[]> list, double[] input) {
+        for (double[] array : list) {
+            if (Arrays.equals(array, input)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -96,7 +101,8 @@ public class BuildingCompanion {
             world = user.player.getWorld();
             input_corners.clear();
             saved_outlines.clear();
-            sendFeedback(Component.text("You have switched worlds, resetting building companion data.", NamedTextColor.YELLOW));
+            sendFeedback(Component.text("You have switched worlds, resetting building companion data.",
+                    NamedTextColor.YELLOW));
         }
     }
 
@@ -147,15 +153,17 @@ public class BuildingCompanion {
                 input_corners.add(new_corner);
                 sendFeedback(ChatUtils.success("New corner recorded."));
             } else {
-                sendFeedback(ChatUtils.error("You have already recorded 4 corners, and it is not close enough to an existing one."));
+                sendFeedback(ChatUtils.error("You have already recorded 4 corners, and it is not close enough to an " +
+                        "existing one."));
             }
         }
 
         // Notify the player if they have 4 corners selected.
         if (input_corners.size() == 4) {
-            //addDrawOutlinesEvent();
+            // addDrawOutlinesEvent();
             sendFeedback(ChatUtils.success("You have 4 corners selected, click here to draw the outlines.")
-                    .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/buildingcompanion drawoutlines")));
+                    .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/buildingcompanion " +
+                            "drawoutlines")));
         }
     }
 
@@ -189,7 +197,8 @@ public class BuildingCompanion {
             // Run a task later to cancel the task if it has not yet been completed.
             Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
                 if (asyncActive && Bukkit.getScheduler().isCurrentlyRunning(taskId)) {
-                    sendFeedback(ChatUtils.error("Drawing outlines task timed out, the selection was too difficult to process."));
+                    sendFeedback(ChatUtils.error("Drawing outlines task timed out, the selection was too difficult to" +
+                            " process."));
                     clearSelection();
                 }
             }, TIMEOUT);
@@ -222,7 +231,8 @@ public class BuildingCompanion {
                 // Draw the lines with fake blocks.
                 drawTempOutlinesTaskWithFeedback(finalOutput);
             } else {
-                sendFeedback(ChatUtils.error("Unable to generate a rectangle using the given corners, clearing selection."));
+                sendFeedback(ChatUtils.error("Unable to generate a rectangle using the given corners, clearing " +
+                        "selection."));
                 clearSelection();
             }
             asyncActive = false;
@@ -238,10 +248,12 @@ public class BuildingCompanion {
                 saved_outlines.put(outline.uuid(), outline);
                 sendFeedback(Component.text("Save outlines: ", NamedTextColor.YELLOW)
                         .append(Component.text("[Yes]", NamedTextColor.GREEN)
-                                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/buildingcompanion save " + outline.uuid())))
+                                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/buildingcompanion " +
+                                        "save " + outline.uuid())))
                         .append(Component.text(" - ", NamedTextColor.YELLOW))
                         .append(Component.text("[No]", NamedTextColor.RED)
-                                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/buildingcompanion remove " + outline.uuid()))));
+                                .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/buildingcompanion " +
+                                        "remove " + outline.uuid()))));
             }
         });
     }
@@ -259,7 +271,8 @@ public class BuildingCompanion {
         if (SERVER_TYPE == ServerType.PLOT) {
             // Get region at first corner. If no region is found return false.
             try {
-                wgRegion = WorldguardUtils.getRegionAt(world, BlockVector3.at(outline.corners()[0][0], 1, outline.corners()[0][1]));
+                wgRegion = WorldguardUtils.getRegionAt(world, BlockVector3.at(outline.corners()[0][0], 1,
+                        outline.corners()[0][1]));
                 if (wgRegion == null) {
                     throw new RegionNotFoundException("No region found at location.");
                 } else {
@@ -269,7 +282,8 @@ public class BuildingCompanion {
                     }
                 }
             } catch (Exception e) {
-                sendFeedback(ChatUtils.error("All or part of your selection is not in a plot you can build in, cancelled drawing outlines."));
+                sendFeedback(ChatUtils.error("All or part of your selection is not in a plot you can build in, " +
+                        "cancelled drawing outlines."));
                 return false;
             }
         } else if (REGIONS_ENABLED && SERVER_TYPE == ServerType.EARTH) {
@@ -277,7 +291,8 @@ public class BuildingCompanion {
             for (int[] point : outline.corners()) {
                 Region region = manager.getRegion(new Location(world, point[0], 1, point[1]), user.dx, user.dz);
                 if (!region.canBuild(user.player)) {
-                    sendFeedback(ChatUtils.error("All or part of your selection is not in a region you can build in, cancelled drawing outlines."));
+                    sendFeedback(ChatUtils.error("All or part of your selection is not in a region you can build in, " +
+                            "cancelled drawing outlines."));
                     return false;
                 }
             }
@@ -286,23 +301,18 @@ public class BuildingCompanion {
             return false;
         }
         try {
-            Blocks.drawLine(user.player, world, outline.corners()[0], outline.corners()[1], block, permanent, true, wgRegion);
-            Blocks.drawLine(user.player, world, outline.corners()[1], outline.corners()[3], block, permanent, true, wgRegion);
-            Blocks.drawLine(user.player, world, outline.corners()[3], outline.corners()[2], block, permanent, true, wgRegion);
-            Blocks.drawLine(user.player, world, outline.corners()[2], outline.corners()[0], block, permanent, true, wgRegion);
+            Blocks.drawLine(user.player, world, outline.corners()[0], outline.corners()[1], block, permanent, true,
+                    wgRegion);
+            Blocks.drawLine(user.player, world, outline.corners()[1], outline.corners()[3], block, permanent, true,
+                    wgRegion);
+            Blocks.drawLine(user.player, world, outline.corners()[3], outline.corners()[2], block, permanent, true,
+                    wgRegion);
+            Blocks.drawLine(user.player, world, outline.corners()[2], outline.corners()[0], block, permanent, true,
+                    wgRegion);
             return true;
         } catch (Exception e) {
             sendFeedback(ChatUtils.error(e.getMessage()));
             return false;
         }
-    }
-
-    private static boolean contains(Set<double[]> list, double[] input) {
-        for (double[] array : list) {
-            if (Arrays.equals(array, input)) {
-                return true;
-            }
-        }
-        return false;
     }
 }

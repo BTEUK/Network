@@ -13,7 +13,7 @@ public class Punmute extends PmuteAction {
 
     private static final Component ERROR = ChatUtils.error("/punmute [player]");
 
-    public Punmute(Network instance)  {
+    public Punmute(Network instance) {
         super(instance, ERROR);
     }
 

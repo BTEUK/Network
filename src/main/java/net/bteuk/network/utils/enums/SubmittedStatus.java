@@ -19,6 +19,7 @@ public enum SubmittedStatus {
 
     /**
      * Get the {@link SubmittedStatus} from the database value.
+     *
      * @param value the database value
      * @return the SubmittedStatus, or null if none match
      */

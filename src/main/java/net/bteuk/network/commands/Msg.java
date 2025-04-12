@@ -34,7 +34,7 @@ public class Msg extends AbstractCommand {
     @Override
     public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        //Check if the sender is a player.
+        // Check if the sender is a player.
         Player player = getPlayer(stack);
         if (player == null) {
             return;
@@ -67,7 +67,8 @@ public class Msg extends AbstractCommand {
 
         // Send direct message, the message is created using all other command arguments.
         String message = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
-        DirectMessage directMessage = getDirectMessage(message, player.getName(), player.getUniqueId().toString(), name, uuid, ChatChannels.GLOBAL);
+        DirectMessage directMessage = getDirectMessage(message, player.getName(), player.getUniqueId().toString(),
+                name, uuid, ChatChannels.GLOBAL);
         instance.getChat().sendSocketMesage(directMessage);
     }
 }

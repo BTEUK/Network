@@ -19,11 +19,9 @@ import static net.bteuk.network.utils.Constants.SERVER_NAME;
  */
 public class MapCommand extends AbstractCommand {
 
-    private final Map map;
-
-    private final String server;
-
     private static final Component INVALID_USAGE = ChatUtils.error("/map [add/remove] [warp/subcategory]");
+    private final Map map;
+    private final String server;
 
     protected MapCommand(Map map, String server) {
         this.map = map;
@@ -39,7 +37,7 @@ public class MapCommand extends AbstractCommand {
             return;
         }
 
-        //Check if the sender is a player.
+        // Check if the sender is a player.
         Player player = getPlayer(stack);
         if (player == null) {
             return;
@@ -60,10 +58,10 @@ public class MapCommand extends AbstractCommand {
 
         if (Objects.equals(server, SERVER_NAME)) {
             switch (args[0]) {
-                case "add" ->
-                        player.sendMessage(map.addMarker(player.getLocation(), String.join(" ", Arrays.copyOfRange(args, 1, args.length))));
-                case "remove" ->
-                        player.sendMessage(map.removeMarker(String.join(" ", Arrays.copyOfRange(args, 1, args.length))));
+                case "add" -> player.sendMessage(map.addMarker(player.getLocation(), String.join(" ",
+                        Arrays.copyOfRange(args, 1, args.length))));
+                case "remove" -> player.sendMessage(map.removeMarker(String.join(" ",
+                        Arrays.copyOfRange(args, 1, args.length))));
                 default -> player.sendMessage(INVALID_USAGE);
             }
         } else {

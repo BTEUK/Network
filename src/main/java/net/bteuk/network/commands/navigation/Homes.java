@@ -20,35 +20,35 @@ public class Homes extends AbstractCommand {
     @Override
     public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        //Check if the sender is a player.
+        // Check if the sender is a player.
         Player player = getPlayer(stack);
         if (player == null) {
             return;
         }
 
-        //Check if the player has permission.
+        // Check if the player has permission.
         if (!hasPermission(player, "uknet.navigation.homes")) {
             return;
         }
 
-        //Set default page to 1.
+        // Set default page to 1.
         int page = 1;
 
-        //Check if a page is specified.
+        // Check if a page is specified.
         if (args.length > 0) {
             try {
 
                 page = Integer.parseInt(args[0]);
-
             } catch (NumberFormatException e) {
-                //Ignore the arguments altogether.
+                // Ignore the arguments altogether.
             }
         }
 
-        //Get all homes in alphabetical order.
-        ArrayList<String> homes = Network.getInstance().getGlobalSQL().getStringList("SELECT name FROM home WHERE uuid='" + player.getUniqueId() + "' ORDER BY name ASC;");
+        // Get all homes in alphabetical order.
+        ArrayList<String> homes = Network.getInstance().getGlobalSQL().getStringList("SELECT name FROM home WHERE " +
+                "uuid='" + player.getUniqueId() + "' ORDER BY name ASC;");
 
-        //If there are no locations notify the user.
+        // If there are no locations notify the user.
         if (homes.isEmpty()) {
             player.sendMessage(ChatUtils.error("You don't have any homes set."));
             return;
@@ -56,10 +56,10 @@ public class Homes extends AbstractCommand {
 
         int pages = (((homes.size() - 1) / 16) + 1);
 
-        //Get the first 16 homes and add them to a string.
-        //If the page is greater than 1 and there are enough homes to support that, then post that page.
+        // Get the first 16 homes and add them to a string.
+        // If the page is greater than 1 and there are enough homes to support that, then post that page.
 
-        if (((page - 1) * 16) >= homes.size()){
+        if (((page - 1) * 16) >= homes.size()) {
 
             if (homes.size() <= 16) {
                 player.sendMessage(ChatUtils.error("There is only ")
@@ -73,21 +73,22 @@ public class Homes extends AbstractCommand {
             return;
         }
 
-        //Show this page of homes.
+        // Show this page of homes.
         Component message = Component.text("");
 
-        //If this isn't the first page show command for previous page.
+        // If this isn't the first page show command for previous page.
         if (page > 1) {
 
-            //Create previousPage button with hover and click event.
+            // Create previousPage button with hover and click event.
             Component previousPage = Component.text("⏪⏪⏪", TextColor.color(212, 113, 15));
-            previousPage = previousPage.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Utils.line("Click to view the previous page of homes.")));
-            previousPage = previousPage.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/homes " + (page - 1 )));
+            previousPage = previousPage.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Utils.line(
+                    "Click to view the previous page of homes.")));
+            previousPage = previousPage.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND,
+                    "/homes " + (page - 1)));
 
-            //Add previousPage button at the start of the first line.
+            // Add previousPage button at the start of the first line.
             message = message.append(previousPage);
             message = message.append(Component.text(" "));
-
         }
 
         message = message.append(Component.text("Page ", NamedTextColor.GREEN)
@@ -95,25 +96,25 @@ public class Homes extends AbstractCommand {
                 .append(Component.text("/", NamedTextColor.GREEN))
                 .append(Component.text(pages, TextColor.color(245, 221, 100))));
 
-        //If this isn't the last page show command for the next page.
+        // If this isn't the last page show command for the next page.
         if ((page * 16) < homes.size()) {
 
-            //Create previousPage button with hover and click event.
+            // Create previousPage button with hover and click event.
             Component nextPage = Component.text("⏩⏩⏩\n", TextColor.color(212, 113, 15));
-            nextPage = nextPage.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Utils.line("Click to view the next page of homes.")));
-            nextPage = nextPage.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/homes " + (page + 1 )));
+            nextPage = nextPage.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Utils.line("Click to " +
+                    "view the next page of homes.")));
+            nextPage = nextPage.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND,
+                    "/homes " + (page + 1)));
 
-            //Add previousPage button at the start of the first line.
+            // Add previousPage button at the start of the first line.
             message = message.append(Component.text(" "));
             message = message.append(nextPage);
-
         } else {
 
             message = message.append(Component.text("\n"));
-
         }
 
-        //Number of entries to skip.
+        // Number of entries to skip.
         int skip = (page - 1) * 16;
 
         for (String home : homes) {
@@ -122,17 +123,15 @@ public class Homes extends AbstractCommand {
                 continue;
             }
 
-            //If it isn't the last entry, as a comma at the end.
-            //This is calculated by it either being the 16th entry, or the last in the list.
+            // If it isn't the last entry, as a comma at the end.
+            // This is calculated by it either being the 16th entry, or the last in the list.
             if (((homes.indexOf(home) + 1) % 16) == 0 || (homes.indexOf(home) + 1 == homes.size())) {
 
                 message = message.append(createHome(home));
                 break;
-
             } else {
 
                 message = message.append(createHome(home)).append(Component.text(", ", NamedTextColor.WHITE));
-
             }
         }
 
@@ -144,15 +143,16 @@ public class Homes extends AbstractCommand {
         Component home;
         if (name == null) {
             home = Component.text("<default>", TextColor.color(245, 221, 100));
-            home = home.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text("Click to teleport to your default home.")));
+            home = home.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text("Click to " +
+                    "teleport to your default home.")));
             home = home.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/home"));
         } else {
             home = Component.text(name, TextColor.color(245, 221, 100));
-            home = home.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text("Click to teleport to " + name)));
+            home = home.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Component.text("Click to " +
+                    "teleport to " + name)));
             home = home.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/home " + name));
         }
 
         return home;
-
     }
 }

@@ -7,5 +7,4 @@ public interface LobbyComponent {
     void unload();
 
     void reload();
-
 }

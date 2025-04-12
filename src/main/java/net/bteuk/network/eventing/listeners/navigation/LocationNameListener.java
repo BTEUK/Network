@@ -30,17 +30,17 @@ public class LocationNameListener implements Listener {
         this.p = p;
         this.gui = gui;
 
-        //Start timer to automatically close the listener.
+        // Start timer to automatically close the listener.
         task = Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
-            //Send message to player telling them it's been timer out.
+            // Send message to player telling them it's been timer out.
             if (p != null) {
                 p.sendMessage(ChatUtils.error("'Set Location Name' cancelled."));
 
-                //If AddLocation gui still exists, reopen it.
-                //Also check if player is actually still online.
+                // If AddLocation gui still exists, reopen it.
+                // Also check if player is actually still online.
                 if (p.isOnline()) {
                     NetworkUser u = Network.getInstance().getUser(p);
-                    //Open staff gui if it's update or review.
+                    // Open staff gui if it's update or review.
                     if (gui.getType() == AddLocationType.ADD) {
                         if (Objects.requireNonNull(u).mainGui != null) {
                             if (u.mainGui instanceof AddLocation) {
@@ -55,38 +55,36 @@ public class LocationNameListener implements Listener {
                         }
                     }
                 }
-
             }
             unregister();
         }, 1200L);
-
     }
 
     @EventHandler
     public void ChatEvent(AsyncChatEvent e) {
 
-        //Check if this is the correct player.
+        // Check if this is the correct player.
         if (e.getPlayer().equals(p)) {
 
             e.setCancelled(true);
 
-            //Check if message is under 64 character.
+            // Check if message is under 64 character.
             if (PlainTextComponentSerializer.plainText().serialize(e.message()).length() > 64) {
                 e.getPlayer().sendMessage(ChatUtils.error("The location name can't be longer than 64 characters."));
             } else {
 
-                //Set location name.
+                // Set location name.
                 gui.setName(PlainTextComponentSerializer.plainText().serialize(e.message()));
 
-                //Send message to player.
+                // Send message to player.
                 p.sendMessage(ChatUtils.success("Set location name to ")
                         .append(e.message().color(NamedTextColor.DARK_AQUA)));
 
-                //Unregister listener and task.
+                // Unregister listener and task.
                 task.cancel();
                 unregister();
 
-                //If AddLocation gui still exists, reopen it.
+                // If AddLocation gui still exists, reopen it.
                 NetworkUser u = Network.getInstance().getUser(p);
                 if (gui.getType() == AddLocationType.ADD) {
                     if (Objects.requireNonNull(u).mainGui != null) {

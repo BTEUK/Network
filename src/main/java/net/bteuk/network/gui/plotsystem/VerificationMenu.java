@@ -32,7 +32,8 @@ public class VerificationMenu extends Gui {
 
     private void createGui() {
 
-        ArrayList<Integer> verifications = plotSQL.getIntList("SELECT id FROM plot_verification WHERE review_id IN (SELECT review_id FROM plot_review WHERE reviewer='" + user.getUuid() + "') ORDER BY id ASC;");
+        ArrayList<Integer> verifications = plotSQL.getIntList("SELECT id FROM plot_verification WHERE review_id IN " +
+                "(SELECT review_id FROM plot_review WHERE reviewer='" + user.getUuid() + "') ORDER BY id ASC;");
 
         // Slot count.
         int slot = 10;
@@ -41,21 +42,27 @@ public class VerificationMenu extends Gui {
         for (int verificationId : verifications) {
 
             // Determine the colour based on what was changed in the verification.
-            boolean feedbackChanged = plotSQL.hasRow("SELECT 1 FROM plot_verification_category WHERE verification_id=" + verificationId + " AND book_id_old <> book_id_new;");
-            boolean selectionChanged = plotSQL.hasRow("SELECT 1 FROM plot_verification_category WHERE verification_id=" + verificationId + " AND selection_old <> selection_old;");
-            boolean outcomeChanged = plotSQL.hasRow("SELECT 1 FROM plot_verification WHERE id=" + verificationId + " AND accepted_old <> accepted_new;");
+            boolean feedbackChanged = plotSQL.hasRow("SELECT 1 FROM plot_verification_category WHERE " +
+                    "verification_id=" + verificationId + " AND book_id_old <> book_id_new;");
+            boolean selectionChanged = plotSQL.hasRow("SELECT 1 FROM plot_verification_category WHERE " +
+                    "verification_id=" + verificationId + " AND selection_old <> selection_old;");
+            boolean outcomeChanged = plotSQL.hasRow("SELECT 1 FROM plot_verification WHERE id=" + verificationId + " " +
+                    "AND accepted_old <> accepted_new;");
 
             Material item;
             Component[] description;
             if (outcomeChanged) {
                 item = Material.RED_CONCRETE;
-                description = new Component[]{Utils.line("The outcome of the review was altered."), Utils.line("Click to view the changes.")};
+                description = new Component[]{Utils.line("The outcome of the review was altered."), Utils.line("Click" +
+                        " to view the changes.")};
             } else if (selectionChanged) {
                 item = Material.ORANGE_CONCRETE;
-                description = new Component[]{Utils.line("The selection of a category was altered."), Utils.line("Click to view the changes.")};
+                description = new Component[]{Utils.line("The selection of a category was altered."), Utils.line(
+                        "Click to view the changes.")};
             } else if (feedbackChanged) {
                 item = Material.YELLOW_CONCRETE;
-                description = new Component[]{Utils.line("The feedback of a category was altered."), Utils.line("Click to view the changes.")};
+                description = new Component[]{Utils.line("The feedback of a category was altered."), Utils.line(
+                        "Click to view the changes.")};
             } else {
                 item = Material.LIME_CONCRETE;
                 description = new Component[]{Utils.line("The review was not altered.")};
@@ -82,7 +89,6 @@ public class VerificationMenu extends Gui {
                 // Increase value by 1.
                 slot++;
             }
-
 
             // Return
             setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,

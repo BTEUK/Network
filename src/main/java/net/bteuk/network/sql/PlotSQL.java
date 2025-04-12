@@ -20,7 +20,11 @@ public class PlotSQL extends AbstractSQL {
 
     public int[][] getPlotCorners(int plotID) {
 
-        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement("SELECT COUNT(corner) FROM plot_corners WHERE id=" + plotID + ";"); ResultSet results = statement.executeQuery()) {
+        try (
+                Connection conn = conn();
+                PreparedStatement statement = conn.prepareStatement("SELECT COUNT(corner) FROM" +
+                        " plot_corners WHERE id=" + plotID + ";"); ResultSet results = statement.executeQuery()
+        ) {
 
             results.next();
 
@@ -29,7 +33,6 @@ public class PlotSQL extends AbstractSQL {
             getPlotCorners(corners, plotID);
 
             return corners;
-
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
@@ -38,18 +41,19 @@ public class PlotSQL extends AbstractSQL {
 
     private int[][] getPlotCorners(int[][] corners, int plotID) {
 
-        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement("SELECT x,z FROM plot_corners WHERE id=" + plotID + ";"); ResultSet results = statement.executeQuery()) {
+        try (
+                Connection conn = conn(); PreparedStatement statement = conn.prepareStatement("SELECT x,z FROM " +
+                "plot_corners WHERE id=" + plotID + ";"); ResultSet results = statement.executeQuery()
+        ) {
 
             for (int i = 0; i < corners.length; i++) {
 
                 results.next();
                 corners[i][0] = results.getInt(1);
                 corners[i][1] = results.getInt(2);
-
             }
 
             return corners;
-
         } catch (SQLException e) {
             e.printStackTrace();
             return corners;
@@ -59,7 +63,11 @@ public class PlotSQL extends AbstractSQL {
     // Creates a new plot and returns the id of the plot.
     public int createPlot(int size, int difficulty, String location, int coordinate_id) {
 
-        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement("INSERT INTO plot_data(status, size, difficulty, location, coordinate_id) VALUES(?, ?, ?, ?, ?);", Statement.RETURN_GENERATED_KEYS)) {
+        try (
+                Connection conn = conn(); PreparedStatement statement = conn.prepareStatement("INSERT INTO plot_data" +
+                        "(status, size, difficulty, location, coordinate_id) VALUES(?, ?, ?, ?, ?);",
+                Statement.RETURN_GENERATED_KEYS)
+        ) {
 
             statement.setString(1, "unclaimed");
             statement.setInt(2, size);
@@ -73,27 +81,25 @@ public class PlotSQL extends AbstractSQL {
                 if (results.next()) {
 
                     return results.getInt(1);
-
                 } else {
 
                     return 0;
-
                 }
             }
-
         } catch (SQLException sql) {
 
             sql.printStackTrace();
             return 0;
-
         }
-
     }
 
     // Creates a new plot and returns the id of the plot.
     public int createZone(String location, long expiration, boolean is_public) {
 
-        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement("INSERT INTO zones(location,expiration,is_public) VALUES(?, ?, ?);", Statement.RETURN_GENERATED_KEYS)) {
+        try (
+                Connection conn = conn(); PreparedStatement statement = conn.prepareStatement("INSERT INTO zones" +
+                "(location,expiration,is_public) VALUES(?, ?, ?);", Statement.RETURN_GENERATED_KEYS)
+        ) {
 
             statement.setString(1, location);
             statement.setLong(2, expiration);
@@ -105,24 +111,24 @@ public class PlotSQL extends AbstractSQL {
                 if (results.next()) {
 
                     return results.getInt(1);
-
                 } else {
 
                     return 0;
-
                 }
             }
-
         } catch (SQLException sql) {
 
             sql.printStackTrace();
             return 0;
-
         }
     }
 
     public double getReviewerReputation(String uuid) {
-        try (Connection conn = conn(); PreparedStatement statement = conn.prepareStatement("SELECT reputation FROM reviewers WHERE uuid=?;")) {
+        try (
+                Connection conn = conn();
+                PreparedStatement statement = conn.prepareStatement("SELECT reputation FROM " +
+                        "reviewers WHERE uuid=?;")
+        ) {
             statement.setString(1, uuid);
             ResultSet results = statement.executeQuery();
 
@@ -136,12 +142,15 @@ public class PlotSQL extends AbstractSQL {
     }
 
     public List<Integer> getReviewablePlots(String uuid, boolean isArchitect, boolean isReviewer) {
-        List<PlotDifficulties> difficulties = Reviewing.getAvailablePlotDifficulties(isArchitect, isReviewer, getReviewerReputation(uuid));
+        List<PlotDifficulties> difficulties = Reviewing.getAvailablePlotDifficulties(isArchitect, isReviewer,
+                getReviewerReputation(uuid));
 
         List<Integer> submitted_plots = new ArrayList<>();
 
         for (PlotDifficulties difficulty : difficulties) {
-            submitted_plots.addAll(getIntList("SELECT pd.id FROM plot_data AS pd INNER JOIN plot_submission AS ps ON pd.id=ps.plot_id WHERE ps.status='submitted' AND pd.difficulty=" + difficulty.getValue() + " ORDER BY ps.submit_time ASC;"));
+            submitted_plots.addAll(getIntList("SELECT pd.id FROM plot_data AS pd INNER JOIN plot_submission AS ps ON " +
+                    "pd.id=ps.plot_id WHERE ps.status='submitted' AND pd.difficulty=" + difficulty.getValue() + " " +
+                    "ORDER BY ps.submit_time ASC;"));
         }
 
         // Get all plots that the user is the owner or a member of, don't use those in the count.
@@ -153,19 +162,23 @@ public class PlotSQL extends AbstractSQL {
     }
 
     public List<Integer> getVerifiablePlots(String uuid, boolean isReviewer) {
-        List<PlotDifficulties> difficulties = Reviewing.getAvailablePlotDifficulties(isReviewer, isReviewer, getReviewerReputation(uuid));
+        List<PlotDifficulties> difficulties = Reviewing.getAvailablePlotDifficulties(isReviewer, isReviewer,
+                getReviewerReputation(uuid));
 
         List<Integer> plots_awaiting_verification = new ArrayList<>();
 
         for (PlotDifficulties difficulty : difficulties) {
-            plots_awaiting_verification.addAll(getIntList("SELECT pd.id FROM plot_data AS pd INNER JOIN plot_submission AS ps ON pd.id=ps.plot_id WHERE ps.status='awaiting verification' AND pd.difficulty=" + difficulty.getValue() + " ORDER BY ps.submit_time ASC;"));
+            plots_awaiting_verification.addAll(getIntList("SELECT pd.id FROM plot_data AS pd INNER JOIN " +
+                    "plot_submission AS ps ON pd.id=ps.plot_id WHERE ps.status='awaiting verification' AND pd" +
+                    ".difficulty=" + difficulty.getValue() + " ORDER BY ps.submit_time ASC;"));
         }
 
         // Get all plots that the user is the owner or a member of, don't use those in the count.
         List<Integer> member_plots = getIntList("SELECT id FROM plot_members WHERE uuid='" + uuid + "';");
 
         // Get all plots that the user has reviewed, don't use those in the count.
-        List<Integer> reviewed_plots = getIntList("SELECT plot_id FROM plot_review WHERE reviewer='" + uuid + "' AND completed=0;");
+        List<Integer> reviewed_plots = getIntList("SELECT plot_id FROM plot_review WHERE reviewer='" + uuid + "' AND " +
+                "completed=0;");
 
         plots_awaiting_verification.removeAll(member_plots);
         plots_awaiting_verification.removeAll(reviewed_plots);
@@ -179,7 +192,7 @@ public class PlotSQL extends AbstractSQL {
 
     public void addOrUpdateReviewer(String uuid, String roleId) {
         // Check if the reviewer is already added to the table.
-        boolean hasRow = hasRow("SELECT uuid FROM reviewers WHERE uuid='" + uuid + "';");
+        boolean hasRow = hasRow("SELECT 1 FROM reviewers WHERE uuid='" + uuid + "';");
 
         double initialValue = getReviewerReputation(uuid);
 
@@ -208,22 +221,28 @@ public class PlotSQL extends AbstractSQL {
      * @return whether the player can review this plot
      */
     public boolean canReviewPlot(int plotId, String uuid, boolean isArchitect, boolean isReviewer) {
-        List<PlotDifficulties> difficulties = Reviewing.getAvailablePlotDifficulties(isArchitect, isReviewer, getReviewerReputation(uuid));
+        List<PlotDifficulties> difficulties = Reviewing.getAvailablePlotDifficulties(isArchitect, isReviewer,
+                getReviewerReputation(uuid));
         int plotDifficulty = getInt("SELECT difficulty FROM plot_data WHERE id=" + plotId + ";");
 
         // Check if the user can review a plot with this difficulty.
         // Check if the user is a member of the plot.
-        return (difficulties.stream().mapToInt(PlotDifficulties::getValue).anyMatch(difficulty -> difficulty == plotDifficulty) && !hasRow("SELECT id FROM plot_members WHERE id=" + plotId + " AND uuid='" + uuid + "';"));
+        return (difficulties.stream().mapToInt(PlotDifficulties::getValue)
+                .anyMatch(difficulty -> difficulty == plotDifficulty) && !hasRow(
+                "SELECT id FROM plot_members WHERE id=" + plotId + " AND uuid='" + uuid + "';"));
     }
 
     public boolean canVerifyPlot(int plotId, String uuid, boolean isReviewer) {
-        List<PlotDifficulties> difficulties = Reviewing.getAvailablePlotDifficulties(isReviewer, isReviewer, getReviewerReputation(uuid));
+        List<PlotDifficulties> difficulties = Reviewing.getAvailablePlotDifficulties(isReviewer, isReviewer,
+                getReviewerReputation(uuid));
         int plotDifficulty = getInt("SELECT difficulty FROM plot_data WHERE id=" + plotId + ";");
 
         // The player must be a reviewer, is not the reviewer of the plot and is not the owner or a member of the plot.
         // The reviewer must also be allowed to verify a plot of this difficulty.
-        return (isReviewer && difficulties.stream().mapToInt(PlotDifficulties::getValue).anyMatch(difficulty -> difficulty == plotDifficulty)
-                && !hasRow("SELECT 1 FROM plot_review WHERE reviewer='" + uuid + "' AND plot_id=" + plotId + " AND completed=0")
+        return (isReviewer && difficulties.stream().mapToInt(PlotDifficulties::getValue)
+                .anyMatch(difficulty -> difficulty == plotDifficulty)
+                && !hasRow("SELECT 1 FROM plot_review WHERE reviewer='" + uuid + "' AND plot_id=" + plotId + " AND " +
+                "completed=0")
                 && !hasRow("SELECT 1 FROM plot_members WHERE id=" + plotId + " AND uuid='" + uuid + "';"));
     }
 
@@ -240,7 +259,9 @@ public class PlotSQL extends AbstractSQL {
     public int createReview(int plotId, String plotOwner, String reviewer, boolean accepted, boolean completed) {
         try (
                 Connection conn = conn();
-                PreparedStatement statement = conn.prepareStatement("INSERT INTO plot_review(plot_id,uuid,reviewer,attempt,review_time,accepted,completed) VALUES(?, ?, ?, ?, ?, ?, ?);", Statement.RETURN_GENERATED_KEYS)
+                PreparedStatement statement = conn.prepareStatement("INSERT INTO plot_review(plot_id,uuid,reviewer," +
+                                "attempt,review_time,accepted,completed) VALUES(?, ?, ?, ?, ?, ?, ?);",
+                        Statement.RETURN_GENERATED_KEYS)
         ) {
 
             statement.setInt(1, plotId);
@@ -269,7 +290,8 @@ public class PlotSQL extends AbstractSQL {
     private int getLatestAttempt(int plotId, String plotOwner) {
         try (
                 Connection conn = conn();
-                PreparedStatement statement = conn.prepareStatement("SELECT COUNT(1) FROM plot_review WHERE plot_id=? AND uuid=?;")
+                PreparedStatement statement = conn.prepareStatement("SELECT COUNT(1) FROM plot_review WHERE plot_id=?" +
+                        " AND uuid=?;")
         ) {
             statement.setInt(1, plotId);
             statement.setString(2, plotOwner);
@@ -287,7 +309,8 @@ public class PlotSQL extends AbstractSQL {
     public void savePlotReviewCategoryFeedback(int reviewId, String category, String selection, int bookId) {
         try (
                 Connection conn = conn();
-                PreparedStatement statement = conn.prepareStatement("INSERT INTO plot_category_feedback(review_id,category,selection,book_id) VALUES(?, ?, ?, ?);")
+                PreparedStatement statement = conn.prepareStatement("INSERT INTO plot_category_feedback(review_id," +
+                        "category,selection,book_id) VALUES(?, ?, ?, ?);")
         ) {
 
             statement.setInt(1, reviewId);
@@ -295,7 +318,6 @@ public class PlotSQL extends AbstractSQL {
             statement.setString(3, selection);
             statement.setInt(4, bookId);
             statement.executeUpdate();
-
         } catch (SQLException sql) {
             sql.printStackTrace();
         }
@@ -313,7 +335,8 @@ public class PlotSQL extends AbstractSQL {
     public int createVerification(int reviewId, String verifier, boolean acceptedOld, boolean acceptedNew) {
         try (
                 Connection conn = conn();
-                PreparedStatement statement = conn.prepareStatement("INSERT INTO plot_verification(review_id,verifier,accepted_old,accepted_new) VALUES(?, ?, ?, ?);", Statement.RETURN_GENERATED_KEYS)
+                PreparedStatement statement = conn.prepareStatement("INSERT INTO plot_verification(review_id," +
+                        "verifier,accepted_old,accepted_new) VALUES(?, ?, ?, ?);", Statement.RETURN_GENERATED_KEYS)
         ) {
             statement.setInt(1, reviewId);
             statement.setString(2, verifier);
@@ -345,10 +368,13 @@ public class PlotSQL extends AbstractSQL {
      * @param bookOld        the book id of the reviewers feedback
      * @param bookNew        the book id of the verifiers feedback
      */
-    public void savePlotVerificationCategory(int verificationId, String category, String selectionOld, String selectionNew, int bookOld, int bookNew) {
+    public void savePlotVerificationCategory(int verificationId, String category, String selectionOld,
+                                             String selectionNew, int bookOld, int bookNew) {
         try (
                 Connection conn = conn();
-                PreparedStatement statement = conn.prepareStatement("INSERT INTO plot_verification_category(verification_id,category,selection_old,selection_new,book_id_old,book_id_new) VALUES(?, ?, ?, ?, ?, ?);")
+                PreparedStatement statement = conn.prepareStatement("INSERT INTO plot_verification_category" +
+                        "(verification_id,category,selection_old,selection_new,book_id_old,book_id_new) VALUES(?, ?, " +
+                        "?, ?, ?, ?);")
         ) {
             statement.setInt(1, verificationId);
             statement.setString(2, category);

@@ -3,7 +3,34 @@ package net.bteuk.network;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
-import net.bteuk.network.commands.*;
+import net.bteuk.network.commands.Afk;
+import net.bteuk.network.commands.BuildingCompanionCommand;
+import net.bteuk.network.commands.Clear;
+import net.bteuk.network.commands.Demote;
+import net.bteuk.network.commands.Discord;
+import net.bteuk.network.commands.Focus;
+import net.bteuk.network.commands.Gamemode;
+import net.bteuk.network.commands.Hdb;
+import net.bteuk.network.commands.Help;
+import net.bteuk.network.commands.Me;
+import net.bteuk.network.commands.Msg;
+import net.bteuk.network.commands.Navigator;
+import net.bteuk.network.commands.Nightvision;
+import net.bteuk.network.commands.Phead;
+import net.bteuk.network.commands.Plot;
+import net.bteuk.network.commands.Pmute;
+import net.bteuk.network.commands.ProgressMap;
+import net.bteuk.network.commands.Promote;
+import net.bteuk.network.commands.Ptime;
+import net.bteuk.network.commands.Punmute;
+import net.bteuk.network.commands.Pweather;
+import net.bteuk.network.commands.RegionCommand;
+import net.bteuk.network.commands.Rules;
+import net.bteuk.network.commands.Season;
+import net.bteuk.network.commands.Speed;
+import net.bteuk.network.commands.TipsToggle;
+import net.bteuk.network.commands.Where;
+import net.bteuk.network.commands.Zone;
 import net.bteuk.network.commands.give.GiveBarrier;
 import net.bteuk.network.commands.give.GiveDebugStick;
 import net.bteuk.network.commands.give.GiveLight;
@@ -125,7 +152,7 @@ public class CommandManager {
             commands.register("focus", "Toggle focus mode, hides chat and players.", List.of("focusmode", "fm"), new Focus());
             commands.register("me", "Disabled", new Me());
 
-            //commands.register("bteuk", "Test", new BTEUK());
+            // commands.register("bteuk", "Test", new BTEUK());
         });
     }
 }

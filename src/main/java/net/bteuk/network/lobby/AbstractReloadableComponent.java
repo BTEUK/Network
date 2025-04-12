@@ -29,5 +29,4 @@ public abstract class AbstractReloadableComponent implements LobbyComponent {
      * Unload method.
      */
     public abstract void unload();
-
 }

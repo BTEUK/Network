@@ -26,51 +26,53 @@ public class DeleteConfirm extends Gui {
         this.regionType = regionType;
 
         createGui();
-
     }
 
     private void createGui() {
 
-        //Get plot sql.
+        // Get plot sql.
         PlotSQL plotSQL = Network.getInstance().getPlotSQL();
 
-        //Delete plot
+        // Delete plot
         setItem(13, Utils.createItem(Material.TNT, 1,
                         Utils.title("Delete " + regionType.label + " " + id),
                         Utils.line("Delete the " + regionType.label + " and its contents.")),
                 u -> {
 
-                    //Delete this inventory.
+                    // Delete this inventory.
                     this.delete();
                     u.mainGui = null;
 
-                    //Create plot or zone menu, so the next time you open the navigator you return to that.
-                    //Then add server event to delete plot or zone.
+                    // Create plot or zone menu, so the next time you open the navigator you return to that.
+                    // Then add server event to delete plot or zone.
                     if (regionType == RegionType.PLOT) {
 
                         u.mainGui = new PlotMenu(u);
                         u.player.closeInventory();
                         u.sendMessage(ChatUtils.success("Deleting plot %s...", String.valueOf(id)));
 
-                        //Add server event to delete plot or zone.
-                        EventManager.createEvent(u.player.getUniqueId().toString(), "plotsystem", plotSQL.getString("SELECT server FROM location_data WHERE name='" +
-                                plotSQL.getString("SELECT location FROM plot_data WHERE id=" + id + ";") + "';"), "delete plot " + id);
-
+                        // Add server event to delete plot or zone.
+                        EventManager.createEvent(u.player.getUniqueId().toString(), "plotsystem", plotSQL.getString(
+                                        "SELECT server FROM location_data WHERE name='" +
+                                                plotSQL.getString(
+                                                        "SELECT location FROM plot_data WHERE id=" + id + ";") + "';"),
+                                "delete plot " + id);
                     } else if (regionType == RegionType.ZONE) {
 
                         u.mainGui = new ZoneMenu(u);
                         u.player.closeInventory();
                         u.sendMessage(ChatUtils.success("Deleting zone %s...", String.valueOf(id)));
 
-                        //Add server event to delete plot or zone.
-                        EventManager.createEvent(u.player.getUniqueId().toString(), "plotsystem", plotSQL.getString("SELECT server FROM location_data WHERE name='" +
-                                plotSQL.getString("SELECT location FROM zones WHERE id=" + id + ";") + "';"), "delete zone " + id);
-
+                        // Add server event to delete plot or zone.
+                        EventManager.createEvent(u.player.getUniqueId().toString(), "plotsystem", plotSQL.getString(
+                                        "SELECT server FROM location_data WHERE name='" +
+                                                plotSQL.getString("SELECT location FROM zones WHERE id=" + id + ";") + "';"),
+                                "delete" +
+                                        " zone " + id);
                     }
-
                 });
 
-        //Return to plot info menu.
+        // Return to plot info menu.
         setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
                         Utils.title("Return"),
                         Utils.line("Return to the menu of " + regionType.label + " " + id + ".")),
@@ -78,27 +80,23 @@ public class DeleteConfirm extends Gui {
 
                 {
 
-                    //Delete this inventory.
+                    // Delete this inventory.
                     this.delete();
                     u.mainGui = null;
 
-                    //Switch back to plot or zone info.
+                    // Switch back to plot or zone info.
                     if (regionType == RegionType.PLOT) {
 
                         u.mainGui = new PlotInfo(u, id);
-
                     } else if (regionType == RegionType.ZONE) {
 
                         u.mainGui = new ZoneInfo(u, id, u.player.getUniqueId().toString());
-
                     } else {
 
                         u.mainGui = new BuildGui(u);
-
                     }
 
                     u.mainGui.open(u);
-
                 });
     }
 
@@ -106,6 +104,5 @@ public class DeleteConfirm extends Gui {
 
         this.clearGui();
         createGui();
-
     }
 }

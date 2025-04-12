@@ -12,74 +12,73 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerEditBookEvent;
 import org.bukkit.inventory.meta.BookMeta;
 
-public class FeaturePropertiesBookListener implements Listener
-{
-    private Network plugin;
-    private NetworkUser user;
-    private FeaturePageGUI featurePageGUI;
-    private Field fieldType;
+public class FeaturePropertiesBookListener implements Listener {
+    private final Network plugin;
+    private final NetworkUser user;
+    private final FeaturePageGUI featurePageGUI;
+    private final Field fieldType;
 
     private String szRelevantTitle;
 
-    public FeaturePropertiesBookListener(Network plugin, FeaturePageGUI featurePageGUI, Field fieldType, NetworkUser user)
-    {
+    public FeaturePropertiesBookListener(Network plugin, FeaturePageGUI featurePageGUI, Field fieldType,
+                                         NetworkUser user) {
         this.plugin = plugin;
         this.featurePageGUI = featurePageGUI;
         this.fieldType = fieldType;
         this.user = user;
 
-        switch (fieldType)
-        {
+        switch (fieldType) {
             case Title:
-                this.szRelevantTitle = ((BookMeta) (featurePageGUI.getFeatureMenu().getTitleBook().getItemMeta())).getTitle();
+                this.szRelevantTitle =
+                        ((BookMeta) (featurePageGUI.getFeatureMenu().getTitleBook().getItemMeta())).getTitle();
                 break;
             case Description:
-                this.szRelevantTitle = ((BookMeta) (featurePageGUI.getFeatureMenu().getDescriptionBook().getItemMeta())).getTitle();
+                this.szRelevantTitle =
+                        ((BookMeta) (featurePageGUI.getFeatureMenu().getDescriptionBook().getItemMeta())).getTitle();
                 break;
             case Media_url:
-                this.szRelevantTitle = ((BookMeta) (featurePageGUI.getFeatureMenu().getMedialURLBook().getItemMeta())).getTitle();
+                this.szRelevantTitle =
+                        ((BookMeta) (featurePageGUI.getFeatureMenu().getMedialURLBook().getItemMeta())).getTitle();
                 break;
         }
     }
 
-    public void register()
-    {
+    public void register() {
         Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
     @EventHandler
-    public void BookCloseEvent(PlayerEditBookEvent e)
-    {
-        //Check the player
+    public void BookCloseEvent(PlayerEditBookEvent e) {
+        // Check the player
         if (!e.getPlayer().equals(user.player))
             return;
 
-        //We can't actually also check the book because the event doesn't give that
-        //We can only check the title
+        // We can't actually also check the book because the event doesn't give that
+        // We can only check the title
         if (!e.getNewBookMeta().getTitle().equalsIgnoreCase(szRelevantTitle))
             return;
 
-        //Extracts the new content from the book
+        // Extracts the new content from the book
         String szNewContent = ((TextComponent) e.getNewBookMeta().page(1).asComponent()).content();
 
-        //Edits the Feature's details in feature menu
+        // Edits the Feature's details in feature menu
         featurePageGUI.getFeatureMenu().fieldEdit(fieldType, szNewContent);
 
-        //Reopen the feature menu
-        featurePageGUI.refresh(); //Refresh will redo the GUI item texts based on the values edited in the line above
+        // Reopen the feature menu
+        featurePageGUI.refresh(); // Refresh will redo the GUI item texts based on the values edited in the line above
         user.mainGui = featurePageGUI;
         user.mainGui.open(user);
 
-        //Unregisters this listener
-        unregister(); //Do I actually want this? Surely I want the book to be re-editable - No. No need really, makes it more confusing for the player
-        //If they just click the item to get a single use book and then the book closes then that's a lot simpler
+        // Unregisters this listener
+        unregister(); // Do I actually want this? Surely I want the book to be re-editable - No. No need really,
+        // makes it more confusing for the player
+        // If they just click the item to get a single use book and then the book closes then that's a lot simpler
 
-        //Removes the book
+        // Removes the book
         user.player.getInventory().getItemInMainHand().setAmount(0);
     }
 
-    private void unregister()
-    {
+    private void unregister() {
         HandlerList.unregisterAll(this);
     }
 }

@@ -20,68 +20,76 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
  */
 public class Moderation {
 
-    //Ban the player.
+    // Ban the player.
     public static void ban(String uuid, long end_time, String reason) throws NotBannedException {
 
-        //Get time.
+        // Get time.
         long time = Time.currentTime();
 
-        //If the player is already banned, end the old ban.
+        // If the player is already banned, end the old ban.
         if (isBanned(uuid)) {
-            Network.getInstance().getGlobalSQL().update("UPDATE moderation SET end_time=" + time + " WHERE uuid='" + uuid + "' AND end_time>" + time + " AND type='ban';");
+            Network.getInstance().getGlobalSQL()
+                    .update("UPDATE moderation SET end_time=" + time + " WHERE uuid='" + uuid + "' AND end_time>" + time + " AND type='ban';");
         }
-        Network.getInstance().getGlobalSQL().update("INSERT INTO moderation(uuid,start_time,end_time,reason,type) VALUES('" + uuid + "'," + time + "," + end_time + ",'" + reason + "','ban');");
+        Network.getInstance().getGlobalSQL().update("INSERT INTO moderation(uuid,start_time,end_time,reason,type) " +
+                "VALUES('" + uuid + "'," + time + "," + end_time + ",'" + reason + "','ban');");
 
-        //If the player is currently online, ban them.
+        // If the player is currently online, ban them.
         kick(uuid, LegacyComponentSerializer.legacyAmpersand().serialize(getBannedComponent(uuid)));
-
     }
 
-    //Mute the player.
+    // Mute the player.
     public static void mute(String uuid, long end_time, String reason) throws NotMutedException {
 
-        //Get time.
+        // Get time.
         long time = Time.currentTime();
 
-        //If the player is already muted, end the old mute.
+        // If the player is already muted, end the old mute.
         if (isMuted(uuid)) {
-            Network.getInstance().getGlobalSQL().update("UPDATE moderation SET end_time=" + time + " WHERE uuid='" + uuid + "' AND end_time>" + time + " AND type='mute';");
+            Network.getInstance().getGlobalSQL()
+                    .update("UPDATE moderation SET end_time=" + time + " WHERE uuid='" + uuid + "' AND end_time>" + time + " AND type='mute';");
         }
-        Network.getInstance().getGlobalSQL().update("INSERT INTO moderation(uuid,start_time,end_time,reason,type) VALUES('" + uuid + "'," + time + "," + end_time + ",'" + reason + "','mute');");
+        Network.getInstance().getGlobalSQL().update("INSERT INTO moderation(uuid,start_time,end_time,reason,type) " +
+                "VALUES('" + uuid + "'," + time + "," + end_time + ",'" + reason + "','mute');");
 
         // Update Tab by sending a moderation event.
         Component mutedComponent = getMutedComponent(uuid);
-        ModerationEvent moderationEvent = new ModerationEvent(ModerationAction.MUTE, null, uuid, end_time, mutedComponent);
+        ModerationEvent moderationEvent = new ModerationEvent(ModerationAction.MUTE, null, uuid, end_time,
+                mutedComponent);
         Network.getInstance().getChat().sendSocketMesage(moderationEvent);
 
-        //Notify the user.
-        DirectMessage directMessage = new DirectMessage(ChatChannels.GLOBAL.getChannelName(), uuid, "server", mutedComponent, true);
+        // Notify the user.
+        DirectMessage directMessage = new DirectMessage(ChatChannels.GLOBAL.getChannelName(), uuid, "server",
+                mutedComponent, true);
         Network.getInstance().getChat().sendSocketMesage(directMessage);
     }
 
-    //Unban the player.
+    // Unban the player.
     public static void unban(String uuid) {
-        //Get time.
+        // Get time.
         long time = Time.currentTime();
-        Network.getInstance().getGlobalSQL().update("UPDATE moderation SET end_time=" + time + " WHERE uuid='" + uuid + "' AND end_time>" + time + " AND type='ban';");
+        Network.getInstance().getGlobalSQL()
+                .update("UPDATE moderation SET end_time=" + time + " WHERE uuid='" + uuid + "' AND end_time>" + time + " AND type='ban';");
     }
 
-    //Unmute the player.
+    // Unmute the player.
     public static void unmute(String uuid) {
-        //Get time.
+        // Get time.
         long time = Time.currentTime();
-        Network.getInstance().getGlobalSQL().update("UPDATE moderation SET end_time=" + time + " WHERE uuid='" + uuid + "' AND end_time>" + time + " AND type='mute';");
+        Network.getInstance().getGlobalSQL()
+                .update("UPDATE moderation SET end_time=" + time + " WHERE uuid='" + uuid + "' AND end_time>" + time + " AND type='mute';");
 
         // Update Tab by sending a moderation event.
         ModerationEvent moderationEvent = new ModerationEvent(ModerationAction.UNMUTE, null, uuid, 0L, null);
         Network.getInstance().getChat().sendSocketMesage(moderationEvent);
     }
 
-    //Kick the player.
+    // Kick the player.
     public static void kick(String uuid, String reason) {
 
-        //Kick them with the reason, if online.
-        Network.getInstance().getOnlineUserByUuid(uuid).ifPresent(onlineUser -> EventManager.createEvent(uuid, "network",
+        // Kick them with the reason, if online.
+        Network.getInstance().getOnlineUserByUuid(uuid).ifPresent(onlineUser -> EventManager.createEvent(uuid,
+                "network",
                 onlineUser.getServer(),
                 "kick", reason));
     }
@@ -93,33 +101,41 @@ public class Moderation {
      * @return true if the player is currently banned, false if not
      */
     public static boolean isBanned(String uuid) {
-        return (Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM moderation WHERE uuid='" + uuid + "' AND end_time>" + Time.currentTime() + " AND type='ban';"));
+        return (Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM moderation WHERE uuid='" + uuid + "' " +
+                "AND end_time>" + Time.currentTime() + " AND type='ban';"));
     }
 
-    //If the player is currently muted, return true.
+    // If the player is currently muted, return true.
     public static boolean isMuted(String uuid) {
-        return (Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM moderation WHERE uuid='" + uuid + "' AND end_time>" + Time.currentTime() + " AND type='mute';"));
+        return (Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM moderation WHERE uuid='" + uuid + "' " +
+                "AND end_time>" + Time.currentTime() + " AND type='mute';"));
     }
 
-    //Get reason why player is banned.
+    // Get reason why player is banned.
     public static String getBannedReason(String uuid) {
-        return (Network.getInstance().getGlobalSQL().getString("SELECT reason FROM moderation WHERE uuid='" + uuid + "' AND end_time>" + Time.currentTime() + " AND type='ban';"));
+        return (Network.getInstance().getGlobalSQL().getString("SELECT reason FROM moderation WHERE uuid='" + uuid +
+                "' AND end_time>" + Time.currentTime() + " AND type='ban';"));
     }
 
-    //Get reason why player is muted.
+    // Get reason why player is muted.
     public static String getMutedReason(String uuid) {
-        return (Network.getInstance().getGlobalSQL().getString("SELECT reason FROM moderation WHERE uuid='" + uuid + "' AND end_time>" + Time.currentTime() + " AND type='mute';"));
+        return (Network.getInstance().getGlobalSQL().getString("SELECT reason FROM moderation WHERE uuid='" + uuid +
+                "' AND end_time>" + Time.currentTime() + " AND type='mute';"));
     }
 
-    //Get duration of ban.
+    // Get duration of ban.
     public static String getBanDuration(String uuid) {
-        long time = Network.getInstance().getGlobalSQL().getLong("SELECT end_time FROM moderation WHERE uuid='" + uuid + "' AND end_time>" + Time.currentTime() + " AND type='ban';");
+        long time =
+                Network.getInstance().getGlobalSQL().getLong("SELECT end_time FROM moderation WHERE uuid='" + uuid +
+                        "' AND end_time>" + Time.currentTime() + " AND type='ban';");
         return Time.getDateTime(time);
     }
 
-    //Get duration of mute.
+    // Get duration of mute.
     public static String getMuteDuration(String uuid) {
-        long time = Network.getInstance().getGlobalSQL().getLong("SELECT end_time FROM moderation WHERE uuid='" + uuid + "' AND end_time>" + Time.currentTime() + " AND type='mute';");
+        long time =
+                Network.getInstance().getGlobalSQL().getLong("SELECT end_time FROM moderation WHERE uuid='" + uuid +
+                        "' AND end_time>" + Time.currentTime() + " AND type='mute';");
         return Time.getDateTime(time);
     }
 
@@ -174,15 +190,15 @@ public class Moderation {
             throw new NullPointerException();
         }
 
-        //Add random letter at the end of the duration string, so it'll always split into 2 parts.
+        // Add random letter at the end of the duration string, so it'll always split into 2 parts.
         String sDuration = formattedInput + "q";
 
-        //Check for valid duration.
-        //ymdh format (year, month, day, hour)
+        // Check for valid duration.
+        // ymdh format (year, month, day, hour)
         String[] duration;
         long time = 0;
 
-        //Check years
+        // Check years
         duration = sDuration.split("y");
 
         if (duration.length == 2) {
@@ -190,19 +206,19 @@ public class Moderation {
 
                 int years = Integer.parseInt(duration[0]);
 
-                //Convert years to milliseconds and add to time.
-                //We're assuming a year is 365 days.
+                // Convert years to milliseconds and add to time.
+                // We're assuming a year is 365 days.
                 time += years * 365 * 24 * 60 * 60 * 1000L;
 
-                //Remove the first part from the string as we've already converted it.
+                // Remove the first part from the string as we've already converted it.
                 sDuration = duration[1];
-
             } catch (NumberFormatException e) {
-                throw new DurationFormatException("Duration must be in ymdh format, for example 1y6m, which is 1 year and 6 months or 2d12h is 2 days and 12 hours.");
+                throw new DurationFormatException("Duration must be in ymdh format, for example 1y6m, which is 1 year" +
+                        " and 6 months or 2d12h is 2 days and 12 hours.");
             }
         }
 
-        //Check months
+        // Check months
         duration = sDuration.split("m");
 
         if (duration.length == 2) {
@@ -210,19 +226,19 @@ public class Moderation {
 
                 int months = Integer.parseInt(duration[0]);
 
-                //Convert months to milliseconds and add to time.
-                //We're assuming a month is 30 days.
+                // Convert months to milliseconds and add to time.
+                // We're assuming a month is 30 days.
                 time += months * 30 * 24 * 60 * 60 * 1000L;
 
-                //Remove the first part from the string as we've already converted it.
+                // Remove the first part from the string as we've already converted it.
                 sDuration = duration[1];
-
             } catch (NumberFormatException e) {
-                throw new DurationFormatException("Duration must be in ymdh format, for example 1y6m, which is 1 year and 6 months or 2d12h is 2 days and 12 hours.");
+                throw new DurationFormatException("Duration must be in ymdh format, for example 1y6m, which is 1 year" +
+                        " and 6 months or 2d12h is 2 days and 12 hours.");
             }
         }
 
-        //Check days
+        // Check days
         duration = sDuration.split("d");
 
         if (duration.length == 2) {
@@ -230,18 +246,18 @@ public class Moderation {
 
                 int days = Integer.parseInt(duration[0]);
 
-                //Convert days to milliseconds and add to time.
+                // Convert days to milliseconds and add to time.
                 time += days * 24 * 60 * 60 * 1000L;
 
-                //Remove the first part from the string as we've already converted it.
+                // Remove the first part from the string as we've already converted it.
                 sDuration = duration[1];
-
             } catch (NumberFormatException e) {
-                throw new DurationFormatException("Duration must be in ymdh format, for example 1y6m, which is 1 year and 6 months or 2d12h is 2 days and 12 hours.");
+                throw new DurationFormatException("Duration must be in ymdh format, for example 1y6m, which is 1 year" +
+                        " and 6 months or 2d12h is 2 days and 12 hours.");
             }
         }
 
-        //Check hours
+        // Check hours
         duration = sDuration.split("h");
 
         if (duration.length == 2) {
@@ -249,20 +265,21 @@ public class Moderation {
 
                 int hours = Integer.parseInt(duration[0]);
 
-                //Convert hours to milliseconds and add to time.
+                // Convert hours to milliseconds and add to time.
                 time += hours * 60 * 60 * 1000L;
 
-                //Remove the first part from the string as we've already converted it.
+                // Remove the first part from the string as we've already converted it.
                 sDuration = duration[1];
-
             } catch (NumberFormatException e) {
-                throw new DurationFormatException("Duration must be in ymdh format, for example 1y6m, which is 1 year and 6 months or 2d12h is 2 days and 12 hours.");
+                throw new DurationFormatException("Duration must be in ymdh format, for example 1y6m, which is 1 year" +
+                        " and 6 months or 2d12h is 2 days and 12 hours.");
             }
         }
 
-        //If the time is 0, or the string does not end with just the character q, then the format was not correct.
+        // If the time is 0, or the string does not end with just the character q, then the format was not correct.
         if (time == 0 || !sDuration.equals("q")) {
-            throw new DurationFormatException("Duration must be in ymdh format, for example 1y6m, which is 1 year and 6 months or 2d12h is 2 days and 12 hours.");
+            throw new DurationFormatException("Duration must be in ymdh format, for example 1y6m, which is 1 year and" +
+                    " 6 months or 2d12h is 2 days and 12 hours.");
         } else {
             return time;
         }

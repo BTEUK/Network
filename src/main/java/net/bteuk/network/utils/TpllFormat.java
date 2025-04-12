@@ -13,5 +13,4 @@ public class TpllFormat {
 
     private double altitude = Double.NaN;
     private LatLng coordinates;
-
 }

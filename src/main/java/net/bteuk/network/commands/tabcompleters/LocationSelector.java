@@ -11,8 +11,9 @@ import java.util.List;
 public class LocationSelector extends AbstractTabCompleter {
 
     public static List<String> locationSelectorOnArg(String[] args, int argIndex) {
-        //Get array of locations.
-        ArrayList<String> locations = Network.getInstance().getGlobalSQL().getStringList("SELECT location FROM location_data;");
+        // Get array of locations.
+        ArrayList<String> locations = Network.getInstance().getGlobalSQL().getStringList("SELECT location FROM " +
+                "location_data;");
 
         return onTabCompleteArg(args, locations, argIndex);
     }

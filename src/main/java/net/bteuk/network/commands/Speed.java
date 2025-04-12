@@ -12,7 +12,7 @@ public class Speed extends AbstractCommand {
     @Override
     public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        //Check if the sender is a player.
+        // Check if the sender is a player.
         Player player = getPlayer(stack);
         if (player == null) {
             return;
@@ -41,17 +41,15 @@ public class Speed extends AbstractCommand {
             player.setFlySpeed(speed);
             player.sendMessage(ChatUtils.success("Set flying speed to ")
                     .append(Component.text(args[0], NamedTextColor.DARK_AQUA)));
-
         } else {
 
             player.setWalkSpeed(speed);
             player.sendMessage(ChatUtils.success("Set walking speed to ")
                     .append(Component.text(args[0], NamedTextColor.DARK_AQUA)));
-
         }
     }
 
-    //Returns the move speed from a string.
+    // Returns the move speed from a string.
     private float getMoveSpeed(final String moveSpeed) throws NumberFormatException {
         float userSpeed;
         userSpeed = Float.parseFloat(moveSpeed);
@@ -63,7 +61,7 @@ public class Speed extends AbstractCommand {
         return userSpeed;
     }
 
-    //Converts the move speed to a Minecraft usable value.
+    // Converts the move speed to a Minecraft usable value.
     private float getRealMoveSpeed(final float userSpeed, final boolean isFly) {
         final float defaultSpeed = isFly ? 0.1f : 0.2f;
         float maxSpeed = 1f;
@@ -76,7 +74,7 @@ public class Speed extends AbstractCommand {
         }
     }
 
-    //Error message.
+    // Error message.
     private void error(Player p) {
         p.sendMessage(ChatUtils.error("/speed [0-10]"));
     }

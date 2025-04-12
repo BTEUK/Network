@@ -10,18 +10,18 @@ public class Clear extends AbstractCommand {
     @Override
     public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        //Check if the sender is a player.
+        // Check if the sender is a player.
         Player player = getPlayer(stack);
         if (player == null) {
             return;
         }
 
-        //Check permission.
+        // Check permission.
         if (!hasPermission(player, "uknet.clear")) {
             return;
         }
 
-        //Clear inventory.
+        // Clear inventory.
         player.getInventory().clear();
         player.sendMessage(ChatUtils.success("Cleared your inventory."));
     }

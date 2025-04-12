@@ -6,7 +6,11 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 import static net.bteuk.network.utils.Constants.SERVER_NAME;
@@ -16,59 +20,58 @@ public class GlobalSQL extends AbstractSQL {
         super(datasource);
     }
 
-    //Get a hashmap of all events for this server for the Network plugin.
+    // Get a hashmap of all events for this server for the Network plugin.
     public ArrayList<String[]> getEvents(String serverName, String type, ArrayList<String[]> list) {
 
-        //Try and get all events for this server.
+        // Try and get all events for this server.
         try (
                 Connection conn = conn();
-                PreparedStatement statement = conn.prepareStatement("SELECT uuid,event,message FROM server_events WHERE server='" + serverName + "' AND type='" + type + "';");
+                PreparedStatement statement = conn.prepareStatement("SELECT uuid,event,message FROM server_events " +
+                        "WHERE server='" + serverName + "' AND type='" + type + "';");
                 ResultSet results = statement.executeQuery()
         ) {
 
             while (results.next()) {
 
                 list.add(new String[]{results.getString(1), results.getString(2), results.getString(3)});
-
             }
         } catch (SQLException e) {
             e.printStackTrace();
             return list;
         }
 
-        //Try and delete all events for this server.
+        // Try and delete all events for this server.
         try (
                 Connection conn = conn();
-                PreparedStatement statement = conn.prepareStatement("DELETE FROM server_events WHERE server='" + serverName + "' AND type='" + type + "';");
+                PreparedStatement statement =
+                        conn.prepareStatement("DELETE FROM server_events WHERE server='" + serverName + "' AND " +
+                                "type='" + type + "';")
         ) {
 
             statement.executeUpdate();
-
         } catch (SQLException e) {
             e.printStackTrace();
             return list;
         }
 
-        //Return the map.
+        // Return the map.
         return list;
-
     }
 
-    //Add new coordinate to database and return the id.
+    // Add new coordinate to database and return the id.
     public int addCoordinate(Location l) {
 
-        return (addCoordinate(SERVER_NAME, l.getWorld().getName(), l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch()));
-
+        return (addCoordinate(SERVER_NAME, l.getWorld().getName(), l.getX(), l.getY(), l.getZ(), l.getYaw(),
+                l.getPitch()));
     }
 
-    //Add new coordinate to database and return the id.
+    // Add new coordinate to database and return the id.
     public int addCoordinate(String server, Location l) {
 
         return (addCoordinate(server, l.getWorld().getName(), l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch()));
-
     }
 
-    //Add new coordinate using values, rather than location.
+    // Add new coordinate using values, rather than location.
     public int addCoordinate(String server, String world, double x, double y, double z, float yaw, float pitch) {
 
         try (
@@ -87,27 +90,23 @@ public class GlobalSQL extends AbstractSQL {
             statement.setFloat(7, pitch);
             statement.executeUpdate();
 
-            //If the id does not exist return 0.
+            // If the id does not exist return 0.
             ResultSet results = statement.getGeneratedKeys();
             if (results.next()) {
 
                 return results.getInt(1);
-
             } else {
 
                 return 0;
-
             }
-
         } catch (SQLException sql) {
 
             sql.printStackTrace();
             return 0;
-
         }
     }
 
-    //Update an existing coordinate.
+    // Update an existing coordinate.
     public void updateCoordinate(int coordinateID, String server, Location l) {
 
         try (
@@ -125,20 +124,16 @@ public class GlobalSQL extends AbstractSQL {
             statement.setFloat(7, l.getPitch());
             statement.setInt(8, coordinateID);
             statement.executeUpdate();
-
         } catch (SQLException sql) {
 
             sql.printStackTrace();
-
         }
-
     }
 
-    //Update an existing coordinate.
+    // Update an existing coordinate.
     public void updateCoordinate(int coordinateID, Location l) {
 
         updateCoordinate(coordinateID, SERVER_NAME, l);
-
     }
 
     public ArrayList<Building> getBuildings(String condition)
@@ -193,17 +188,15 @@ public class GlobalSQL extends AbstractSQL {
                     results.getDouble("z"),
                     results.getFloat("yaw"),
                     results.getFloat("pitch")));
-
         } catch (SQLException sql) {
 
             sql.printStackTrace();
             return null;
-
         }
     }
 
-    //Get coordinate from database by id.
-    //World must be on this server else this will throw a null pointer exception.
+    // Get coordinate from database by id.
+    // World must be on this server else this will throw a null pointer exception.
     public Coordinate getCoordinate(int coordinateID) {
 
         try (
@@ -225,12 +218,10 @@ public class GlobalSQL extends AbstractSQL {
                     results.getFloat("yaw"),
                     results.getFloat("pitch"))
             );
-
         } catch (SQLException sql) {
 
             sql.printStackTrace();
             return null;
-
         }
     }
 

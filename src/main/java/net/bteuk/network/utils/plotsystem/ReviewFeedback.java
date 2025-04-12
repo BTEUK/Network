@@ -38,13 +38,18 @@ public final class ReviewFeedback {
         Component firstPage = Component.empty();
 
         // Title
-        firstPage = firstPage.append(Component.text("Feedback").decorate(TextDecoration.UNDERLINED).decorate(TextDecoration.BOLD).appendNewline().appendNewline());
+        firstPage =
+                firstPage.append(
+                        Component.text("Feedback").decorate(TextDecoration.UNDERLINED).decorate(TextDecoration.BOLD)
+                                .appendNewline().appendNewline());
 
         // Reviewer
         String reviewer = Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" +
-                Network.getInstance().getPlotSQL().getString("SELECT reviewer FROM plot_review WHERE id=" + reviewId + ";")
+                Network.getInstance().getPlotSQL()
+                        .getString("SELECT reviewer FROM plot_review WHERE id=" + reviewId + ";")
                 + "';");
-        firstPage = firstPage.append(Component.text(String.format("Reviewer: %s", reviewer), NamedTextColor.DARK_GRAY)).appendNewline();
+        firstPage = firstPage.append(Component.text(String.format("Reviewer: %s", reviewer),
+                NamedTextColor.DARK_GRAY)).appendNewline();
 
         List<Component> pages = new ArrayList<>();
 
@@ -78,12 +83,16 @@ public final class ReviewFeedback {
         Component firstPage = Component.empty();
 
         // Title
-        firstPage = firstPage.append(Component.text("Feedback").decorate(TextDecoration.UNDERLINED).decorate(TextDecoration.BOLD).appendNewline().appendNewline());
+        firstPage =
+                firstPage.append(
+                        Component.text("Feedback").decorate(TextDecoration.UNDERLINED).decorate(TextDecoration.BOLD)
+                                .appendNewline().appendNewline());
 
         List<Component> pages = new ArrayList<>();
 
         // Add each category that has a selection.
-        Map<ReviewCategory, ReviewCategoryFeedback> verificationCategoryFeedback = getVerificationCategoryFeedback(verificationId, old);
+        Map<ReviewCategory, ReviewCategoryFeedback> verificationCategoryFeedback =
+                getVerificationCategoryFeedback(verificationId, old);
         for (ReviewCategory category : ReviewCategory.values()) {
             ReviewCategoryFeedback categoryFeedback = verificationCategoryFeedback.get(category);
             if (categoryFeedback == null) {
@@ -105,36 +114,48 @@ public final class ReviewFeedback {
         Map<ReviewCategory, ReviewCategoryFeedback> reviewCategoryFeedbackMap = new HashMap<>();
 
         // Get the feedback for the review.
-        List<String> reviewCategories = Network.getInstance().getPlotSQL().getStringList("SELECT category FROM plot_category_feedback WHERE review_id=" + reviewId + ";");
+        List<String> reviewCategories = Network.getInstance().getPlotSQL().getStringList("SELECT category FROM " +
+                "plot_category_feedback WHERE review_id=" + reviewId + ";");
         for (String category : reviewCategories) {
             reviewCategoryFeedbackMap.put(ReviewCategory.valueOf(category), new ReviewCategoryFeedback(
                     ReviewCategory.valueOf(category),
-                    ReviewSelection.valueOf(Network.getInstance().getPlotSQL().getString("SELECT selection FROM plot_category_feedback WHERE review_id=" + reviewId + " AND category='" + category + "';")),
-                    Network.getInstance().getPlotSQL().getInt("SELECT book_id FROM plot_category_feedback WHERE review_id=" + reviewId + " AND category='" + category + "';")
+                    ReviewSelection.valueOf(Network.getInstance().getPlotSQL().getString("SELECT selection FROM " +
+                            "plot_category_feedback WHERE review_id=" + reviewId + " AND category='" + category + "';"
+                    )),
+                    Network.getInstance().getPlotSQL().getInt("SELECT book_id FROM plot_category_feedback WHERE " +
+                            "review_id=" + reviewId + " AND category='" + category + "';")
             ));
         }
 
         return reviewCategoryFeedbackMap;
     }
 
-    private static Map<ReviewCategory, ReviewCategoryFeedback> getVerificationCategoryFeedback(int verificationId, boolean old) {
+    private static Map<ReviewCategory, ReviewCategoryFeedback> getVerificationCategoryFeedback(int verificationId,
+                                                                                               boolean old) {
 
         Map<ReviewCategory, ReviewCategoryFeedback> reviewCategoryFeedbackMap = new HashMap<>();
 
         // Get the feedback for the review.
-        List<String> verificationCategories = Network.getInstance().getPlotSQL().getStringList("SELECT category FROM plot_verification_category WHERE verification_id=" + verificationId + ";");
+        List<String> verificationCategories = Network.getInstance().getPlotSQL().getStringList("SELECT category FROM " +
+                "plot_verification_category WHERE verification_id=" + verificationId + ";");
         for (String category : verificationCategories) {
             if (old) {
                 reviewCategoryFeedbackMap.put(ReviewCategory.valueOf(category), new ReviewCategoryFeedback(
                         ReviewCategory.valueOf(category),
-                        ReviewSelection.valueOf(Network.getInstance().getPlotSQL().getString("SELECT selection_old FROM plot_verification_category WHERE verification_id=" + verificationId + " AND category='" + category + "';")),
-                        Network.getInstance().getPlotSQL().getInt("SELECT book_id_old FROM plot_verification_category WHERE verification_id=" + verificationId + " AND category='" + category + "';")
+                        ReviewSelection.valueOf(Network.getInstance().getPlotSQL().getString("SELECT selection_old " +
+                                "FROM plot_verification_category WHERE verification_id=" + verificationId + " AND " +
+                                "category='" + category + "';")),
+                        Network.getInstance().getPlotSQL().getInt("SELECT book_id_old FROM plot_verification_category" +
+                                " WHERE verification_id=" + verificationId + " AND category='" + category + "';")
                 ));
             } else {
                 reviewCategoryFeedbackMap.put(ReviewCategory.valueOf(category), new ReviewCategoryFeedback(
                         ReviewCategory.valueOf(category),
-                        ReviewSelection.valueOf(Network.getInstance().getPlotSQL().getString("SELECT selection_new FROM plot_verification_category WHERE verification_id=" + verificationId + " AND category='" + category + "';")),
-                        Network.getInstance().getPlotSQL().getInt("SELECT book_id_new FROM plot_verification_category WHERE verification_id=" + verificationId + " AND category='" + category + "';")
+                        ReviewSelection.valueOf(Network.getInstance().getPlotSQL().getString("SELECT selection_new " +
+                                "FROM plot_verification_category WHERE verification_id=" + verificationId + " AND " +
+                                "category='" + category + "';")),
+                        Network.getInstance().getPlotSQL().getInt("SELECT book_id_new FROM plot_verification_category" +
+                                " WHERE verification_id=" + verificationId + " AND category='" + category + "';")
                 ));
             }
         }
@@ -146,15 +167,19 @@ public final class ReviewFeedback {
     private static Component addCategoryToFeedbackBook(ReviewCategoryFeedback categoryFeedback, List<Component> pages) {
 
         Component line = Component.empty();
-        Component category = Component.text(categoryFeedback.category().getDisplayName(), Style.style(TextDecoration.BOLD));
+        Component category = Component.text(categoryFeedback.category().getDisplayName(),
+                Style.style(TextDecoration.BOLD));
 
         // Add the feedback to the book if it exists.
         if (categoryFeedback.bookId() != 0) {
-            ArrayList<String> sPages = Network.getInstance().getPlotSQL().getStringList("SELECT contents FROM book_data WHERE id=" + categoryFeedback.bookId() + " ORDER BY page ASC;");
+            ArrayList<String> sPages = Network.getInstance().getPlotSQL().getStringList("SELECT contents FROM " +
+                    "book_data WHERE id=" + categoryFeedback.bookId() + " ORDER BY page ASC;");
 
             category = category.clickEvent(getGotoFeedbackClickEvent(pages.size() + 2))
-                    .hoverEvent(HoverEvent.showText(Component.text(String.format("Click to go view %s feedback.", categoryFeedback.category().getDisplayName()))));
-            category = category.color(NamedTextColor.DARK_BLUE).decorate(TextDecoration.UNDERLINED); // Blue colour underlined to indicate that you can navigate to the feedback.
+                    .hoverEvent(HoverEvent.showText(Component.text(String.format("Click to go view %s feedback.",
+                            categoryFeedback.category().getDisplayName()))));
+            category = category.color(NamedTextColor.DARK_BLUE).decorate(TextDecoration.UNDERLINED); // Blue colour
+            // underlined to indicate that you can navigate to the feedback.
             pages.addAll(sPages.stream().map(Component::text).toList());
 
             if (categoryFeedback.selection() != ReviewSelection.NONE) {

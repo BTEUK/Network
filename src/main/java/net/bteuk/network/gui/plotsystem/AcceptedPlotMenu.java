@@ -60,7 +60,6 @@ public class AcceptedPlotMenu extends Gui {
         globalSQL = Network.getInstance().getGlobalSQL();
 
         createGuiAsync();
-
     }
 
     private void createGuiAsync() {
@@ -68,9 +67,11 @@ public class AcceptedPlotMenu extends Gui {
         // Fetch accepted plots.
         HashMap<Integer, String> plots;
         if (StringUtils.isEmpty(filter)) {
-            plots = plotSQL.getIntStringMap("SELECT plot_id,uuid FROM plot_review WHERE accepted=1 AND completed=1 ORDER BY review_time DESC;");
+            plots = plotSQL.getIntStringMap("SELECT plot_id,uuid FROM plot_review WHERE accepted=1 AND completed=1 " +
+                    "ORDER BY review_time DESC;");
         } else {
-            plots = plotSQL.getIntStringMap("SELECT plot_id,uuid FROM plot_review WHERE accepted=1 AND completed=1 AND uuid='" + filter + "' ORDER BY review_time DESC;");
+            plots = plotSQL.getIntStringMap("SELECT plot_id,uuid FROM plot_review WHERE accepted=1 AND completed=1 " +
+                    "AND uuid='" + filter + "' ORDER BY review_time DESC;");
         }
 
         // Set the filter.
@@ -78,7 +79,8 @@ public class AcceptedPlotMenu extends Gui {
         setItem(4, Utils.createItem(
                         Material.SPRUCE_SIGN, 1, Utils.title("Set filter"),
                         Utils.line("The current filter is set to: ").append(Component.text(
-                                StringUtils.isEmpty(filter) ? "All Players" : globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + filter + "';"), NamedTextColor.GRAY
+                                StringUtils.isEmpty(filter) ? "All Players" : globalSQL.getString("SELECT name FROM " +
+                                        "player_data WHERE uuid='" + filter + "';"), NamedTextColor.GRAY
                         )),
                         Utils.line("Click to select a different filter.")),
                 filterMenu::open);
@@ -89,7 +91,7 @@ public class AcceptedPlotMenu extends Gui {
         // If page > 1 set number of iterations that must be skipped.
         int skip = (page - 1) * 21;
 
-        //If page is greater than 1 add a previous page button.
+        // If page is greater than 1 add a previous page button.
         if (page > 1) {
             setItem(18, Utils.createItem(Material.ARROW, 1,
                             Utils.title("Previous Page"),
@@ -97,23 +99,23 @@ public class AcceptedPlotMenu extends Gui {
                     u ->
 
                     {
-                        //Update the gui.
+                        // Update the gui.
                         page--;
                         this.refresh();
                         u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
                     });
         }
 
-        //Make a button for each plot.
+        // Make a button for each plot.
         for (int plotID : plots.keySet()) {
 
-            //Skip iterations if skip > 0.
+            // Skip iterations if skip > 0.
             if (skip > 0) {
                 skip--;
                 continue;
             }
 
-            //If the slot is greater than the number that fit in a page, create a new page.
+            // If the slot is greater than the number that fit in a page, create a new page.
             if (slot > 34) {
 
                 setItem(26, Utils.createItem(Material.ARROW, 1,
@@ -122,13 +124,14 @@ public class AcceptedPlotMenu extends Gui {
                         u ->
 
                         {
-                            //Update the gui.
+                            // Update the gui.
                             page++;
                             this.refresh();
-                            u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
+                            u.player.getOpenInventory().getTopInventory()
+                                    .setContents(this.getInventory().getContents());
                         });
 
-                //Stop iterating.
+                // Stop iterating.
                 break;
             }
 
@@ -145,27 +148,26 @@ public class AcceptedPlotMenu extends Gui {
                 });
             }
 
-
-            //Increase slot accordingly.
+            // Increase slot accordingly.
             if (slot % 9 == 7) {
-                //Increase row, basically add 3.
+                // Increase row, basically add 3.
                 slot += 3;
             } else {
-                //Increase value by 1.
+                // Increase value by 1.
                 slot++;
             }
         }
 
-        //Return
+        // Return
         setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
                         Utils.title("Return"),
                         Utils.line("Open the plot menu.")),
                 u -> {
-                    //Delete this gui.
+                    // Delete this gui.
                     this.delete();
                     u.mainGui = null;
 
-                    //Return to the plot menu.
+                    // Return to the plot menu.
                     u.mainGui = new PlotMenu(u);
                     u.mainGui.open(u);
                 });
@@ -190,11 +192,12 @@ public class AcceptedPlotMenu extends Gui {
     private void createPlayerHeadGuiItem(PlayerProfile profile, int plotID, String uuid, int slot) {
         ItemStack guiItem = Utils.createPlayerSkull(profile, 1,
                 Utils.title("Plot " + plotID),
-                Utils.line("Completed by: ").append(Component.text(globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';"), NamedTextColor.GRAY)),
+                Utils.line("Completed by: ").append(Component.text(globalSQL.getString("SELECT name FROM player_data " +
+                        "WHERE uuid='" + uuid + "';"), NamedTextColor.GRAY)),
                 Utils.line("Click to open the menu of this plot."));
 
         setItem(slot, guiItem, u -> {
-            //Switch to plot info.
+            // Switch to plot info.
             if (plotInfo != null) {
                 plotInfo.deleteThis();
             }

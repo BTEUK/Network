@@ -23,13 +23,12 @@ public class GuiListener implements Listener {
 
         this.instance = instance;
         Bukkit.getServer().getPluginManager().registerEvents(this, instance);
-
     }
 
     @EventHandler
-    public void onClick(InventoryClickEvent e){
+    public void onClick(InventoryClickEvent e) {
 
-        if (!(e.getWhoClicked() instanceof Player player)){
+        if (!(e.getWhoClicked() instanceof Player player)) {
             return;
         }
 
@@ -37,11 +36,11 @@ public class GuiListener implements Listener {
 
         UUID inventoryUUID = Gui.openInventories.get(playerUUID);
 
-        if (inventoryUUID != null){
+        if (inventoryUUID != null) {
 
             NetworkUser u = instance.getUser(player);
 
-            //If u is null, cancel.
+            // If u is null, cancel.
             if (u == null) {
                 LOGGER.severe("User " + e.getWhoClicked().getName() + " can not be found!");
                 e.getWhoClicked().sendMessage(ChatUtils.error("User can not be found, please relog!"));
@@ -52,7 +51,7 @@ public class GuiListener implements Listener {
             Gui gui = Gui.inventoriesByUUID.get(inventoryUUID);
             Gui.guiAction action = gui.getActions().get(e.getRawSlot());
 
-            if (action != null){
+            if (action != null) {
                 action.click(u);
             }
         }
@@ -76,7 +75,7 @@ public class GuiListener implements Listener {
             if (gui != null && gui.isDeleteOnClose()) {
                 gui.delete();
             } else {
-                //Remove the player from the list of open inventories.
+                // Remove the player from the list of open inventories.
                 Gui.openInventories.remove(playerUUID);
             }
         }

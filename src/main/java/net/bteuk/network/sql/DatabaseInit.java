@@ -9,7 +9,7 @@ import static net.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public class DatabaseInit {
 
-    //Creates the mysql connection.
+    // Creates the mysql connection.
     public BasicDataSource mysqlSetup(String database) throws SQLException {
 
         String host = CONFIG.getString("host");
@@ -19,13 +19,13 @@ public class DatabaseInit {
 
         BasicDataSource dataSource = new BasicDataSource();
 
-        dataSource.setUrl("jdbc:mysql://" + host + ":" + port + "/" + database + "?&allowPublicKeyRetrieval=true&useSSL=false&");
+        dataSource.setUrl("jdbc:mysql://" + host + ":" + port + "/" + database + "?&allowPublicKeyRetrieval=true" +
+                "&useSSL=false&");
         dataSource.setUsername(username);
         dataSource.setPassword(password);
 
         testDataSource(dataSource);
         return dataSource;
-
     }
 
     private void testDataSource(BasicDataSource dataSource) throws SQLException {

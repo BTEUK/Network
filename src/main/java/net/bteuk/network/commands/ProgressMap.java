@@ -16,16 +16,18 @@ public class ProgressMap extends AbstractCommand {
     @Override
     public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        //Check if the sender is a player.
+        // Check if the sender is a player.
         Player player = getPlayer(stack);
         if (player == null) {
             return;
         }
 
-        //Send them a link
+        // Send them a link
         if (PROGRESS_MAP) {
-            TextComponent textComponent = Component.text("Click here to view a map of our progress!", NamedTextColor.AQUA);
-            textComponent = textComponent.clickEvent(ClickEvent.openUrl(CONFIG.getString("ProgressMap.Link", Strings.EMPTY)));
+            TextComponent textComponent = Component.text("Click here to view a map of our progress!",
+                    NamedTextColor.AQUA);
+            textComponent = textComponent.clickEvent(ClickEvent.openUrl(CONFIG.getString("ProgressMap.Link",
+                    Strings.EMPTY)));
             player.sendMessage(textComponent);
         }
     }

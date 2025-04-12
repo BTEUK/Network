@@ -20,6 +20,7 @@ public enum PlotStatus {
 
     /**
      * Get the {@link PlotStatus} from the database value.
+     *
      * @param value the database value
      * @return the PlotStatus, or null if none match
      */

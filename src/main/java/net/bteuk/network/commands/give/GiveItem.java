@@ -19,27 +19,27 @@ public abstract class GiveItem extends AbstractCommand {
 
     public void onCommand(CommandSourceStack stack, String permission, ItemStack item, String itemName) {
 
-        //Check if the sender is a player.
+        // Check if the sender is a player.
         Player player = getPlayer(stack);
         if (player == null) {
             return;
         }
 
-        //Check if the user has permission.
+        // Check if the user has permission.
         if (!hasPermission(player, permission)) {
             return;
         }
 
         NetworkUser user = Network.getInstance().getUser(player);
 
-        //If u is null, cancel.
+        // If u is null, cancel.
         if (user == null) {
             LOGGER.severe("User " + player.getName() + " can not be found!");
             player.sendMessage(ChatUtils.error("User can not be found, please relog!"));
             return;
         }
 
-        //Add debug stick to inventory.
+        // Add debug stick to inventory.
         Utils.giveItem(player, item, itemName);
     }
 }

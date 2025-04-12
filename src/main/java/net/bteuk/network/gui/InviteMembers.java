@@ -23,16 +23,14 @@ import java.util.List;
 
 public class InviteMembers extends Gui {
 
-    private int page;
-
-    //This is either a region, plot or zone.
-    //We can decypher it by using the regionType variable.
+    // This is either a region, plot or zone.
+    // We can decypher it by using the regionType variable.
     private final Object o;
     private final RegionType regionType;
-
     private final GlobalSQL globalSQL;
     private final RegionSQL regionSQL;
     private final PlotSQL plotSQL;
+    private int page;
 
     public InviteMembers(Object o, RegionType regionType) {
 
@@ -48,21 +46,20 @@ public class InviteMembers extends Gui {
         plotSQL = Network.getInstance().getPlotSQL();
 
         createGui();
-
     }
 
     private void createGui() {
 
-        //Get all online players in the network.
+        // Get all online players in the network.
         List<String> online_users = Network.getInstance().getOnlineUsers().stream().map(OnlineUser::getUuid).toList();
 
-        //Slot count.
+        // Slot count.
         int slot = 10;
 
-        //Skip count.
+        // Skip count.
         int skip = 21 * (page - 1);
 
-        //If page is greater than 1 add a previous page button.
+        // If page is greater than 1 add a previous page button.
         if (page > 1) {
             setItem(18, Utils.createItem(Material.ARROW, 1,
                             Utils.title("Previous Page"),
@@ -71,18 +68,17 @@ public class InviteMembers extends Gui {
 
                     {
 
-                        //Update the gui.
+                        // Update the gui.
                         page--;
                         this.refresh();
                         u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
-
                     });
         }
 
-        //Iterate through all online players.
+        // Iterate through all online players.
         for (String uuid : online_users) {
 
-            //If the slot is greater than the number that fit in a page, create a new page.
+            // If the slot is greater than the number that fit in a page, create a new page.
             if (slot > 34) {
 
                 setItem(26, Utils.createItem(Material.ARROW, 1,
@@ -92,74 +88,72 @@ public class InviteMembers extends Gui {
 
                         {
 
-                            //Update the gui.
+                            // Update the gui.
                             page++;
                             this.refresh();
-                            u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
-
+                            u.player.getOpenInventory().getTopInventory()
+                                    .setContents(this.getInventory().getContents());
                         });
 
-                //Stop iterating.
+                // Stop iterating.
                 break;
-
             }
 
-            //Check whether the player is not already the owner or member of the region, plot or zone, if true skip them.
+            // Check whether the player is not already the owner or member of the region, plot or zone, if true skip
+            // them.
             if (isMember(uuid)) {
                 continue;
             }
 
-            //If skip is greater than 0, skip this iteration.
+            // If skip is greater than 0, skip this iteration.
             if (skip > 0) {
                 skip--;
                 continue;
             }
 
-            //Add player to gui.
+            // Add player to gui.
             setItem(slot, Utils.createPlayerSkull(uuid, 1,
-                            Utils.title("Invite " + globalSQL.getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " to your " + regionType.label + "."),
+                            Utils.title("Invite " + globalSQL.getString(
+                                    "SELECT name FROM player_data WHERE uuid='" + uuid + "';") + " to your " + regionType.label + "."),
                             Utils.line("They will receive an invitation in chat.")),
                     u ->
 
                     {
 
-                        //Check if the player is still online.
+                        // Check if the player is still online.
                         if (Network.getInstance().isOnlineOnNetwork(uuid)) {
 
-                            //Check if the player is not already a member of the region, plot or zone.
+                            // Check if the player is not already a member of the region, plot or zone.
                             if (!isMember(uuid)) {
 
-                                //Check if the player has not already been invited.
+                                // Check if the player has not already been invited.
                                 if (!isInvited(uuid)) {
 
                                     invite(u, uuid);
-
                                 } else {
-                                    u.player.sendMessage(ChatUtils.error("You've already invited this player to your " + regionType.label + "."));
+                                    u.player.sendMessage(ChatUtils.error("You've already invited this player to your "
+                                            + regionType.label + "."));
                                 }
-
                             } else {
-                                u.player.sendMessage(ChatUtils.error("This player is already a member of your " + regionType.label + "."));
+                                u.player.sendMessage(ChatUtils.error(
+                                        "This player is already a member of your " + regionType.label + "."));
                             }
-
                         } else {
                             u.player.sendMessage(ChatUtils.error("This player is no longer online."));
                         }
-
                     });
 
-
-            //Increase slot accordingly.
+            // Increase slot accordingly.
             if (slot % 9 == 7) {
-                //Increase row, basically add 3.
+                // Increase row, basically add 3.
                 slot += 3;
             } else {
-                //Increase value by 1.
+                // Increase value by 1.
                 slot++;
             }
         }
 
-        //Return to region, plot or zone info.
+        // Return to region, plot or zone info.
         if (regionType == RegionType.REGION) {
 
             Region region = (Region) o;
@@ -172,16 +166,14 @@ public class InviteMembers extends Gui {
 
                     {
 
-                        //Delete this gui.
+                        // Delete this gui.
                         this.delete();
                         u.mainGui = null;
 
-                        //Switch back to plot info.
+                        // Switch back to plot info.
                         u.mainGui = new RegionInfo(region, u.player.getUniqueId().toString());
                         u.mainGui.open(u);
-
                     });
-
         } else if (regionType == RegionType.PLOT) {
 
             Integer plotID = (Integer) o;
@@ -193,16 +185,14 @@ public class InviteMembers extends Gui {
 
                     {
 
-                        //Delete this gui.
+                        // Delete this gui.
                         this.delete();
                         u.mainGui = null;
 
-                        //Switch back to plot info.
+                        // Switch back to plot info.
                         u.mainGui = new PlotInfo(u, plotID);
                         u.mainGui.open(u);
-
                     });
-
         } else if (regionType == RegionType.ZONE) {
 
             Integer zoneID = (Integer) o;
@@ -214,16 +204,14 @@ public class InviteMembers extends Gui {
 
                     {
 
-                        //Delete this gui.
+                        // Delete this gui.
                         this.delete();
                         u.mainGui = null;
 
-                        //Switch back to plot info.
+                        // Switch back to plot info.
                         u.mainGui = new ZoneInfo(u, zoneID, u.player.getUniqueId().toString());
                         u.mainGui.open(u);
-
                     });
-
         }
     }
 
@@ -231,30 +219,27 @@ public class InviteMembers extends Gui {
 
         this.clearGui();
         createGui();
-
     }
 
     public boolean isInvited(String uuid) {
 
-        //Check whether the player is not already the owner or member of the region, plot or zone, if true skip them.
+        // Check whether the player is not already the owner or member of the region, plot or zone, if true skip them.
         if (regionType == RegionType.REGION) {
 
             Region region = (Region) o;
 
-            return regionSQL.hasRow("SELECT region FROM region_invites WHERE region='" + region.regionName() + "' AND uuid='" + uuid + "';");
-
+            return regionSQL.hasRow("SELECT region FROM region_invites WHERE region='" + region.regionName() + "' AND" +
+                    " uuid='" + uuid + "';");
         } else if (regionType == RegionType.PLOT) {
 
             Integer plotID = (Integer) o;
 
             return plotSQL.hasRow("SELECT id FROM plot_invites WHERE id='" + plotID + "' AND uuid='" + uuid + "';");
-
         } else if (regionType == RegionType.ZONE) {
 
             Integer zoneID = (Integer) o;
 
             return plotSQL.hasRow("SELECT id FROM zone_invites WHERE id='" + zoneID + "' AND uuid='" + uuid + "';");
-
         }
 
         return false;
@@ -266,20 +251,18 @@ public class InviteMembers extends Gui {
 
             Region region = (Region) o;
 
-            return regionSQL.hasRow("SELECT uuid FROM region_members WHERE region='" + region.regionName() + "' AND uuid='" + uuid + "';");
-
+            return regionSQL.hasRow("SELECT uuid FROM region_members WHERE region='" + region.regionName() + "' AND " +
+                    "uuid='" + uuid + "';");
         } else if (regionType == RegionType.PLOT) {
 
             Integer plotID = (Integer) o;
 
             return plotSQL.hasRow("SELECT uuid FROM plot_members WHERE id=" + plotID + " AND uuid='" + uuid + "';");
-
         } else if (regionType == RegionType.ZONE) {
 
             Integer zoneID = (Integer) o;
 
             return plotSQL.hasRow("SELECT uuid FROM zone_members WHERE id=" + zoneID + " AND uuid='" + uuid + "';");
-
         }
 
         return false;
@@ -287,14 +270,14 @@ public class InviteMembers extends Gui {
 
     public void invite(NetworkUser u, String uuid) {
 
-        //Check whether the player is not already invites to the region, plot or zone, if true skip them.
+        // Check whether the player is not already invites to the region, plot or zone, if true skip them.
         if (regionType == RegionType.REGION) {
 
             Region region = (Region) o;
 
-            //Send invite via chat.
-            //The invite will be active until they disconnect from the network.
-            //They will need to run a command to actually join the plot.
+            // Send invite via chat.
+            // The invite will be active until they disconnect from the network.
+            // They will need to run a command to actually join the plot.
             regionSQL.update("INSERT INTO region_invites(region,owner,uuid) VALUES('" + region.regionName() + "','" +
                     u.player.getUniqueId() + "','" + uuid + "');");
 
@@ -302,17 +285,17 @@ public class InviteMembers extends Gui {
             Network.getInstance().getOnlineUserByUuid(uuid).ifPresentOrElse(onlineUser -> {
                         EventManager.createEvent(uuid, "network", onlineUser.getServer(),
                                 "invite region " + region.regionName());
-                        u.player.sendMessage(ChatUtils.success("Invited %s to region %s", name, region.getTag(u.player.getUniqueId().toString())));
+                        u.player.sendMessage(ChatUtils.success("Invited %s to region %s", name,
+                                region.getTag(u.player.getUniqueId().toString())));
                     },
                     () -> u.player.sendMessage(ChatUtils.error("%s is no longer online.", name)));
-
         } else if (regionType == RegionType.PLOT) {
 
             Integer plotID = (Integer) o;
 
-            //Send invite via chat.
-            //The invite will be active until they disconnect from the network.
-            //They will need to run a command to actually join the plot.
+            // Send invite via chat.
+            // The invite will be active until they disconnect from the network.
+            // They will need to run a command to actually join the plot.
             plotSQL.update("INSERT INTO plot_invites(id,owner,uuid) VALUES(" + plotID + ",'" +
                     u.player.getUniqueId() + "','" + uuid + "');");
 
@@ -323,14 +306,13 @@ public class InviteMembers extends Gui {
                         u.player.sendMessage(ChatUtils.success("Invited %s to your Plot.", name));
                     },
                     () -> u.player.sendMessage(ChatUtils.error("%s is no longer online.", name)));
-
         } else if (regionType == RegionType.ZONE) {
 
             Integer zoneID = (Integer) o;
 
-            //Send invite via chat.
-            //The invite will be active until they disconnect from the network.
-            //They will need to run a command to actually join the plot.
+            // Send invite via chat.
+            // The invite will be active until they disconnect from the network.
+            // They will need to run a command to actually join the plot.
             plotSQL.update("INSERT INTO zone_invites(id,owner,uuid) VALUES(" + zoneID + ",'" +
                     u.player.getUniqueId() + "','" + uuid + "');");
 
@@ -341,7 +323,6 @@ public class InviteMembers extends Gui {
                         u.player.sendMessage(ChatUtils.success("Invited %s to zone your Zone.", name));
                     },
                     () -> u.player.sendMessage(ChatUtils.error("%s is no longer online.", name)));
-
         }
     }
 }

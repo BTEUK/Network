@@ -42,6 +42,7 @@ public final class Permissions {
 
     /**
      * Checks whether a group exists with the name provided.
+     *
      * @param groupName the name of the group to check
      * @return {@link Group}
      */
@@ -57,8 +58,8 @@ public final class Permissions {
     }
 
     /**
-     * @param uuid user to modify the group for
-     * @param group the group to modify
+     * @param uuid   user to modify the group for
+     * @param group  the group to modify
      * @param remove true if the group should be removed
      * @return the primary role after the modification
      */

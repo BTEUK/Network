@@ -14,7 +14,7 @@ public class Exp extends AbstractCommand {
     @Override
     public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        //Check if sender is player, then check permissions
+        // Check if sender is player, then check permissions
         CommandSender sender = stack.getSender();
         if (sender instanceof Player) {
             if (!hasPermission(sender, "uknet.exp")) {
@@ -27,7 +27,9 @@ public class Exp extends AbstractCommand {
         }
 
         if (args[0].equals("give")) {
-            String uuid = Network.getInstance().getGlobalSQL().getString("SELECT uuid FROM player_data WHERE name='" + args[1] + "';");
+            String uuid =
+                    Network.getInstance().getGlobalSQL()
+                            .getString("SELECT uuid FROM player_data WHERE name='" + args[1] + "';");
             if (uuid == null) {
                 sender.sendMessage(ChatUtils.error("Player " + args[1] + " could not be found."));
             } else {
@@ -35,7 +37,6 @@ public class Exp extends AbstractCommand {
                     int val = Integer.parseInt(args[2]);
                     Progression.addExp(uuid, val);
                 } catch (NumberFormatException ignored) {
-                    return;
                 }
             }
         }

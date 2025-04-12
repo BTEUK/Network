@@ -57,22 +57,19 @@ public class CommandPreProcess implements Listener {
             }
         }
 
-        //Replace /region with /network:region
+        // Replace /region with /network:region
         if (isCommand(e.getMessage(), "/region")) {
             if (REGIONS_ENABLED) {
                 e.setMessage(e.getMessage().replace("/region", "/network:region"));
             }
-
         } else if (isCommand(e.getMessage(), "/tpll")) {
             if (TPLL_ENABLED) {
                 e.setMessage(e.getMessage().replace("/tpll", "/network:tpll"));
             }
-
         } else if (isCommand(e.getMessage(), "/server")) {
             e.setMessage(e.getMessage().replace("/server", "/network:server"));
-
         } else if (isCommand(e.getMessage(), "/hdb")) {
-            //If skulls plugin exists and is loaded.
+            // If skulls plugin exists and is loaded.
             if (Bukkit.getServer().getPluginManager().getPlugin("skulls") != null) {
                 e.setMessage(e.getMessage().replace("/hdb", "/skulls"));
             }
@@ -134,15 +131,12 @@ public class CommandPreProcess implements Listener {
         if (instance.getGlobalSQL().hasRow("SELECT name FROM server_data WHERE type='LOBBY' AND online=1;")) {
 
             server = instance.getGlobalSQL().getString("SELECT name FROM server_data WHERE type='LOBBY' AND online=1;");
-
         } else if (instance.getGlobalSQL().hasRow("SELECT name FROM server_data WHERE type='EARTH' AND online=1;")) {
 
             server = instance.getGlobalSQL().getString("SELECT name FROM server_data WHERE type='EARTH' AND online=1;");
-
         } else if (instance.getGlobalSQL().hasRow("SELECT name FROM server_data WHERE online=1;")) {
 
             server = instance.getGlobalSQL().getString("SELECT name FROM server_data WHERE online=1;");
-
         }
 
         for (NetworkUser user : users) {

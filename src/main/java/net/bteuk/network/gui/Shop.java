@@ -14,7 +14,6 @@ public class Shop extends Gui {
         super(27, Component.text("Shop", NamedTextColor.AQUA, TextDecoration.BOLD));
 
         createGui();
-
     }
 
     private void createGui() {
@@ -22,10 +21,11 @@ public class Shop extends Gui {
         setItem(10, Utils.createItem(Material.PINK_CONCRETE_POWDER, 1,
                         Utils.title("2023 Card Pack"),
                         Utils.line("Price: 1000")),
-                u -> {}
+                u -> {
+                }
         );
 
-        //Return
+        // Return
         setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
                         Utils.title("Return"),
                         Utils.line("Open the navigator main menu.")),
@@ -33,13 +33,12 @@ public class Shop extends Gui {
 
                 {
 
-                    //Delete this gui.
+                    // Delete this gui.
                     this.delete();
                     u.mainGui = null;
 
-                    //Switch to navigation menu.
+                    // Switch to navigation menu.
                     Network.getInstance().navigatorGui.open(u);
-
                 });
     }
 
@@ -47,6 +46,5 @@ public class Shop extends Gui {
 
         this.clearGui();
         createGui();
-
     }
 }

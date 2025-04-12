@@ -13,24 +13,24 @@ import net.bteuk.network.Network;
 
 public class Coins {
 
-    //Add coins to a specific player.
+    // Add coins to a specific player.
     public void addCoins(String uuid, int coins) {
 
-        Network.getInstance().getGlobalSQL().update("UPDATE coins SET coins=coins+" + coins + " WHERE uuid='" + uuid + "';");
-
+        Network.getInstance().getGlobalSQL()
+                .update("UPDATE coins SET coins=coins+" + coins + " WHERE uuid='" + uuid + "';");
     }
 
-    //Remove coins from a specific player.
+    // Remove coins from a specific player.
     public void removeCoins(String uuid, int coins) {
 
-        Network.getInstance().getGlobalSQL().update("UPDATE coins SET coins=coins-" + coins + " WHERE uuid='" + uuid + "';");
-
+        Network.getInstance().getGlobalSQL()
+                .update("UPDATE coins SET coins=coins-" + coins + " WHERE uuid='" + uuid + "';");
     }
 
-    //Check if the player has at least this many coins.
+    // Check if the player has at least this many coins.
     public boolean hasEnoughCoins(String uuid, int minimum) {
 
-        return (Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM coins WHERE uuid='" + uuid + "' AND coins>=" + minimum + ";"));
-
+        return (Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM coins WHERE uuid='" + uuid + "' AND " +
+                "coins>=" + minimum + ";"));
     }
 }

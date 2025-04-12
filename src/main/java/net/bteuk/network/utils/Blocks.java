@@ -15,10 +15,13 @@ import static java.lang.Math.round;
 
 public class Blocks {
 
-    private static int MAX_DISTANCE = 200;
+    private static final int MAX_DISTANCE = 200;
 
     // Add a line.
-    public static void drawLine(Player player, World world, int[] block1, int[] block2, BlockData block, boolean permanent, boolean skipFirst, ProtectedRegion checkRegionPermission) throws OutsidePlotException, DistanceLimitException {
+    public static void drawLine(Player player, World world, int[] block1, int[] block2, BlockData block,
+                                boolean permanent, boolean skipFirst,
+                                ProtectedRegion checkRegionPermission) throws OutsidePlotException,
+            DistanceLimitException {
 
         // Check for maximum distance.
         if (Point.distanceBetween(block1, block2) > MAX_DISTANCE) {
@@ -43,7 +46,8 @@ public class Blocks {
             if (checkRegionPermission == null || checkRegionPermission.contains(x, 1, z)) {
                 drawBlock(player, world, x, z, block, permanent);
             } else {
-                throw new OutsidePlotException("All or part of your selection is not in a plot you can build in, cancelled drawing outlines.");
+                throw new OutsidePlotException("All or part of your selection is not in a plot you can build in, " +
+                        "cancelled drawing outlines.");
             }
         }
     }

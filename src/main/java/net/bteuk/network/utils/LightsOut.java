@@ -12,14 +12,13 @@ import java.util.Random;
 
 public class LightsOut extends Gui {
 
-    //Lights out is a simple game where the objective is to turn off all the lights.
-    //You start with a 6*9 grid of lights that are either on or off.
-    //Click on any slot will invert the value of the slot and all adjacent slots (not diagonals).
+    // Lights out is a simple game where the objective is to turn off all the lights.
+    // You start with a 6*9 grid of lights that are either on or off.
+    // Click on any slot will invert the value of the slot and all adjacent slots (not diagonals).
 
-    private boolean[][] game;
     private final NetworkUser u;
-
     private final long startTime;
+    private boolean[][] game;
 
     public LightsOut(NetworkUser u) {
 
@@ -30,12 +29,11 @@ public class LightsOut extends Gui {
 
         initialize();
         setItems();
-
     }
 
     public void initialize() {
 
-        //Create a random layout of 0 and 1s.
+        // Create a random layout of 0 and 1s.
         Random random = new Random();
 
         game = new boolean[9][6];
@@ -44,17 +42,16 @@ public class LightsOut extends Gui {
             for (int j = 0; j < 6; j++) {
 
                 game[i][j] = random.nextBoolean();
-
             }
         }
     }
 
     public void endGame() {
 
-        //Get time difference between start and end time.
+        // Get time difference between start and end time.
         long timeDiff = Time.currentTime() - startTime;
 
-        //Other game end functionality.
+        // Other game end functionality.
         u.player.closeInventory();
         u.lightsOut = null;
         this.delete();
@@ -65,7 +62,6 @@ public class LightsOut extends Gui {
                 .append(ChatUtils.success(" " + Time.minuteString(timeDiff) + " and "))
                 .append(Component.text(Time.seconds(timeDiff), NamedTextColor.DARK_AQUA))
                 .append(ChatUtils.success(" " + Time.secondString(timeDiff) + ".")));
-
     }
 
     public void setItems() {
@@ -78,16 +74,14 @@ public class LightsOut extends Gui {
 
                 if (game[i][j]) {
 
-                    //Light is on.
+                    // Light is on.
                     setItem(i + j * 9, Utils.createItem(Material.SEA_LANTERN, 1, Component.empty()),
                             u -> invertLights(finalI, finalJ));
-
                 } else {
 
-                    //Light is off.
+                    // Light is off.
                     setItem(i + j * 9, Utils.createItem(Material.REDSTONE_LAMP, 1, Component.empty()),
                             u -> invertLights(finalI, finalJ));
-
                 }
             }
         }
@@ -95,7 +89,7 @@ public class LightsOut extends Gui {
 
     public void invertLights(int i, int j) {
 
-        //Invert this slot and the adjacent slots.
+        // Invert this slot and the adjacent slots.
         game[i][j] = !game[i][j];
 
         if (i != 0) {
@@ -114,28 +108,25 @@ public class LightsOut extends Gui {
             game[i][j + 1] = !game[i][j + 1];
         }
 
-        //Refresh the gui.
+        // Refresh the gui.
         refresh();
-
     }
 
     public void refresh() {
 
-        //Check if solution is complete.
-        //If it is then stop end the game.
+        // Check if solution is complete.
+        // If it is then stop end the game.
         if (Arrays.deepEquals(game, new boolean[9][6])) {
 
             endGame();
-
         } else {
 
-            //Change items.
+            // Change items.
             clearGui();
             setItems();
 
-            //Set contents of inventory.
+            // Set contents of inventory.
             u.player.getOpenInventory().getTopInventory().setContents(getInventory().getContents());
-
         }
     }
 }

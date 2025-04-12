@@ -7,5 +7,4 @@ public interface GuiInterface {
      * This usually involves clearing the content and recreating it.
      */
     void refresh();
-
 }

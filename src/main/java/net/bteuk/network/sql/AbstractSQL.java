@@ -19,7 +19,6 @@ public abstract class AbstractSQL {
     public AbstractSQL(BasicDataSource datasource) {
 
         this.dataSource = datasource;
-
     }
 
     Connection conn() throws SQLException {
@@ -35,14 +34,13 @@ public abstract class AbstractSQL {
         ) {
 
             return results.next();
-
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
     }
 
-    //Generic update statement, return true if successful.
+    // Generic update statement, return true if successful.
     public boolean update(String sql) {
 
         try (
@@ -53,7 +51,6 @@ public abstract class AbstractSQL {
             statement.executeUpdate();
 
             return true;
-
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
@@ -71,13 +68,10 @@ public abstract class AbstractSQL {
             if (results.next()) {
 
                 return results.getBoolean(1);
-
             } else {
 
                 return false;
-
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
@@ -95,13 +89,10 @@ public abstract class AbstractSQL {
             if (results.next()) {
 
                 return results.getInt(1);
-
             } else {
 
                 return 0;
-
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
             return 0;
@@ -119,13 +110,10 @@ public abstract class AbstractSQL {
             if (results.next()) {
 
                 return results.getDouble(1);
-
             } else {
 
                 return 0;
-
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
             return 0;
@@ -143,13 +131,10 @@ public abstract class AbstractSQL {
             if (results.next()) {
 
                 return results.getInt(1);
-
             } else {
 
                 return 0;
-
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
             return 0;
@@ -167,13 +152,10 @@ public abstract class AbstractSQL {
             if (results.next()) {
 
                 return results.getLong(1);
-
             } else {
 
                 return 0;
-
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
             return 0;
@@ -189,7 +171,6 @@ public abstract class AbstractSQL {
         ) {
 
             return results;
-
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
@@ -207,13 +188,10 @@ public abstract class AbstractSQL {
             if (results.next()) {
 
                 return results.getString(1);
-
             } else {
 
                 return null;
-
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
@@ -233,9 +211,7 @@ public abstract class AbstractSQL {
             while (results.next()) {
 
                 list.add(results.getString(1));
-
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
@@ -257,9 +233,7 @@ public abstract class AbstractSQL {
             while (results.next()) {
 
                 list.add(results.getInt(1));
-
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
