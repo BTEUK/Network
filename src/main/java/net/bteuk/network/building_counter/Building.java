@@ -9,24 +9,21 @@ public class Building {
     public String playerId;
     public Integer coordinateId;
 
-    public Building(int bId,int cId, String pId)
-    {
+    public Building(int bId, int cId, String pId) {
         buildingId = bId;
         coordinate = Network.getInstance().getGlobalSQL().getLocation(cId);
         playerId = pId;
         coordinateId = cId;
     }
 
-    public Building(int bId, Location c, String pId, int cId)
-    {
+    public Building(int bId, Location c, String pId, int cId) {
         buildingId = bId;
         coordinate = c;
         playerId = pId;
         coordinateId = cId;
     }
 
-    public Building()
-    {
+    public Building() {
         buildingId = null;
         coordinate = null;
         playerId = null;

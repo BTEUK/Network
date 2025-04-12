@@ -4,6 +4,7 @@ import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.bteuk.network.commands.Afk;
+import net.bteuk.network.commands.Buildings;
 import net.bteuk.network.commands.BuildingCompanionCommand;
 import net.bteuk.network.commands.Clear;
 import net.bteuk.network.commands.Demote;
@@ -115,7 +116,7 @@ public class CommandManager {
             /*
              * Utility commands.
              */
-            commands.register("building","adds or shows completed buildings",new Buildings(instance));
+            commands.register("building", "adds or shows completed buildings", new Buildings(instance));
             commands.register("teleporttoggle", "Enables/Disables the ability for other players to teleport to you.", List.of("tptoggle", "toggleteleport", "toggletp"), new TpToggle());
             commands.register("discord", "Sends a link to our discord server.", new Discord());
             commands.register("nightvision", "Toggle nightvision.", List.of("nv"), new Nightvision());

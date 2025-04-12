@@ -13,16 +13,14 @@ import java.util.Locale;
 public class ConfirmationListener implements Listener {
     private Buildings instancefrom;
 
-    public ConfirmationListener(Buildings b)
-    {
+    public ConfirmationListener(Buildings b) {
         instancefrom = b;
     }
 
 
     @EventHandler
-    public void chatEvent(AsyncChatEvent e)
-    {
-        if(e.getPlayer().getUniqueId() == instancefrom.player.getUniqueId()) {
+    public void chatEvent(AsyncChatEvent e) {
+        if (e.getPlayer().getUniqueId() == instancefrom.player.getUniqueId()) {
             e.getHandlers().unregister(this);
             e.setCancelled(true);
             if (((net.kyori.adventure.text.TextComponent) e.message()).content().equals("y")) {

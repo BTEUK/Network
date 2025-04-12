@@ -136,8 +136,7 @@ public class GlobalSQL extends AbstractSQL {
         updateCoordinate(coordinateID, SERVER_NAME, l);
     }
 
-    public ArrayList<Building> getBuildings(String condition)
-    {
+    public ArrayList<Building> getBuildings(String condition) {
         try (
                 Connection conn = conn();
                 PreparedStatement statement = conn.prepareStatement(
@@ -147,16 +146,16 @@ public class GlobalSQL extends AbstractSQL {
         ) {
             ArrayList<Building> coords = new ArrayList<Building>();
 
-            while(results.next()) {
+            while (results.next()) {
 
 
-                        Location temp = new Location(Bukkit.getWorld(results.getString("world")),
+                Location temp = new Location(Bukkit.getWorld(results.getString("world")),
                         results.getDouble("x"),
                         results.getDouble("y"),
                         results.getDouble("z"),
                         results.getFloat("yaw"),
                         results.getFloat("pitch"));
-                coords.add(new Building(results.getInt("building_id"),temp,results.getString("player_id"),results.getInt("coordinate_id")));
+                coords.add(new Building(results.getInt("building_id"), temp, results.getString("player_id"), results.getInt("coordinate_id")));
             }
             return coords;
 
