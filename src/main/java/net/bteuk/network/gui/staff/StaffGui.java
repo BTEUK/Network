@@ -268,8 +268,7 @@ public class StaffGui extends Gui {
                             SwitchServer.switchServer(u.player, server);
                         }
                     } else {
-                        u.player.sendMessage(ChatUtils.error("There are currently no submitted plots that you can " +
-                                "review.."));
+                        u.player.sendMessage(ChatUtils.error("There are currently no submitted plots that you can review.."));
                     }
                 });
 
@@ -290,8 +289,7 @@ public class StaffGui extends Gui {
                         u.staffGui.open(u);
                     } else {
 
-                        u.player.sendMessage(ChatUtils.error("You do not have permission to access the Moderation " +
-                                "Menu."));
+                        u.player.sendMessage(ChatUtils.error("You do not have permission to access the Moderation Menu."));
                         // Don't close the inventory as the player could have just miss-clicked, the chat should
                         // still be visible either way.
                         // Staff users should also be aware if they have this permission beforehand.

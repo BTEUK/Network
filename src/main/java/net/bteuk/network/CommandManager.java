@@ -74,8 +74,7 @@ public class CommandManager {
                 commands.register("tpll", "Teleport to coordinates", instance.getTpll());
             }
             if (LL) {
-                commands.register("where", "Returns the coordinates where the player is standing with a link to " +
-                        "google maps.", List.of("location", "ll"), new Where(instance));
+                commands.register("where", "Returns the coordinates where the player is standing with a link to google maps.", List.of("location", "ll"), new Where(instance));
             }
             commands.register("teleport", "Teleport to any online player.", List.of("tp"), new Tp());
             commands.register("back", "Teleports the player to the previous teleported location.", new Back());
@@ -87,8 +86,7 @@ public class CommandManager {
                 commands.register("sethome", "Set a home to your current location.", new Sethome(instance));
                 commands.register("home", "Teleport to your home.", new Home(instance));
                 commands.register("delhome", "Delete a home.", new Delhome(instance));
-                commands.register("homes", "Like warps, but for homes, shows all homes the player has set.",
-                        new Homes());
+                commands.register("homes", "Like warps, but for homes, shows all homes the player has set.", new Homes());
             }
             commands.register("spawn", "Teleport to spawnpoint in lobby.", new Spawn());
             commands.register("server", "Switch server by command.", new Server());
@@ -97,12 +95,9 @@ public class CommandManager {
             /*
              * Gui commands.
              */
-            commands.register("navigator", "Opens the main gui, will always return to the previous menu if possible."
-                    , List.of("nav", "gui", "menu", "claim"), new Navigator());
-            commands.register("plot", "Allows players to manipulate plots without using the gui.", List.of("plots"),
-                    new Plot(instance));
-            commands.register("region", "Allows players to manipulate regions without using the gui.",
-                    new RegionCommand());
+            commands.register("navigator", "Opens the main gui, will always return to the previous menu if possible.", List.of("nav", "gui", "menu", "claim"), new Navigator());
+            commands.register("plot", "Allows players to manipulate plots without using the gui.", List.of("plots"), new Plot(instance));
+            commands.register("region", "Allows players to manipulate regions without using the gui.", new RegionCommand());
             commands.register("zone", "Zone command.", new Zone());
 
             /*
@@ -120,8 +115,8 @@ public class CommandManager {
             /*
              * Utility commands.
              */
-            commands.register("teleporttoggle", "Enables/Disables the ability for other players to teleport to you.",
-                    List.of("tptoggle", "toggleteleport", "toggletp"), new TpToggle());
+            commands.register("teleporttoggle", "Enables/Disables the ability for other players to teleport to you.", List.of("tptoggle", "toggleteleport", "toggletp"),
+                    new TpToggle());
             commands.register("discord", "Sends a link to our discord server.", new Discord());
             commands.register("nightvision", "Toggle nightvision.", List.of("nv"), new Nightvision());
             commands.register("speed", "Sets the players speed, value up to 10.", new Speed());
@@ -136,20 +131,16 @@ public class CommandManager {
             commands.register("phead", "Get the player head of someone who has connected to the server.", new Phead());
             commands.register("hdb", "Added so it can be routed to /skulls", new Hdb());
             if (PROGRESS_MAP) {
-                commands.register("progressmap", "Sends a link of the progress map", List.of("progress"),
-                        new ProgressMap());
+                commands.register("progressmap", "Sends a link of the progress map", List.of("progress"), new ProgressMap());
             }
             if (TIPS) {
-                commands.register("tips", "Toggles tips in chat.", List.of("toggletips", "tipstoggle"),
-                        new TipsToggle());
+                commands.register("tips", "Toggles tips in chat.", List.of("toggletips", "tipstoggle"), new TipsToggle());
             }
             commands.register("ptime", "Sets the time of day for the player", new Ptime());
             commands.register("pweather", "Sets the weather for the player", new Pweather());
-            commands.register("season", "Command for creating, starting and ending seasons.", List.of("seasons"),
-                    new Season());
+            commands.register("season", "Command for creating, starting and ending seasons.", List.of("seasons"), new Season());
             commands.register("exp", "Test command for adding exp.", new Exp());
-            commands.register("buildingcompanion", "Toggle the building companion.", List.of("bc", "companion"),
-                    new BuildingCompanionCommand());
+            commands.register("buildingcompanion", "Toggle the building companion.", List.of("bc", "companion"), new BuildingCompanionCommand());
             commands.register("pmute", "Mute a player", new Pmute(instance));
             commands.register("punmute", "Unmute a player", new Punmute(instance));
             Msg msgCommand = new Msg(instance);
@@ -158,8 +149,7 @@ public class CommandManager {
             commands.register("tell", "Sends a direct message to a player.", msgCommand);
             commands.register("promote", "Add a role to a player.", new Promote(instance));
             commands.register("demote", "Remove a role from a player.", new Demote(instance));
-            commands.register("focus", "Toggle focus mode, hides chat and players.", List.of("focusmode", "fm"),
-                    new Focus());
+            commands.register("focus", "Toggle focus mode, hides chat and players.", List.of("focusmode", "fm"), new Focus());
             commands.register("me", "Disabled", new Me());
 
             // commands.register("bteuk", "Test", new BTEUK());
