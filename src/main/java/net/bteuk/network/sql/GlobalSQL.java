@@ -148,7 +148,6 @@ public class GlobalSQL extends AbstractSQL {
 
             while (results.next()) {
 
-
                 Location temp = new Location(Bukkit.getWorld(results.getString("world")),
                         results.getDouble("x"),
                         results.getDouble("y"),
@@ -168,8 +167,8 @@ public class GlobalSQL extends AbstractSQL {
 
     }
 
-    //Get coordinate from database by id.
-    //World must be on this server else this will throw a null pointer exception.
+    // Get coordinate from database by id.
+    // World must be on this server else this will throw a null pointer exception.
     public Location getLocation(int coordinateID) {
 
         try (
@@ -230,16 +229,16 @@ public class GlobalSQL extends AbstractSQL {
 
         try (
                 Connection conn = conn();
-                PreparedStatement deleteBuildingStmt = conn.prepareStatement(deleteBuildingSQL);
-                PreparedStatement deleteCoordinatesStmt = conn.prepareStatement(deleteCoordinatesSQL)
+                PreparedStatement deleteBuildingStatement = conn.prepareStatement(deleteBuildingSQL);
+                PreparedStatement deleteCoordinatesStatement = conn.prepareStatement(deleteCoordinatesSQL)
         ) {
             conn.setAutoCommit(false); // Start transaction
 
-            deleteBuildingStmt.setInt(1, b.buildingId);
-            deleteBuildingStmt.executeUpdate();
+            deleteBuildingStatement.setInt(1, b.buildingId());
+            deleteBuildingStatement.executeUpdate();
 
-            deleteCoordinatesStmt.setInt(1, b.coordinateId);
-            deleteCoordinatesStmt.executeUpdate();
+            deleteCoordinatesStatement.setInt(1, b.coordinateId());
+            deleteCoordinatesStatement.executeUpdate();
 
             conn.commit(); // Commit if both deletions succeed
 
@@ -247,6 +246,5 @@ public class GlobalSQL extends AbstractSQL {
             sql.printStackTrace();
         }
     }
-
 
 }

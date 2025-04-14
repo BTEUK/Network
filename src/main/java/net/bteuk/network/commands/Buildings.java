@@ -23,10 +23,7 @@ import static net.bteuk.network.utils.Constants.SERVER_TYPE;
 public class Buildings extends AbstractCommand {
     private static final Component ERROR = ChatUtils.error("/building add/show/count/delete/definition");
 
-    private final Network instance;
-    private Location playerloc;
-    public Player player;
-    private ConfirmationListener response = new ConfirmationListener(this);
+    private static Network instance = null;
 
     public Buildings(Network instance) {
         super();
@@ -36,7 +33,7 @@ public class Buildings extends AbstractCommand {
 
     @Override
     public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
-        player = getPlayer(stack);
+        Player player = getPlayer(stack);
         if (player == null) {
             return;
         }
@@ -50,32 +47,40 @@ public class Buildings extends AbstractCommand {
             player.sendMessage(ChatUtils.error("Please join the earth server before running this command"));
             return;
         }
-        if (args[0].equals("add")) {
-            if (player.hasPermission("network.buildings.add")) {
+        switch (args[0]) {
+            case "add":
+                if (player.hasPermission("network.buildings.add")) {
 
-                AddBuilding(player);
-            } else {
-                player.sendMessage(ChatUtils.error("You need to be at least jr builder to run this command"));
-            }
-        } else if (args[0].equals("show")) {
-            ShowBuildings(player);
+                    addBuilding(player);
+                } else {
+                    player.sendMessage(ChatUtils.error("You don't have permission to use this command"));
+                }
+                break;
+            case "show":
+                showBuildings(player);
+                break;
+            case "count":
+                displayCount(player);
+                break;
+            case "delete":
+                deleteBuilding(player);
+                break;
+            case "definition":
+                player.sendMessage(ChatUtils.success(
+                        "A building is a structure that has walls on all sides, a roof, is larger than 2*3m and can be entered by a human. In other words use common sense. It is" +
+                                " up to you whether you count terraced houses as one or many buildings."));
+                break;
 
-        } else if (args[0].equals("count")) {
-            DisplayCount(player);
-        } else if (args[0].equals("delete")) {
-            DeleteBuilding(player);
-        } else if (args[0].equals("definition")) {
-            player.sendMessage(ChatUtils.success("A building is a structure that has walls on all sides, a roof, is larger than 2*3m and can be entered by a human. In other words use common sense. It is up to you whether you count terraced houses as one or many buildings."));
         }
 
     }
 
-    public void DeleteBuilding(Player player) {
+    private static void deleteBuilding(Player player) {
         ArrayList<Building> nearbyBuildings = getNearbyBuildings(player, 5);
         double minDist = 100;
         Building minbuilding = null;
         for (Building i : nearbyBuildings) {
-            double currentDist = GetDist(i.coordinate, player.getLocation());
+            double currentDist = getDist(i.coordinate(), player.getLocation());
             if (currentDist < minDist) {
                 minDist = currentDist;
                 minbuilding = i;
@@ -85,7 +90,7 @@ public class Buildings extends AbstractCommand {
             player.sendMessage(ChatUtils.error("No buildings within 5 blocks"));
             return;
         }
-        if (minbuilding.playerId.equals(player.getUniqueId().toString()) || player.hasPermission("network.buildings.delete")) {
+        if (minbuilding.playerId().equals(player.getUniqueId().toString()) || player.hasPermission("network.buildings.delete")) {
             Network.getInstance().getGlobalSQL().deleteBuilding(minbuilding);
             player.sendMessage(ChatUtils.success("Building deleted"));
         } else {
@@ -93,52 +98,51 @@ public class Buildings extends AbstractCommand {
 
         }
 
-
     }
 
-    public double GetDist(Location l1, Location l2) {
+    public static double getDist(Location l1, Location l2) {
         double deltax = l1.getX() - l2.getX();
         double deltaz = l2.getZ() - l2.getZ();
         return Math.sqrt((deltax * deltax) + (deltaz * deltaz));
     }
 
-    public void DisplayCount(Player player) {
+    private static void displayCount(Player player) {
         int buildingCount = Network.getInstance().getGlobalSQL().getInt("SELECT COUNT(*) FROM buildings;");
         player.sendMessage(ChatUtils.success(buildingCount + " buildings have been built!!"));
 
     }
 
-    public void AddBuilding(Player player) {
-        playerloc = player.getLocation();
+    private static void addBuilding(Player player) {
         ArrayList<Building> nearbyBuildings = getNearbyBuildings(player, 20);
         StringBuilder locs = new StringBuilder("buildings nearby:");
         for (Building j : nearbyBuildings) {
-            Location i = j.coordinate;
+            Location i = j.coordinate();
             locs.append(" (").append(Math.round(i.getX())).append(",").append(Math.round(i.getZ())).append("),");
         }
         if (!nearbyBuildings.isEmpty()) {
             locs.deleteCharAt(locs.length() - 1);
             player.sendMessage(ChatUtils.error("Other buildings nearby, to confirm a new building being added type 'y'. If unsure type 'n' and run /building show."));
-            Bukkit.getServer().getPluginManager().registerEvents(response, Network.getInstance());
+            ConfirmationListener response = new ConfirmationListener(player.getLocation(), player, Network.getInstance());
+
             return;
         }
-        addBuildingToDataBase(player);
+        addBuildingToDataBase(player, player.getLocation());
 
     }
 
-    public void addBuildingToDataBase(Player player) {
-        Location l = playerloc;
+    public static void addBuildingToDataBase(Player player, Location l) {
+        ;
         player.sendMessage(ChatUtils.success("Building added at " + l.getX() + "," + l.getZ()));
         int CID = Network.getInstance().getGlobalSQL().addCoordinate(l);
         Network.getInstance().getGlobalSQL().update("INSERT INTO buildings (coordinate_id, player_id) VALUES (" + CID + ", '" + player.getUniqueId() + "');");
 
     }
 
-    public void ShowBuildings(Player player) {
+    private static void showBuildings(Player player) {
         ArrayList<Building> nearbyBuildings = getNearbyBuildings(player, 100);
         StringBuilder locs = new StringBuilder("buildings nearby:");
         for (Building j : nearbyBuildings) {
-            Location i = j.coordinate;
+            Location i = j.coordinate();
             locs.append(" (").append(Math.round(i.getX())).append(",").append(Math.round(i.getZ())).append("),");
             Location finalHeight = new Location(i.getWorld(), i.getX(), i.getWorld().getHighestBlockYAt(i) + 1, i.getZ());
             new BukkitRunnable() {
@@ -158,11 +162,11 @@ public class Buildings extends AbstractCommand {
         }
         if (!nearbyBuildings.isEmpty()) {
             locs.deleteCharAt(locs.length() - 1);
-            //player.sendMessage(ChatUtils.success(locs.toString()));
+            // player.sendMessage(ChatUtils.success(locs.toString()));
         }
     }
 
-    public ArrayList<Building> getNearbyBuildings(Player player, int radius) {
+    private static ArrayList<Building> getNearbyBuildings(Player player, int radius) {
         Location Pl = player.getLocation();
         double xmax = Pl.getX() + radius;
         double xmin = Pl.getX() - radius;
