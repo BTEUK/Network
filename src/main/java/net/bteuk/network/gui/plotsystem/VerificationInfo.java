@@ -74,7 +74,6 @@ public class VerificationInfo extends Gui {
         Component[] description;
         if (!outcomeOld.equals(outcomeNew)) {
             description = new Component[]{
-                    Utils.line("Plot " + plotId),
                     Utils.line("Verified by " + verifier),
                     Utils.line("The outcome of the review"),
                     Utils.line("was altered from:"),
@@ -82,7 +81,6 @@ public class VerificationInfo extends Gui {
             };
         } else if (selectionChanged) {
             description = new Component[]{
-                    Utils.line("Plot " + plotId),
                     Utils.line("Verified by " + verifier),
                     Utils.line("The selection of at least one"),
                     Utils.line("category was altered, check"),
@@ -90,7 +88,6 @@ public class VerificationInfo extends Gui {
             };
         } else if (feedbackChanged) {
             description = new Component[]{
-                    Utils.line("Plot " + plotId),
                     Utils.line("Verified by " + verifier),
                     Utils.line("The feedback of at least one"),
                     Utils.line("category was altered, check"),
@@ -98,7 +95,6 @@ public class VerificationInfo extends Gui {
             };
         } else {
             description = new Component[]{
-                    Utils.line("Plot " + plotId),
                     Utils.line("Verified by " + verifier)
             };
         }

@@ -12,6 +12,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import static net.buildtheearth.terraminusminus.TerraMinusMinus.LOGGER;
+
 public class PlotSQL extends AbstractSQL {
 
     public PlotSQL(BasicDataSource datasource) {
@@ -364,6 +366,19 @@ public class PlotSQL extends AbstractSQL {
             statement.executeUpdate();
         } catch (SQLException sql) {
             sql.printStackTrace();
+        }
+    }
+
+    public void saveBook(int id, int page, String contents) {
+        try (
+                Connection conn = conn();
+                PreparedStatement statement = conn.prepareStatement("INSERT INTO book_data(id,page,contents) VALUES(?, ?, ?);");
+        ) {
+            statement.setInt(1, id);
+            statement.setInt(2, page);
+            statement.setString(3, contents);
+        } catch (SQLException sql) {
+            LOGGER.error("An error occurred when executing insert statement: ", sql);
         }
     }
 }
