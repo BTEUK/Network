@@ -33,7 +33,7 @@ public class ConfirmationListener implements Listener {
 
     @EventHandler
     public void chatEvent(AsyncChatEvent e) {
-        if (e.getPlayer().getUniqueId() == currentPlayer.getUniqueId()) {
+        if (e.getPlayer().equals(currentPlayer)) {
             timeoutTask.cancel();
             e.getHandlers().unregister(this);
             e.setCancelled(true);

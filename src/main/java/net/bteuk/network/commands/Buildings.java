@@ -91,7 +91,7 @@ public class Buildings extends AbstractCommand {
             return;
         }
         if (minbuilding.playerId().equals(player.getUniqueId().toString()) || player.hasPermission("network.buildings.delete")) {
-            Network.getInstance().getGlobalSQL().deleteBuilding(minbuilding);
+            instance.getGlobalSQL().deleteBuilding(minbuilding);
             player.sendMessage(ChatUtils.success("Building deleted"));
         } else {
             player.sendMessage(ChatUtils.error("You don't have permission to delete this building"));
@@ -107,7 +107,7 @@ public class Buildings extends AbstractCommand {
     }
 
     private static void displayCount(Player player) {
-        int buildingCount = Network.getInstance().getGlobalSQL().getInt("SELECT COUNT(*) FROM buildings;");
+        int buildingCount = instance.getGlobalSQL().getInt("SELECT COUNT(*) FROM buildings;");
         player.sendMessage(ChatUtils.success(buildingCount + " buildings have been built!!"));
 
     }
@@ -122,7 +122,7 @@ public class Buildings extends AbstractCommand {
         if (!nearbyBuildings.isEmpty()) {
             locs.deleteCharAt(locs.length() - 1);
             player.sendMessage(ChatUtils.error("Other buildings nearby, to confirm a new building being added type 'y'. If unsure type 'n' and run /building show."));
-            ConfirmationListener response = new ConfirmationListener(player.getLocation(), player, Network.getInstance());
+            ConfirmationListener response = new ConfirmationListener(player.getLocation(), player, instance);
 
             return;
         }
@@ -133,8 +133,8 @@ public class Buildings extends AbstractCommand {
     public static void addBuildingToDataBase(Player player, Location l) {
         ;
         player.sendMessage(ChatUtils.success("Building added at " + l.getX() + "," + l.getZ()));
-        int CID = Network.getInstance().getGlobalSQL().addCoordinate(l);
-        Network.getInstance().getGlobalSQL().update("INSERT INTO buildings (coordinate_id, player_id) VALUES (" + CID + ", '" + player.getUniqueId() + "');");
+        int CID = instance.getGlobalSQL().addCoordinate(l);
+        instance.getGlobalSQL().update("INSERT INTO buildings (coordinate_id, player_id) VALUES (" + CID + ", '" + player.getUniqueId() + "');");
 
     }
 
@@ -173,7 +173,7 @@ public class Buildings extends AbstractCommand {
         double zmax = Pl.getZ() + radius;
         double zmin = Pl.getZ() - radius;
         String condition = "WHERE coordinates.x > " + xmin + " AND coordinates.x < " + xmax + " AND coordinates.z > " + zmin + " AND coordinates.z < " + zmax;
-        return Network.getInstance().getGlobalSQL().getBuildings(condition);
+        return instance.getGlobalSQL().getBuildings(condition);
 
     }
 }
