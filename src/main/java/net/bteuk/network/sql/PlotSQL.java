@@ -372,7 +372,7 @@ public class PlotSQL extends AbstractSQL {
     public void saveBook(int id, int page, String contents) {
         try (
                 Connection conn = conn();
-                PreparedStatement statement = conn.prepareStatement("INSERT INTO book_data(id,page,contents) VALUES(?, ?, ?);");
+                PreparedStatement statement = conn.prepareStatement("INSERT INTO book_data(id,page,contents) VALUES(?, ?, ?);")
         ) {
             statement.setInt(1, id);
             statement.setInt(2, page);
