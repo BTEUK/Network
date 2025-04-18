@@ -9,7 +9,7 @@ import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.enums.ServerType;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
-import org.bukkit.Particle;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +22,7 @@ import static net.bteuk.network.utils.Constants.SERVER_TYPE;
 public class Buildings extends AbstractCommand {
     private static final Component ERROR = ChatUtils.error("/building add/show/count/delete/definition");
 
-    private static final int SHOW_BUILDINGS_DURATION = 200;
+    private static final int SHOW_BUILDINGS_DURATION = 300;
 
     private final Network instance;
 
@@ -137,23 +137,27 @@ public class Buildings extends AbstractCommand {
     private void showBuildings(Player player) {
         ArrayList<Building> nearbyBuildings = getNearbyBuildings(player, 100);
         // StringBuilder locs = new StringBuilder("buildings nearby:");
+        ArrayList<Location> heightBuildingsAdded = new ArrayList<Location>();
         for (Building j : nearbyBuildings) {
             Location i = j.coordinate();
             // locs.append(" (").append(Math.round(i.getX())).append(",").append(Math.round(i.getZ())).append("),");
-            Location finalHeight = new Location(i.getWorld(), i.getX(), i.getWorld().getHighestBlockYAt(i) + 1, i.getZ());
-            new BukkitRunnable() {
-                int tickCount = 0;
-
-                @Override
-                public void run() {
-                    if (tickCount >= SHOW_BUILDINGS_DURATION) {
-                        cancel(); // Stop the task after the duration is reached
-                        return;
-                    }
-                    player.spawnParticle(Particle.HAPPY_VILLAGER, finalHeight, 1, 0.2, 0, 0.2);
-                    tickCount++;
+            Location finalHeight = new Location(i.getWorld(), i.getX(), i.getWorld().getHighestBlockYAt(i) - 1, i.getZ());
+            heightBuildingsAdded.add(finalHeight);
+            player.sendBlockChange(finalHeight, Material.BEACON.createBlockData());
+            for (int x = -1; x <= 1; x++) {
+                for (int z = -1; z <= 1; z++) {
+                    Location ironLoc = finalHeight.clone().add(x, -1, z);
+                    player.sendBlockChange(ironLoc, Material.IRON_BLOCK.createBlockData());
                 }
-            }.runTaskTimer(instance, 0L, 1L); // Starts immediately, repeating every 1 tick (1/20th of a second)
+            }
+
+            Location glassLoc = finalHeight.clone().add(0, 1, 0);
+            if (j.playerId().equals(player.getUniqueId().toString())) {
+                player.sendBlockChange(glassLoc, Material.GREEN_STAINED_GLASS.createBlockData());
+            } else {
+                player.sendBlockChange(glassLoc, Material.RED_STAINED_GLASS.createBlockData());
+            }
+            instance.getServer().getScheduler().runTaskLater(instance, () -> removeDisplayBeacons(player, heightBuildingsAdded), SHOW_BUILDINGS_DURATION);
         }
         // if (!nearbyBuildings.isEmpty()) {
         //     locs.deleteCharAt(locs.length() - 1);
@@ -170,4 +174,20 @@ public class Buildings extends AbstractCommand {
         String condition = String.format("WHERE coordinates.x > %f AND coordinates.x < %f AND coordinates.z > %f AND coordinates.z < %f", xmin, xmax, zmin, zmax);
         return instance.getGlobalSQL().getBuildings(condition);
     }
+
+    private void removeDisplayBeacons(Player player, ArrayList<Location> nearbyBuildings) {
+        for (Location i : nearbyBuildings) {
+            Location glassLoc = i.clone().add(0, 1, 0);
+            player.sendBlockChange(i, i.getBlock().getBlockData());
+            player.sendBlockChange(glassLoc, glassLoc.getBlock().getBlockData());
+            for (int x = -1; x <= 1; x++) {
+                for (int z = -1; z <= 1; z++) {
+                    Location ironLoc = i.clone().add(x, -1, z);
+                    player.sendBlockChange(ironLoc, ironLoc.getBlock().getBlockData());
+                }
+            }
+        }
+
+    }
+
 }
