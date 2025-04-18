@@ -8,7 +8,6 @@ import net.bteuk.network.commands.tabcompleters.FixedArgSelector;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.enums.ServerType;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
@@ -23,7 +22,9 @@ import static net.bteuk.network.utils.Constants.SERVER_TYPE;
 public class Buildings extends AbstractCommand {
     private static final Component ERROR = ChatUtils.error("/building add/show/count/delete/definition");
 
-    private static Network instance = null;
+    private static final int SHOW_BUILDINGS_DURATION = 200;
+
+    private final Network instance;
 
     public Buildings(Network instance) {
         super();
@@ -32,7 +33,7 @@ public class Buildings extends AbstractCommand {
     }
 
     @Override
-    public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
+    public void execute(@NotNull CommandSourceStack stack, String @NotNull [] args) {
         Player player = getPlayer(stack);
         if (player == null) {
             return;
@@ -67,15 +68,15 @@ public class Buildings extends AbstractCommand {
                 break;
             case "definition":
                 player.sendMessage(ChatUtils.success(
-                        "A building is a structure that has walls on all sides, a roof, is larger than 2*3m and can be entered by a human. In other words use common sense. It is" +
-                                " up to you whether you count terraced houses as one or many buildings."));
+                        "A building is a structure that has walls on all sides, a roof, is larger than 2*3m and can be entered by a human. In other words use common sense. It " +
+                                "is" + " up to you whether you count terraced houses as one or many buildings."));
                 break;
 
         }
 
     }
 
-    private static void deleteBuilding(Player player) {
+    private void deleteBuilding(Player player) {
         ArrayList<Building> nearbyBuildings = getNearbyBuildings(player, 5);
         double minDist = 100;
         Building minbuilding = null;
@@ -106,52 +107,46 @@ public class Buildings extends AbstractCommand {
         return Math.sqrt((deltax * deltax) + (deltaz * deltaz));
     }
 
-    private static void displayCount(Player player) {
+    private void displayCount(Player player) {
         int buildingCount = instance.getGlobalSQL().getInt("SELECT COUNT(*) FROM buildings;");
-        player.sendMessage(ChatUtils.success(buildingCount + " buildings have been built!!"));
-
+        player.sendMessage(ChatUtils.success("%s buildings have been built!", String.valueOf(buildingCount)));
     }
 
-    private static void addBuilding(Player player) {
+    private void addBuilding(Player player) {
         ArrayList<Building> nearbyBuildings = getNearbyBuildings(player, 20);
-        StringBuilder locs = new StringBuilder("buildings nearby:");
-        for (Building j : nearbyBuildings) {
-            Location i = j.coordinate();
-            locs.append(" (").append(Math.round(i.getX())).append(",").append(Math.round(i.getZ())).append("),");
-        }
+        // StringBuilder locs = new StringBuilder("buildings nearby:");
+        // for (Building j : nearbyBuildings) {
+        //     Location i = j.coordinate();
+        //     locs.append(" (").append(Math.round(i.getX())).append(",").append(Math.round(i.getZ())).append("),");
+        // }
         if (!nearbyBuildings.isEmpty()) {
-            locs.deleteCharAt(locs.length() - 1);
+            // locs.deleteCharAt(locs.length() - 1);
             player.sendMessage(ChatUtils.error("Other buildings nearby, to confirm a new building being added type 'y'. If unsure type 'n' and run /building show."));
-            ConfirmationListener response = new ConfirmationListener(player.getLocation(), player, instance);
-
-            return;
+            new ConfirmationListener(this, player.getLocation(), player, instance);
+        } else {
+            addBuildingToDataBase(player, player.getLocation());
         }
-        addBuildingToDataBase(player, player.getLocation());
-
     }
 
-    public static void addBuildingToDataBase(Player player, Location l) {
-        ;
-        player.sendMessage(ChatUtils.success("Building added at " + l.getX() + "," + l.getZ()));
-        int CID = instance.getGlobalSQL().addCoordinate(l);
-        instance.getGlobalSQL().update("INSERT INTO buildings (coordinate_id, player_id) VALUES (" + CID + ", '" + player.getUniqueId() + "');");
-
+    public void addBuildingToDataBase(Player player, Location l) {
+        player.sendMessage(ChatUtils.success("Building added at %s,%s", String.valueOf(l.getX()), String.valueOf(l.getZ())));
+        int coordinateId = instance.getGlobalSQL().addCoordinate(l);
+        instance.getGlobalSQL().update(String.format("INSERT INTO buildings (coordinate_id, player_id) VALUES (%d, '%s');", coordinateId, player.getUniqueId()));
     }
 
-    private static void showBuildings(Player player) {
+    private void showBuildings(Player player) {
         ArrayList<Building> nearbyBuildings = getNearbyBuildings(player, 100);
-        StringBuilder locs = new StringBuilder("buildings nearby:");
+        // StringBuilder locs = new StringBuilder("buildings nearby:");
         for (Building j : nearbyBuildings) {
             Location i = j.coordinate();
-            locs.append(" (").append(Math.round(i.getX())).append(",").append(Math.round(i.getZ())).append("),");
+            // locs.append(" (").append(Math.round(i.getX())).append(",").append(Math.round(i.getZ())).append("),");
             Location finalHeight = new Location(i.getWorld(), i.getX(), i.getWorld().getHighestBlockYAt(i) + 1, i.getZ());
             new BukkitRunnable() {
-                int duration = 200;
                 int tickCount = 0;
 
                 @Override
                 public void run() {
-                    if (tickCount >= duration) {
+                    if (tickCount >= SHOW_BUILDINGS_DURATION) {
                         cancel(); // Stop the task after the duration is reached
                         return;
                     }
@@ -160,20 +155,19 @@ public class Buildings extends AbstractCommand {
                 }
             }.runTaskTimer(instance, 0L, 1L); // Starts immediately, repeating every 1 tick (1/20th of a second)
         }
-        if (!nearbyBuildings.isEmpty()) {
-            locs.deleteCharAt(locs.length() - 1);
-            // player.sendMessage(ChatUtils.success(locs.toString()));
-        }
+        // if (!nearbyBuildings.isEmpty()) {
+        //     locs.deleteCharAt(locs.length() - 1);
+        //     player.sendMessage(ChatUtils.success(locs.toString()));
+        // }
     }
 
-    private static ArrayList<Building> getNearbyBuildings(Player player, int radius) {
+    private ArrayList<Building> getNearbyBuildings(Player player, int radius) {
         Location Pl = player.getLocation();
         double xmax = Pl.getX() + radius;
         double xmin = Pl.getX() - radius;
         double zmax = Pl.getZ() + radius;
         double zmin = Pl.getZ() - radius;
-        String condition = "WHERE coordinates.x > " + xmin + " AND coordinates.x < " + xmax + " AND coordinates.z > " + zmin + " AND coordinates.z < " + zmax;
+        String condition = String.format("WHERE coordinates.x > %f AND coordinates.x < %f AND coordinates.z > %f AND coordinates.z < %f", xmin, xmax, zmin, zmax);
         return instance.getGlobalSQL().getBuildings(condition);
-
     }
 }
