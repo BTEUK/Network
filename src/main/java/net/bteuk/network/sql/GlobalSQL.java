@@ -1,5 +1,6 @@
 package net.bteuk.network.sql;
 
+import net.bteuk.network.building_counter.Building;
 import net.bteuk.network.utils.Coordinate;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Bukkit;
@@ -25,8 +26,7 @@ public class GlobalSQL extends AbstractSQL {
         // Try and get all events for this server.
         try (
                 Connection conn = conn();
-                PreparedStatement statement = conn.prepareStatement("SELECT uuid,event,message FROM server_events " +
-                        "WHERE server='" + serverName + "' AND type='" + type + "';");
+                PreparedStatement statement = conn.prepareStatement("SELECT uuid,event,message FROM server_events " + "WHERE server='" + serverName + "' AND type='" + type + "';");
                 ResultSet results = statement.executeQuery()
         ) {
 
@@ -42,9 +42,7 @@ public class GlobalSQL extends AbstractSQL {
         // Try and delete all events for this server.
         try (
                 Connection conn = conn();
-                PreparedStatement statement =
-                        conn.prepareStatement("DELETE FROM server_events WHERE server='" + serverName + "' AND " +
-                                "type='" + type + "';")
+                PreparedStatement statement = conn.prepareStatement("DELETE FROM server_events WHERE server='" + serverName + "' AND " + "type='" + type + "';")
         ) {
 
             statement.executeUpdate();
@@ -60,8 +58,7 @@ public class GlobalSQL extends AbstractSQL {
     // Add new coordinate to database and return the id.
     public int addCoordinate(Location l) {
 
-        return (addCoordinate(SERVER_NAME, l.getWorld().getName(), l.getX(), l.getY(), l.getZ(), l.getYaw(),
-                l.getPitch()));
+        return (addCoordinate(SERVER_NAME, l.getWorld().getName(), l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch()));
     }
 
     // Add new coordinate to database and return the id.
@@ -75,10 +72,8 @@ public class GlobalSQL extends AbstractSQL {
 
         try (
                 Connection conn = conn();
-                PreparedStatement statement = conn.prepareStatement(
-                        "INSERT INTO coordinates(server,world, x, y, z, yaw, pitch) VALUES(?, ?, ?, ?, ?, ?, ?);",
-                        Statement.RETURN_GENERATED_KEYS
-                )
+                PreparedStatement statement = conn.prepareStatement("INSERT INTO coordinates(server,world, x, y, z, yaw, pitch) VALUES(?, ?, ?, ?, ?, ?, ?);",
+                        Statement.RETURN_GENERATED_KEYS)
         ) {
             statement.setString(1, server);
             statement.setString(2, world);
@@ -109,10 +104,7 @@ public class GlobalSQL extends AbstractSQL {
     public void updateCoordinate(int coordinateID, String server, Location l) {
 
         try (
-                Connection conn = conn();
-                PreparedStatement statement = conn.prepareStatement(
-                        "UPDATE coordinates SET server=?, world=?, x=?, y=?, z=?, yaw=?, pitch=? WHERE id=?;"
-                )
+                Connection conn = conn(); PreparedStatement statement = conn.prepareStatement("UPDATE coordinates SET server=?, world=?, x=?, y=?, z=?, yaw=?, pitch=? WHERE id=?;")
         ) {
             statement.setString(1, server);
             statement.setString(2, l.getWorld().getName());
@@ -131,8 +123,26 @@ public class GlobalSQL extends AbstractSQL {
 
     // Update an existing coordinate.
     public void updateCoordinate(int coordinateID, Location l) {
-
         updateCoordinate(coordinateID, SERVER_NAME, l);
+    }
+
+    public ArrayList<Building> getBuildings(String condition) {
+        try (
+                Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
+                String.format("SELECT * FROM buildings INNER JOIN coordinates ON buildings.coordinate_id = coordinates.id %s;", condition));
+                ResultSet results = statement.executeQuery()
+        ) {
+            ArrayList<Building> buildings = new ArrayList<>();
+            while (results.next()) {
+                Location temp = new Location(Bukkit.getWorld(results.getString("world")), results.getDouble("x"), results.getDouble("y"), results.getDouble("z"),
+                        results.getFloat("yaw"), results.getFloat("pitch"));
+                buildings.add(new Building(results.getInt("building_id"), temp, results.getString("player_id"), results.getInt("coordinate_id")));
+            }
+            return buildings;
+        } catch (SQLException sql) {
+            sql.printStackTrace();
+            return null;
+        }
     }
 
     // Get coordinate from database by id.
@@ -140,19 +150,12 @@ public class GlobalSQL extends AbstractSQL {
     public Location getLocation(int coordinateID) {
 
         try (
-                Connection conn = conn();
-                PreparedStatement statement = conn.prepareStatement(
-                        "SELECT * FROM coordinates WHERE id=" + coordinateID + ";"
-                );
+                Connection conn = conn(); PreparedStatement statement = conn.prepareStatement("SELECT * FROM coordinates WHERE id=" + coordinateID + ";");
                 ResultSet results = statement.executeQuery()
         ) {
 
             results.next();
-            return (new Location(Bukkit.getWorld(results.getString("world")),
-                    results.getDouble("x"),
-                    results.getDouble("y"),
-                    results.getDouble("z"),
-                    results.getFloat("yaw"),
+            return (new Location(Bukkit.getWorld(results.getString("world")), results.getDouble("x"), results.getDouble("y"), results.getDouble("z"), results.getFloat("yaw"),
                     results.getFloat("pitch")));
         } catch (SQLException sql) {
 
@@ -166,28 +169,40 @@ public class GlobalSQL extends AbstractSQL {
     public Coordinate getCoordinate(int coordinateID) {
 
         try (
-                Connection conn = conn();
-                PreparedStatement statement = conn.prepareStatement(
-                        "SELECT * FROM coordinates WHERE id=" + coordinateID + ";"
-                );
+                Connection conn = conn(); PreparedStatement statement = conn.prepareStatement("SELECT * FROM coordinates WHERE id=" + coordinateID + ";");
                 ResultSet results = statement.executeQuery()
         ) {
 
             results.next();
-            return (new Coordinate(
-                    coordinateID,
-                    results.getString("server"),
-                    results.getString("world"),
-                    results.getDouble("x"),
-                    results.getDouble("y"),
-                    results.getDouble("z"),
-                    results.getFloat("yaw"),
-                    results.getFloat("pitch"))
-            );
+            return (new Coordinate(coordinateID, results.getString("server"), results.getString("world"), results.getDouble("x"), results.getDouble("y"), results.getDouble("z"),
+                    results.getFloat("yaw"), results.getFloat("pitch")));
         } catch (SQLException sql) {
 
             sql.printStackTrace();
             return null;
+        }
+    }
+
+    public void deleteBuilding(Building b) {
+        String deleteBuildingSQL = "DELETE FROM buildings WHERE building_id = ?";
+        String deleteCoordinatesSQL = "DELETE FROM coordinates WHERE id = ?";
+
+        try (
+                Connection conn = conn(); PreparedStatement deleteBuildingStatement = conn.prepareStatement(deleteBuildingSQL);
+                PreparedStatement deleteCoordinatesStatement = conn.prepareStatement(deleteCoordinatesSQL)
+        ) {
+            conn.setAutoCommit(false); // Start transaction
+
+            deleteBuildingStatement.setInt(1, b.buildingId());
+            deleteBuildingStatement.executeUpdate();
+
+            deleteCoordinatesStatement.setInt(1, b.coordinateId());
+            deleteCoordinatesStatement.executeUpdate();
+
+            conn.commit(); // Commit if both deletions succeed
+
+        } catch (SQLException sql) {
+            sql.printStackTrace();
         }
     }
 }
