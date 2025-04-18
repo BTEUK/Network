@@ -69,7 +69,7 @@ public class Buildings extends AbstractCommand {
             case "definition":
                 player.sendMessage(ChatUtils.success(
                         "A building is a structure that has walls on all sides, a roof, is larger than 2*3m and can be entered by a human. In other words use common sense. It " +
-                                "is" + " up to you whether you count terraced houses as one or many buildings."));
+                                "is up to you whether you count terraced houses as one or many buildings."));
                 break;
 
         }
