@@ -377,6 +377,7 @@ public class PlotSQL extends AbstractSQL {
             statement.setInt(1, id);
             statement.setInt(2, page);
             statement.setString(3, contents);
+            statement.executeUpdate();
         } catch (SQLException sql) {
             LOGGER.error("An error occurred when executing insert statement: ", sql);
         }
