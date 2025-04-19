@@ -11,7 +11,6 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -25,9 +24,11 @@ public class Buildings extends AbstractCommand {
     private static final int SHOW_BUILDINGS_DURATION = 300;
 
     private final Network instance;
+    private final ArrayList<Player> playersUsingConfirmationListeners;
 
     public Buildings(Network instance) {
         super();
+        playersUsingConfirmationListeners = new ArrayList<Player>();
         this.instance = instance;
         setTabCompleter(new FixedArgSelector(Arrays.asList("add", "show", "count", "delete", "definition", "query"), 0));
     }
@@ -68,8 +69,8 @@ public class Buildings extends AbstractCommand {
                 break;
             case "definition":
                 player.sendMessage(ChatUtils.success(
-                        "A building is a structure that has walls on all sides, a roof, is larger than 2*3m and can be entered by a human. In other words use common sense. It " +
-                                "is up to you whether you count terraced houses as one or many buildings."));
+                        "A building is a structure that has walls on all sides, a roof, is larger than 2*3m and can be entered by a human (no sheds or caravans). In other words use common sense. A " +
+                                "terrace is many buildings (one for each property). A semi detached is one building. Apartments are one building"));
                 break;
             case "query":
                 queryBuilding(player);
@@ -122,8 +123,23 @@ public class Buildings extends AbstractCommand {
         player.sendMessage(ChatUtils.success("%s buildings have been built!", String.valueOf(buildingCount)));
     }
 
+    public void addPlayerToListenerList(Player player)
+    {
+        playersUsingConfirmationListeners.add(player);
+    }
+
+    public void removePlayerFromListenerList(Player player)
+    {
+        playersUsingConfirmationListeners.remove(player);
+    }
+
     private void addBuilding(Player player) {
         ArrayList<Building> nearbyBuildings = getNearbyBuildings(player, 20);
+        if(playersUsingConfirmationListeners.contains(player))
+        {
+            player.sendMessage(ChatUtils.error("Please respond to your current building add attempt before adding a new building."));
+            return;
+        }
         // StringBuilder locs = new StringBuilder("buildings nearby:");
         // for (Building j : nearbyBuildings) {
         //     Location i = j.coordinate();
