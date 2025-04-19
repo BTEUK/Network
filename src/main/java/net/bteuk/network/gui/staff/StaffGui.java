@@ -213,8 +213,7 @@ public class StaffGui extends Gui {
                         } else {
                             // Player is not on the current server.
                             // Set the server join event.
-                            EventManager.createJoinEvent(u.getUuid(), "plotsystem", SERVER_NAME,
-                                    "review plot " + plotID);
+                            EventManager.createJoinEvent(u.getUuid(), "plotsystem", "review plot " + plotID);
 
                             // Teleport them to the server.
                             u.player.closeInventory();
@@ -260,8 +259,7 @@ public class StaffGui extends Gui {
                         } else {
                             // Player is not on the current server.
                             // Set the server join event.
-                            EventManager.createJoinEvent(u.getUuid(), "plotsystem", SERVER_NAME,
-                                    "verify plot " + plotID);
+                            EventManager.createJoinEvent(u.getUuid(), "plotsystem", "verify plot " + plotID);
 
                             // Teleport them to the server.
                             u.player.closeInventory();

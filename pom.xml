@@ -80,6 +80,7 @@
                                         <exclude>changelog.txt</exclude>
                                         <exclude>latestchanges.html</exclude>
                                         <exclude>release-timestamp.txt</exclude>
+                                        <exclude>net/bteuk/teachingtutorials/services/**</exclude>
                                     </excludes>
                                 </filter>
                                 <filter>

@@ -326,7 +326,7 @@ public final class Network extends JavaPlugin {
                     ServicePriority.High);
             LOGGER.info("Registered Network Promotion Service");
         } catch (ClassNotFoundException e) {
-            // Only load the PromotionService is the class exists.
+            // Only load the PromotionService if the class exists.
         }
 
         // Let the Proxy know that the server is enabled.
