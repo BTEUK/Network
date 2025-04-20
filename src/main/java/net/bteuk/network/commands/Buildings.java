@@ -45,12 +45,13 @@ public class Buildings extends AbstractCommand {
             return;
         }
 
-        if (SERVER_TYPE != ServerType.EARTH) {
-            player.sendMessage(ChatUtils.error("Please join the earth server before running this command"));
-            return;
-        }
+
         switch (args[0]) {
             case "add":
+                if (SERVER_TYPE != ServerType.EARTH) {
+                    player.sendMessage(ChatUtils.error("Please join the earth server before running this command"));
+                    return;
+                }
                 if (player.hasPermission("network.buildings.add")) {
 
                     addBuilding(player);
@@ -59,12 +60,20 @@ public class Buildings extends AbstractCommand {
                 }
                 break;
             case "show":
+                if (SERVER_TYPE != ServerType.EARTH) {
+                    player.sendMessage(ChatUtils.error("Please join the earth server before running this command"));
+                    return;
+                }
                 showBuildings(player);
                 break;
             case "count":
                 displayCount(player);
                 break;
             case "delete":
+                if (SERVER_TYPE != ServerType.EARTH) {
+                    player.sendMessage(ChatUtils.error("Please join the earth server before running this command"));
+                    return;
+                }
                 deleteBuilding(player);
                 break;
             case "definition":
@@ -73,6 +82,10 @@ public class Buildings extends AbstractCommand {
                                 "terrace is many buildings (one for each property). A semi detached is one building. Apartments are one building"));
                 break;
             case "query":
+                if (SERVER_TYPE != ServerType.EARTH) {
+                    player.sendMessage(ChatUtils.error("Please join the earth server before running this command"));
+                    return;
+                }
                 queryBuilding(player);
                 break;
 
