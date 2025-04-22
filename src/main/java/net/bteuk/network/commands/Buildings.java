@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static net.bteuk.network.utils.Constants.SERVER_TYPE;
 
@@ -24,11 +25,11 @@ public class Buildings extends AbstractCommand {
     private static final int SHOW_BUILDINGS_DURATION = 300;
 
     private final Network instance;
-    private final ArrayList<Player> playersUsingConfirmationListeners;
+    private final List<Player> playersUsingConfirmationListeners = new ArrayList<Player>();
+    ;
 
     public Buildings(Network instance) {
         super();
-        playersUsingConfirmationListeners = new ArrayList<Player>();
         this.instance = instance;
         setTabCompleter(new FixedArgSelector(Arrays.asList("add", "show", "count", "delete", "definition", "query"), 0));
     }
@@ -44,7 +45,6 @@ public class Buildings extends AbstractCommand {
             player.sendMessage(ERROR);
             return;
         }
-
 
         switch (args[0]) {
             case "add":
@@ -78,7 +78,8 @@ public class Buildings extends AbstractCommand {
                 break;
             case "definition":
                 player.sendMessage(ChatUtils.success(
-                        "A building is a structure that has walls on all sides, a roof, is larger than 2*3m and can be entered by a human (no sheds or caravans). In other words use common sense. A " +
+                        "A building is a structure that has walls on all sides, a roof, is larger than 2*3m and can be entered by a human (no sheds or caravans). In other words " +
+                                "use common sense. A " +
                                 "terrace is many buildings (one for each property). A semi detached is one building. Apartments are one building"));
                 break;
             case "query":
@@ -109,7 +110,7 @@ public class Buildings extends AbstractCommand {
     }
 
     private Building getClosestBuilding(Player player) {
-        ArrayList<Building> nearbyBuildings = getNearbyBuildings(player, 5);
+        List<Building> nearbyBuildings = getNearbyBuildings(player, 5);
         double minDist = 100;
         Building minbuilding = null;
         for (Building i : nearbyBuildings) {
@@ -136,20 +137,17 @@ public class Buildings extends AbstractCommand {
         player.sendMessage(ChatUtils.success("%s buildings have been built!", String.valueOf(buildingCount)));
     }
 
-    public void addPlayerToListenerList(Player player)
-    {
+    public void addPlayerToListenerList(Player player) {
         playersUsingConfirmationListeners.add(player);
     }
 
-    public void removePlayerFromListenerList(Player player)
-    {
+    public void removePlayerFromListenerList(Player player) {
         playersUsingConfirmationListeners.remove(player);
     }
 
     private void addBuilding(Player player) {
-        ArrayList<Building> nearbyBuildings = getNearbyBuildings(player, 20);
-        if(playersUsingConfirmationListeners.contains(player))
-        {
+        List<Building> nearbyBuildings = getNearbyBuildings(player, 20);
+        if (playersUsingConfirmationListeners.contains(player)) {
             player.sendMessage(ChatUtils.error("Please respond to your current building add attempt before adding a new building."));
             return;
         }
@@ -184,9 +182,9 @@ public class Buildings extends AbstractCommand {
     }
 
     private void showBuildings(Player player) {
-        ArrayList<Building> nearbyBuildings = getNearbyBuildings(player, 100);
+        List<Building> nearbyBuildings = getNearbyBuildings(player, 100);
         // StringBuilder locs = new StringBuilder("buildings nearby:");
-        ArrayList<Location> heightBuildingsAdded = new ArrayList<Location>();
+        List<Location> heightBuildingsAdded = new ArrayList<Location>();
         for (Building j : nearbyBuildings) {
             Location i = j.coordinate();
             // locs.append(" (").append(Math.round(i.getX())).append(",").append(Math.round(i.getZ())).append("),");
@@ -214,7 +212,7 @@ public class Buildings extends AbstractCommand {
         // }
     }
 
-    private ArrayList<Building> getNearbyBuildings(Player player, int radius) {
+    private List<Building> getNearbyBuildings(Player player, int radius) {
         Location Pl = player.getLocation();
         double xmax = Pl.getX() + radius;
         double xmin = Pl.getX() - radius;
@@ -224,7 +222,7 @@ public class Buildings extends AbstractCommand {
         return instance.getGlobalSQL().getBuildings(condition);
     }
 
-    private void removeDisplayBeacons(Player player, ArrayList<Location> nearbyBuildings) {
+    private void removeDisplayBeacons(Player player, List<Location> nearbyBuildings) {
         for (Location i : nearbyBuildings) {
             Location glassLoc = i.clone().add(0, 1, 0);
             player.sendBlockChange(i, i.getBlock().getBlockData());
