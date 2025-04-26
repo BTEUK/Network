@@ -184,6 +184,10 @@ public class PlotSQL extends AbstractSQL {
         return getReviewablePlots(uuid, isArchitect, isReviewer).size();
     }
 
+    public int getVerifiablePlotCount(String uuid, boolean isReviewer) {
+        return getVerifiablePlots(uuid, isReviewer).size();
+    }
+
     public void addOrUpdateReviewer(String uuid, String roleId) {
         // Check if the reviewer is already added to the table.
         boolean hasRow = hasRow("SELECT 1 FROM reviewers WHERE uuid='" + uuid + "';");

@@ -166,25 +166,25 @@ public class StaffGui extends Gui {
         // Show review plot button in gui.
         boolean isArchitect = user.hasPermission("group.architect");
         boolean isReviewer = user.hasPermission("group.reviewer");
-        int plot_count =
+        int reviewCount =
                 Network.getInstance().getPlotSQL().getReviewablePlotCount(user.player.getUniqueId().toString(),
                         isArchitect, isReviewer);
-        Component message;
+        Component plotReviewMessage;
 
-        if (plot_count == 1) {
-            message = Utils.line("There is currently ")
+        if (reviewCount == 1) {
+            plotReviewMessage = Utils.line("There is currently ")
                     .append(Component.text("1", NamedTextColor.GRAY))
                     .append(Utils.line(" submitted plot."));
         } else {
-            message = Utils.line("There are currently ")
-                    .append(Component.text(plot_count, NamedTextColor.GRAY))
+            plotReviewMessage = Utils.line("There are currently ")
+                    .append(Component.text(reviewCount, NamedTextColor.GRAY))
                     .append(Utils.line(" submitted plots."));
         }
 
         setItem(21, Utils.createItem(Material.WRITABLE_BOOK, 1,
                         Utils.title("Review Plot"),
                         Utils.line("Click to review a submitted plot."),
-                        message),
+                        plotReviewMessage),
                 u -> {
 
                     // Get arraylist of submitted plots.
@@ -225,10 +225,23 @@ public class StaffGui extends Gui {
                     }
                 });
 
+        int verifyCount =
+                Network.getInstance().getPlotSQL().getVerifiablePlotCount(user.player.getUniqueId().toString(), isReviewer);
+        Component plotVerifyMessage;
+
+        if (verifyCount == 1) {
+            plotVerifyMessage = Utils.line("There is currently ")
+                    .append(Component.text("1", NamedTextColor.GRAY))
+                    .append(Utils.line(" plot awaiting verification."));
+        } else {
+            plotVerifyMessage = Utils.line("There are currently ")
+                    .append(Component.text(verifyCount, NamedTextColor.GRAY))
+                    .append(Utils.line(" plots awaiting verification."));
+        }
         setItem(23, Utils.createItem(Material.KNOWLEDGE_BOOK, 1,
                         Utils.title("Verify Plot"),
                         Utils.line("Click to verify a reviewed plot."),
-                        message),
+                        plotVerifyMessage),
                 u ->
 
                 {
