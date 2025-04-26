@@ -22,6 +22,7 @@ public class ConfirmationListener implements Listener {
         this.buildings = buildings;
         this.location = location;
         this.player = player;
+        buildings.addPlayerToListenerList(player);
         Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
         timeoutTask = plugin.getServer().getScheduler().runTaskLater(plugin, this::timeout, 20 * 120);
     }
@@ -31,6 +32,7 @@ public class ConfirmationListener implements Listener {
         if (e.getPlayer().equals(player)) {
             timeoutTask.cancel();
             e.getHandlers().unregister(this);
+            buildings.removePlayerFromListenerList(player);
             e.setCancelled(true);
             if (((net.kyori.adventure.text.TextComponent) e.message()).content().equals("y")) {
                 buildings.addBuildingToDataBase(e.getPlayer(), location);
@@ -42,6 +44,7 @@ public class ConfirmationListener implements Listener {
 
     private void timeout() {
         AsyncChatEvent.getHandlerList().unregister(this);
+        buildings.removePlayerFromListenerList(player);
         player.sendMessage(ChatUtils.error("Confirmation timed out. No building added."));
     }
 }
