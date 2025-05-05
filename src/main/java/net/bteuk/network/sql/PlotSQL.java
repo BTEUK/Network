@@ -2,6 +2,7 @@ package net.bteuk.network.sql;
 
 import net.bteuk.network.lib.enums.PlotDifficulties;
 import net.bteuk.network.lib.utils.Reviewing;
+import net.bteuk.network.utils.plotsystem.SubmittedPlot;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 import java.sql.Connection;
@@ -140,22 +141,46 @@ public class PlotSQL extends AbstractSQL {
         return 0;
     }
 
-    public List<Integer> getReviewablePlots(String uuid, boolean isArchitect, boolean isReviewer) {
+    /**
+     * Returns an unsorted list of submitted plots that are reviewable by the user of the uuid.
+     *
+     * @param uuid        the uuid of the user
+     * @param isArchitect whether the user has Architects permissions
+     * @param isReviewer  whether the user has Reviewer permissions
+     * @return the list of submitted plot
+     */
+    public List<SubmittedPlot> getReviewablePlots(String uuid, boolean isArchitect, boolean isReviewer) {
         List<PlotDifficulties> difficulties = Reviewing.getAvailablePlotDifficulties(isArchitect, isReviewer, getReviewerReputation(uuid));
 
-        List<Integer> submitted_plots = new ArrayList<>();
+        List<SubmittedPlot> submittedPlots = new ArrayList<>();
 
         for (PlotDifficulties difficulty : difficulties) {
-            submitted_plots.addAll(getIntList(
-                    "SELECT pd.id FROM plot_data AS pd INNER JOIN plot_submission AS ps ON " + "pd.id=ps.plot_id WHERE ps.status='submitted' AND pd.difficulty=" + difficulty.getValue() + " " + "ORDER BY ps.submit_time ASC;"));
+            submittedPlots.addAll(getSubmittedPlots(difficulty));
         }
 
         // Get all plots that the user is the owner or a member of, don't use those in the count.
-        List<Integer> member_plots = getIntList("SELECT id FROM plot_members WHERE uuid='" + uuid + "';");
+        List<Integer> memberPlotIds = getIntList("SELECT id FROM plot_members WHERE uuid='" + uuid + "';");
+        submittedPlots.removeIf(submittedPlot -> memberPlotIds.contains(submittedPlot.id()));
 
-        submitted_plots.removeAll(member_plots);
+        return submittedPlots;
+    }
 
-        return submitted_plots;
+    public List<SubmittedPlot> getSubmittedPlots(PlotDifficulties plotDifficulty) {
+        ArrayList<SubmittedPlot> list = new ArrayList<>();
+        try (
+                Connection conn = conn();
+                PreparedStatement statement = conn.prepareStatement(
+                        "SELECT pd.id,ps.submit_time FROM plot_data AS pd INNER JOIN plot_submission AS ps ON " + "pd.id=ps.plot_id WHERE ps.status='submitted' AND pd" +
+                                ".difficulty='" + plotDifficulty.getValue() + "';");
+                ResultSet results = statement.executeQuery()
+        ) {
+            while (results.next()) {
+                list.add(new SubmittedPlot(results.getInt(1), results.getLong(2)));
+            }
+        } catch (SQLException e) {
+            LOGGER.error("An error occurred while getting a list of submitted plots: ", e);
+        }
+        return list;
     }
 
     public List<Integer> getVerifiablePlots(String uuid, boolean isReviewer) {

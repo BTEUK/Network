@@ -19,9 +19,7 @@ public class NavigationTabCompleter extends AbstractTabCompleter {
             switch (args[0].toUpperCase()) {
 
                 // If arg[0] is remove, update or suggested, then use locations as arg[1] selector.
-                case "UPDATE", "REMOVE", "SUGGESTED" -> {
-                    result.addAll(LocationSelector.locationSelectorOnArg(args, 1));
-                }
+                case "UPDATE", "REMOVE", "SUGGESTED" -> result.addAll(LocationSelector.locationSelectorOnArg(args, 1));
 
                 // If arg[0] is subcategory then the selector depends on the next argument.
                 case "SUBCATEGORY" -> {

@@ -14,6 +14,7 @@ import net.bteuk.network.utils.SwitchServer;
 import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.enums.PlotStatus;
 import net.bteuk.network.utils.enums.RegionType;
+import net.bteuk.network.utils.enums.ServerType;
 import net.bteuk.network.utils.enums.SubmittedStatus;
 import net.bteuk.network.utils.plotsystem.ReviewFeedback;
 import net.buildtheearth.terraminusminus.generator.EarthGeneratorSettings;
@@ -22,6 +23,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
@@ -29,7 +31,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static net.bteuk.network.utils.Constants.EARTH_WORLD;
 import static net.bteuk.network.utils.Constants.SERVER_NAME;
+import static net.bteuk.network.utils.Constants.SERVER_TYPE;
 
 public class PlotInfo extends Gui {
 
@@ -112,8 +116,14 @@ public class PlotInfo extends Gui {
             String server = plotSQL.getString(
                     "SELECT server FROM location_data WHERE name='" + plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + "';");
 
+            // If the server is null it implies the location in the plotsystem was removed, teleport them to the location the plot should be in the Earth server.
+            if (server == null) {
+                teleportToPlotOutsidePlotsystem(u, plotID);
+                return;
+            }
+
             // If the plot is on the current server teleport them directly.
-            // Else teleport them to the correct server and them teleport them to the plot.
+            // Else teleport them to the correct server and then teleport them to the plot.
             if (server.equals(SERVER_NAME)) {
                 EventManager.createTeleportEvent(false, u.player.getUniqueId().toString(), "plotsystem", "teleport plot " + plotID, u.player.getLocation());
             } else {
@@ -143,10 +153,6 @@ public class PlotInfo extends Gui {
                     }
                     double x = sumX / (double) corners.length;
                     double z = sumZ / (double) corners.length;
-
-                    // Subtract the coordinate transform to make the coordinates in the real location.
-                    x -= plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + "';");
-                    z -= plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + "';");
 
                     // Convert to irl coordinates.
                     try {
@@ -485,6 +491,38 @@ public class PlotInfo extends Gui {
             return 21;
         } else {
             return -1;
+        }
+    }
+
+    private void teleportToPlotOutsidePlotsystem(NetworkUser user, int plotID) {
+        // Get corners of the plot.
+        int[][] corners = plotSQL.getPlotCorners(plotID);
+        int sumX = 0;
+        int sumZ = 0;
+
+        // Find the centre.
+        for (int[] corner : corners) {
+
+            sumX += corner[0];
+            sumZ += corner[1];
+        }
+        double x = sumX / (double) corners.length;
+        double z = sumZ / (double) corners.length;
+
+        // Teleport to the location on the Earth server.
+        Component teleportMessage = ChatUtils.success("Teleported to accepted plot %s", String.valueOf(plotID));
+
+        boolean switchServer = SERVER_TYPE != ServerType.EARTH;
+
+        EventManager.createTeleportEvent(switchServer, user.player.getUniqueId().toString(), "network",
+                "teleport " + EARTH_WORLD + " " + x + " " + z + " "
+                        + user.player.getLocation().getYaw() + " " + user.player.getLocation().getPitch(), PlainTextComponentSerializer.plainText().serialize(teleportMessage),
+                user.player.getLocation());
+
+        // Switch to Earth server is necessary.
+        if (switchServer) {
+            user.player.closeInventory();
+            SwitchServer.switchServer(user.player, Network.getInstance().getGlobalSQL().getString("SELECT name FROM server_data WHERE type='EARTH';"));
         }
     }
 

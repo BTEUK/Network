@@ -8,11 +8,13 @@ import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.SwitchServer;
 import net.bteuk.network.utils.Utils;
+import net.bteuk.network.utils.plotsystem.SubmittedPlot;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 
+import java.util.Comparator;
 import java.util.List;
 
 import static net.bteuk.network.utils.Constants.SERVER_NAME;
@@ -189,15 +191,14 @@ public class StaffGui extends Gui {
 
                     // Get arraylist of submitted plots.
                     // Order them by submit time, so the oldest submissions are reviewed first.
-                    List<Integer> nPlots =
-                            Network.getInstance().getPlotSQL().getReviewablePlots(u.player.getUniqueId().toString(),
-                                    isArchitect, isReviewer);
+                    List<SubmittedPlot> nPlots = Network.getInstance().getPlotSQL().getReviewablePlots(u.player.getUniqueId().toString(), isArchitect, isReviewer);
+                    nPlots.sort(Comparator.comparingLong(SubmittedPlot::submitTime));
 
                     // Check if there is a plot available to review,
                     // that you are not already the owner or member of.
                     if (!nPlots.isEmpty()) {
 
-                        int plotID = nPlots.getFirst();
+                        int plotID = nPlots.getFirst().id();
 
                         // Get server of plot.
                         String server = Network.getInstance().getPlotSQL().getString("SELECT server FROM " +
