@@ -26,6 +26,7 @@ import net.bteuk.network.commands.Ptime;
 import net.bteuk.network.commands.Punmute;
 import net.bteuk.network.commands.Pweather;
 import net.bteuk.network.commands.RegionCommand;
+import net.bteuk.network.commands.Reply;
 import net.bteuk.network.commands.Rules;
 import net.bteuk.network.commands.Season;
 import net.bteuk.network.commands.Speed;
@@ -148,6 +149,7 @@ public class CommandManager {
             commands.register("msg", "Sends a direct message to a player.", msgCommand);
             commands.register("w", "Sends a direct message to a player.", msgCommand);
             commands.register("tell", "Sends a direct message to a player.", msgCommand);
+            commands.register("r","sends a direct message to the last player you messaged", List.of("reply"), new Reply(msgCommand));
             commands.register("promote", "Add a role to a player.", new Promote(instance));
             commands.register("demote", "Remove a role from a player.", new Demote(instance));
             commands.register("focus", "Toggle focus mode, hides chat and players.", List.of("focusmode", "fm"), new Focus());

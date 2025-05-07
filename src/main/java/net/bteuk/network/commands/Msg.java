@@ -64,7 +64,9 @@ public class Msg extends AbstractCommand {
                 // Ignored
             }
         }
-
+        //add the message to the last messages table.
+        instance.getGlobalSQL().update("REPLACE INTO last_messages (player_to_id, player_from_id) VALUES ('" + uuid + "', '" + player.getUniqueId().toString() + "');");
+        instance.getGlobalSQL().update("REPLACE INTO last_messages (player_to_id, player_from_id) VALUES ('" + player.getUniqueId().toString() + "', '" + uuid + "');");
         // Send direct message, the message is created using all other command arguments.
         String message = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
         DirectMessage directMessage = getDirectMessage(message, player.getName(), player.getUniqueId().toString(),

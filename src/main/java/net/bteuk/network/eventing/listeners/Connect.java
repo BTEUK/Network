@@ -159,6 +159,9 @@ public class Connect implements Listener {
         // Remove user from list.
         instance.removeUser(user);
 
+        //remove users last message record
+        instance.getGlobalSQL().update("DELETE FROM last_messages WHERE player_from_id='" + user.player.getUniqueId().toString() + "';");
+
         // Get player uuid.
         UUID playerUUID = user.player.getUniqueId();
 
