@@ -152,6 +152,20 @@ public class VerificationInfo extends Gui {
                         SwitchServer.switchServer(u.player, server);
                     }
                 });
+
+        // Return
+        setItem(26, Utils.createItem(Material.SPRUCE_DOOR, 1,
+                        Utils.title("Return"),
+                        Utils.line("Open the verified review menu.")),
+                u -> {
+                    // Delete this gui.
+                    this.delete();
+                    u.mainGui = null;
+
+                    // Switch to verified review menu.
+                    u.mainGui = new VerificationMenu(u);
+                    u.mainGui.open(u);
+                });
     }
 
     public void refresh() {
