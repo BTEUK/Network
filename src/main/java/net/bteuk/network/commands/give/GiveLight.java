@@ -12,6 +12,6 @@ import org.jetbrains.annotations.NotNull;
 public class GiveLight extends GiveItem {
     @Override
     public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
-        onCommand(stack, "uknet.light", new ItemStack(Material.LIGHT), "Light");
+        onCommand(stack, "uknet.light", ItemStack.of(Material.LIGHT), "Light");
     }
 }

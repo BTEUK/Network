@@ -67,7 +67,7 @@ public class FeaturePageGUI extends Gui {
         // Geometry
         setAction(8, u -> {
             // Gives the blaze rod
-            ItemStack blazeRod = new ItemStack(Material.BLAZE_ROD, 1);
+            ItemStack blazeRod = ItemStack.of(Material.BLAZE_ROD, 1);
             Utils.giveItem(u.player, blazeRod, "Area selection tool");
             u.player.sendMessage(Component.text("Use the blaze rod like a WorldEdit wand to make a selection. When " +
                             "you have made your selection, reopen the nether star menu and click confirm selection",

@@ -12,6 +12,6 @@ import org.jetbrains.annotations.NotNull;
 public class GiveDebugStick extends GiveItem {
     @Override
     public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
-        onCommand(stack, "uknet.debugstick", new ItemStack(Material.DEBUG_STICK), "Debug Stick");
+        onCommand(stack, "uknet.debugstick", ItemStack.of(Material.DEBUG_STICK), "Debug Stick");
     }
 }

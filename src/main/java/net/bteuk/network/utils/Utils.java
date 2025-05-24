@@ -125,9 +125,7 @@ public class Utils {
 
     public static ItemStack createItem(Material material, int amount, Component displayName, Component... loreString) {
 
-        ItemStack item;
-
-        item = new ItemStack(material);
+        ItemStack item = ItemStack.of(material.isItem() ? material : Material.STRUCTURE_VOID);
         item.setAmount(amount);
 
         ItemMeta meta = item.getItemMeta();
@@ -151,7 +149,7 @@ public class Utils {
             }
 
             URL url = new URL("http://textures.minecraft.net/texture/" + texture);
-            item = new ItemStack(Material.PLAYER_HEAD);
+            item = ItemStack.of(Material.PLAYER_HEAD);
 
             SkullMeta meta = (SkullMeta) item.getItemMeta();
 
@@ -167,7 +165,7 @@ public class Utils {
 
             item.setItemMeta(meta);
         } catch (Exception e) {
-            item = new ItemStack(fallback);
+            item = ItemStack.of(fallback);
         }
 
         item.setAmount(amount);
@@ -185,7 +183,7 @@ public class Utils {
 
         ItemStack item;
 
-        item = new ItemStack(Material.PLAYER_HEAD);
+        item = ItemStack.of(Material.PLAYER_HEAD);
         item.setAmount(amount);
 
         SkullMeta meta = (SkullMeta) item.getItemMeta();
@@ -206,7 +204,7 @@ public class Utils {
 
         ItemStack item;
 
-        item = new ItemStack(Material.PLAYER_HEAD);
+        item = ItemStack.of(Material.PLAYER_HEAD);
         item.setAmount(amount);
 
         SkullMeta meta = (SkullMeta) item.getItemMeta();
@@ -224,7 +222,7 @@ public class Utils {
 
         ItemStack item;
 
-        item = new ItemStack(material);
+        item = ItemStack.of(material);
         item.setAmount(amount);
 
         PotionMeta meta = (PotionMeta) item.getItemMeta();
