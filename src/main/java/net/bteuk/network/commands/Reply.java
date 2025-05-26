@@ -2,9 +2,16 @@ package net.bteuk.network.commands;
 
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.bteuk.network.Network;
+import net.bteuk.network.lib.dto.DirectMessage;
+import net.bteuk.network.lib.dto.ReplyMessage;
+import net.bteuk.network.lib.enums.ChatChannels;
 import net.bteuk.network.lib.utils.ChatUtils;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Arrays;
+
+import static net.bteuk.network.CustomChat.getDirectMessage;
 
 public class Reply  extends AbstractCommand {
 
@@ -27,17 +34,9 @@ public class Reply  extends AbstractCommand {
             player.sendMessage(ChatUtils.error(ERROR));
             return;
         }
-
-        String uuid = instance.getGlobalSQL().getString("SELECT player_to_id FROM last_messages WHERE player_from_id='" + player.getUniqueId() + "';");
-        if (uuid == null) {
-            player.sendMessage(ChatUtils.error("You have no last messaged player."));
-            return;
-        }
-        String name = instance.getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
-        String[] newargs = new String[args.length + 1];
-        newargs[0] = name;
-        System.arraycopy(args, 0, newargs, 1, args.length);
-        msgCommand.execute(stack,newargs);
+        String message = String.join(" ", Arrays.copyOfRange(args, 0, args.length));
+        ReplyMessage replymessage = new ReplyMessage(ChatChannels.GLOBAL.getChannelName(),player.getName(),message,false);
+        instance.getChat().sendSocketMesage(replymessage);
     }
 
 
