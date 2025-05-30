@@ -17,6 +17,7 @@ import teachingtutorials.guis.EventType;
 import teachingtutorials.tutorialobjects.LessonObject;
 import teachingtutorials.tutorialobjects.Location;
 import teachingtutorials.tutorialobjects.Tutorial;
+import teachingtutorials.tutorialobjects.TutorialRecommendation;
 import teachingtutorials.tutorialplaythrough.Lesson;
 import teachingtutorials.utils.User;
 
@@ -217,7 +218,7 @@ public class TutorialsGui extends Gui {
                 Utils.title("Redo the Starter Tutorial"),
                 Utils.line("Refresh your essential knowledge"));
 
-        super.setItem(10, compulsory, new Gui.guiAction() {
+        super.setItem(9, compulsory, new Gui.guiAction() {
             @Override
             public void click(NetworkUser u) {
                 startTutorial(compulsoryTutorial, null);
@@ -229,7 +230,7 @@ public class TutorialsGui extends Gui {
                 Utils.title("Tutorial Library"),
                 Utils.line("Browse all of our available tutorials"));
 
-        super.setItem(12, tutorialLibrary, new Gui.guiAction() {
+        super.setItem(11, tutorialLibrary, new Gui.guiAction() {
             @Override
             public void click(NetworkUser u) {
                 user.mainGui = new TutorialLibraryGui(plugin, user, Tutorial.getInUseTutorialsWithLocations(plugin.getTutorialsDBConnection(), plugin.getLogger()),
@@ -243,7 +244,7 @@ public class TutorialsGui extends Gui {
         ItemStack currentLessons = teachingtutorials.utils.Utils.createItem(Material.WRITABLE_BOOK, 1,
                 Utils.title("Current Lessons"),
                 Utils.line("View your unfinished lessons"));
-        super.setItem(14, currentLessons, new Gui.guiAction() {
+        super.setItem(13, currentLessons, new Gui.guiAction() {
             @Override
             public void click(NetworkUser u) {
                 user.mainGui = new LessonsMenu(plugin, user, TutorialsGui.this, TutorialsGui.this.currentLessons);
@@ -251,13 +252,24 @@ public class TutorialsGui extends Gui {
             }
         });
 
+        // Tutorial recommendations
+        super.setItem(15, Utils.createItem(Material.CHEST, 1, Utils.title("Recommended Tutorials")),
+                new guiAction() {
+                    @Override
+                    public void click(NetworkUser u) {
+                        user.mainGui = new RecommendedTutorialsMenu(plugin, TutorialsGui.this, user,
+                                TutorialRecommendation.fetchTutorialRecommendationsForPlayer(plugin.getTutorialsDBConnection(), plugin.getLogger(), user.player.getUniqueId()));
+                        user.mainGui.open(user);
+                    }
+                });
+
         // Continue learning/next tutorial
         ItemStack continueLearning = teachingtutorials.utils.Utils.createItem(Material.END_CRYSTAL, 1,
                 Utils.title("Start a new Tutorial:"),
                 Utils.line(nextTutorial.getTutorialName()));
 
         if (nextTutorial != null)
-            super.setItem(16, continueLearning, new Gui.guiAction() {
+            super.setItem(17, continueLearning, new Gui.guiAction() {
                 @Override
                 public void click(NetworkUser u) {
                     startTutorial(nextTutorial, null);
