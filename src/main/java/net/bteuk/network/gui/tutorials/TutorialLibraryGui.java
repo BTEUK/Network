@@ -10,11 +10,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import teachingtutorials.TeachingTutorials;
 import teachingtutorials.guis.Event;
 import teachingtutorials.guis.EventType;
 import teachingtutorials.tutorialobjects.LessonObject;
 import teachingtutorials.tutorialobjects.Location;
 import teachingtutorials.tutorialobjects.Tutorial;
+import teachingtutorials.utils.User;
 
 import static net.bteuk.network.utils.Constants.LOGGER;
 
@@ -26,7 +28,9 @@ public class TutorialLibraryGui extends Gui {
 
     private Tutorial[] inUseTutorials;
 
-    /** The list of lessons that this player has ongoing */
+    /**
+     * The list of lessons that this player has ongoing
+     */
     private final LessonObject[] lessons;
 
     private static final Component inventoryName = Utils.title("Library");
@@ -47,12 +51,12 @@ public class TutorialLibraryGui extends Gui {
 
     /**
      * Creates an inventory with icons representing a library of available tutorials
+     *
      * @param tutorials A list of all in-use tutorials
      * @return An inventory of icons
      */
-    public static Inventory getGUI (Tutorial[] tutorials)
-    {
-        //Declare variables
+    public static Inventory getGUI(Tutorial[] tutorials) {
+        // Declare variables
         int i;
         int iTutorials;
         int iDiv;
@@ -61,46 +65,43 @@ public class TutorialLibraryGui extends Gui {
 
         Inventory inventory;
 
-        //Works out how many rows in the inventory are needed
+        // Works out how many rows in the inventory are needed
         iTutorials = tutorials.length;
-        iDiv = iTutorials/9;
-        iMod = iTutorials%9;
+        iDiv = iTutorials / 9;
+        iMod = iTutorials % 9;
 
-        if (iMod != 0 || iDiv == 0)
-        {
+        if (iMod != 0 || iDiv == 0) {
             iDiv = iDiv + 1;
         }
 
-        //Enables an empty row and then a row for the back button
-        iRows = iDiv+2;
+        // Enables an empty row and then a row for the back button
+        iRows = iDiv + 2;
 
-        //Create inventory
+        // Create inventory
         inventory = Bukkit.createInventory(null, iRows * 9);
         inventory.clear();
 
         Inventory toReturn = Bukkit.createInventory(null, iRows * 9, inventoryName);
 
-        //Indicates that there are no tutorials in the system
-        if (iTutorials == 0)
-        {
+        // Indicates that there are no tutorials in the system
+        if (iTutorials == 0) {
             ItemStack noTutorials = teachingtutorials.utils.Utils.createItem(Material.BARRIER, 1,
                     Utils.title("There are no tutorials available to play currently"),
                     Utils.line("Ask a server admin to get some created"));
-            inventory.setItem(5-1, noTutorials);
+            inventory.setItem(5 - 1, noTutorials);
         }
 
-        //Adds the tutorials to the menu options
-        //Inv slot 0 = the first one
+        // Adds the tutorials to the menu options
+        // Inv slot 0 = the first one
         ItemStack tutorial;
-        for (i = 0 ; i < iTutorials ; i++)
-        {
+        for (i = 0; i < iTutorials; i++) {
             tutorial = teachingtutorials.utils.Utils.createItem(Material.KNOWLEDGE_BOOK, 1,
                     Utils.title(tutorials[i].getTutorialName()).decoration(TextDecoration.BOLD, true),
-                    Utils.line("Tutor - " +Bukkit.getOfflinePlayer(tutorials[i].getUUIDOfAuthor()).getName()));
+                    Utils.line("Tutor - " + Bukkit.getOfflinePlayer(tutorials[i].getUUIDOfAuthor()).getName()));
             inventory.setItem(i, tutorial);
         }
 
-        //Adds a back button
+        // Adds a back button
         ItemStack back = teachingtutorials.utils.Utils.createItem(Material.SPRUCE_DOOR, 1, Utils.title("Back to main menu"));
         inventory.setItem((iRows * 9) - 1, back);
 
@@ -111,29 +112,27 @@ public class TutorialLibraryGui extends Gui {
     /**
      * Adds the click-actions to the menu slots of this library menu
      */
-    private void setActions()
-    {
-        //Declare variables
+    private void setActions() {
+        // Declare variables
         int i;
         int iTutorials;
         int iDiv;
         int iMod;
         int iRows;
 
-        //Works out how many rows in the inventory are needed
+        // Works out how many rows in the inventory are needed
         iTutorials = inUseTutorials.length;
-        iDiv = iTutorials/9;
-        iMod = iTutorials%9;
+        iDiv = iTutorials / 9;
+        iMod = iTutorials % 9;
 
-        if (iMod != 0 || iDiv == 0)
-        {
+        if (iMod != 0 || iDiv == 0) {
             iDiv = iDiv + 1;
         }
 
-        //Enables an empty row and then a row for the back button
-        iRows = iDiv+2;
+        // Enables an empty row and then a row for the back button
+        iRows = iDiv + 2;
 
-        //Adds back button
+        // Adds back button
         setAction((iRows * 9) - 1, new Gui.guiAction() {
             @Override
             public void click(NetworkUser u) {
@@ -143,76 +142,69 @@ public class TutorialLibraryGui extends Gui {
             }
         });
 
-
-        //Inv slot 0 = the first one
-        //Adds the actions of each slot
-        for (i = 0 ; i < inUseTutorials.length ; i++)
-        {
+        // Inv slot 0 = the first one
+        // Adds the actions of each slot
+        for (i = 0; i < inUseTutorials.length; i++) {
             int iSlot = i;
             setAction(iSlot, new Gui.guiAction() {
                 @Override
                 public void click(NetworkUser u) {
-                    startTutorial(inUseTutorials[iSlot], null);
+                    startTutorial(plugin, lessons, user, TutorialLibraryGui.this, inUseTutorials[iSlot], null);
                 }
             });
         }
     }
 
     /**
-     * Handles the logic when a player wishes to start a tutorial
+     * Handles the logic when a player wishes to start a specific tutorial
+     *
+     * @param plugin          A reference to the instance of the TeachingTutorials plugin
+     * @param lessons         A list of unfinished lessons for the given player
+     * @param user            A reference to the user who wishes to start a specific tutorial
+     * @param parentGui       A reference to the parent gui which to return back
      * @param tutorialToStart A reference to the Tutorial that the player wishes to start
+     * @param locationToStart A reference to the Location that a player wishes to start, if specified
      * @return
      */
-    public void startTutorial(Tutorial tutorialToStart, Location locationToStart)
-    {
-        //Check whether the player already has a current lesson for this tutorial
+    public static void startTutorial(Network plugin, LessonObject[] lessons, NetworkUser user, Gui parentGui, Tutorial tutorialToStart, Location locationToStart) {
+        // Check whether the player already has a current lesson for this tutorial
         boolean bLessonFound = false;
-        for (LessonObject lesson : lessons)
-        {
-            if (tutorialToStart.getTutorialID() == lesson.getTutorialID())
-            {
-                //Open confirmation menu
-                //If location matters then check that
-                if (locationToStart != null)
-                {
-                    if (locationToStart.getLocationID() == lesson.getLocation().getLocationID())
-                    {
+        for (LessonObject lesson : lessons) {
+            if (tutorialToStart.getTutorialID() == lesson.getTutorialID()) {
+                // Open confirmation menu
+                // If location matters then check that
+                if (locationToStart != null) {
+                    if (locationToStart.getLocationID() == lesson.getLocation().getLocationID()) {
                         bLessonFound = true;
 
-                        user.mainGui = new LessonContinueConfirmer(plugin, user, this, lesson, "You have a lesson at this location already");
+                        user.mainGui = new LessonContinueConfirmer(plugin, user, parentGui, lesson, "You have a lesson at this location already");
                         user.mainGui.open(user);
 
-                        //Break, let the other menu take over
+                        // Break, let the other menu take over
                         break;
                     }
-                }
-                else
-                {
+                } else {
                     bLessonFound = true;
-                    //If not then open confirmation menu
-                    user.mainGui = new LessonContinueConfirmer(plugin, user, this, lesson, "You have a lesson for this tutorial already");
+                    // If not then open confirmation menu
+                    user.mainGui = new LessonContinueConfirmer(plugin, user, parentGui, lesson, "You have a lesson for this tutorial already");
                     user.mainGui.open(user);
 
-                    //Break, let the other menu take over
+                    // Break, let the other menu take over
                     break;
                 }
             }
         }
 
-        //If player doesn't have current lesson for this tutorial then create a new one
-        if (!bLessonFound)
-        {
-            if (locationToStart == null)
-            {
+        // If player doesn't have current lesson for this tutorial then create a new one
+        if (!bLessonFound) {
+            if (locationToStart == null) {
                 // Switch to the tutorial.
                 if (Event.addEvent(EventType.START_TUTORIAL, user.player.getUniqueId(), tutorialToStart.getTutorialID(),
                         Network.getInstance().getTutorialsDBConnection(), LOGGER))
                     TutorialsGui.switchServer(user);
                 else
                     user.sendMessage(Utils.error("A problem occurred, please let staff know"));
-            }
-            else
-            {
+            } else {
                 // Switch to the tutorial.
                 if (Event.addEvent(EventType.START_LOCATION, user.player.getUniqueId(), locationToStart.getLocationID(),
                         Network.getInstance().getTutorialsDBConnection(), LOGGER))
