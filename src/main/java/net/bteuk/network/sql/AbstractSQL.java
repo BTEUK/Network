@@ -163,27 +163,6 @@ public abstract class AbstractSQL {
         }
     }
 
-    /**
-     * WARNING: Using this may result in thread timeout, causing the server to crash
-     * @param sql
-     * @return A results set, or null of there was an error
-     */
-    public ResultSet getResultSet(String sql) {
-        Connection conn;
-        PreparedStatement statement;
-        ResultSet results;
-
-        try {
-            conn = conn();
-            statement = conn.prepareStatement(sql);
-            results = statement.executeQuery();
-            return results;
-        } catch (SQLException e) {
-            LOGGER.log(Level.WARNING, "SQL error on query: "+sql, e);
-            return null;
-        }
-    }
-
     public String getString(String sql) {
 
         try (
