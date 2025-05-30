@@ -169,11 +169,14 @@ public abstract class AbstractSQL {
      * @return A results set, or null of there was an error
      */
     public ResultSet getResultSet(String sql) {
+        Connection conn;
+        PreparedStatement statement;
+        ResultSet results;
 
         try {
-            Connection conn = conn();
-            PreparedStatement statement = conn.prepareStatement(sql);
-            ResultSet results = statement.executeQuery();
+            conn = conn();
+            statement = conn.prepareStatement(sql);
+            results = statement.executeQuery();
             return results;
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "SQL error on query: "+sql, e);
