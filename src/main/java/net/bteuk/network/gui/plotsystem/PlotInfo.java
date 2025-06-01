@@ -477,7 +477,7 @@ public class PlotInfo extends Gui {
     }
 
     private int getSlotForGoogleMapsLink(PLOT_INFO_TYPE plotInfoType) {
-        if (plotInfoType == PLOT_INFO_TYPE.CLAIMED_OWNER || plotInfoType == PLOT_INFO_TYPE.CLAIMED_MEMBER || plotInfoType == PLOT_INFO_TYPE.SUBMITTED_REVIEWER) {
+        if (plotInfoType == PLOT_INFO_TYPE.CLAIMED_OWNER || plotInfoType == PLOT_INFO_TYPE.CLAIMED_MEMBER || plotInfoType == PLOT_INFO_TYPE.SUBMITTED_REVIEWER || plotInfoType == PLOT_INFO_TYPE.REVIEWED_REVIEWER) {
             return 23;
         } else {
             return 20;
