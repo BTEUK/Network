@@ -164,7 +164,7 @@ public abstract class AbstractSQL {
     }
 
     /**
-     *
+     * WARNING: Using this may result in thread timeout, causing the server to crash
      * @param sql
      * @return A results set, or null of there was an error
      */
