@@ -5,6 +5,7 @@ import net.bteuk.network.Network;
 import net.bteuk.network.eventing.events.EventManager;
 import net.bteuk.network.gui.Gui;
 import net.bteuk.network.gui.InviteMembers;
+import net.bteuk.network.gui.tutorials.RecommendedTutorialsGui;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.sql.PlotSQL;
@@ -186,7 +187,7 @@ public class PlotInfo extends Gui {
         // As well as the submit/retract button. (Slot 2)
         // If the plot is not under review allow it to be removed. (Slot 6)
         if (plotInfoType == PLOT_INFO_TYPE.CLAIMED_OWNER) {
-            setItem(21, Utils.createItem(Material.PLAYER_HEAD, 1, Utils.title("Plot Members"), Utils.line("Manage the members of your plot.")), u -> {
+            setItem(20, Utils.createItem(Material.PLAYER_HEAD, 1, Utils.title("Plot Members"), Utils.line("Manage the members of your plot.")), u -> {
 
                 // Delete this gui.
                 this.delete();
@@ -197,7 +198,7 @@ public class PlotInfo extends Gui {
                 u.mainGui.open(u);
             });
 
-            setItem(20, Utils.createItem(Material.OAK_BOAT, 1, Utils.title("Invite Members"), Utils.line("Invite a new member to your plot."),
+            setItem(19, Utils.createItem(Material.OAK_BOAT, 1, Utils.title("Invite Members"), Utils.line("Invite a new member to your plot."),
                     Utils.line("You can only invite online users.")), u -> {
 
                 // Delete this gui.
@@ -272,7 +273,7 @@ public class PlotInfo extends Gui {
         }
 
         // If this plot has feedback, add feedback for the plot owner and members (Slot 22)
-        // As well as for reviewers (Slot 22 while reviewing, slot 21 while submitted)
+        // As well as for reviewers (Slot 22 while submitted, reviewed or reviewing)
         if ((plotInfoType == PLOT_INFO_TYPE.CLAIMED_OWNER || plotInfoType == PLOT_INFO_TYPE.CLAIMED_MEMBER || plotInfoType == PLOT_INFO_TYPE.REVIEWING_REVIEWER || plotInfoType == PLOT_INFO_TYPE.SUBMITTED_REVIEWER || plotInfoType == PLOT_INFO_TYPE.REVIEWED_REVIEWER || plotInfoType == PLOT_INFO_TYPE.VERIFYING_REVIEWER) && plotSQL.hasRow(
                 "SELECT 1 FROM plot_review WHERE plot_id=" + plotID + " AND uuid='" + plot_owner + "' AND accepted=0 AND completed=1;")) {
             setItem(getFeedbackSlot(plotInfoType), Utils.createItem(Material.WRITABLE_BOOK, 1, Utils.title("Plot Feedback"), Utils.line("Click to show feedback for this plot.")),
@@ -286,7 +287,7 @@ public class PlotInfo extends Gui {
                         u.mainGui = new DeniedPlotFeedback(plotID);
                         u.mainGui.open(u);
                     });
-            // If the plot is accepted and has feedback show for the owner (Slot 22)
+            // If the plot is accepted and has feedback show for the owner (Slot 21)
         } else if (plotInfoType == PLOT_INFO_TYPE.ACCEPTED_OWNER && plotSQL.hasRow(
                 "SELECT 1 FROM " + "plot_category_feedback WHERE review_id=( SELECT id FROM plot_review WHERE plot_id=" + plotID + " AND " + "accepted=1 AND completed=1 );")) {
             setItem(getFeedbackSlot(plotInfoType), Utils.createItem(Material.WRITABLE_BOOK, 1, Utils.title("Plot Feedback"), Utils.line("Click to show feedback for this plot.")),
@@ -297,6 +298,38 @@ public class PlotInfo extends Gui {
                         // Open the feedback book.
                         u.player.openBook(ReviewFeedback.createFeedbackBook(reviewId));
                     });
+        }
+
+        // Tutorial recommendations
+        switch (plotInfoType) {
+            case CLAIMED_OWNER, CLAIMED_MEMBER, ACCEPTED_OWNER -> {
+                setItem(getRecommendationsSlot(plotInfoType), Utils.createItem(Material.LECTERN, 1, Utils.title("Tutorial Recommendations"),
+                        Utils.line("Click to see your"), Utils.line("recommended tutorials")), u ->
+                {
+                    user.mainGui = new RecommendedTutorialsGui(this, plotID, user, plot_owner, false);
+                    user.mainGui.open(user);
+                });
+            }
+            case SUBMITTED_REVIEWER, REVIEWED_REVIEWER, REVIEWING_REVIEWER, VERIFYING_REVIEWER -> {
+                setItem(getRecommendationsSlot(plotInfoType), Utils.createItem(Material.LECTERN, 1, Utils.title("Tutorial Recommendations"),
+                        Utils.line("Click to see the"), Utils.line("tutorial recommendations"), Utils.line("and add more")), u ->
+                {
+                    user.mainGui = new RecommendedTutorialsGui(this, plotID, user, plot_owner, true);
+                    user.mainGui.open(user);
+                });
+            }
+            case CLAIMED, ACCEPTED ->
+            {
+                if (user.hasPermission("group.reviewer"))
+                {
+                    setItem(getRecommendationsSlot(plotInfoType), Utils.createItem(Material.LECTERN, 1, Utils.title("Tutorial Recommendations"),
+                            Utils.line("Click to see the"), Utils.line("tutorial recommendations"), Utils.line("and add more")), u ->
+                    {
+                        user.mainGui = new RecommendedTutorialsGui(this, plotID, user, plot_owner, true);
+                        user.mainGui.open(user);
+                    });
+                }
+            }
         }
 
         // If the plot is submitted add the start review option for reviewers. (Slot 20)
@@ -477,7 +510,7 @@ public class PlotInfo extends Gui {
     }
 
     private int getSlotForGoogleMapsLink(PLOT_INFO_TYPE plotInfoType) {
-        if (plotInfoType == PLOT_INFO_TYPE.CLAIMED_OWNER || plotInfoType == PLOT_INFO_TYPE.CLAIMED_MEMBER || plotInfoType == PLOT_INFO_TYPE.SUBMITTED_REVIEWER || plotInfoType == PLOT_INFO_TYPE.REVIEWED_REVIEWER) {
+        if (plotInfoType == PLOT_INFO_TYPE.CLAIMED_OWNER || plotInfoType == PLOT_INFO_TYPE.CLAIMED_MEMBER || plotInfoType == PLOT_INFO_TYPE.SUBMITTED_REVIEWER || plotInfoType == PLOT_INFO_TYPE.REVIEWED_REVIEWER || plotInfoType == PLOT_INFO_TYPE.ACCEPTED_OWNER) {
             return 23;
         } else {
             return 20;
@@ -485,13 +518,21 @@ public class PlotInfo extends Gui {
     }
 
     private int getFeedbackSlot(PLOT_INFO_TYPE plotInfoType) {
-        if (plotInfoType == PLOT_INFO_TYPE.CLAIMED_OWNER || plotInfoType == PLOT_INFO_TYPE.CLAIMED_MEMBER || plotInfoType == PLOT_INFO_TYPE.REVIEWING_REVIEWER || plotInfoType == PLOT_INFO_TYPE.ACCEPTED_OWNER || plotInfoType == PLOT_INFO_TYPE.VERIFYING_REVIEWER) {
+        if (plotInfoType == PLOT_INFO_TYPE.CLAIMED_OWNER || plotInfoType == PLOT_INFO_TYPE.CLAIMED_MEMBER || plotInfoType == PLOT_INFO_TYPE.SUBMITTED_REVIEWER || plotInfoType == PLOT_INFO_TYPE.REVIEWED_REVIEWER || plotInfoType == PLOT_INFO_TYPE.REVIEWING_REVIEWER || plotInfoType == PLOT_INFO_TYPE.VERIFYING_REVIEWER) {
             return 22;
-        } else if (plotInfoType == PLOT_INFO_TYPE.SUBMITTED_REVIEWER || plotInfoType == PLOT_INFO_TYPE.REVIEWED_REVIEWER) {
+        } else if (plotInfoType == PLOT_INFO_TYPE.ACCEPTED_OWNER) {
             return 21;
         } else {
             return -1;
         }
+    }
+
+    private int getRecommendationsSlot(PLOT_INFO_TYPE plotInfoType) {
+        return switch (plotInfoType) {
+            case CLAIMED_OWNER, CLAIMED_MEMBER, SUBMITTED_REVIEWER, REVIEWED_REVIEWER -> 21;
+            case ACCEPTED_OWNER, CLAIMED, REVIEWING_REVIEWER, ACCEPTED -> 22; //So when claimed, sometimes feedback is in 22
+            default -> -1;
+        };
     }
 
     private void teleportToPlotOutsidePlotsystem(NetworkUser user, int plotID) {

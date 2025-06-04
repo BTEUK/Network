@@ -16,12 +16,12 @@ import teachingtutorials.tutorialobjects.LessonObject;
 import teachingtutorials.tutorialobjects.Location;
 import teachingtutorials.tutorialobjects.Tutorial;
 import teachingtutorials.utils.DBConnection;
+
 import static net.bteuk.network.utils.Constants.LOGGER;
 
 import java.util.UUID;
 
-public class RecommendedTutorialsGui extends Gui
-{
+public class RecommendedTutorialsGui extends Gui {
     private final Gui parentGui;
 
     private final int iPlotID;
@@ -32,57 +32,59 @@ public class RecommendedTutorialsGui extends Gui
 
     private TutorialRecommendation[] tutorialRecommendations;
 
-    private boolean bStaffView;
+    private final boolean bStaffView;
 
-    /** The number of pages in this menu */
+    /**
+     * The number of pages in this menu
+     */
     private int iPages;
 
-    /** The current page that the player is on */
+    /**
+     * The current page that the player is on
+     */
     private int iPage;
-
 
     public RecommendedTutorialsGui(Gui parentGui, int iPlotID, NetworkUser user, String plotOwner, boolean bStaffView) {
         super(54, Utils.title("Recommended Tutorials"));
         this.parentGui = parentGui;
         this.iPlotID = iPlotID;
         this.user = user;
-        this.ownerUUID = UUID.fromString(plotOwner);
+        if (plotOwner != null)
+            this.ownerUUID = UUID.fromString(plotOwner);
+        else
+            this.ownerUUID = null;
+        this.bStaffView = bStaffView;
 
-        //Fetches the tutorial recommendations for this plot
-        tutorialRecommendations = TutorialRecommendation.fetchTutorialRecommendationsForPlot(LOGGER, iPlotID);
+        // Fetches the tutorial recommendations for this plot
+        tutorialRecommendations = Network.getInstance().getPlotSQL().fetchTutorialRecommendationsForPlot(LOGGER, iPlotID);
 
-        this.iPages = ((tutorialRecommendations.length-1)/45)+1;
+        this.iPages = ((tutorialRecommendations.length - 1) / 45) + 1;
         this.iPage = 1;
 
         addItems();
     }
 
-    private void addItems()
-    {
-        //Back button
-        String szBackText = bStaffView ? "Go back to the review menu." : "Go back to the plot menu.";
+    private void addItems() {
+        // Back button
         setItem(53, Utils.createItem(Material.SPRUCE_DOOR, 1,
-                        ChatUtils.title("Return"),
-                        ChatUtils.line(szBackText)),
+                        ChatUtils.title("Return")),
 
                 u -> {
-                    //Go back to the review gui.
+                    // Go back to the review gui.
                     u.player.closeInventory();
                     parentGui.open(u);
                 }
         );
 
-        //Indicates that there are no unfinished lessons
-        if (tutorialRecommendations.length == 0)
-        {
+        // Indicates that there are no unfinished lessons
+        if (tutorialRecommendations.length == 0) {
             ItemStack noRecommendations = Utils.createItem(Material.BARRIER, 1,
                     Utils.title("There are no tutorial recommendations"));
-            setItem(5-1, noRecommendations);
+            setItem(5 - 1, noRecommendations);
         }
 
-        //Page back
-        if (iPage > 1)
-        {
+        // Page back
+        if (iPage > 1) {
             ItemStack pageBack = Utils.createCustomSkullWithFallback("4eff72715e6032e90f50a38f4892529493c9f555b9af0d5e77a6fa5cddff3cd2",
                     Material.ACACIA_BOAT, 1,
                     Utils.title("Page back"));
@@ -97,9 +99,8 @@ public class RecommendedTutorialsGui extends Gui
             });
         }
 
-        //Page forwards
-        if (iPage < iPages)
-        {
+        // Page forwards
+        if (iPage < iPages) {
             ItemStack pageBack = Utils.createCustomSkullWithFallback("a7ba2aa14ae5b0b65573dc4971d3524e92a61dd779e4412e4642adabc2e56c44",
                     Material.ACACIA_BOAT, 1,
                     Utils.title("Page forwards"));
@@ -114,36 +115,43 @@ public class RecommendedTutorialsGui extends Gui
             });
         }
 
-
-        //Adds the tutorials
-        int iStart = (iPage-1)*9;
-        int iMax = Math.min((iPage+4)*9, tutorialRecommendations.length);
+        // Adds the tutorials
+        int iStart = (iPage - 1) * 9;
+        int iMax = Math.min((iPage + 4) * 9, tutorialRecommendations.length);
         int i;
-        for (i = iStart ; i < iMax ; i++)
-        {
+        for (i = iStart; i < iMax; i++) {
             teachingtutorials.tutorialobjects.TutorialRecommendation tutorialRecommendation = tutorialRecommendations[i].getLinkedTutorialRecommendation();
             ItemStack recommendationIcon;
 
-            //Display different icons depending on whether it is completed or not
-            if (tutorialRecommendation.isCompleted())
-            {
-                recommendationIcon = teachingtutorials.utils.Utils.createItem(Material.KNOWLEDGE_BOOK, 1,
-                        Utils.title(tutorialRecommendation.getTutorialName(Network.getInstance().getTutorialsDBConnection(), LOGGER)),
-                        Utils.line("Recommended by "+ tutorialRecommendation.getRecommenderName()),
-                        Utils.line("Completed"));
-            }
-            else
-            {
-                recommendationIcon = teachingtutorials.utils.Utils.createItem(Material.BOOK, 1,
-                        Utils.title(tutorialRecommendation.getTutorialName(Network.getInstance().getTutorialsDBConnection(), LOGGER)),
-                        Utils.line("Recommended by "+ tutorialRecommendation.getRecommenderName()));
+            // Display different icons depending on whether it is completed or not
+            if (tutorialRecommendation.isCompleted()) {
+                if (bStaffView)
+                    recommendationIcon = teachingtutorials.utils.Utils.createItem(Material.KNOWLEDGE_BOOK, 1,
+                            Utils.title(tutorialRecommendation.getTutorialName(Network.getInstance().getTutorialsDBConnection(), LOGGER)),
+                            Utils.line("Recommended by " + tutorialRecommendation.getRecommenderName()),
+                            Utils.line("Completed"));
+                else
+                    recommendationIcon = teachingtutorials.utils.Utils.createItem(Material.KNOWLEDGE_BOOK, 1,
+                            Utils.title(tutorialRecommendation.getTutorialName(Network.getInstance().getTutorialsDBConnection(), LOGGER)),
+                            Utils.line("Recommended by " + tutorialRecommendation.getRecommenderName()),
+                            Utils.line("Completed"),
+                            Utils.line("Click to start tutorial again"));
+            } else {
+                if (bStaffView)
+                    recommendationIcon = teachingtutorials.utils.Utils.createItem(Material.BOOK, 1,
+                            Utils.title(tutorialRecommendation.getTutorialName(Network.getInstance().getTutorialsDBConnection(), LOGGER)),
+                            Utils.line("Recommended by " + tutorialRecommendation.getRecommenderName()));
+                else
+                    recommendationIcon = teachingtutorials.utils.Utils.createItem(Material.BOOK, 1,
+                            Utils.title(tutorialRecommendation.getTutorialName(Network.getInstance().getTutorialsDBConnection(), LOGGER)),
+                            Utils.line("Recommended by " + tutorialRecommendation.getRecommenderName()),
+                            Utils.line("Click to start tutorial"));
             }
 
-            super.setItem(i-iStart, recommendationIcon, new guiAction() {
+            super.setItem(i - iStart, recommendationIcon, new guiAction() {
                 @Override
                 public void click(NetworkUser u) {
-                    if (!bStaffView)
-                    {
+                    if (!bStaffView && ownerUUID != null) {
                         DBConnection dbConnection = Network.getInstance().getTutorialsDBConnection();
                         startTutorial(Network.getInstance(), LessonObject.getUnfinishedLessonsOfPlayer(ownerUUID, dbConnection, LOGGER),
                                 user, RecommendedTutorialsGui.this, Tutorial.fetchByTutorialID(tutorialRecommendation.getTutorialID(), dbConnection, LOGGER),
@@ -155,10 +163,10 @@ public class RecommendedTutorialsGui extends Gui
 
         int iOrder = i;
 
-        //Add the + button - will open the add menu
-        if (iPage == iPages && bStaffView) //If on last page and staff view
+        // Add the + button - will open the add menu
+        if (iPage == iPages && bStaffView & ownerUUID != null) // If on last page and staff view
         {
-            int iLocationOfAdd = iOrder-iStart;
+            int iLocationOfAdd = iOrder - iStart;
 
             super.setItem(iLocationOfAdd,
                     Utils.createItem(Material.WRITABLE_BOOK, 1,
@@ -167,7 +175,7 @@ public class RecommendedTutorialsGui extends Gui
                     new guiAction() {
                         @Override
                         public void click(NetworkUser u) {
-                            //Opens the new recommendation menu
+                            // Opens the new recommendation menu
                             RecommendationAddGui add = new RecommendationAddGui(RecommendedTutorialsGui.this, user, iPlotID, ownerUUID, tutorialRecommendations);
                             add.open(user);
                         }
@@ -178,7 +186,7 @@ public class RecommendedTutorialsGui extends Gui
     public static void startTutorial(Network plugin, LessonObject[] lessons, NetworkUser user, Gui parentGui, Tutorial tutorialToStart, Location locationToStart) {
         boolean bLessonFound = false;
 
-        for(LessonObject lesson : lessons) {
+        for (LessonObject lesson : lessons) {
             if (tutorialToStart.getTutorialID() == lesson.getTutorialID()) {
                 if (locationToStart == null) {
                     bLessonFound = true;
@@ -205,7 +213,8 @@ public class RecommendedTutorialsGui extends Gui
                 } else {
                     user.sendMessage(Utils.error("A problem occurred, please let staff know"));
                 }
-            } else if (Event.addEvent(EventType.START_LOCATION, user.player.getUniqueId(), locationToStart.getLocationID(), Network.getInstance().getTutorialsDBConnection(), Constants.LOGGER)) {
+            } else if (Event.addEvent(EventType.START_LOCATION, user.player.getUniqueId(), locationToStart.getLocationID(), Network.getInstance().getTutorialsDBConnection(),
+                    Constants.LOGGER)) {
                 SwitchServer.switchServer(user.player, Network.getInstance().getGlobalSQL().getString("SELECT name FROM server_data WHERE type='TUTORIAL';"));
                 user.player.closeInventory();
             } else {
@@ -219,10 +228,10 @@ public class RecommendedTutorialsGui extends Gui
     public void refresh() {
         clearGui();
 
-        //Fetches the tutorial recommendations for this plot
-        tutorialRecommendations = TutorialRecommendation.fetchTutorialRecommendationsForPlot(LOGGER, iPlotID);
+        // Fetches the tutorial recommendations for this plot
+        tutorialRecommendations = Network.getInstance().getPlotSQL().fetchTutorialRecommendationsForPlot(LOGGER, iPlotID);
 
-        this.iPages = ((tutorialRecommendations.length-1)/45)+1;
+        this.iPages = ((tutorialRecommendations.length - 1) / 45) + 1;
         this.iPage = 1;
 
         addItems();
