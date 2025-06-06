@@ -318,10 +318,10 @@ public class PlotInfo extends Gui {
                     user.mainGui.open(user);
                 });
             }
-            case CLAIMED, ACCEPTED ->
-            {
-                if (user.hasPermission("group.reviewer"))
-                {
+            case CLAIMED, ACCEPTED -> {
+                // Reviewers can always add recommendations to claimed and accepted plots
+                // Architects can always add recommendations to claimed plots
+                if (user.hasPermission("group.reviewer") || (user.hasPermission("group.architect") && plotInfoType.equals(PLOT_INFO_TYPE.CLAIMED))) {
                     setItem(getRecommendationsSlot(plotInfoType), Utils.createItem(Material.LECTERN, 1, Utils.title("Tutorial Recommendations"),
                             Utils.line("Click to see the"), Utils.line("tutorial recommendations"), Utils.line("and add more")), u ->
                     {
@@ -529,8 +529,9 @@ public class PlotInfo extends Gui {
 
     private int getRecommendationsSlot(PLOT_INFO_TYPE plotInfoType) {
         return switch (plotInfoType) {
-            case CLAIMED_OWNER, CLAIMED_MEMBER, SUBMITTED_REVIEWER, REVIEWED_REVIEWER -> 21;
-            case ACCEPTED_OWNER, CLAIMED, REVIEWING_REVIEWER, ACCEPTED -> 22; //So when claimed, sometimes feedback is in 22
+            case CLAIMED_OWNER, CLAIMED_MEMBER, SUBMITTED_REVIEWER, REVIEWING_REVIEWER, VERIFYING_REVIEWER, REVIEWED_REVIEWER -> 21;
+            case CLAIMED, ACCEPTED -> 22;
+            case ACCEPTED_OWNER -> 20;
             default -> -1;
         };
     }

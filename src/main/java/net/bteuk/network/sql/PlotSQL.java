@@ -432,19 +432,19 @@ public class PlotSQL extends AbstractSQL {
         // A count of the number of tutorial recommendations for this plot
         int iCount;
 
-        try {
+        try (
+                Connection conn = conn();
+                PreparedStatement statement = conn.prepareStatement("SELECT * FROM tutorial_recommendations WHERE plot_id = " + iPlotID)
+        ) {
             sql = "SELECT Count(1) FROM tutorial_recommendations WHERE plot_id = " + iPlotID;
             iCount = getInt(sql);
             recommendations = new TutorialRecommendation[iCount];
 
-            Connection conn = conn();
-            PreparedStatement statement = conn.prepareStatement(sql);
-            resultSet = statement.executeQuery(sql);
+            resultSet = statement.executeQuery();
             for (int i = 0; i < iCount; i++) {
                 resultSet.next();
                 recommendations[i] = new TutorialRecommendation(resultSet.getInt("recommendation_id"), iPlotID);
             }
-            resultSet.close();
         } catch (SQLException e) {
             logger.log(Level.WARNING, "Error fetching tutorial recommendations for plot " + iPlotID, e);
             return new TutorialRecommendation[0];
