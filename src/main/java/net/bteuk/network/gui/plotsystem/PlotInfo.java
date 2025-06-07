@@ -298,16 +298,14 @@ public class PlotInfo extends Gui {
         switch (plotInfoType) {
             case CLAIMED_OWNER, CLAIMED_MEMBER, ACCEPTED_OWNER -> {
                 setItem(getRecommendationsSlot(plotInfoType), Utils.createItem(Material.LECTERN, 1, Utils.title("Tutorial Recommendations"),
-                        Utils.line("Click to see your"), Utils.line("recommended tutorials")), u ->
-                {
+                        Utils.line("Click to see your"), Utils.line("recommended tutorials")), u -> {
                     user.mainGui = new RecommendedTutorialsGui(this, plotID, user, plot_owner, false);
                     user.mainGui.open(user);
                 });
             }
             case SUBMITTED_REVIEWER, REVIEWED_REVIEWER, REVIEWING_REVIEWER, VERIFYING_REVIEWER -> {
                 setItem(getRecommendationsSlot(plotInfoType), Utils.createItem(Material.LECTERN, 1, Utils.title("Tutorial Recommendations"),
-                        Utils.line("Click to see the"), Utils.line("tutorial recommendations"), Utils.line("and add more")), u ->
-                {
+                        Utils.line("Click to see the"), Utils.line("tutorial recommendations"), Utils.line("and add more")), u -> {
                     user.mainGui = new RecommendedTutorialsGui(this, plotID, user, plot_owner, true);
                     user.mainGui.open(user);
                 });
@@ -317,8 +315,7 @@ public class PlotInfo extends Gui {
                 // Architects can always add recommendations to claimed plots
                 if (user.hasPermission("group.reviewer") || (user.hasPermission("group.architect") && plotInfoType.equals(PLOT_INFO_TYPE.CLAIMED))) {
                     setItem(getRecommendationsSlot(plotInfoType), Utils.createItem(Material.LECTERN, 1, Utils.title("Tutorial Recommendations"),
-                            Utils.line("Click to see the"), Utils.line("tutorial recommendations"), Utils.line("and add more")), u ->
-                    {
+                            Utils.line("Click to see the"), Utils.line("tutorial recommendations"), Utils.line("and add more")), u -> {
                         user.mainGui = new RecommendedTutorialsGui(this, plotID, user, plot_owner, true);
                         user.mainGui.open(user);
                     });
