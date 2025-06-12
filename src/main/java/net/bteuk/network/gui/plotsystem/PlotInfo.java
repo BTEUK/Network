@@ -80,7 +80,7 @@ public class PlotInfo extends Gui {
         if (status == PlotStatus.CLAIMED || status == PlotStatus.SUBMITTED) {
             plot_owner = plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plotID + " AND is_owner=1;");
         } else if (status == PlotStatus.COMPLETED) {
-            plot_owner = plotSQL.getString("SELECT uuid FROM plot_review WHERE id=" + plotID + " AND accepted=1 AND " + "completed=1;");
+            plot_owner = plotSQL.getString("SELECT uuid FROM plot_review WHERE plot_id=" + plotID + " AND accepted=1 AND " + "completed=1;");
         }
         // Determine the type of menu to create.
         PLOT_INFO_TYPE plotInfoType = determineMenuType(status, submittedStatus);

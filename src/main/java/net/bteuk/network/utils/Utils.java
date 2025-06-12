@@ -247,14 +247,15 @@ public class Utils {
         return 65;
     }
 
-    // Gives a player an item, it will be set in their main hand, if it does not already exist there.
-
-    // If the main hand is empty, set it there.
-    // If then main hand is slot 8 and includes the navigator, find the first empty slot available and set it there.
-    // If no empty slots are available set it to slot 7.
-    // If the main hand has an item swap the current item to an empty slot in the inventory.
-    // If no empty slots are available overwrite it.
-
+    /**
+     * Gives a player an item, it will be set in their main hand, if it does not already exist there.
+     * <p>
+     * If the main hand is empty, set it there.
+     * If then main hand is slot 8 and includes the navigator, find the first empty slot available and set it there.
+     * If no empty slots are available set it to slot 7.
+     * If the main hand has an item swap the current item to an empty slot in the inventory.
+     * If no empty slots are available overwrite it.
+     */
     public static void giveItem(Player p, ItemStack item, String name) {
 
         ItemStack currentItem = p.getInventory().getItemInMainHand();
@@ -291,12 +292,16 @@ public class Utils {
             p.getInventory().setItem(emptySlot, item);
             p.sendMessage(ChatUtils.success("Set ").append(Component.text(name, NamedTextColor.DARK_AQUA)
                     .append(ChatUtils.success(" to slot " + (emptySlot + 1)))));
-        } else {
-
+        } else if (hasNavigator) {
             // Player has no empty slots and is holding the navigator, set to item to slot 7.
             p.getInventory().setItem(7, item);
             p.sendMessage(ChatUtils.success("Set ")
                     .append(Component.text(name, NamedTextColor.DARK_AQUA).append(ChatUtils.success(" to slot 8"))));
+        } else {
+            // Set item in current slot.
+            p.getInventory().setItemInMainHand(item);
+            p.sendMessage(ChatUtils.success("Set ").append(Component.text(name, NamedTextColor.DARK_AQUA)
+                    .append(ChatUtils.success(" to main hand."))));
         }
     }
 
