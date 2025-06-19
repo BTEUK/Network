@@ -164,8 +164,8 @@ public class RecommendedTutorialsGui extends Gui {
         int iOrder = i;
 
         // Add the + button - will open the add menu
-        if (iPage == iPages && bStaffView & ownerUUID != null) // If on last page and staff view
-        {
+        if (iPage == iPages && bStaffView & ownerUUID != null) { // If on last page and staff view
+
             int iLocationOfAdd = iOrder - iStart;
 
             super.setItem(iLocationOfAdd,
