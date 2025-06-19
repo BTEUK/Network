@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.logging.Level;
 
 import static net.bteuk.network.utils.Constants.LOGGER;
 
@@ -159,21 +160,6 @@ public abstract class AbstractSQL {
         } catch (SQLException e) {
             e.printStackTrace();
             return 0;
-        }
-    }
-
-    public ResultSet getResultSet(String sql) {
-
-        try (
-                Connection conn = conn();
-                PreparedStatement statement = conn.prepareStatement(sql);
-                ResultSet results = statement.executeQuery()
-        ) {
-
-            return results;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
         }
     }
 

@@ -10,11 +10,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import teachingtutorials.TeachingTutorials;
 import teachingtutorials.guis.Event;
 import teachingtutorials.guis.EventType;
 import teachingtutorials.tutorialobjects.LessonObject;
 import teachingtutorials.tutorialobjects.Location;
 import teachingtutorials.tutorialobjects.Tutorial;
+import teachingtutorials.utils.User;
 
 import static net.bteuk.network.utils.Constants.LOGGER;
 
@@ -147,19 +149,24 @@ public class TutorialLibraryGui extends Gui {
             setAction(iSlot, new Gui.guiAction() {
                 @Override
                 public void click(NetworkUser u) {
-                    startTutorial(inUseTutorials[iSlot], null);
+                    startTutorial(plugin, lessons, user, TutorialLibraryGui.this, inUseTutorials[iSlot], null);
                 }
             });
         }
     }
 
     /**
-     * Handles the logic when a player wishes to start a tutorial
+     * Handles the logic when a player wishes to start a specific tutorial
      *
+     * @param plugin          A reference to the instance of the TeachingTutorials plugin
+     * @param lessons         A list of unfinished lessons for the given player
+     * @param user            A reference to the user who wishes to start a specific tutorial
+     * @param parentGui       A reference to the parent gui which to return back
      * @param tutorialToStart A reference to the Tutorial that the player wishes to start
+     * @param locationToStart A reference to the Location that a player wishes to start, if specified
      * @return
      */
-    public void startTutorial(Tutorial tutorialToStart, Location locationToStart) {
+    public static void startTutorial(Network plugin, LessonObject[] lessons, NetworkUser user, Gui parentGui, Tutorial tutorialToStart, Location locationToStart) {
         // Check whether the player already has a current lesson for this tutorial
         boolean bLessonFound = false;
         for (LessonObject lesson : lessons) {
@@ -170,7 +177,7 @@ public class TutorialLibraryGui extends Gui {
                     if (locationToStart.getLocationID() == lesson.getLocation().getLocationID()) {
                         bLessonFound = true;
 
-                        user.mainGui = new LessonContinueConfirmer(plugin, user, this, lesson, "You have a lesson at this location already");
+                        user.mainGui = new LessonContinueConfirmer(plugin, user, parentGui, lesson, "You have a lesson at this location already");
                         user.mainGui.open(user);
 
                         // Break, let the other menu take over
@@ -179,7 +186,7 @@ public class TutorialLibraryGui extends Gui {
                 } else {
                     bLessonFound = true;
                     // If not then open confirmation menu
-                    user.mainGui = new LessonContinueConfirmer(plugin, user, this, lesson, "You have a lesson for this tutorial already");
+                    user.mainGui = new LessonContinueConfirmer(plugin, user, parentGui, lesson, "You have a lesson for this tutorial already");
                     user.mainGui.open(user);
 
                     // Break, let the other menu take over

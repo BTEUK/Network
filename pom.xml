@@ -245,7 +245,7 @@
         <dependency>
             <groupId>com.github.BTEUK</groupId>
             <artifactId>TeachingTutorials</artifactId>
-            <version>8c846b660f</version>
+            <version>1.13.0</version>
         </dependency>
         <dependency>
             <groupId>com.github.BTEUK</groupId>

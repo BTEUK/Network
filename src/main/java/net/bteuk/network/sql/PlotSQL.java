@@ -3,6 +3,7 @@ package net.bteuk.network.sql;
 import net.bteuk.network.lib.enums.PlotDifficulties;
 import net.bteuk.network.lib.utils.Reviewing;
 import net.bteuk.network.utils.plotsystem.SubmittedPlot;
+import net.bteuk.network.utils.TutorialRecommendation;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 import java.sql.Connection;
@@ -12,6 +13,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static net.buildtheearth.terraminusminus.TerraMinusMinus.LOGGER;
 
@@ -410,5 +413,43 @@ public class PlotSQL extends AbstractSQL {
         } catch (SQLException sql) {
             LOGGER.error("An error occurred when executing insert statement: ", sql);
         }
+    }
+
+    /**
+     * Fetches a list of tutorial recommendations for a given plot
+     *
+     * @param logger  A logger to output to
+     * @param iPlotID The ID of the plot to fetch the recommended tutorials of
+     * @return A list of tutorial recommendations
+     */
+    public TutorialRecommendation[] fetchTutorialRecommendationsForPlot(Logger logger, int iPlotID) {
+        // SQL objects
+        String sql;
+        ResultSet resultSet;
+
+        TutorialRecommendation[] recommendations;
+
+        // A count of the number of tutorial recommendations for this plot
+        int iCount;
+
+        try (
+                Connection conn = conn();
+                PreparedStatement statement = conn.prepareStatement("SELECT * FROM tutorial_recommendations WHERE plot_id = " + iPlotID)
+        ) {
+            sql = "SELECT Count(1) FROM tutorial_recommendations WHERE plot_id = " + iPlotID;
+            iCount = getInt(sql);
+            recommendations = new TutorialRecommendation[iCount];
+
+            resultSet = statement.executeQuery();
+            for (int i = 0; i < iCount; i++) {
+                resultSet.next();
+                recommendations[i] = new TutorialRecommendation(resultSet.getInt("recommendation_id"), iPlotID);
+            }
+        } catch (SQLException e) {
+            logger.log(Level.WARNING, "Error fetching tutorial recommendations for plot " + iPlotID, e);
+            return new TutorialRecommendation[0];
+        }
+
+        return recommendations;
     }
 }

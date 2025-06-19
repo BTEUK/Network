@@ -61,12 +61,7 @@ public class LessonContinueConfirmer extends Gui {
     private void addItems() {
         // Info
         super.setItem(4, Utils.createItem(Material.KNOWLEDGE_BOOK, 1,
-                Utils.line(szMessage)), new guiAction() {
-            @Override
-            public void click(NetworkUser u) {
-
-            }
-        });
+                Utils.line(szMessage)));
 
         // Restart lesson
         super.setItem(12 - 1, Utils.createItem(Material.BOOK, 1,
