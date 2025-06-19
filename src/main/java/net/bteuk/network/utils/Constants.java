@@ -56,9 +56,14 @@ public class Constants {
     public static final boolean ANNOUNCE_OVERALL_LEVELUPS;
     public static final boolean ANNOUNCE_SEASONAL_LEVELUPS;
 
+    // Sidebar message details
     public static final boolean SIDEBAR_ENABLED;
     public static final String SIDEBAR_TITLE;
     public static final List<String> SIDEBAR_CONTENT;
+
+    // Message of the day details
+    public static final boolean MOTD_ENABLED;
+    public static final String MOTD_CONTENT;
 
     static {
 
@@ -107,6 +112,9 @@ public class Constants {
         }
 
         SIDEBAR_CONTENT = Collections.unmodifiableList(sidebarText);
+
+        MOTD_ENABLED = CONFIG.getBoolean("motd.enabled");
+        MOTD_CONTENT = CONFIG.getString("motd.text", "");
 
         if (CONFIG.getString("earth_world") == null) {
             // Setting default value.
