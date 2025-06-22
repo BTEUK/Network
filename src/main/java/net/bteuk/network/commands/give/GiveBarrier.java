@@ -12,6 +12,6 @@ import org.jetbrains.annotations.NotNull;
 public class GiveBarrier extends GiveItem {
     @Override
     public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
-        onCommand(stack, "uknet.barrier", new ItemStack(Material.BARRIER), "Barrier");
+        onCommand(stack, "uknet.barrier", ItemStack.of(Material.BARRIER), "Barrier");
     }
 }

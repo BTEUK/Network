@@ -5,6 +5,7 @@ import net.bteuk.network.Network;
 import net.bteuk.network.eventing.events.EventManager;
 import net.bteuk.network.gui.Gui;
 import net.bteuk.network.gui.InviteMembers;
+import net.bteuk.network.gui.tutorials.RecommendedTutorialsGui;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.sql.PlotSQL;
@@ -14,6 +15,7 @@ import net.bteuk.network.utils.SwitchServer;
 import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.enums.PlotStatus;
 import net.bteuk.network.utils.enums.RegionType;
+import net.bteuk.network.utils.enums.ServerType;
 import net.bteuk.network.utils.enums.SubmittedStatus;
 import net.bteuk.network.utils.plotsystem.ReviewFeedback;
 import net.buildtheearth.terraminusminus.generator.EarthGeneratorSettings;
@@ -22,6 +24,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
@@ -29,7 +32,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static net.bteuk.network.utils.Constants.EARTH_WORLD;
 import static net.bteuk.network.utils.Constants.SERVER_NAME;
+import static net.bteuk.network.utils.Constants.SERVER_TYPE;
 
 public class PlotInfo extends Gui {
 
@@ -76,7 +81,7 @@ public class PlotInfo extends Gui {
         if (status == PlotStatus.CLAIMED || status == PlotStatus.SUBMITTED) {
             plot_owner = plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plotID + " AND is_owner=1;");
         } else if (status == PlotStatus.COMPLETED) {
-            plot_owner = plotSQL.getString("SELECT uuid FROM plot_review WHERE id=" + plotID + " AND accepted=1 AND " + "completed=1;");
+            plot_owner = plotSQL.getString("SELECT uuid FROM plot_review WHERE plot_id=" + plotID + " AND accepted=1 AND " + "completed=1;");
         }
         // Determine the type of menu to create.
         PLOT_INFO_TYPE plotInfoType = determineMenuType(status, submittedStatus);
@@ -112,8 +117,14 @@ public class PlotInfo extends Gui {
             String server = plotSQL.getString(
                     "SELECT server FROM location_data WHERE name='" + plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + "';");
 
+            // If the server is null it implies the location in the plotsystem was removed, teleport them to the location the plot should be in the Earth server.
+            if (server == null) {
+                teleportToPlotOutsidePlotsystem(u, plotID);
+                return;
+            }
+
             // If the plot is on the current server teleport them directly.
-            // Else teleport them to the correct server and them teleport them to the plot.
+            // Else teleport them to the correct server and then teleport them to the plot.
             if (server.equals(SERVER_NAME)) {
                 EventManager.createTeleportEvent(false, u.player.getUniqueId().toString(), "plotsystem", "teleport plot " + plotID, u.player.getLocation());
             } else {
@@ -143,10 +154,6 @@ public class PlotInfo extends Gui {
                     }
                     double x = sumX / (double) corners.length;
                     double z = sumZ / (double) corners.length;
-
-                    // Subtract the coordinate transform to make the coordinates in the real location.
-                    x -= plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + "';");
-                    z -= plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plotID + ";") + "';");
 
                     // Convert to irl coordinates.
                     try {
@@ -180,7 +187,7 @@ public class PlotInfo extends Gui {
         // As well as the submit/retract button. (Slot 2)
         // If the plot is not under review allow it to be removed. (Slot 6)
         if (plotInfoType == PLOT_INFO_TYPE.CLAIMED_OWNER) {
-            setItem(21, Utils.createItem(Material.PLAYER_HEAD, 1, Utils.title("Plot Members"), Utils.line("Manage the members of your plot.")), u -> {
+            setItem(20, Utils.createItem(Material.PLAYER_HEAD, 1, Utils.title("Plot Members"), Utils.line("Manage the members of your plot.")), u -> {
 
                 // Delete this gui.
                 this.delete();
@@ -191,7 +198,7 @@ public class PlotInfo extends Gui {
                 u.mainGui.open(u);
             });
 
-            setItem(20, Utils.createItem(Material.OAK_BOAT, 1, Utils.title("Invite Members"), Utils.line("Invite a new member to your plot."),
+            setItem(19, Utils.createItem(Material.OAK_BOAT, 1, Utils.title("Invite Members"), Utils.line("Invite a new member to your plot."),
                     Utils.line("You can only invite online users.")), u -> {
 
                 // Delete this gui.
@@ -266,7 +273,7 @@ public class PlotInfo extends Gui {
         }
 
         // If this plot has feedback, add feedback for the plot owner and members (Slot 22)
-        // As well as for reviewers (Slot 22 while reviewing, slot 21 while submitted)
+        // As well as for reviewers (Slot 22 while submitted, reviewed or reviewing)
         if ((plotInfoType == PLOT_INFO_TYPE.CLAIMED_OWNER || plotInfoType == PLOT_INFO_TYPE.CLAIMED_MEMBER || plotInfoType == PLOT_INFO_TYPE.REVIEWING_REVIEWER || plotInfoType == PLOT_INFO_TYPE.SUBMITTED_REVIEWER || plotInfoType == PLOT_INFO_TYPE.REVIEWED_REVIEWER || plotInfoType == PLOT_INFO_TYPE.VERIFYING_REVIEWER) && plotSQL.hasRow(
                 "SELECT 1 FROM plot_review WHERE plot_id=" + plotID + " AND uuid='" + plot_owner + "' AND accepted=0 AND completed=1;")) {
             setItem(getFeedbackSlot(plotInfoType), Utils.createItem(Material.WRITABLE_BOOK, 1, Utils.title("Plot Feedback"), Utils.line("Click to show feedback for this plot.")),
@@ -280,7 +287,7 @@ public class PlotInfo extends Gui {
                         u.mainGui = new DeniedPlotFeedback(plotID);
                         u.mainGui.open(u);
                     });
-            // If the plot is accepted and has feedback show for the owner (Slot 22)
+            // If the plot is accepted and has feedback show for the owner (Slot 21)
         } else if (plotInfoType == PLOT_INFO_TYPE.ACCEPTED_OWNER && plotSQL.hasRow(
                 "SELECT 1 FROM " + "plot_category_feedback WHERE review_id=( SELECT id FROM plot_review WHERE plot_id=" + plotID + " AND " + "accepted=1 AND completed=1 );")) {
             setItem(getFeedbackSlot(plotInfoType), Utils.createItem(Material.WRITABLE_BOOK, 1, Utils.title("Plot Feedback"), Utils.line("Click to show feedback for this plot.")),
@@ -291,6 +298,35 @@ public class PlotInfo extends Gui {
                         // Open the feedback book.
                         u.player.openBook(ReviewFeedback.createFeedbackBook(reviewId));
                     });
+        }
+
+        // Tutorial recommendations
+        switch (plotInfoType) {
+            case CLAIMED_OWNER, CLAIMED_MEMBER, ACCEPTED_OWNER -> {
+                setItem(getRecommendationsSlot(plotInfoType), Utils.createItem(Material.LECTERN, 1, Utils.title("Tutorial Recommendations"),
+                        Utils.line("Click to see your"), Utils.line("recommended tutorials")), u -> {
+                    user.mainGui = new RecommendedTutorialsGui(this, plotID, user, plot_owner, false);
+                    user.mainGui.open(user);
+                });
+            }
+            case SUBMITTED_REVIEWER, REVIEWED_REVIEWER, REVIEWING_REVIEWER, VERIFYING_REVIEWER -> {
+                setItem(getRecommendationsSlot(plotInfoType), Utils.createItem(Material.LECTERN, 1, Utils.title("Tutorial Recommendations"),
+                        Utils.line("Click to see the"), Utils.line("tutorial recommendations"), Utils.line("and add more")), u -> {
+                    user.mainGui = new RecommendedTutorialsGui(this, plotID, user, plot_owner, true);
+                    user.mainGui.open(user);
+                });
+            }
+            case CLAIMED, ACCEPTED -> {
+                // Reviewers can always add recommendations to claimed and accepted plots
+                // Architects can always add recommendations to claimed plots
+                if (user.hasPermission("group.reviewer") || (user.hasPermission("group.architect") && plotInfoType.equals(PLOT_INFO_TYPE.CLAIMED))) {
+                    setItem(getRecommendationsSlot(plotInfoType), Utils.createItem(Material.LECTERN, 1, Utils.title("Tutorial Recommendations"),
+                            Utils.line("Click to see the"), Utils.line("tutorial recommendations"), Utils.line("and add more")), u -> {
+                        user.mainGui = new RecommendedTutorialsGui(this, plotID, user, plot_owner, true);
+                        user.mainGui.open(user);
+                    });
+                }
+            }
         }
 
         // If the plot is submitted add the start review option for reviewers. (Slot 20)
@@ -471,7 +507,7 @@ public class PlotInfo extends Gui {
     }
 
     private int getSlotForGoogleMapsLink(PLOT_INFO_TYPE plotInfoType) {
-        if (plotInfoType == PLOT_INFO_TYPE.CLAIMED_OWNER || plotInfoType == PLOT_INFO_TYPE.CLAIMED_MEMBER || plotInfoType == PLOT_INFO_TYPE.SUBMITTED_REVIEWER) {
+        if (plotInfoType == PLOT_INFO_TYPE.CLAIMED_OWNER || plotInfoType == PLOT_INFO_TYPE.CLAIMED_MEMBER || plotInfoType == PLOT_INFO_TYPE.SUBMITTED_REVIEWER || plotInfoType == PLOT_INFO_TYPE.REVIEWED_REVIEWER || plotInfoType == PLOT_INFO_TYPE.ACCEPTED_OWNER) {
             return 23;
         } else {
             return 20;
@@ -479,12 +515,53 @@ public class PlotInfo extends Gui {
     }
 
     private int getFeedbackSlot(PLOT_INFO_TYPE plotInfoType) {
-        if (plotInfoType == PLOT_INFO_TYPE.CLAIMED_OWNER || plotInfoType == PLOT_INFO_TYPE.CLAIMED_MEMBER || plotInfoType == PLOT_INFO_TYPE.REVIEWING_REVIEWER || plotInfoType == PLOT_INFO_TYPE.ACCEPTED_OWNER || plotInfoType == PLOT_INFO_TYPE.VERIFYING_REVIEWER) {
+        if (plotInfoType == PLOT_INFO_TYPE.CLAIMED_OWNER || plotInfoType == PLOT_INFO_TYPE.CLAIMED_MEMBER || plotInfoType == PLOT_INFO_TYPE.SUBMITTED_REVIEWER || plotInfoType == PLOT_INFO_TYPE.REVIEWED_REVIEWER || plotInfoType == PLOT_INFO_TYPE.REVIEWING_REVIEWER || plotInfoType == PLOT_INFO_TYPE.VERIFYING_REVIEWER) {
             return 22;
-        } else if (plotInfoType == PLOT_INFO_TYPE.SUBMITTED_REVIEWER || plotInfoType == PLOT_INFO_TYPE.REVIEWED_REVIEWER) {
+        } else if (plotInfoType == PLOT_INFO_TYPE.ACCEPTED_OWNER) {
             return 21;
         } else {
             return -1;
+        }
+    }
+
+    private int getRecommendationsSlot(PLOT_INFO_TYPE plotInfoType) {
+        return switch (plotInfoType) {
+            case CLAIMED_OWNER, CLAIMED_MEMBER, SUBMITTED_REVIEWER, REVIEWING_REVIEWER, VERIFYING_REVIEWER, REVIEWED_REVIEWER -> 21;
+            case CLAIMED, ACCEPTED -> 22;
+            case ACCEPTED_OWNER -> 20;
+            default -> -1;
+        };
+    }
+
+    private void teleportToPlotOutsidePlotsystem(NetworkUser user, int plotID) {
+        // Get corners of the plot.
+        int[][] corners = plotSQL.getPlotCorners(plotID);
+        int sumX = 0;
+        int sumZ = 0;
+
+        // Find the centre.
+        for (int[] corner : corners) {
+
+            sumX += corner[0];
+            sumZ += corner[1];
+        }
+        double x = sumX / (double) corners.length;
+        double z = sumZ / (double) corners.length;
+
+        // Teleport to the location on the Earth server.
+        Component teleportMessage = ChatUtils.success("Teleported to accepted plot %s", String.valueOf(plotID));
+
+        boolean switchServer = SERVER_TYPE != ServerType.EARTH;
+
+        EventManager.createTeleportEvent(switchServer, user.player.getUniqueId().toString(), "network",
+                "teleport " + EARTH_WORLD + " " + x + " " + z + " "
+                        + user.player.getLocation().getYaw() + " " + user.player.getLocation().getPitch(), PlainTextComponentSerializer.plainText().serialize(teleportMessage),
+                user.player.getLocation());
+
+        // Switch to Earth server is necessary.
+        if (switchServer) {
+            user.player.closeInventory();
+            SwitchServer.switchServer(user.player, Network.getInstance().getGlobalSQL().getString("SELECT name FROM server_data WHERE type='EARTH';"));
         }
     }
 

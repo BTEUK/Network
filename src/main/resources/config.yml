@@ -1,5 +1,5 @@
 # Config version, do not update this manually as it could break the config.
-version: 1.6.2
+version: 1.7.3
 
 #MySQL is mandatory for this plugin.
 #Login information
@@ -152,3 +152,10 @@ sidebar:
     - "Select BTE UK to choose our team."
     - "You can not change your selection!"
     - "Check our /discord for more information."
+    -
+
+# Sends a message to the player on joining
+motd:
+  enabled: false
+  # Use MiniMessage format to define the text. (https://webui.advntr.dev/). Use %player% as player name placeholder
+  text: ""

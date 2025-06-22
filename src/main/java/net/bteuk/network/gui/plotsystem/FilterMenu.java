@@ -114,28 +114,32 @@ public class FilterMenu extends Gui {
 
             // The icon is the player head of the user, the amount is the number of plots they've completed.
             // If this is the current filter, make it enchanted.
-            if (StringUtils.isEmpty(uuid)) {
-                setItem(slot, Utils.createItem(Material.ENDER_CHEST, newMap.get(uuid),
-                                Utils.title("All Plots"),
-                                Utils.line("Click to set the filter"),
-                                Utils.line("to all completed plots.")),
-                        u -> {
-                            // Set the filter and refresh the accepted plots menu at page 1.
-                            acceptedPlotMenu.setFilter(uuid);
-                            acceptedPlotMenu.setPage(1);
-                            acceptedPlotMenu.refresh();
-                            this.refresh();
+            // Skip if the count is 0.
+            if (newMap.get(uuid) > 0) {
+                if (StringUtils.isEmpty(uuid)) {
+                    setItem(slot, Utils.createItem(Material.ENDER_CHEST, newMap.get(uuid),
+                                    Utils.title("All Plots"),
+                                    Utils.line("Click to set the filter"),
+                                    Utils.line("to all completed plots.")),
+                            u -> {
+                                // Set the filter and refresh the accepted plots menu at page 1.
+                                acceptedPlotMenu.setFilter(uuid);
+                                acceptedPlotMenu.setPage(1);
+                                acceptedPlotMenu.refresh();
+                                this.refresh();
 
-                            // Return to the accepted plot menu.
-                            acceptedPlotMenu.open(u);
-                        });
-            } else {
-                PlayerProfile profile = Bukkit.createProfile(UUID.fromString(uuid));
-                if (profile.hasTextures()) {
-                    createPlayerHeadGuiItem(profile, newMap.get(uuid), uuid, slot);
+                                // Return to the accepted plot menu.
+                                acceptedPlotMenu.open(u);
+                            });
                 } else {
-                    profile.complete();
-                    createPlayerHeadGuiItem(profile, newMap.get(uuid), uuid, slot);
+
+                    PlayerProfile profile = Bukkit.createProfile(UUID.fromString(uuid));
+                    if (profile.hasTextures()) {
+                        createPlayerHeadGuiItem(profile, newMap.get(uuid), uuid, slot);
+                    } else {
+                        profile.complete();
+                        createPlayerHeadGuiItem(profile, newMap.get(uuid), uuid, slot);
+                    }
                 }
             }
 

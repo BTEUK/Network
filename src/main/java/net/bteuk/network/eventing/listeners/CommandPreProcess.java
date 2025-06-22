@@ -128,15 +128,15 @@ public class CommandPreProcess implements Listener {
         String server = null;
 
         // Try different servers.
-        if (instance.getGlobalSQL().hasRow("SELECT name FROM server_data WHERE type='LOBBY' AND online=1;")) {
+        if (instance.getGlobalSQL().hasRow("SELECT name FROM server_data WHERE type='LOBBY' AND online=1 AND name<>'" + SERVER_NAME + "';")) {
 
-            server = instance.getGlobalSQL().getString("SELECT name FROM server_data WHERE type='LOBBY' AND online=1;");
-        } else if (instance.getGlobalSQL().hasRow("SELECT name FROM server_data WHERE type='EARTH' AND online=1;")) {
+            server = instance.getGlobalSQL().getString("SELECT name FROM server_data WHERE type='LOBBY' AND online=1 AND name<>'" + SERVER_NAME + "';");
+        } else if (instance.getGlobalSQL().hasRow("SELECT name FROM server_data WHERE type='EARTH' AND online=1 AND name<>'" + SERVER_NAME + "';")) {
 
-            server = instance.getGlobalSQL().getString("SELECT name FROM server_data WHERE type='EARTH' AND online=1;");
-        } else if (instance.getGlobalSQL().hasRow("SELECT name FROM server_data WHERE online=1;")) {
+            server = instance.getGlobalSQL().getString("SELECT name FROM server_data WHERE type='EARTH' AND online=1 AND name<>'" + SERVER_NAME + "';");
+        } else if (instance.getGlobalSQL().hasRow("SELECT name FROM server_data WHERE online=1 AND name<>'" + SERVER_NAME + "';")) {
 
-            server = instance.getGlobalSQL().getString("SELECT name FROM server_data WHERE online=1;");
+            server = instance.getGlobalSQL().getString("SELECT name FROM server_data WHERE online=1 AND name<>'" + SERVER_NAME + "';");
         }
 
         for (NetworkUser user : users) {
@@ -145,7 +145,7 @@ public class CommandPreProcess implements Listener {
                 SwitchServer.switchServer(user.player, server);
             } else {
                 // Kick the player.
-                user.player.kick(Component.text("The server is restarting!", NamedTextColor.RED));
+                instance.getServer().getScheduler().runTask(instance, () -> user.player.kick(Component.text("The server is restarting!", NamedTextColor.RED)));
             }
         }
 

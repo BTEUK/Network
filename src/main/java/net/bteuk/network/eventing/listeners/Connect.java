@@ -10,11 +10,15 @@ import net.bteuk.network.lib.dto.UserConnectReply;
 import net.bteuk.network.lib.dto.UserConnectRequest;
 import net.bteuk.network.lib.dto.UserDisconnect;
 import net.bteuk.network.lib.dto.UserRemove;
+import net.bteuk.network.utils.Constants;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.TextureUtils;
 import net.bteuk.network.utils.Time;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -27,6 +31,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import static net.bteuk.network.utils.Constants.LOGGER;
+import static net.bteuk.network.utils.Constants.MOTD_CONTENT;
+import static net.bteuk.network.utils.Constants.MOTD_ENABLED;
 import static net.bteuk.network.utils.Constants.SERVER_NAME;
 
 // This class deals with players joining and leaving the network.
@@ -79,6 +85,17 @@ public class Connect implements Listener {
                     serverUser.hidePlayer(player);
                 }
             });
+
+            // Sends the message of the day to the player, if applicable
+            if (MOTD_ENABLED) {
+                MiniMessage miniMessage = MiniMessage.miniMessage();
+
+                //Replaces the player placeholder
+                String rawMessage = MOTD_CONTENT.replace("%player%", player.getName());
+
+                Component componentMessage = miniMessage.deserialize(rawMessage);
+                player.sendMessage(componentMessage);
+            }
 
             // Send offline messages to the player.
             reply.getMessages().forEach(player::sendMessage);
