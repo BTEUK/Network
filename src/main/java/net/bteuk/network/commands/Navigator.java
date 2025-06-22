@@ -17,10 +17,26 @@ import static net.bteuk.network.utils.enums.ServerType.TUTORIAL;
 
 public class Navigator extends AbstractCommand {
 
+    public static void openNavigator(NetworkUser u) {
+
+        // Check if the mainGui is not null.
+        // If not then open it after refreshing its contents.
+        // If no gui exists open the navigator.
+
+        if (u.mainGui != null) {
+
+            u.mainGui.refresh();
+            u.mainGui.open(u);
+        } else {
+
+            Network.getInstance().navigatorGui.open(u);
+        }
+    }
+
     @Override
     public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        //Check if the sender is a player.
+        // Check if the sender is a player.
         Player player = getPlayer(stack);
         if (player == null) {
             return;
@@ -28,14 +44,14 @@ public class Navigator extends AbstractCommand {
 
         NetworkUser user = Network.getInstance().getUser(player);
 
-        //If u is null, cancel.
+        // If u is null, cancel.
         if (user == null) {
             LOGGER.severe("User " + player.getName() + " can not be found!");
             player.sendMessage(ChatUtils.error("User can not be found, please relog!"));
             return;
         }
 
-        //Check args, allows the player to open a specific menu directly.
+        // Check args, allows the player to open a specific menu directly.
         if (args.length > 0) {
             switch (args[0]) {
 
@@ -43,31 +59,11 @@ public class Navigator extends AbstractCommand {
                 case "building" -> openBuilding(user);
                 case "tutorials" -> openTutorials(user);
                 default -> openNavigator(user);
-
             }
         } else {
 
-            //If the player has a previous gui, open that.
+            // If the player has a previous gui, open that.
             openNavigator(user);
-
-        }
-    }
-
-    public static void openNavigator(NetworkUser u) {
-
-        //Check if the mainGui is not null.
-        //If not then open it after refreshing its contents.
-        //If no gui exists open the navigator.
-
-        if (u.mainGui != null) {
-
-            u.mainGui.refresh();
-            u.mainGui.open(u);
-
-        } else {
-
-            Network.getInstance().navigatorGui.open(u);
-
         }
     }
 
@@ -80,7 +76,6 @@ public class Navigator extends AbstractCommand {
 
         u.mainGui = new ExploreGui(u);
         u.mainGui.open(u);
-
     }
 
     private void openBuilding(NetworkUser u) {
@@ -92,10 +87,9 @@ public class Navigator extends AbstractCommand {
 
         u.mainGui = new BuildGui(u);
         u.mainGui.open(u);
-
     }
 
-    //Only if tutorials is enabled and the server is not already tutorials.
+    // Only if tutorials is enabled and the server is not already tutorials.
     private void openTutorials(NetworkUser u) {
 
         if (SERVER_TYPE != TUTORIAL && TUTORIALS) {
@@ -107,11 +101,9 @@ public class Navigator extends AbstractCommand {
 
             u.mainGui = new TutorialsGui(u);
             u.mainGui.open(u);
-
         } else {
 
             openNavigator(u);
-
         }
     }
 }

@@ -23,13 +23,13 @@ public class Tp extends AbstractCommand {
     @Override
     public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        //Check if the sender is a player.
+        // Check if the sender is a player.
         Player player = getPlayer(stack);
         if (player == null) {
             return;
         }
 
-        //Check if args exist.
+        // Check if args exist.
         if (args.length == 0) {
             player.sendMessage(ChatUtils.error("You must specify a player to teleport to."));
             return;
@@ -41,31 +41,34 @@ public class Tp extends AbstractCommand {
 
             OnlineUser onlineUser = optionalOnlineUser.get();
 
-            //Check if the player has teleport enabled/disabled.
-            //If disabled cancel teleport.
-            if (Network.getInstance().getGlobalSQL().hasRow("SELECT uuid FROM player_data WHERE uuid='" + onlineUser.getUuid() + "' AND teleport_enabled=1;") || player.hasPermission("uknet.navigation.teleport.bypass")) {
+            // Check if the player has teleport enabled/disabled.
+            // If disabled cancel teleport.
+            if (Network.getInstance().getGlobalSQL()
+                    .hasRow("SELECT uuid FROM player_data WHERE uuid='" + onlineUser.getUuid() + "' AND " +
+                            "teleport_enabled=1;") || player.hasPermission(
+                    "uknet.navigation.teleport.bypass")) {
 
-                //If the player is on your server teleport.
-                //Else switch server and add teleport join event.
-                Optional<NetworkUser> optionalNetworkUser = Network.getInstance().getNetworkUserByUuid(onlineUser.getUuid());
+                // If the player is on your server teleport.
+                // Else switch server and add teleport join event.
+                Optional<NetworkUser> optionalNetworkUser =
+                        Network.getInstance().getNetworkUserByUuid(onlineUser.getUuid());
                 if (optionalNetworkUser.isPresent()) {
 
                     Player playerToTeleportTo = optionalNetworkUser.get().player;
 
-                    //Set current location for /back
+                    // Set current location for /back
                     Back.setPreviousCoordinate(player.getUniqueId().toString(), player.getLocation());
 
                     player.teleport(playerToTeleportTo.getLocation());
                     player.sendMessage(ChatUtils.success("Teleported to %s", onlineUser.getName()));
-
                 } else {
-                    EventManager.createTeleportEvent(true, player.getUniqueId().toString(), "network", "teleport player " + onlineUser.getUuid(), player.getLocation());
+                    EventManager.createTeleportEvent(true, player.getUniqueId().toString(), "network", "teleport " +
+                            "player " + onlineUser.getUuid(), player.getLocation());
                     SwitchServer.switchServer(player, onlineUser.getServer());
                 }
             } else {
                 player.sendMessage(ChatUtils.error("%s has teleport disabled.", onlineUser.getName()));
             }
-
         } else {
             player.sendMessage(ChatUtils.error("%s is not online.", args[0]));
         }

@@ -24,54 +24,52 @@ public class LocationSearch implements Listener {
 
         this.u = u;
 
-        //Start timer to automatically close the listener.
+        // Start timer to automatically close the listener.
         task = Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
-            //Send message to player telling them it's been timer out.
+            // Send message to player telling them it's been timer out.
             if (u.player != null) {
                 u.player.sendMessage(ChatUtils.error("'Find Location' cancelled."));
             }
             unregister();
         }, 1200L);
-
     }
 
     @EventHandler
     public void ChatEvent(AsyncChatEvent e) {
 
-        //Check if this is the correct player.
+        // Check if this is the correct player.
         if (e.getPlayer().equals(u.player)) {
 
             e.setCancelled(true);
 
-            //Check if message is under 64 character.
+            // Check if message is under 64 character.
             if (PlainTextComponentSerializer.plainText().serialize(e.message()).length() > 64) {
                 e.getPlayer().sendMessage(ChatUtils.error("The phrase can't be longer than 64 characters."));
             } else {
 
-                LocationMenu gui = new LocationMenu("Search: " + PlainTextComponentSerializer.plainText().serialize(e.message()), u, Category.SEARCH, Category.EXPLORE, PlainTextComponentSerializer.plainText().serialize(e.message()));
+                LocationMenu gui =
+                        new LocationMenu("Search: " + PlainTextComponentSerializer.plainText().serialize(e.message())
+                                , u, Category.SEARCH, Category.EXPLORE,
+                                PlainTextComponentSerializer.plainText().serialize(e.message()));
 
-
-                //If there are no locations notify the user.
+                // If there are no locations notify the user.
                 if (gui.isEmpty()) {
 
                     gui.delete();
                     u.player.sendMessage(ChatUtils.error("No locations have been found."));
-
                 } else {
-                    //Open the location menu with these locations.
+                    // Open the location menu with these locations.
                     Bukkit.getScheduler().runTask(Network.getInstance(), () -> {
 
                         u.mainGui.delete();
                         u.mainGui = gui;
                         u.mainGui.open(u);
-
                     });
                 }
 
-                //Unregister listener and task.
+                // Unregister listener and task.
                 task.cancel();
                 unregister();
-
             }
         }
     }

@@ -35,34 +35,34 @@ public class PlotsystemLocations extends Gui {
         globalSQL = Network.getInstance().getGlobalSQL();
 
         createGui();
-
     }
 
     private void createGui() {
 
         counter = 0;
 
-        //Get plotsystem locations.
+        // Get plotsystem locations.
         ArrayList<String> locations = plotSQL.getStringList("SELECT name FROM location_data;");
 
-        //Slot count.
+        // Slot count.
         int slot = 10;
 
-        //Make a button for each plot.
+        // Make a button for each plot.
         for (String name : locations) {
 
             setItem(slot, Utils.createItem(nextIcon(), 1,
-                            Utils.title(plotSQL.getString("SELECT alias FROM location_data WHERE name='" + name + "';")),
+                            Utils.title(plotSQL.getString("SELECT alias FROM location_data WHERE name='" + name + "';"
+                            )),
                             Utils.line("Click to teleport to the centre"),
                             Utils.line("of this plotsystem location.")),
                     u -> {
 
-                        //Teleport to centre of the plotsystem location.
-                        //Get coordinate ids for min and max.
+                        // Teleport to centre of the plotsystem location.
+                        // Get coordinate ids for min and max.
                         int min = plotSQL.getInt("SELECT coordMin FROM location_data WHERE name='" + name + "';");
                         int max = plotSQL.getInt("SELECT coordMax FROM location_data WHERE name='" + name + "';");
 
-                        //Get middle.
+                        // Get middle.
                         double x = ((globalSQL.getDouble("SELECT x FROM coordinates WHERE id=" + max + ";") +
                                 globalSQL.getDouble("SELECT x FROM coordinates WHERE id=" + min + ";")) / 2) +
                                 plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + name + "';");
@@ -71,59 +71,61 @@ public class PlotsystemLocations extends Gui {
                                 globalSQL.getDouble("SELECT z FROM coordinates WHERE id=" + min + ";")) / 2) +
                                 plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + name + "';");
 
-                        String server = plotSQL.getString("SELECT server FROM location_data WHERE name='" + name + "';");
+                        String server = plotSQL.getString("SELECT server FROM location_data WHERE name='" + name +
+                                "';");
 
                         if (server.equals(SERVER_NAME)) {
 
                             u.player.closeInventory();
 
-                            //Teleport to the location.
+                            // Teleport to the location.
                             World world = Bukkit.getWorld(name);
                             double y = Objects.requireNonNull(world).getHighestBlockYAt((int) x, (int) z);
                             y++;
 
-                            EventManager.createTeleportEvent(false, u.player.getUniqueId().toString(), "network", "teleport " + name + " " + x + " " + y + " " + z + " "
+                            EventManager.createTeleportEvent(false, u.player.getUniqueId().toString(), "network",
+                                    "teleport " + name + " " + x + " " + y + " " + z + " "
                                             + u.player.getLocation().getYaw() + " " + u.player.getLocation().getPitch(),
-                                    "&aTeleported to location &3" + plotSQL.getString("SELECT alias FROM location_data WHERE name='" + name + "';"), u.player.getLocation());
-
+                                    "&aTeleported to location &3" + plotSQL.getString("SELECT alias FROM " +
+                                            "location_data WHERE name='" + name + "';"), u.player.getLocation());
                         } else {
 
-                            //Set the server join event.
-                            EventManager.createTeleportEvent(true, u.player.getUniqueId().toString(), "network", "teleport " + name + " " + x + " " + z + " "
+                            // Set the server join event.
+                            EventManager.createTeleportEvent(true, u.player.getUniqueId().toString(), "network",
+                                    "teleport " + name + " " + x + " " + z + " "
                                             + u.player.getLocation().getYaw() + " " + u.player.getLocation().getPitch(),
-                                    "&aTeleported to location &3" + plotSQL.getString("SELECT alias FROM location_data WHERE name='" + name + "';"), u.player.getLocation());
+                                    "&aTeleported to location &3" + plotSQL.getString("SELECT alias FROM " +
+                                            "location_data WHERE name='" + name + "';"), u.player.getLocation());
 
-                            //Teleport them to another server.
+                            // Teleport them to another server.
                             this.delete();
                             SwitchServer.switchServer(u.player, server);
-
                         }
                     });
 
-            //Increase slot accordingly.
+            // Increase slot accordingly.
             if (slot % 9 == 7) {
-                //Increase row, basically add 3.
+                // Increase row, basically add 3.
                 slot += 3;
             } else {
-                //Increase value by 1.
+                // Increase value by 1.
                 slot++;
             }
         }
 
-        //Return
+        // Return
         setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
                         Utils.title("Return"),
                         Utils.line("Open the building menu.")),
                 u -> {
 
-                    //Delete this gui.
+                    // Delete this gui.
                     this.delete();
                     u.mainGui = null;
 
-                    //Switch to plot info.
+                    // Switch to plot info.
                     u.mainGui = new BuildGui(u);
                     u.mainGui.open(u);
-
                 });
     }
 
@@ -131,7 +133,6 @@ public class PlotsystemLocations extends Gui {
 
         this.clearGui();
         createGui();
-
     }
 
     private Material nextIcon() {
@@ -146,7 +147,6 @@ public class PlotsystemLocations extends Gui {
             case 4 -> mat = Material.ACACIA_BOAT;
             case 5 -> mat = Material.DARK_OAK_BOAT;
             default -> mat = Material.OAK_BOAT;
-
         }
 
         if (counter == 5) {
@@ -156,6 +156,5 @@ public class PlotsystemLocations extends Gui {
         }
 
         return mat;
-
     }
 }

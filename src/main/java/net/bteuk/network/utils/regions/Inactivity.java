@@ -9,6 +9,5 @@ public class Inactivity {
 
         this.region = region;
         this.uuid = uuid;
-
     }
 }

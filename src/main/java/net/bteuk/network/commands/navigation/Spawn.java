@@ -17,30 +17,30 @@ public class Spawn extends AbstractCommand {
     @Override
     public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        //Check if the sender is a player.
+        // Check if the sender is a player.
         Player player = getPlayer(stack);
         if (player == null) {
             return;
         }
 
-        //Check permission.
+        // Check permission.
         if (!hasPermission(player, "uknet.navigation.spawn")) {
             return;
         }
 
-        //If server is Lobby, teleport to spawn.
+        // If server is Lobby, teleport to spawn.
         if (SERVER_TYPE == ServerType.LOBBY) {
 
             Back.setPreviousCoordinate(player.getUniqueId().toString(), player.getLocation());
             player.teleport(Network.getInstance().getLobby().spawn);
             player.sendMessage(ChatUtils.success("Teleported to spawn."));
-
         } else {
 
-            //Set teleport event to go to spawn.
-            EventManager.createTeleportEvent(true, player.getUniqueId().toString(), "network", "teleport spawn", player.getLocation());
-            SwitchServer.switchServer(player, Network.getInstance().getGlobalSQL().getString("SELECT name FROM server_data WHERE type='LOBBY';"));
-
+            // Set teleport event to go to spawn.
+            EventManager.createTeleportEvent(true, player.getUniqueId().toString(), "network", "teleport spawn",
+                    player.getLocation());
+            SwitchServer.switchServer(player, Network.getInstance().getGlobalSQL().getString("SELECT name FROM " +
+                    "server_data WHERE type='LOBBY';"));
         }
     }
 }

@@ -18,7 +18,8 @@ import java.util.Collections;
  */
 public abstract class AbstractCommand implements BasicCommand {
 
-    protected static final Component COMMAND_ONLY_BY_PLAYER = ChatUtils.error("This command can only be run by a player.");
+    protected static final Component COMMAND_ONLY_BY_PLAYER = ChatUtils.error("This command can only be run by a " +
+            "player.");
     protected static final Component NO_PERMISSION = ChatUtils.error("You do not have permission to use this command.");
 
     @Setter
@@ -41,23 +42,23 @@ public abstract class AbstractCommand implements BasicCommand {
      */
     protected Player getPlayer(CommandSourceStack stack) {
 
-        //Check if the sender is a player.
+        // Check if the sender is a player.
         CommandSender sender = stack.getSender();
         if (!(sender instanceof Player p)) {
 
             sender.sendMessage(COMMAND_ONLY_BY_PLAYER);
             return null;
-
         }
 
         return p;
     }
 
     /**
-     * Checks whether the sender has permission, if the sender is not a {@link Player} then this will always return true.
+     * Checks whether the sender has permission, if the sender is not a {@link Player} then this will always return
+     * true.
      * If the player doesn't have the permission send a no permission message.
      *
-     * @param sender the command sender
+     * @param sender     the command sender
      * @param permission the permission to check
      * @return whether the sender has the permission
      */

@@ -31,48 +31,47 @@ public class RegionTagListener implements Listener {
 
         Bukkit.getServer().getPluginManager().registerEvents(this, Network.getInstance());
 
-        //Start timer to automatically close the listener.
+        // Start timer to automatically close the listener.
         task = Bukkit.getScheduler().runTaskLater(Network.getInstance(), () -> {
-            //Send message to player telling them it's been timer out.
+            // Send message to player telling them it's been timer out.
             if (p != null) {
                 p.sendMessage(ChatUtils.error("'Set Region Tag' cancelled."));
             }
             unregister();
         }, 1200L);
-
     }
 
     @EventHandler
     public void ChatEvent(AsyncChatEvent e) {
 
-        //Check if this is the correct player.
+        // Check if this is the correct player.
         if (e.getPlayer().equals(p)) {
 
             e.setCancelled(true);
 
-            //Check if message is under 64 character.
+            // Check if message is under 64 character.
             if (PlainTextComponentSerializer.plainText().serialize(e.message()).length() > 64) {
                 e.getPlayer().sendMessage(ChatUtils.error("The region tag can't be longer than 64 characters."));
             } else {
 
-                //Set region tag.
-                region.setTag(p.getUniqueId().toString(), PlainTextComponentSerializer.plainText().serialize(e.message()));
+                // Set region tag.
+                region.setTag(p.getUniqueId().toString(),
+                        PlainTextComponentSerializer.plainText().serialize(e.message()));
 
-                //Send message to player.
+                // Send message to player.
                 p.sendMessage(ChatUtils.success("Set tag for region ")
                         .append(Component.text(region.regionName(), NamedTextColor.DARK_AQUA))
                         .append(ChatUtils.success(" to "))
                         .append(e.message().color(NamedTextColor.DARK_AQUA)));
 
-                //Unregister listener and task.
+                // Unregister listener and task.
                 task.cancel();
                 unregister();
 
-                //Reset the regionInfo gui
+                // Reset the regionInfo gui
                 NetworkUser u = Network.getInstance().getUser(p);
                 Objects.requireNonNull(u).mainGui.delete();
                 u.mainGui = new RegionInfo(region, p.getUniqueId().toString());
-
             }
         }
     }

@@ -21,7 +21,7 @@ public abstract class Gui implements GuiInterface {
     public static final Map<UUID, Gui> inventoriesByUUID = new HashMap<>();
     public static final Map<UUID, UUID> openInventories = new HashMap<>();
 
-    //Information about the gui.
+    // Information about the gui.
     private final UUID uuid;
     private final Inventory inv;
     private final Map<Integer, guiAction> actions;
@@ -37,8 +37,7 @@ public abstract class Gui implements GuiInterface {
         inventoriesByUUID.put(getUuid(), this);
     }
 
-    public Gui(Inventory inv)
-    {
+    public Gui(Inventory inv) {
         this.inv = inv;
         uuid = UUID.randomUUID();
         actions = new HashMap<>();
@@ -49,29 +48,23 @@ public abstract class Gui implements GuiInterface {
         return inv;
     }
 
-    public interface guiAction {
-        void click(NetworkUser u);
-    }
-
     public void setItem(int slot, ItemStack stack, guiAction action) {
 
         inv.setItem(slot, stack);
         if (action != null) {
             actions.put(slot, action);
         }
-
     }
 
     public void setItem(int slot, ItemStack stack) {
         setItem(slot, stack, null);
     }
 
-    public void setAction(int slot, guiAction action){
+    public void setAction(int slot, guiAction action) {
 
         if (action != null) {
             actions.put(slot, action);
         }
-
     }
 
     public void clearGui() {
@@ -85,7 +78,6 @@ public abstract class Gui implements GuiInterface {
         openInventories.put(u.player.getUniqueId(), getUuid());
 
         LOGGER.info("Total gui's = " + inventoriesByUUID.size());
-
     }
 
     public void delete() {
@@ -93,5 +85,9 @@ public abstract class Gui implements GuiInterface {
             openInventories.remove(p.getUniqueId(), getUuid());
         }
         inventoriesByUUID.remove(getUuid());
+    }
+
+    public interface guiAction {
+        void click(NetworkUser u);
     }
 }

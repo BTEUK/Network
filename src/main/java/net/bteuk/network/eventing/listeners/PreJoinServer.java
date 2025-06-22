@@ -20,7 +20,7 @@ public class PreJoinServer implements Listener {
 
     @EventHandler
     public void preJoin(AsyncPlayerPreLoginEvent e) {
-        //If player is banned, stop them from logging in.
+        // If player is banned, stop them from logging in.
         if (isBanned(e.getUniqueId().toString())) {
             try {
                 e.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, getBannedComponent(e.getUniqueId().toString()));
@@ -29,7 +29,7 @@ public class PreJoinServer implements Listener {
             }
         }
 
-        //Check if server is restarting.
+        // Check if server is restarting.
         if (Network.getInstance().allow_shutdown) {
             e.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, Component.text("The server is restarting!"));
         }

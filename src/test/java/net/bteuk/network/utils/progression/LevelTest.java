@@ -25,7 +25,6 @@ class LevelTest {
         assertEquals(65, getThreshold(5));
         assertEquals(105, getThreshold(10));
         assertEquals(166, getThreshold(25));
-
     }
 
     @Test
@@ -36,7 +35,6 @@ class LevelTest {
 
         assertFalse(reachedNextLevel(4, 64));
         assertFalse(reachedNextLevel(10, 100));
-
     }
 
     @Test
@@ -44,6 +42,5 @@ class LevelTest {
 
         assertEquals(4, getLeftoverExp(2, 20));
         assertEquals(0, getLeftoverExp(5, 65));
-
     }
 }

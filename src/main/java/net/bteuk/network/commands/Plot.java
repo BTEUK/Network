@@ -11,14 +11,10 @@ import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.enums.PlotStatus;
-import net.kyori.adventure.inventory.Book;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
+import net.bteuk.network.utils.plotsystem.ReviewFeedback;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import static net.bteuk.network.utils.Constants.LOGGER;
@@ -37,7 +33,7 @@ public class Plot extends AbstractCommand {
     @Override
     public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        //Check if the sender is a player.
+        // Check if the sender is a player.
         Player player = getPlayer(stack);
         if (player == null) {
             return;
@@ -50,7 +46,7 @@ public class Plot extends AbstractCommand {
 
         int plotID = -1;
         if (args.length > 1) {
-            //Check if the plotID is an actual number.
+            // Check if the plotID is an actual number.
             try {
                 plotID = Integer.parseInt(args[1]);
             } catch (NumberFormatException e) {
@@ -67,8 +63,6 @@ public class Plot extends AbstractCommand {
             default -> error(player);
         }
     }
-
-
 
     private void menu(Player p) {
         // Get the user.
@@ -92,7 +86,8 @@ public class Plot extends AbstractCommand {
             return;
         }
         // Check if the plot exists and is not deleted.
-        PlotStatus status = PlotStatus.fromDatabaseValue(plotSQL.getString("SELECT status FROM plot_data WHERE id=" + plot + ";"));
+        PlotStatus status =
+                PlotStatus.fromDatabaseValue(plotSQL.getString("SELECT status FROM plot_data WHERE id=" + plot + ";"));
         if (status == null || status == PlotStatus.DELETED) {
             p.sendMessage(ChatUtils.error("This plot does not exist."));
             return;
@@ -118,14 +113,16 @@ public class Plot extends AbstractCommand {
             return;
         }
 
-        //Check if they have an invite for this plot.
+        // Check if they have an invite for this plot.
         if (plotSQL.hasRow("SELECT id FROM plot_invites WHERE id=" + plot + " AND uuid='" + p.getUniqueId() + "';")) {
 
-            //Add server event to join plot.
-            EventManager.createEvent(p.getUniqueId().toString(), "plotsystem", plotSQL.getString("SELECT server FROM location_data WHERE name='" +
-                    plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plot + ";") + "';"), "join plot " + plot);
+            // Add server event to join plot.
+            EventManager.createEvent(p.getUniqueId().toString(), "plotsystem", plotSQL.getString("SELECT server FROM " +
+                            "location_data WHERE name='" +
+                            plotSQL.getString("SELECT location FROM plot_data WHERE id=" + plot + ";") + "';"),
+                    "join plot " + plot);
 
-            //Remove invite.
+            // Remove invite.
             plotSQL.update("DELETE FROM plot_invites WHERE id=" + plot + " AND uuid='" + p.getUniqueId() + "';");
         } else {
             p.sendMessage(ChatUtils.error("You have not been invited to join this plot."));
@@ -140,14 +137,16 @@ public class Plot extends AbstractCommand {
         // Check if the player is the owner of a member of the plot.
         // Then open the latest feedback.
         // And set their Main gui to the plot info of this plot.
-        if (!plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plot + " AND uuid='" + player.getUniqueId() + "';")) {
+        if (!plotSQL.hasRow("SELECT id FROM plot_members WHERE id=" + plot + " AND uuid='" + player.getUniqueId() +
+                "';")) {
             player.sendMessage(ChatUtils.error("You are no longer the owner or a member of this plot."));
             return;
         }
 
         // Find the latest attempt.
         String uuid = plotSQL.getString("SELECT uuid FROM plot_members WHERE id=" + plot + " AND is_owner=1;");
-        int latestAttempt = plotSQL.getInt("SELECT MAX(attempt) FROM deny_data WHERE id=" + plot + " AND uuid='" + uuid + "';");
+        int latestAttempt = plotSQL.getInt("SELECT MAX(attempt) FROM plot_review WHERE plot_id=" + plot + " AND " +
+                "uuid='" + uuid + "' AND accepted=0 AND completed=1;");
 
         if (latestAttempt == 0) {
             player.sendMessage(Utils.error("There is no feedback available for this plot."));
@@ -159,26 +158,12 @@ public class Plot extends AbstractCommand {
             user.mainGui = new PlotInfo(user, plot);
         }
 
-        // Open the feedback, if it exists.
-        //Create book.
-        Component title = Component.text("Plot " + plot + " Attempt " + latestAttempt, NamedTextColor.AQUA, TextDecoration.BOLD);
-        Component author = Component.text(instance.getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" +
-                plotSQL.getString("SELECT reviewer FROM deny_data WHERE id=" + plot + " AND uuid='" + uuid + "' AND attempt=" + latestAttempt + ";") + "';"));
+        // Create book.
+        int reviewId = plotSQL.getInt("SELECT id FROM plot_review WHERE plot_id=" + plot + " AND uuid='" + uuid + "' " +
+                "AND attempt=" + latestAttempt + ";");
 
-        //Get pages of the book.
-        ArrayList<String> sPages = plotSQL.getStringList("SELECT contents FROM book_data WHERE id="
-                + plotSQL.getInt("SELECT book_id FROM deny_data WHERE id=" + plot + " AND uuid='" + uuid + "' AND attempt=" + latestAttempt + ";") + ";");
-
-        //Create a list of components from the list of strings.
-        ArrayList<Component> pages = new ArrayList<>();
-        for (String page : sPages) {
-            pages.add(Component.text(page));
-        }
-
-        Book book = Book.book(title, author, pages);
-
-        //Open the book.
-        player.openBook(book);
+        // Open the book.
+        player.openBook(ReviewFeedback.createFeedbackBook(reviewId));
     }
 
     private void error(Player p) {

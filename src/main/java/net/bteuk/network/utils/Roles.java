@@ -36,11 +36,10 @@ public final class Roles {
 
     private static final Component PROMOTION_TEMPLATE = Component.text(" has been promoted to ");
     private static final Component PROMOTION_SELF = Component.text("You have been promoted to ");
-
-    private static Set<Role> ROLES;
-
-    private static final LinkedHashSet<String> BUILDER_ROLE_NAMES = Stream.of("reviewer", "architect", "builder", "jrbuilder", "apprentice", "applicant", "default")
+    private static final LinkedHashSet<String> BUILDER_ROLE_NAMES = Stream.of("reviewer", "architect", "builder",
+                    "jrbuilder", "apprentice", "applicant", "default")
             .collect(Collectors.toCollection(LinkedHashSet::new));
+    private static Set<Role> ROLES;
 
     public static Set<Role> getRoles() {
         if (ROLES == null) {
@@ -83,6 +82,7 @@ public final class Roles {
 
     /**
      * Get the builder role for a potentially offline player.
+     *
      * @param uuid the uuid of the player
      * @return a {@link CompletableFuture} with a String
      */
@@ -161,23 +161,28 @@ public final class Roles {
     @Deprecated
     public static void promoteBuilder(String uuid, String pRole, String nRole) {
 
-        //Get console sender.
+        // Get console sender.
         ConsoleCommandSender console = Network.getInstance().getServer().getConsoleSender();
 
-        //Add new builder role.
+        // Add new builder role.
         Bukkit.getServer().dispatchCommand(console, "lp user " + uuid + " parent add " + nRole);
 
-        //Remove current builder role. Remove after adding to make sure the player always has a role.
+        // Remove current builder role. Remove after adding to make sure the player always has a role.
         Bukkit.getServer().dispatchCommand(console, "lp user " + uuid + " parent remove " + pRole);
 
-        //Update database.
-        Network.getInstance().getGlobalSQL().update("UPDATE player_data SET builder_role='" + nRole + "' WHERE uuid='" + uuid + "';");
+        // Update database.
+        Network.getInstance().getGlobalSQL().update("UPDATE player_data SET builder_role='" + nRole + "' WHERE " +
+                "uuid='" + uuid + "';");
 
-        //Announce the promotion in chat and discord.
-        //Send a message to the user if not online, so they'll be notified of their promotion next time they join the server.
-        Component colouredRole = Component.text(Objects.requireNonNull(CONFIG.getString("roles." + nRole + ".name")), TextColor.fromHexString(Objects.requireNonNull(CONFIG.getString("roles." + nRole + ".colour"))));
+        // Announce the promotion in chat and discord.
+        // Send a message to the user if not online, so they'll be notified of their promotion next time they join
+        // the server.
+        Component colouredRole = Component.text(Objects.requireNonNull(CONFIG.getString("roles." + nRole + ".name")),
+                TextColor.fromHexString(Objects.requireNonNull(CONFIG.getString("roles." + nRole + ".colour"))));
         if (CONFIG.getBoolean("chat.announce_promotions")) {
-            String name = Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
+            String name =
+                    Network.getInstance().getGlobalSQL()
+                            .getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
 
             Component promotation_message = Component.text(name)
                     .append(PROMOTION_TEMPLATE)
@@ -186,37 +191,38 @@ public final class Roles {
 
             ChatMessage chatMessage = new ChatMessage(GLOBAL.getChannelName(), "server", promotation_message);
             Network.getInstance().getChat().sendSocketMesage(chatMessage);
-
         }
 
-        //Check if the player is online.
+        // Check if the player is online.
         if (!Network.getInstance().isOnlineOnNetwork(uuid)) {
 
-            //Send a message that will show when they next log in.
+            // Send a message that will show when they next log in.
             DirectMessage directMessage = new DirectMessage(ChatChannels.GLOBAL.getChannelName(), uuid, "server",
                     PROMOTION_SELF.append(colouredRole),
                     true);
             Network.getInstance().getChat().sendSocketMesage(directMessage);
-
         }
     }
 
     /**
      * Promote/demote a player for a specific role.
-     * @param uuid the uuid of the player to promote.
-     * @param roleId the role to add or remove
-     * @param remove whether to remove the role or not
+     *
+     * @param uuid     the uuid of the player to promote.
+     * @param roleId   the role to add or remove
+     * @param remove   whether to remove the role or not
      * @param announce whether to announce the promotion (demotion is never announced)
      * @return {@link CompletableFuture} completableFuture with {@link Component} message.
      */
-    public static CompletableFuture<Component> alterRole(String uuid, String name, String roleId, boolean remove, boolean announce) {
+    public static CompletableFuture<Component> alterRole(String uuid, String name, String roleId, boolean remove,
+                                                         boolean announce) {
 
         // Get the configured group.
         Role role = getRoleById(roleId);
         Group group = Permissions.getGroup(roleId);
 
         if (group == null || role == null) {
-            return CompletableFuture.completedFuture(ChatUtils.error("%s is not configured in LuckPerms and/or roles.yml.", roleId));
+            return CompletableFuture.completedFuture(ChatUtils.error("%s is not configured in LuckPerms and/or roles" +
+                    ".yml.", roleId));
         }
 
         return CompletableFuture.supplyAsync(() -> {
@@ -247,6 +253,12 @@ public final class Roles {
                 userUpdate.setUuid(uuid);
                 userUpdate.setTabPlayer(tabPlayer);
                 Network.getInstance().getChat().sendSocketMesage(userUpdate);
+
+                // If the new primary role is architect or reviewer, and they were promoted add them to the reviewers
+                // database table.
+                if (!remove && (primaryRole.getId().equals("architect") || primaryRole.getId().equals("reviewer"))) {
+                    Network.getInstance().getPlotSQL().addOrUpdateReviewer(uuid, primaryRole.getId());
+                }
             }
 
             DiscordRole discordRole = new DiscordRole(uuid, roleId, !remove);
@@ -280,6 +292,7 @@ public final class Roles {
         Component message = PROMOTION_SELF
                 .append(role.getColouredRoleName())
                 .decorate(TextDecoration.BOLD);
-        Network.getInstance().getChat().sendSocketMesage(new DirectMessage(ChatChannels.GLOBAL.getChannelName(), uuid, "server", message, true));
+        Network.getInstance().getChat().sendSocketMesage(new DirectMessage(ChatChannels.GLOBAL.getChannelName(), uuid
+                , "server", message, true));
     }
 }

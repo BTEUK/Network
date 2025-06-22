@@ -17,7 +17,7 @@ public class Focus extends AbstractCommand {
     @Override
     public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        //Check if the sender is a player.
+        // Check if the sender is a player.
         Player player = getPlayer(stack);
         if (player == null) {
             return;
@@ -25,7 +25,7 @@ public class Focus extends AbstractCommand {
 
         NetworkUser user = Network.getInstance().getUser(player);
 
-        //If u is null, cancel.
+        // If u is null, cancel.
         if (user == null) {
             LOGGER.severe("User " + player.getName() + " can not be found!");
             player.sendMessage(ChatUtils.error("User can not be found, please relog!"));

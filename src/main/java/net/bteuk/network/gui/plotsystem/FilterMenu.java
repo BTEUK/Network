@@ -28,12 +28,9 @@ public class FilterMenu extends Gui {
 
     private final PlotSQL plotSQL;
     private final GlobalSQL globalSQL;
-
-    private int page;
-
     private final NetworkUser user;
-
     private final AcceptedPlotMenu acceptedPlotMenu;
+    private int page;
 
     public FilterMenu(AcceptedPlotMenu acceptedPlotMenu, NetworkUser user) {
         super(45, Component.text("Set Filter", NamedTextColor.AQUA, TextDecoration.BOLD));
@@ -52,11 +49,12 @@ public class FilterMenu extends Gui {
     private void createGui() {
 
         // Get a list of all users that have completed plots.
-        HashMap<String, Integer> map = plotSQL.getStringIntMap("SELECT uuid,COUNT(id) FROM accept_data GROUP BY uuid ORDER BY COUNT(id) DESC;");
+        HashMap<String, Integer> map = plotSQL.getStringIntMap("SELECT uuid,COUNT(id) FROM plot_review WHERE " +
+                "accepted=1 AND completed=1 GROUP BY uuid ORDER BY COUNT(id) DESC;");
         HashMap<String, Integer> newMap = new LinkedHashMap<>();
 
         // The first item is for all plots.
-        newMap.put("", plotSQL.getInt("SELECT COUNT(id) FROM accept_data;"));
+        newMap.put("", plotSQL.getInt("SELECT COUNT(1) FROM plot_review WHERE accepted=1 AND completed=1;"));
         // Get the number for the current user and set it as the second item.
         Integer userPlots = map.get(user.player.getUniqueId().toString());
         newMap.put(user.player.getUniqueId().toString(), Objects.requireNonNullElse(userPlots, 0));
@@ -64,13 +62,13 @@ public class FilterMenu extends Gui {
         // Add all the other users after.
         newMap.putAll(map);
 
-        //Slot count.
+        // Slot count.
         int slot = 10;
 
-        //Skip count.
+        // Skip count.
         int skip = 21 * (page - 1);
 
-        //If page is greater than 1 add a previous page button.
+        // If page is greater than 1 add a previous page button.
         if (page > 1) {
             setItem(18, Utils.createItem(Material.ARROW, 1,
                             Utils.title("Previous Page"),
@@ -79,18 +77,17 @@ public class FilterMenu extends Gui {
 
                     {
 
-                        //Update the gui.
+                        // Update the gui.
                         page--;
                         this.refresh();
                         u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
-
                     });
         }
 
-        //Iterate through all accepted plots.
+        // Iterate through all accepted plots.
         for (String uuid : newMap.keySet()) {
 
-            //If the slot is greater than the number that fit in a page, create a new page.
+            // If the slot is greater than the number that fit in a page, create a new page.
             if (slot > 34) {
 
                 setItem(26, Utils.createItem(Material.ARROW, 1,
@@ -98,19 +95,18 @@ public class FilterMenu extends Gui {
                                 Utils.line("Open the next page of users.")),
                         u -> {
 
-                            //Update the gui.
+                            // Update the gui.
                             page++;
                             this.refresh();
-                            u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
-
+                            u.player.getOpenInventory().getTopInventory()
+                                    .setContents(this.getInventory().getContents());
                         });
 
-                //Stop iterating.
+                // Stop iterating.
                 break;
-
             }
 
-            //If skip is greater than 0, skip this iteration.
+            // If skip is greater than 0, skip this iteration.
             if (skip > 0) {
                 skip--;
                 continue;
@@ -153,7 +149,7 @@ public class FilterMenu extends Gui {
             }
         }
 
-        //Return to plot menu.
+        // Return to plot menu.
         setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
                         Utils.title("Return"),
                         Utils.line("Open the accepted plot menu.")),
@@ -164,7 +160,6 @@ public class FilterMenu extends Gui {
 
         this.clearGui();
         createGui();
-
     }
 
     @Override

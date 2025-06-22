@@ -8,7 +8,8 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
 /**
- * Implementation of pmute and punmute. The only difference between the 2 is the boolean that indicates whether it's a mute or unmute.
+ * Implementation of pmute and punmute. The only difference between the 2 is the boolean that indicates whether it's
+ * a mute or unmute.
  */
 public abstract class PmuteAction extends AbstractCommand {
 
@@ -24,7 +25,7 @@ public abstract class PmuteAction extends AbstractCommand {
 
     public void onCommand(CommandSourceStack stack, String[] args, boolean mute) {
 
-        //Check if the sender is a player.
+        // Check if the sender is a player.
         Player player = getPlayer(stack);
         if (player == null) {
             return;

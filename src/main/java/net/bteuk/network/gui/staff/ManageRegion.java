@@ -24,7 +24,6 @@ public class ManageRegion extends Gui {
         this.user = user;
 
         createGui();
-
     }
 
     private void createGui() {
@@ -38,9 +37,8 @@ public class ManageRegion extends Gui {
                 Utils.line("Region status: ")
                         .append(Component.text(region.status().label, NamedTextColor.GRAY))));
 
-
-        //Set public if status is default or inactive.
-        //Set private if status is public.
+        // Set public if status is default or inactive.
+        // Set private if status is public.
         if (user.player.hasPermission("uknet.regions.manage.public")) {
             if (region.status() == RegionStatus.DEFAULT || region.status() == RegionStatus.INACTIVE) {
 
@@ -57,9 +55,7 @@ public class ManageRegion extends Gui {
                                     .append(Component.text(region.regionName(), NamedTextColor.DARK_AQUA))
                                     .append(ChatUtils.success(" to public.")));
                             this.refresh();
-
                         });
-
             } else if (region.status() == RegionStatus.PUBLIC) {
 
                 setItem(2, Utils.createItem(Material.IRON_DOOR, 1,
@@ -75,16 +71,15 @@ public class ManageRegion extends Gui {
                                     .append(Component.text(region.regionName(), NamedTextColor.DARK_AQUA))
                                     .append(ChatUtils.success(" to default.")));
                             this.refresh();
-
                         });
             }
         }
 
-        //Transfer ownership if status is default or public, must have at least 1 member.
+        // Transfer ownership if status is default or public, must have at least 1 member.
         if (user.player.hasPermission("uknet.regions.manage.owner")) {
             if (region.hasMember()) {
 
-                //Slot 5
+                // Slot 5
                 setItem(5, Utils.createItem(Material.MAGENTA_GLAZED_TERRACOTTA, 1,
                                 Utils.title("Transfer Ownership"),
                                 Utils.line("Open the transfer ownership menu."),
@@ -93,24 +88,22 @@ public class ManageRegion extends Gui {
 
                         u -> {
 
-                            //Close this menu.
+                            // Close this menu.
                             this.delete();
                             u.staffGui = null;
 
-                            //Open transfer owner menu.
+                            // Open transfer owner menu.
                             u.staffGui = new TransferOwner(region);
                             u.staffGui.open(u);
-
-
                         });
             }
         }
 
-        //Kick members, must have owner and/or members.
+        // Kick members, must have owner and/or members.
         if (user.player.hasPermission("uknet.regions.manage.kick")) {
             if (region.hasOwner() || region.hasMember()) {
 
-                //Slot 6
+                // Slot 6
                 setItem(6, Utils.createItem(Material.BARRIER, 1,
                                 Utils.title("Kick Members"),
                                 Utils.line("Remove any current members,"),
@@ -118,21 +111,19 @@ public class ManageRegion extends Gui {
 
                         u -> {
 
-                            //Close this menu.
+                            // Close this menu.
                             this.delete();
                             u.staffGui = null;
 
-                            //Open transfer owner menu.
+                            // Open transfer owner menu.
                             u.staffGui = new KickMembers(region);
                             u.staffGui.open(u);
-
-
                         });
             }
         }
 
-        //Set region locked if region is default, public, open or inactive.
-        //Set region unlocked if region is locked.
+        // Set region locked if region is default, public, open or inactive.
+        // Set region unlocked if region is locked.
         if (user.player.hasPermission("uknet.regions.manage.lock")) {
             if (region.status() == RegionStatus.DEFAULT || region.status() == RegionStatus.PUBLIC || region.status() == RegionStatus.OPEN || region.status() == RegionStatus.INACTIVE) {
 
@@ -145,7 +136,7 @@ public class ManageRegion extends Gui {
 
                         u -> {
 
-                            //If region is currently open, remove jrbuilder group.
+                            // If region is currently open, remove jrbuilder group.
                             if (region.status() == RegionStatus.OPEN) {
                                 region.setDefault("jrbuilder");
                             }
@@ -156,9 +147,7 @@ public class ManageRegion extends Gui {
                                     .append(ChatUtils.success(" to locked.")));
 
                             this.refresh();
-
                         });
-
             } else if (region.status() == RegionStatus.LOCKED) {
 
                 setItem(4, Utils.createItem(Material.OAK_TRAPDOOR, 1,
@@ -174,13 +163,12 @@ public class ManageRegion extends Gui {
                                     .append(Component.text(region.regionName(), NamedTextColor.DARK_AQUA))
                                     .append(ChatUtils.success(" to default.")));
                             this.refresh();
-
                         });
             }
         }
 
-        //Set region open if status is default, public or inactive.
-        //Set region default if status is open.
+        // Set region open if status is default, public or inactive.
+        // Set region default if status is open.
         if (user.player.hasPermission("uknet.regions.manage.open")) {
             if (region.status() == RegionStatus.DEFAULT || region.status() == RegionStatus.PUBLIC || region.status() == RegionStatus.INACTIVE) {
 
@@ -198,7 +186,6 @@ public class ManageRegion extends Gui {
                                     .append(ChatUtils.success(" to open.")));
                             this.refresh();
                         });
-
             } else if (region.status() == RegionStatus.OPEN) {
 
                 setItem(3, Utils.createItem(Material.OAK_FENCE, 1,
@@ -214,7 +201,6 @@ public class ManageRegion extends Gui {
                                     .append(ChatUtils.success(" to default.")));
                             this.refresh();
                         });
-
             }
         }
 
@@ -225,13 +211,12 @@ public class ManageRegion extends Gui {
 
                 {
 
-                    //Return to request menu.
+                    // Return to request menu.
                     this.delete();
                     u.staffGui = null;
 
                     u.staffGui = new StaffGui(u);
                     u.staffGui.open(u);
-
                 });
     }
 
@@ -239,6 +224,5 @@ public class ManageRegion extends Gui {
 
         this.clearGui();
         createGui();
-
     }
 }

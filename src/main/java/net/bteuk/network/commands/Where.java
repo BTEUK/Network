@@ -22,9 +22,9 @@ import static net.bteuk.network.utils.enums.ServerType.PLOT;
 
 public class Where extends AbstractCommand {
 
-    private final EarthGeneratorSettings bteGeneratorSettings = EarthGeneratorSettings.parse(EarthGeneratorSettings.BTE_DEFAULT_SETTINGS);
     private static final DecimalFormat DECIMAL_FORMATTER = new DecimalFormat("##.#####");
-
+    private final EarthGeneratorSettings bteGeneratorSettings =
+            EarthGeneratorSettings.parse(EarthGeneratorSettings.BTE_DEFAULT_SETTINGS);
     private final PlotSQL plotSQL;
 
     public Where(Network instance) {
@@ -34,59 +34,64 @@ public class Where extends AbstractCommand {
     @Override
     public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        //Check if the sender is a player.
+        // Check if the sender is a player.
         Player player = getPlayer(stack);
         if (player == null) {
             return;
         }
 
-        //Get coordinates at the location of the player if they're in a region.
+        // Get coordinates at the location of the player if they're in a region.
         NetworkUser user = Network.getInstance().getUser(player);
 
-        //If u is null, cancel.
+        // If u is null, cancel.
         if (user == null) {
             LOGGER.severe("User " + player.getName() + " can not be found!");
             player.sendMessage(ChatUtils.error("User can not be found, please relog!"));
             return;
         }
 
-        //Check is regions are enabled
+        // Check is regions are enabled
         if (REGIONS_ENABLED) {
-            //Check if in a valid region.
+            // Check if in a valid region.
             if (!user.inRegion) {
 
                 player.sendMessage(ChatUtils.error("You must be standing in a region to get the coordinates."));
                 return;
-
             }
         }
 
-        //Send coordinates with a link to Google Maps to the player.
+        // Send coordinates with a link to Google Maps to the player.
         try {
 
-            //TEMP: The following if statement is only necessary because the server does not update the dx,dz
+            // TEMP: The following if statement is only necessary because the server does not update the dx,dz
             // on teleport when regions are disabled, this will be fixed in BTEUK-315!
             // If the player is in the plotsystem update their dx,dz.
-            if (SERVER_TYPE == PLOT && plotSQL.hasRow("SELECT name FROM location_data WHERE name='" + player.getWorld().getName() + "';")) {
+            if (SERVER_TYPE == PLOT && plotSQL.hasRow(
+                    "SELECT name FROM location_data WHERE name='" + player.getWorld().getName() + "';")) {
 
-                //Get negative coordinate transform of new location.
-                user.dx = -plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + player.getWorld().getName() + "';");
-                user.dz = -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + player.getWorld().getName() + "';");
+                // Get negative coordinate transform of new location.
+                user.dx =
+                        -plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + player.getWorld()
+                                .getName() + "';");
+                user.dz =
+                        -plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + player.getWorld()
+                                .getName() + "';");
             }
 
-            double[] coords = bteGeneratorSettings.projection().toGeo(player.getLocation().getX() + user.dx, player.getLocation().getZ() + user.dz);
+            double[] coords = bteGeneratorSettings.projection().toGeo(player.getLocation().getX() + user.dx,
+                    player.getLocation().getZ() + user.dz);
 
             player.sendMessage(ChatUtils.success("Your coordinates are ")
                     .append(Component.text(DECIMAL_FORMATTER.format(coords[1]), NamedTextColor.DARK_AQUA))
                     .append(ChatUtils.success(","))
                     .append(Component.text(DECIMAL_FORMATTER.format(coords[0]), NamedTextColor.DARK_AQUA)));
             Component message = ChatUtils.success("Click here to view the coordinates in Google Maps.");
-            message = message.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://www.google.com/maps/@?api=1&map_action=map&basemap=satellite&zoom=21&center=" + coords[1] + "," + coords[0]));
+            message = message.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL, "https://www.google" +
+                    ".com/maps/@?api=1&map_action=map&basemap=satellite&zoom=21&center=" + coords[1] + "," + coords[0]));
             player.sendMessage(message);
-
         } catch (OutOfProjectionBoundsException e) {
-            player.sendMessage(ChatUtils.error("You are not standing in a location where coordinates can be retrieved."));
+            player.sendMessage(ChatUtils.error("You are not standing in a location where coordinates can be retrieved" +
+                    "."));
         }
-
     }
 }

@@ -37,16 +37,12 @@ import static net.bteuk.network.utils.Constants.SIDEBAR_TITLE;
 
 public class TabManager {
 
-    private final Network instance;
-
-    private final ProtocolManager pm;
-    private PacketListener pl;
-
-    private Scoreboard scoreboard;
-
     private static final char[] ALPHABET = "abcdefghijklmnopqrstuvwxyz".toCharArray();
-
+    private final Network instance;
+    private final ProtocolManager pm;
     private final Map<String, Team> teams = new HashMap<>();
+    private PacketListener pl;
+    private Scoreboard scoreboard;
 
     public TabManager(Network instance) {
 
@@ -130,7 +126,8 @@ public class TabManager {
         // Set sidebar if enabled.
         if (SIDEBAR_ENABLED) {
 
-            Objective objective = scoreboard.registerNewObjective("sidebar", Criteria.DUMMY, Component.text(SIDEBAR_TITLE));
+            Objective objective = scoreboard.registerNewObjective("sidebar", Criteria.DUMMY,
+                    Component.text(SIDEBAR_TITLE));
             objective.setDisplaySlot(DisplaySlot.SIDEBAR);
             int score = SIDEBAR_CONTENT.size();
             for (String sidebarText : SIDEBAR_CONTENT) {
@@ -145,10 +142,10 @@ public class TabManager {
         Team team = scoreboard.getTeam(name);
 
         if (team != null) {
-            //Remove all players from the team.
+            // Remove all players from the team.
             team.removeEntries(team.getEntries());
         } else {
-            //Create team.
+            // Create team.
             team = scoreboard.registerNewTeam(name);
         }
 
@@ -160,7 +157,8 @@ public class TabManager {
     /**
      * Adds a player to a team for tab-list sorting by role
      * .
-     * @param name the name of the player to add to the team
+     *
+     * @param name        the name of the player to add to the team
      * @param primaryRole the role of the player
      */
     public void addToTeam(String name, String primaryRole) {
@@ -173,7 +171,8 @@ public class TabManager {
             if (team != null) {
                 team.addEntry(name);
             } else {
-                LOGGER.warning(String.format("Player %s with primary role %s does not have a team.", name, primaryRole));
+                LOGGER.warning(String.format("Player %s with primary role %s does not have a team.", name,
+                        primaryRole));
             }
         });
     }
@@ -197,7 +196,9 @@ public class TabManager {
 
                     infoList.forEach(info -> {
                         // Create an exact copy, but set 'listed' to false.
-                        newInfoList.add(new PlayerInfoData(info.getProfileId(), info.getLatency(), false, info.getGameMode(), info.getProfile(), info.getDisplayName(), info.getRemoteChatSessionData()));
+                        newInfoList.add(new PlayerInfoData(info.getProfileId(), info.getLatency(), false,
+                                info.getGameMode(), info.getProfile(), info.getDisplayName(),
+                                info.getRemoteChatSessionData()));
                     });
 
                     packet.getPlayerInfoDataLists().write(1, newInfoList);

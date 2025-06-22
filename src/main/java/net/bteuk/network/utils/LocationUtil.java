@@ -27,5 +27,4 @@ public class LocationUtil {
 
         return new Location(world, x + 0.5, y, z + 0.5);
     }
-
 }

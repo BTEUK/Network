@@ -14,9 +14,8 @@ import static net.bteuk.network.utils.Constants.SERVER_TYPE;
 
 public class LobbyCommand extends AbstractCommand {
 
-    private final Lobby lobby;
-
     private static final Component INVALID_FORMAT = ChatUtils.error("/lobby reload portals");
+    private final Lobby lobby;
 
     public LobbyCommand(Network instance) {
         this.lobby = instance.getLobby();
@@ -25,16 +24,16 @@ public class LobbyCommand extends AbstractCommand {
     @Override
     public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        //Check permission if player, or if the server is the lobby.
+        // Check permission if player, or if the server is the lobby.
         CommandSender sender = stack.getSender();
-        if (!hasPermission(sender, "uknet.lobby.reload") || SERVER_TYPE != ServerType.LOBBY) {
+        if (!sender.hasPermission("uknet.lobby.reload") || SERVER_TYPE != ServerType.LOBBY) {
             if (sender instanceof Player p) {
                 p.performCommand("spawn");
             }
             return;
         }
 
-        //Check args.
+        // Check args.
         if (args.length < 2 || !args[0].equalsIgnoreCase("reload")) {
             sender.sendMessage(INVALID_FORMAT);
         } else if (args[1].equalsIgnoreCase("portals")) {
@@ -45,7 +44,6 @@ public class LobbyCommand extends AbstractCommand {
 
             lobby.reloadPortals();
             sender.sendMessage(ChatUtils.success("Reloaded portals"));
-
         } else {
             sender.sendMessage(INVALID_FORMAT);
         }

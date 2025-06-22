@@ -10,48 +10,48 @@ import java.util.logging.Logger;
 
 import static net.bteuk.network.utils.NetworkConfig.CONFIG;
 
-//This class houses static variables that need to be accessed throughout the plugin.
+// This class houses static variables that need to be accessed throughout the plugin.
 public class Constants {
 
-    //Logger
+    // Logger
     public static final Logger LOGGER;
 
-    //Server Name
+    // Server Name
     public static final String SERVER_NAME;
     public static final ServerType SERVER_TYPE;
 
-    //Regions.
+    // Regions.
     public static final boolean REGIONS_ENABLED;
 
-    //Tpll
+    // Tpll
     public static final boolean TPLL_ENABLED;
 
-    //World height.
+    // World height.
     public static final int MAX_Y;
     public static final int MIN_Y;
 
-    //Earth world name.
+    // Earth world name.
     public static final String EARTH_WORLD;
 
-    //Custom join/leave messages.
+    // Custom join/leave messages.
     public static final boolean CUSTOM_MESSAGES;
 
-    //Is staff chat enabled
+    // Is staff chat enabled
     public static final boolean STAFF_CHAT;
-    
-    //Are tips enabled
+
+    // Are tips enabled
     public static final boolean TIPS;
 
-    //Is the tutorial enabled
+    // Is the tutorial enabled
     public static final boolean TUTORIALS;
 
-    //Is /ll enabled
+    // Is /ll enabled
     public static final boolean LL;
 
-    //Is the progress map enabled
+    // Is the progress map enabled
     public static final boolean PROGRESS_MAP;
 
-    //Is progression enabled
+    // Is progression enabled
     public static final boolean PROGRESSION;
     public static final boolean ANNOUNCE_OVERALL_LEVELUPS;
     public static final boolean ANNOUNCE_SEASONAL_LEVELUPS;
@@ -64,10 +64,10 @@ public class Constants {
 
         LOGGER = Network.getInstance().getLogger();
 
-        //Set the server name from config.
+        // Set the server name from config.
         SERVER_NAME = CONFIG.getString("server_name");
 
-        //Set the server type from config.
+        // Set the server type from config.
         SERVER_TYPE = ServerType.valueOf(CONFIG.getString("server_type"));
 
         REGIONS_ENABLED = CONFIG.getBoolean("regions_enabled");
@@ -109,7 +109,7 @@ public class Constants {
         SIDEBAR_CONTENT = Collections.unmodifiableList(sidebarText);
 
         if (CONFIG.getString("earth_world") == null) {
-            //Setting default value.
+            // Setting default value.
             EARTH_WORLD = "earth";
         } else {
             EARTH_WORLD = CONFIG.getString("earth_world");

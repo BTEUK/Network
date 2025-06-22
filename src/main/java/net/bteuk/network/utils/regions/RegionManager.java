@@ -28,7 +28,7 @@ public class RegionManager {
         return findRegion(x, z);
     }
 
-    //Get region at location.
+    // Get region at location.
     public Region getRegion(Location l) {
         // Get x and z of the region as int rounded down.
         int x = (l.getX() >= 0 ? (int) l.getX() : ((int) l.getX()) - 1) >> 9;
@@ -37,7 +37,7 @@ public class RegionManager {
         return getRegion(x, z);
     }
 
-    //Get region at location with coordinate transform.
+    // Get region at location with coordinate transform.
     public Region getRegion(Location l, int dx, int dz) {
         // Get x and z of the region as int rounded down with any necessary coordinate transforms.
         int x = ((l.getX() >= 0 ? (int) l.getX() : ((int) l.getX()) - 1) + dx) >> 9;
@@ -52,8 +52,8 @@ public class RegionManager {
         return findRegion(x, z);
     }
 
-    //Check whether the region exists in the database.
-    //This is mainly used to check whether guests can teleport there.
+    // Check whether the region exists in the database.
+    // This is mainly used to check whether guests can teleport there.
     public boolean exists(String regionName) {
         return (regionSQL.hasRow("SELECT region FROM regions WHERE region='" + regionName + "';"));
     }

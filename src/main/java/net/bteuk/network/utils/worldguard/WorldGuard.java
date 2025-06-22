@@ -18,10 +18,10 @@ public class WorldGuard {
 
     public static boolean addMember(String region, String uuid, World world) {
 
-        //Get instance of WorldGuard.
+        // Get instance of WorldGuard.
         com.sk89q.worldguard.WorldGuard wg = com.sk89q.worldguard.WorldGuard.getInstance();
 
-        //Get regions.
+        // Get regions.
         RegionContainer container = wg.getPlatform().getRegionContainer();
         RegionManager buildRegions = container.get(BukkitAdapter.adapt(world));
 
@@ -29,7 +29,6 @@ public class WorldGuard {
 
             LOGGER.warning("RegionManager for world " + world.getName() + " is null!");
             return false;
-
         }
 
         ProtectedRegion buildRegion = buildRegions.getRegion(region);
@@ -38,13 +37,12 @@ public class WorldGuard {
 
             LOGGER.warning("Region " + region + " does not exist!");
             return false;
-
         }
 
-        //Add the member to the region.
+        // Add the member to the region.
         buildRegion.getMembers().addPlayer(UUID.fromString(uuid));
 
-        //Save the changes
+        // Save the changes
         try {
             buildRegions.saveChanges();
             return true;
@@ -56,10 +54,10 @@ public class WorldGuard {
 
     public static boolean addGroup(String region, String group, World world) {
 
-        //Get instance of WorldGuard.
+        // Get instance of WorldGuard.
         com.sk89q.worldguard.WorldGuard wg = com.sk89q.worldguard.WorldGuard.getInstance();
 
-        //Get regions.
+        // Get regions.
         RegionContainer container = wg.getPlatform().getRegionContainer();
         RegionManager buildRegions = container.get(BukkitAdapter.adapt(world));
 
@@ -67,7 +65,6 @@ public class WorldGuard {
 
             LOGGER.warning("RegionManager for world " + world.getName() + " is null!");
             return false;
-
         }
 
         ProtectedRegion buildRegion = buildRegions.getRegion(region);
@@ -76,14 +73,13 @@ public class WorldGuard {
 
             LOGGER.warning("Region " + region + " does not exist!");
             return false;
-
         }
 
-        //Add the group to the region.
+        // Add the group to the region.
         buildRegion.getMembers().addGroup(group);
         Network.getInstance().getLogger().info("Added " + group + " to " + region);
 
-        //Save the changes
+        // Save the changes
         try {
             buildRegions.saveChanges();
             return true;
@@ -95,10 +91,10 @@ public class WorldGuard {
 
     public static boolean removeMember(String region, String uuid, World world) {
 
-        //Get instance of WorldGuard.
+        // Get instance of WorldGuard.
         com.sk89q.worldguard.WorldGuard wg = com.sk89q.worldguard.WorldGuard.getInstance();
 
-        //Get regions.
+        // Get regions.
         RegionContainer container = wg.getPlatform().getRegionContainer();
         RegionManager buildRegions = container.get(BukkitAdapter.adapt(world));
 
@@ -106,7 +102,6 @@ public class WorldGuard {
 
             LOGGER.warning("RegionManager for world " + world.getName() + " is null!");
             return false;
-
         }
 
         ProtectedRegion buildRegion = buildRegions.getRegion(region);
@@ -115,18 +110,17 @@ public class WorldGuard {
 
             LOGGER.warning("Region " + region + " does not exist!");
             return false;
-
         }
 
-        //Check if the member is in the region.
+        // Check if the member is in the region.
         if (buildRegion.getMembers().contains(UUID.fromString(uuid))) {
-            //Remove the member to the region.
+            // Remove the member to the region.
             buildRegion.getMembers().removePlayer(UUID.fromString(uuid));
         } else {
             return false;
         }
 
-        //Save the changes
+        // Save the changes
         try {
             buildRegions.saveChanges();
             return true;
@@ -138,10 +132,10 @@ public class WorldGuard {
 
     public static boolean removeGroup(String region, String group, World world) {
 
-        //Get instance of WorldGuard.
+        // Get instance of WorldGuard.
         com.sk89q.worldguard.WorldGuard wg = com.sk89q.worldguard.WorldGuard.getInstance();
 
-        //Get regions.
+        // Get regions.
         RegionContainer container = wg.getPlatform().getRegionContainer();
         RegionManager buildRegions = container.get(BukkitAdapter.adapt(world));
 
@@ -149,22 +143,20 @@ public class WorldGuard {
 
             LOGGER.warning("RegionManager for world " + world.getName() + " is null!");
             return false;
-
         }
 
-        //Remove the group from the region.
+        // Remove the group from the region.
         ProtectedRegion buildRegion = buildRegions.getRegion(region);
 
         if (buildRegion == null) {
 
             LOGGER.warning("Region " + region + " does not exist!");
             return false;
-
         }
 
         buildRegion.getMembers().removeGroup(group);
 
-        //Save the changes
+        // Save the changes
         try {
             buildRegions.saveChanges();
             return true;
@@ -173,15 +165,14 @@ public class WorldGuard {
             e1.printStackTrace();
             return false;
         }
-
     }
 
     public static boolean createRegion(String regionName, int xmin, int zmin, int xmax, int zmax, World world) {
 
-        //Get instance of WorldGuard.
+        // Get instance of WorldGuard.
         com.sk89q.worldguard.WorldGuard wg = com.sk89q.worldguard.WorldGuard.getInstance();
 
-        //Get regions.
+        // Get regions.
         RegionContainer container = wg.getPlatform().getRegionContainer();
         RegionManager buildRegions = container.get(BukkitAdapter.adapt(world));
 
@@ -189,14 +180,14 @@ public class WorldGuard {
 
             LOGGER.warning("RegionManager for world " + world.getName() + " is null!");
             return false;
-
         }
 
-        ProtectedCuboidRegion region = new ProtectedCuboidRegion(regionName, BlockVector3.at(xmin, -512, zmin), BlockVector3.at(xmax, 1536, zmax));
+        ProtectedCuboidRegion region = new ProtectedCuboidRegion(regionName, BlockVector3.at(xmin, -512, zmin),
+                BlockVector3.at(xmax, 1536, zmax));
 
         buildRegions.addRegion(region);
 
-        //Save the changes
+        // Save the changes
         try {
             buildRegions.saveChanges();
             return true;

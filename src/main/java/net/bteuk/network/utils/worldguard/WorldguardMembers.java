@@ -13,7 +13,8 @@ import java.util.UUID;
 
 public class WorldguardMembers {
 
-    public static boolean addMember(String regionName, String uuid, World world) throws RegionManagerNotFoundException, RegionNotFoundException {
+    public static boolean addMember(String regionName, String uuid,
+                                    World world) throws RegionManagerNotFoundException, RegionNotFoundException {
 
         RegionManager buildRegions = WorldguardManager.getRegionManager(world);
         ProtectedRegion region = buildRegions.getRegion(regionName);
@@ -21,13 +22,12 @@ public class WorldguardMembers {
         if (region == null) {
 
             throw new RegionNotFoundException("Region " + regionName + " does not exist!");
-
         }
 
-        //Add the member to the region.
+        // Add the member to the region.
         region.getMembers().addPlayer(UUID.fromString(uuid));
 
-        //Save the changes
+        // Save the changes
         try {
             buildRegions.saveChanges();
             return true;
@@ -37,7 +37,8 @@ public class WorldguardMembers {
         }
     }
 
-    public static void removeMember(String regionName, String uuid, World world) throws RegionManagerNotFoundException, RegionNotFoundException {
+    public static void removeMember(String regionName, String uuid,
+                                    World world) throws RegionManagerNotFoundException, RegionNotFoundException {
 
         RegionManager buildRegions = WorldguardManager.getRegionManager(world);
         ProtectedRegion region = buildRegions.getRegion(regionName);
@@ -45,17 +46,16 @@ public class WorldguardMembers {
         if (region == null) {
 
             throw new RegionNotFoundException("Region " + regionName + " does not exist!");
-
         }
 
         if (region.getMembers().contains(UUID.fromString(uuid))) {
-            //Remove the member to the region.
+            // Remove the member to the region.
             region.getMembers().removePlayer(UUID.fromString(uuid));
         } else {
             return;
         }
 
-        //Save the changes
+        // Save the changes
         try {
             buildRegions.saveChanges();
         } catch (StorageException e1) {
@@ -63,7 +63,8 @@ public class WorldguardMembers {
         }
     }
 
-    public static void clearMembers(String regionName, World world) throws RegionNotFoundException, RegionManagerNotFoundException {
+    public static void clearMembers(String regionName, World world) throws RegionNotFoundException,
+            RegionManagerNotFoundException {
 
         RegionManager buildRegions = WorldguardManager.getRegionManager(world);
         ProtectedRegion region = buildRegions.getRegion(regionName);
@@ -71,13 +72,12 @@ public class WorldguardMembers {
         if (region == null) {
 
             throw new RegionNotFoundException("Region " + regionName + " does not exist!");
-
         }
 
-        //Remove all members from the region.
+        // Remove all members from the region.
         region.getMembers().clear();
 
-        //Save the changes
+        // Save the changes
         try {
             buildRegions.saveChanges();
         } catch (StorageException e1) {

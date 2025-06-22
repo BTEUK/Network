@@ -35,12 +35,10 @@ import static net.bteuk.network.utils.enums.ServerType.PLOT;
 
 public class NetworkUser {
 
-    // Network instance.
-    private final Network instance;
-
     // Player instance.
     public final Player player;
-
+    // Network instance.
+    private final Network instance;
     // Main gui, includes everything that is part of the navigator.
     public Gui mainGui;
 
@@ -49,57 +47,46 @@ public class NetworkUser {
 
     // Staff gui.
     public Gui staffGui;
-
+    // Region information.
+    public boolean inRegion;
+    public Region region;
+    public int dx;
+    public int dz;
+    // If the player is switching server.
+    public boolean switching;
+    // If the player is afk.
+    public boolean afk;
+    public long last_movement;
+    // If linked to discord.
+    public boolean isLinked;
+    // If the player is currently in a portal,
+    // This is to prevent continuous execution of portal events.
+    public boolean inPortal;
+    public boolean wasInPortal;
     // The current active chat channel.
     // The default is global.
     @Getter
     @Setter
     private String chatChannel;
-
-    //Region information.
-    public boolean inRegion;
-    public Region region;
-    public int dx;
-    public int dz;
-
-    //Navigator in hotbar.
+    // Navigator in hotbar.
     @Getter
     @Setter
     private boolean navigatorEnabled;
-
     @Getter
     @Setter
     private boolean teleportEnabled;
-
     @Getter
     @Setter
     private boolean nightvisionEnabled;
-
-    //If the player is switching server.
-    public boolean switching;
-
-    //If the player is afk.
-    public boolean afk;
-    public long last_movement;
-
-    //If linked to discord.
-    public boolean isLinked;
-
     @Getter
     @Setter
     private long discordId;
-
-    //If the player is currently in a portal,
-    //This is to prevent continuous execution of portal events.
-    public boolean inPortal;
-    public boolean wasInPortal;
-
-    //Should tips be displayed for the player.
+    // Should tips be displayed for the player.
     @Getter
     @Setter
     private boolean tipsEnabled;
 
-    //Building companion tool.
+    // Building companion tool.
     @Getter
     @Setter
     private BuildingCompanion companion;
@@ -137,14 +124,17 @@ public class NetworkUser {
 
         primaryRole = Roles.getPrimaryRole(player);
 
-        //Get discord linked status.
-        //If they're linked get discord id.
-        isLinked = instance.getGlobalSQL().hasRow("SELECT uuid FROM discord WHERE uuid='" + player.getUniqueId() + "';");
+        // Get discord linked status.
+        // If they're linked get discord id.
+        isLinked = instance.getGlobalSQL().hasRow("SELECT uuid FROM discord WHERE uuid='" + player.getUniqueId() +
+                "';");
         if (isLinked) {
-            discordId = instance.getGlobalSQL().getLong("SELECT discord_id FROM discord WHERE uuid='" + player.getUniqueId() + "';");
+            discordId =
+                    instance.getGlobalSQL()
+                            .getLong("SELECT discord_id FROM discord WHERE uuid='" + player.getUniqueId() + "';");
         }
 
-        //If navigator is disabled, remove the navigator if in the inventory.
+        // If navigator is disabled, remove the navigator if in the inventory.
         if (!navigatorEnabled) {
 
             ItemStack slot8 = player.getInventory().getItem(8);
@@ -156,19 +146,21 @@ public class NetworkUser {
             }
         }
 
-        //Check if the player is in a region.
+        // Check if the player is in a region.
         if (REGIONS_ENABLED) {
             if (SERVER_TYPE == EARTH) {
-                //Check if they are in the earth world.
+                // Check if they are in the earth world.
                 if (player.getWorld().getName().equals(EARTH_WORLD)) {
                     region = instance.getRegionManager().getRegion(player.getLocation());
-                    //Add region to database if not exists.
+                    // Add region to database if not exists.
                     region.addToDatabase();
                     inRegion = true;
                 }
             } else if (SERVER_TYPE == PLOT) {
                 // Check if the player is in a buildable plot world and apply coordinate transform if true.
-                if (instance.getPlotSQL().hasRow("SELECT name FROM location_data WHERE name='" + player.getLocation().getWorld().getName() + "';")) {
+                if (instance.getPlotSQL()
+                        .hasRow("SELECT name FROM location_data WHERE name='" + player.getLocation().getWorld()
+                                .getName() + "';")) {
                     updateCoordinateTransform(instance.getPlotSQL(), player.getLocation());
 
                     region = instance.getRegionManager().getRegion(player.getLocation(), dx, dz);
@@ -179,88 +171,19 @@ public class NetworkUser {
 
         runEvents();
 
-        //Give the player nightvision if enabled or remove it if disabled.
+        // Give the player nightvision if enabled or remove it if disabled.
         if (nightvisionEnabled) {
 
             Nightvision.giveNightvision(player);
-
         } else {
 
             Nightvision.removeNightvision(player);
-
         }
 
         // If focus mode is enabled hide other players.
         if (focusEnabled) {
             hidePlayers();
         }
-    }
-
-    public UserDisconnect createDisconnectEvent() {
-        return new UserDisconnect(
-                player.getUniqueId().toString(),
-                SERVER_NAME,
-                isNavigatorEnabled(),
-                isTeleportEnabled(),
-                isNightvisionEnabled(),
-                getChatChannel(),
-                isTipsEnabled()
-        );
-    }
-
-    private void runEvents() {
-
-        //Check if the player has any join events, if try run them.
-        //Delay by 1 second for all plugins to run their join events.
-        Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> {
-            if (instance.getGlobalSQL().hasRow("SELECT uuid FROM join_events WHERE uuid='" + player.getUniqueId() + "' AND type='network';")) {
-
-                //Get the event from the database.
-                String event = instance.getGlobalSQL().getString("SELECT event FROM join_events WHERE uuid='" + player.getUniqueId() + "' AND type='network'");
-
-                //Get message.
-                String message = instance.getGlobalSQL().getString("SELECT message FROM join_events WHERE uuid='" + player.getUniqueId() + "' AND type='network'");
-
-                //Split the event by word.
-                String[] aEvent = event.split(" ");
-
-                //Clear the events.
-                instance.getGlobalSQL().update("DELETE FROM join_events WHERE uuid='" + player.getUniqueId() + "' AND type='network';");
-
-                //Send the event to the event handler.
-                instance.getTimers().getEventManager().event(player.getUniqueId().toString(), aEvent, message);
-
-            }
-        }, 20L);
-
-    }
-
-    /**
-     * Check if the {@link NetworkUser} has the permission node.
-     *
-     * @param permission_node permission node.
-     * @return whether the {@link NetworkUser} has the permission node.
-     */
-    public boolean hasPermission(String permission_node) {
-        return player.hasPermission(permission_node);
-    }
-
-    /**
-     * Check if the {@link NetworkUser} has any permission node in the array.
-     *
-     * @param permission_nodes array of permission nodes.
-     * @return whether the {@link NetworkUser} has any of the permission nodes.
-     */
-    public boolean hasAnyPermission(String[] permission_nodes) {
-
-        for (String permission_node : permission_nodes) {
-            if (hasPermission(permission_node)) {
-                return true;
-            }
-        }
-
-        return false;
-
     }
 
     /**
@@ -270,7 +193,8 @@ public class NetworkUser {
      * @return {@link String} name of the user
      */
     public static String getName(String uuid) {
-        return Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + uuid + "';");
+        return Network.getInstance().getGlobalSQL().getString("SELECT name FROM player_data WHERE uuid='" + uuid +
+                "';");
     }
 
     /**
@@ -296,22 +220,96 @@ public class NetworkUser {
     }
 
     /**
+     * Send the user an offline message. This also works for online players.
+     *
+     * @param uuid    uuid of the user
+     * @param message the message to send
+     */
+    public static void sendOfflineMessage(String uuid, Component message) {
+        DirectMessage directMessage = new DirectMessage(ChatChannels.GLOBAL.getChannelName(), uuid, "server", message
+                , true);
+        Network.getInstance().getChat().sendSocketMesage(directMessage);
+    }
+
+    public UserDisconnect createDisconnectEvent() {
+        return new UserDisconnect(
+                player.getUniqueId().toString(),
+                SERVER_NAME,
+                isNavigatorEnabled(),
+                isTeleportEnabled(),
+                isNightvisionEnabled(),
+                getChatChannel(),
+                isTipsEnabled()
+        );
+    }
+
+    private void runEvents() {
+
+        // Check if the player has any join events, if try run them.
+        // Delay by 1 second for all plugins to run their join events.
+        Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> {
+            if (instance.getGlobalSQL().hasRow("SELECT uuid FROM join_events WHERE uuid='" + player.getUniqueId() +
+                    "' AND type='network';")) {
+
+                // Get the event from the database.
+                String event =
+                        instance.getGlobalSQL().getString(
+                                "SELECT event FROM join_events WHERE uuid='" + player.getUniqueId() + "' AND " +
+                                        "type='network'");
+
+                // Get message.
+                String message =
+                        instance.getGlobalSQL().getString(
+                                "SELECT message FROM join_events WHERE uuid='" + player.getUniqueId() + "' AND " +
+                                        "type='network'");
+
+                // Split the event by word.
+                String[] aEvent = event.split(" ");
+
+                // Clear the events.
+                instance.getGlobalSQL().update("DELETE FROM join_events WHERE uuid='" + player.getUniqueId() + "' AND" +
+                        " type='network';");
+
+                // Send the event to the event handler.
+                instance.getTimers().getEventManager().event(player.getUniqueId().toString(), aEvent, message);
+            }
+        }, 20L);
+    }
+
+    /**
+     * Check if the {@link NetworkUser} has the permission node.
+     *
+     * @param permission_node permission node.
+     * @return whether the {@link NetworkUser} has the permission node.
+     */
+    public boolean hasPermission(String permission_node) {
+        return player.hasPermission(permission_node);
+    }
+
+    /**
+     * Check if the {@link NetworkUser} has any permission node in the array.
+     *
+     * @param permission_nodes array of permission nodes.
+     * @return whether the {@link NetworkUser} has any of the permission nodes.
+     */
+    public boolean hasAnyPermission(String... permission_nodes) {
+
+        for (String permission_node : permission_nodes) {
+            if (hasPermission(permission_node)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Sends the given message to player.
+     *
      * @param message the message to send
      */
     public void sendMessage(Component message) {
         player.sendMessage(message);
-    }
-
-    /**
-     * Send the user an offline message. This also works for online players.
-     *
-     * @param uuid uuid of the user
-     * @param message the message to send
-     */
-    public static void sendOfflineMessage(String uuid, Component message) {
-        DirectMessage directMessage = new DirectMessage(ChatChannels.GLOBAL.getChannelName(), uuid, "server", message, true);
-        Network.getInstance().getChat().sendSocketMesage(directMessage);
     }
 
     public void updateCoordinateTransform(PlotSQL plotSQL, Location l) {
@@ -328,6 +326,10 @@ public class NetworkUser {
                 player.getLocation().getYaw(),
                 player.getLocation().getPitch()
         );
+    }
+
+    public String getUuid() {
+        return player.getUniqueId().toString();
     }
 
     public void toggleFocus() {

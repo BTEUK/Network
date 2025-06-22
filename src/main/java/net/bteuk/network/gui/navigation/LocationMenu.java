@@ -28,11 +28,11 @@ import static net.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public class LocationMenu extends Gui {
 
-    private Map<String, Boolean> locations;
-    private int page = 1;
     private final Category category;
     private final Category returnMenu;
     private final String[] extraInfo;
+    private Map<String, Boolean> locations;
+    private int page = 1;
     private Location l = null;
 
     private int radius;
@@ -72,13 +72,13 @@ public class LocationMenu extends Gui {
 
     private void createGui() {
 
-        //If page > 1 set number of iterations that must be skipped.
+        // If page > 1 set number of iterations that must be skipped.
         int skip = (page - 1) * 21;
 
-        //Slot count.
+        // Slot count.
         int slot = 10;
 
-        //If page is greater than 1 add a previous page button.
+        // If page is greater than 1 add a previous page button.
         if (page > 1) {
             setItem(18, Utils.createItem(Material.ARROW, 1,
                             Utils.title("Previous Page"),
@@ -87,24 +87,23 @@ public class LocationMenu extends Gui {
 
                     {
 
-                        //Update the gui.
+                        // Update the gui.
                         page--;
                         this.refresh();
                         u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
-
                     });
         }
 
-        //Iterate through all locations
+        // Iterate through all locations
         for (Map.Entry<String, Boolean> location : locations.entrySet()) {
 
-            //Skip iterations if skip > 0.
+            // Skip iterations if skip > 0.
             if (skip > 0) {
                 skip--;
                 continue;
             }
 
-            //If the slot is greater than the number that fit in a page, create a new page.
+            // If the slot is greater than the number that fit in a page, create a new page.
             if (slot > 34) {
 
                 setItem(26, Utils.createItem(Material.ARROW, 1,
@@ -114,14 +113,14 @@ public class LocationMenu extends Gui {
 
                         {
 
-                            //Update the gui.
+                            // Update the gui.
                             page++;
                             this.refresh();
-                            u.player.getOpenInventory().getTopInventory().setContents(this.getInventory().getContents());
-
+                            u.player.getOpenInventory().getTopInventory()
+                                    .setContents(this.getInventory().getContents());
                         });
 
-                //Stop iterating.
+                // Stop iterating.
                 break;
             }
 
@@ -132,95 +131,97 @@ public class LocationMenu extends Gui {
                                 Utils.line("Click to open the menu for"),
                                 Utils.line("for this subcategory.")),
                         u -> {
-                            u.mainGui = new LocationMenu(location.getKey(), u, Category.SUBCATEGORY, category, location.getKey());
+                            u.mainGui = new LocationMenu(location.getKey(), u, Category.SUBCATEGORY, category,
+                                    location.getKey());
 
-                            //Switch to location menu.
+                            // Switch to location menu.
                             this.delete();
                             u.mainGui.open(u);
                         });
             } else {
-                //Create location teleport button.
+                // Create location teleport button.
                 setItem(slot, Utils.createItem(Material.ENDER_PEARL, 1,
                                 Utils.title(location.getKey()),
                                 Utils.line("Click to teleport here.")),
 
                         u -> {
 
-                            //Get the coordinate id.
-                            int coordinate_id = Network.getInstance().getGlobalSQL().getInt("SELECT coordinate FROM location_data WHERE location='" + location.getKey() + "';");
+                            // Get the coordinate id.
+                            int coordinate_id = Network.getInstance().getGlobalSQL().getInt("SELECT coordinate FROM " +
+                                    "location_data WHERE location='" + location.getKey() + "';");
 
-                            //Get the server of the location.
-                            String server = Network.getInstance().getGlobalSQL().getString("SELECT server FROM coordinates WHERE id=" + coordinate_id + ";");
+                            // Get the server of the location.
+                            String server = Network.getInstance().getGlobalSQL().getString("SELECT server FROM " +
+                                    "coordinates WHERE id=" + coordinate_id + ";");
 
-                            //If the plot is on the current server teleport them directly.
-                            //Else teleport them to the correct server and them teleport them to the plot.
+                            // If the plot is on the current server teleport them directly.
+                            // Else teleport them to the correct server and them teleport them to the plot.
                             if (server.equals(SERVER_NAME)) {
 
-                                //Close inventory.
+                                // Close inventory.
                                 u.player.closeInventory();
 
-                                //Get location from coordinate id.
+                                // Get location from coordinate id.
                                 Location l = Network.getInstance().getGlobalSQL().getLocation(coordinate_id);
 
-                                String worldName = Network.getInstance().getGlobalSQL().getString("SELECT world FROM coordinates WHERE id=" + coordinate_id + ";");
+                                String worldName = Network.getInstance().getGlobalSQL().getString("SELECT world FROM " +
+                                        "coordinates WHERE id=" + coordinate_id + ";");
 
-                                //Check if world is in plotsystem.
-                                if (Network.getInstance().getPlotSQL().hasRow("SELECT name FROM location_data WHERE name='" + worldName + "';")) {
+                                // Check if world is in plotsystem.
+                                if (Network.getInstance().getPlotSQL().hasRow("SELECT name FROM location_data WHERE " +
+                                        "name='" + worldName + "';")) {
 
-                                    //Add coordinate transformation.
+                                    // Add coordinate transformation.
                                     l = new Location(
                                             Bukkit.getWorld(worldName),
-                                            l.getX() + Network.getInstance().getPlotSQL().getInt("SELECT xTransform FROM location_data WHERE name='" + worldName + "';"),
+                                            l.getX() + Network.getInstance().getPlotSQL().getInt("SELECT xTransform " +
+                                                    "FROM location_data WHERE name='" + worldName + "';"),
                                             l.getY(),
-                                            l.getZ() + Network.getInstance().getPlotSQL().getInt("SELECT zTransform FROM location_data WHERE name='" + worldName + "';"),
+                                            l.getZ() + Network.getInstance().getPlotSQL().getInt("SELECT zTransform " +
+                                                    "FROM location_data WHERE name='" + worldName + "';"),
                                             l.getYaw(),
                                             l.getPitch()
                                     );
-
                                 }
 
-                                //Set current location for /back
+                                // Set current location for /back
                                 Back.setPreviousCoordinate(u.player.getUniqueId().toString(), u.player.getLocation());
 
                                 u.player.teleport(l);
                                 u.player.sendMessage(ChatUtils.success("Teleported to ")
                                         .append(Component.text(location.getKey(), NamedTextColor.DARK_AQUA)));
-
                             } else {
 
-                                //Create teleport event.
-                                EventManager.createTeleportEvent(true, u.player.getUniqueId().toString(), "network", "teleport location " + location.getKey(), u.player.getLocation());
+                                // Create teleport event.
+                                EventManager.createTeleportEvent(true, u.player.getUniqueId().toString(), "network",
+                                        "teleport location " + location.getKey(), u.player.getLocation());
 
-                                //Switch server.
+                                // Switch server.
                                 SwitchServer.switchServer(u.player, server);
-
                             }
-
                         });
             }
 
-
-            //Increase slot accordingly.
+            // Increase slot accordingly.
             if (slot % 9 == 7) {
-                //Increase row, basically add 3.
+                // Increase row, basically add 3.
                 slot += 3;
             } else {
-                //Increase value by 1.
+                // Increase value by 1.
                 slot++;
             }
-
         }
 
-        //Return (optional)
+        // Return (optional)
         if (returnMenu != null) {
             setItem(44, Utils.createItem(Material.SPRUCE_DOOR, 1,
                             Utils.title("Return"),
                             Utils.line("Open the previous menu.")),
                     u -> {
-                        //Delete this gui.
+                        // Delete this gui.
                         this.delete();
 
-                        //Switch to navigation menu.
+                        // Switch to navigation menu.
                         Gui returnGui = getReturnGui(u);
                         if (returnGui != null) {
                             if (!returnGui.isDeleteOnClose()) {
@@ -239,58 +240,60 @@ public class LocationMenu extends Gui {
 
         this.clearGui();
 
-        //Refresh the location list.
+        // Refresh the location list.
         locations = getLocations();
 
-        //Check if page has content.
-        //Else set it to the maximum possible.
+        // Check if page has content.
+        // Else set it to the maximum possible.
         if (Math.ceil(locations.size() / 21.0) < page) {
             page = locations.size() / 21;
         }
 
         createGui();
-
     }
 
     public boolean isEmpty() {
         return locations.isEmpty();
     }
 
-    //Method to determine the search parameters when getting the locations to display in the menu.
+    // Method to determine the search parameters when getting the locations to display in the menu.
     private Map<String, Boolean> getLocations() {
 
-        // We use a linked hashmap to preserve insertion order. Since in most cases we want subcategories to be listed first.
+        // We use a linked hashmap to preserve insertion order. Since in most cases we want subcategories to be
+        // listed first.
         Map<String, Boolean> locations = new LinkedHashMap<>();
 
         switch (category) {
 
             // Main categories (can include subcategories.
             case ENGLAND, SCOTLAND, WALES, NORTHERN_IRELAND, OTHER -> {
-                Network.getInstance().getGlobalSQL().getStringList("SELECT name FROM location_subcategory WHERE category='" + category + "' ORDER BY name ASC;")
+                Network.getInstance().getGlobalSQL().getStringList("SELECT name FROM location_subcategory WHERE " +
+                                "category='" + category + "' ORDER BY name ASC;")
                         .forEach(name -> locations.put(name, true));
-                Network.getInstance().getGlobalSQL().getStringList("SELECT location FROM location_data WHERE category='" + category + "' AND subcategory is null ORDER BY location ASC;")
+                Network.getInstance().getGlobalSQL().getStringList("SELECT location FROM location_data WHERE " +
+                                "category='" + category + "' AND subcategory is null ORDER BY location ASC;")
                         .forEach(name -> locations.put(name, false));
             }
             // Subcategory, can only include locations.
             case SUBCATEGORY -> {
                 // Get the subcategory id from the name.
-                int id = Network.getInstance().getGlobalSQL().getInt("SELECT id FROM location_subcategory WHERE name='" + extraInfo[0] + "';");
-                Network.getInstance().getGlobalSQL().getStringList("SELECT location FROM location_data WHERE subcategory=" + id + " ORDER BY location ASC;")
+                int id = Network.getInstance().getGlobalSQL().getInt("SELECT id FROM location_subcategory WHERE " +
+                        "name='" + extraInfo[0] + "';");
+                Network.getInstance().getGlobalSQL().getStringList("SELECT location FROM location_data WHERE " +
+                                "subcategory=" + id + " ORDER BY location ASC;")
                         .forEach(name -> locations.put(name, false));
             }
 
             // Suggested locations can only include locations.
-            case SUGGESTED ->
-                    Network.getInstance().getGlobalSQL().getStringList("SELECT location FROM location_data WHERE suggested=1 ORDER BY location ASC;")
-                            .forEach(name -> locations.put(name, false));
+            case SUGGESTED -> Network.getInstance().getGlobalSQL().getStringList("SELECT location FROM location_data WHERE " +
+                            "suggested=1 ORDER BY location ASC;")
+                    .forEach(name -> locations.put(name, false));
 
             // Nearby locations can only include locations and are found based on the player's current location.
-            case NEARBY ->
-                    getNearbyLocations().forEach(name -> locations.put(name, false));
+            case NEARBY -> getNearbyLocations().forEach(name -> locations.put(name, false));
 
             // Search locations based on the given string query.
-            case SEARCH ->
-                    searchLocations().forEach(name -> locations.put(name, false));
+            case SEARCH -> searchLocations().forEach(name -> locations.put(name, false));
 
             // Temporary implies that the menu is being opened from the map.
             // A temporary menu provides the list of locations as extra args.
@@ -304,40 +307,47 @@ public class LocationMenu extends Gui {
     }
 
     private LinkedHashSet<String> getNearbyLocations() {
-        return new LinkedHashSet<>(Network.getInstance().getGlobalSQL().getStringList("SELECT location_data.location FROM location_data INNER JOIN coordinates ON location_data.coordinate=coordinates.id " +
+        return new LinkedHashSet<>(Network.getInstance().getGlobalSQL().getStringList("SELECT location_data.location " +
+                "FROM location_data INNER JOIN coordinates ON location_data.coordinate=coordinates.id " +
                 "WHERE ((((coordinates.x/1000)-" + (l.getX() / 1000) + ")*((coordinates.x/1000)-" + (l.getX() / 1000) + ")) + " +
-                "(((coordinates.z/1000)-" + (l.getZ() / 1000) + ")*((coordinates.z/1000)-" + (l.getZ() / 1000) + "))) < " +
+                "(((coordinates.z/1000)-" + (l.getZ() / 1000) + ")*((coordinates.z/1000)-" + (l.getZ() / 1000) + ")))" +
+                " < " +
                 (radius * radius) +
                 " ORDER BY ((((coordinates.x/1000)-" + (l.getX() / 1000) + ")*((coordinates.x/1000)-" + (l.getX() / 1000) + ")) + " +
-                "(((coordinates.z/1000)-" + (l.getZ() / 1000) + ")*((coordinates.z/1000)-" + (l.getZ() / 1000) + "))) ASC;"));
+                "(((coordinates.z/1000)-" + (l.getZ() / 1000) + ")*((coordinates.z/1000)-" + (l.getZ() / 1000) + ")))" +
+                " ASC;"));
     }
 
     private LinkedHashSet<String> searchLocations() {
 
         // The search query is the first argument of the extra info.
 
-        //Search for locations that include the phrase.
-        ArrayList<String> locations = Network.getInstance().getGlobalSQL().getStringList("SELECT location FROM location_data WHERE location LIKE '%" + extraInfo[0] + "%';");
+        // Search for locations that include the phrase.
+        ArrayList<String> locations = Network.getInstance().getGlobalSQL().getStringList("SELECT location FROM " +
+                "location_data WHERE location LIKE '%" + extraInfo[0] + "%';");
 
-        //Also search for any categories or subcategories.
-        locations.addAll(Network.getInstance().getGlobalSQL().getStringList("SELECT location FROM location_data WHERE category LIKE '%" + extraInfo[0] + "%';"));
-        locations.addAll(Network.getInstance().getGlobalSQL().getStringList("SELECT location FROM location_data WHERE subcategory LIKE '%" + extraInfo[0] + "%';"));
+        // Also search for any categories or subcategories.
+        locations.addAll(Network.getInstance().getGlobalSQL().getStringList("SELECT location FROM location_data WHERE" +
+                " category LIKE '%" + extraInfo[0] + "%';"));
+        locations.addAll(Network.getInstance().getGlobalSQL().getStringList("SELECT location FROM location_data WHERE" +
+                " subcategory LIKE '%" + extraInfo[0] + "%';"));
 
         locations.sort(Comparator.naturalOrder());
 
         return new LinkedHashSet<>(locations);
-
     }
 
-    //Function to get the gui for the return button.
+    // Function to get the gui for the return button.
     private Gui getReturnGui(NetworkUser u) {
         if (returnMenu == Category.EXPLORE) {
             return new ExploreGui(u);
         } else if (returnMenu == Category.TEMPORARY) {
             // If the returnMenu is temporary it implies that a subcategory was opened from a temporary menu.
-            // In this case the locations to add to the menu will in the extra info, excluding the first value, which is the subcategory.
+            // In this case the locations to add to the menu will in the extra info, excluding the first value, which
+            // is the subcategory.
             if (extraInfo.length > 1) {
-                LocationMenu gui = new LocationMenu("Map", u, Category.TEMPORARY, null, Arrays.copyOfRange(extraInfo, 1, extraInfo.length));
+                LocationMenu gui = new LocationMenu("Map", u, Category.TEMPORARY, null, Arrays.copyOfRange(extraInfo,
+                        1, extraInfo.length));
                 gui.setDeleteOnClose(true);
                 return gui;
             } else {

@@ -5,7 +5,7 @@
 
     <groupId>net.bteuk</groupId>
     <artifactId>Network</artifactId>
-    <version>1.7.1</version>
+    <version>1.7.2</version>
     <packaging>jar</packaging>
 
     <name>Network</name>
@@ -80,6 +80,7 @@
                                         <exclude>changelog.txt</exclude>
                                         <exclude>latestchanges.html</exclude>
                                         <exclude>release-timestamp.txt</exclude>
+                                        <exclude>net/bteuk/teachingtutorials/services/**</exclude>
                                     </excludes>
                                 </filter>
                                 <filter>
@@ -216,7 +217,7 @@
         <dependency>
             <groupId>com.github.BTEUK</groupId>
             <artifactId>terraminusminus</artifactId>
-            <version>feature~paper_1_21-5e925b8af2-1</version>
+            <version>41d3843a79</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.fasterxml.jackson.core</groupId>
@@ -234,12 +235,12 @@
         <dependency>
             <groupId>com.github.BTEUK</groupId>
             <artifactId>ProgressMapper</artifactId>
-            <version>2f3fc96c3</version>
+            <version>231624865f</version>
         </dependency>
         <dependency>
             <groupId>com.github.BTEUK</groupId>
             <artifactId>NetworkLib</artifactId>
-            <version>723b185fc1</version>
+            <version>f886b1fc1a</version>
         </dependency>
         <dependency>
             <groupId>com.github.BTEUK</groupId>

@@ -17,7 +17,8 @@ public class FixedArgSelector extends AbstractTabCompleter {
 
     /**
      * Contructor
-     * @param options   the options that should be available in the TAB completion on the first argument
+     *
+     * @param options  the options that should be available in the TAB completion on the first argument
      * @param argIndex the index for which the tab completer should be.
      */
     public FixedArgSelector(List<String> options, int argIndex) {

@@ -22,20 +22,20 @@ public class Progression {
      */
     public static void addExp(String uuid, int exp) {
 
-        //If progression is disabled, cancel.
+        // If progression is disabled, cancel.
         if (!PROGRESSION) {
             return;
         }
 
-        //Add exp for the overall progression.
+        // Add exp for the overall progression.
         addExp("default", uuid, exp, ANNOUNCE_OVERALL_LEVELUPS);
 
-        //Add exp for the active season, if it exists. There can only be 1 active season at a time.
-        //Don't use the default season, this is always active.
+        // Add exp for the active season, if it exists. There can only be 1 active season at a time.
+        // Don't use the default season, this is always active.
         if (Network.getInstance().getGlobalSQL().hasRow("SELECT id FROM seasons WHERE active=1 and id<>'default'")) {
-            addExp(Network.getInstance().getGlobalSQL().getString("SELECT id FROM seasons WHERE active=1 and id<>'default'"), uuid, exp, ANNOUNCE_SEASONAL_LEVELUPS);
+            addExp(Network.getInstance().getGlobalSQL().getString("SELECT id FROM seasons WHERE active=1 and " +
+                    "id<>'default'"), uuid, exp, ANNOUNCE_SEASONAL_LEVELUPS);
         }
-
     }
 
     /**
@@ -55,18 +55,16 @@ public class Progression {
 
         while (Level.reachedNextLevel(currentLevel, currentExp)) {
 
-            //Increase level.
+            // Increase level.
             currentLevel++;
             levelUp(season, uuid, currentLevel, announce_levelups);
 
-            //Get remainig exp.
+            // Get remainig exp.
             currentExp = Level.getLeftoverExp(currentLevel, currentExp);
-
         }
 
-        //Set exp.
+        // Set exp.
         Level.setExp(season, uuid, currentExp);
-
     }
 
     private static void levelUp(String season, String uuid, int level, boolean announce_levelup) {
@@ -87,20 +85,17 @@ public class Progression {
 
             globalMessage = globalMessage.append(ChatUtils.success(" in season ")
                     .append(Component.text(season, NamedTextColor.DARK_AQUA)));
-
         }
 
-        //Announce the levelup if enabled.
+        // Announce the levelup if enabled.
         if (announce_levelup) {
 
             // Announce level-up.
             ChatMessage chatMessage = new ChatMessage(ChatChannels.GLOBAL.getChannelName(), "server", globalMessage);
             Network.getInstance().getChat().sendSocketMesage(chatMessage);
-
         }
 
-        //Send a message to the player.
+        // Send a message to the player.
         NetworkUser.sendOfflineMessage(uuid, playerMessage);
-
     }
 }

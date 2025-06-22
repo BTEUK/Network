@@ -16,7 +16,7 @@ public class NavigationTabCompleter extends AbstractTabCompleter {
     public @NotNull Collection<String> onTabComplete(@NotNull CommandSender sender, @NotNull String[] args) {
         Collection<String> result = new ArrayList<>();
         if (args.length > 0) {
-            switch(args[0].toUpperCase()) {
+            switch (args[0].toUpperCase()) {
 
                 // If arg[0] is remove, update or suggested, then use locations as arg[1] selector.
                 case "UPDATE", "REMOVE", "SUGGESTED" -> {
@@ -28,9 +28,12 @@ public class NavigationTabCompleter extends AbstractTabCompleter {
                     // If arg[1] is add then list all categories for arg[2].
                     // If arg[1] is remove then give all subcategories for arg[2].
                     if (args.length > 1 && args[1].equalsIgnoreCase("add")) {
-                        result.addAll(onTabCompleteArg(args, Arrays.stream(Category.values()).filter(Category::isSelectable).map(Category::toString).collect(Collectors.toList()), 2));
+                        result.addAll(onTabCompleteArg(args,
+                                Arrays.stream(Category.values()).filter(Category::isSelectable).map(Category::toString)
+                                        .collect(Collectors.toList()), 2));
                     } else if (args.length > 1 && args[1].equalsIgnoreCase("remove")) {
-                        result.addAll(onTabCompleteArg(args, Network.getInstance().getGlobalSQL().getStringList("SELECT name FROM location_subcategory"), 2));
+                        result.addAll(onTabCompleteArg(args, Network.getInstance().getGlobalSQL().getStringList(
+                                "SELECT name FROM location_subcategory"), 2));
                     }
                 }
             }

@@ -61,161 +61,150 @@ import static net.bteuk.network.utils.NetworkConfig.CONFIG;
 
 public final class Network extends JavaPlugin {
 
-    //Returns an instance of the plugin.
+    // Returns an instance of the plugin.
     @Getter
     private static Network instance;
 
-    //If the server can shutdown.
+    // If the server can shutdown.
     public boolean allow_shutdown;
-
-    //Return an instance of the regionManager.
-    //RegionManager
+    // Guis
+    public NavigatorGui navigatorGui;
+    public ItemStack navigator;
+    public RegionSQL regionSQL;
+    // Movement listeners.
+    public MoveListener moveListener;
+    public TeleportListener teleportListener;
+    // Return an instance of the regionManager.
+    // RegionManager
     @Getter
     private RegionManager regionManager;
-
     // List of users connected to the network.
     @Getter
     private HashSet<OnlineUser> onlineUsers;
-
     // Server User List
     private ArrayList<NetworkUser> networkUsers;
-
-    //Guis
-    public NavigatorGui navigatorGui;
-    public ItemStack navigator;
-
-    //SQL
+    // SQL
     @Getter
     private PlotSQL plotSQL;
     @Getter
     private GlobalSQL globalSQL;
-    public RegionSQL regionSQL;
-
-    //Chat
+    // Chat
     @Getter
     private CustomChat chat;
-
-    //Timers
+    // Timers
     @Getter
     private Timers timers;
-
-    //Get lobby.
-    //Lobby
+    // Get lobby.
+    // Lobby
     @Getter
     private Lobby lobby;
-
-    //Listener and manager of server connects.
+    // Listener and manager of server connects.
     @Getter
     private Connect connect;
-
-    //Movement listeners.
-    public MoveListener moveListener;
-    public TeleportListener teleportListener;
-
-    //Tab
+    // Tab
     @Getter
     private TabManager tab;
 
-    //Kick Command
+    // Kick Command
     @Getter
     private Kick kick;
 
-    //Mute Command
+    // Mute Command
     @Getter
     private Mute mute;
 
-    //Unmute Command
+    // Unmute Command
     @Getter
     private Unmute unmute;
 
-    //Ban Command
+    // Ban Command
     @Getter
     private Ban ban;
 
-    //Unban Command
+    // Unban Command
     @Getter
     private Unban unban;
 
-    //Tpll Command
+    // Tpll Command
     @Getter
     private Tpll tpll;
 
-    //Tutorials DB connection
+    // Tutorials DB connection
     @Getter
     private DBConnection tutorialsDBConnection;
 
     @Override
     public void onEnable() {
 
-        //Config Setup
+        // Config Setup
         Network.instance = this;
 
         allow_shutdown = true;
 
-        //Sets the config if the file has not yet been created.
+        // Sets the config if the file has not yet been created.
         ConfigurationSerialization.registerClass(ConfigurationSerializable.class);
         saveDefaultConfig();
 
-        //Update the config to the latest version if it's outdated.
-        //It will copy over any keys that remain the same.
-        //This will also set the status variable to access the config project-wide.
+        // Update the config to the latest version if it's outdated.
+        // It will copy over any keys that remain the same.
+        // This will also set the status variable to access the config project-wide.
         NetworkConfig networkConfig = new NetworkConfig();
         networkConfig.updateConfig();
 
         if (!CONFIG.getBoolean("enabled")) {
 
             getLogger().warning("The config must be configured before the plugin can be enabled!");
-            getLogger().warning("Please edit the database values in the config, give the server a unique name and then set 'enabled: true'");
+            getLogger().warning("Please edit the database values in the config, give the server a unique name and " +
+                    "then set 'enabled: true'");
             getLogger().warning("Also make sure to set the server to the correct type.");
             return;
-
         }
 
-        //Setup MySQL
+        // Setup MySQL
         try {
 
             DatabaseInit init = new DatabaseInit();
 
-            //Global Database
+            // Global Database
             String global_database = CONFIG.getString("database.global");
             BasicDataSource global_dataSource = init.mysqlSetup(global_database);
             globalSQL = new GlobalSQL(global_dataSource);
 
-            //Region Database
+            // Region Database
             String region_database = CONFIG.getString("database.region");
             BasicDataSource region_dataSource = init.mysqlSetup(region_database);
             regionSQL = new RegionSQL(region_dataSource);
 
-            //Plot Database
+            // Plot Database
             String plot_database = CONFIG.getString("database.plot");
             BasicDataSource plot_dataSource = init.mysqlSetup(plot_database);
             plotSQL = new PlotSQL(plot_dataSource);
-
-
         } catch (SQLException | RuntimeException e) {
-            getLogger().severe("Failed to connect to the database, please check that you have set the config values correctly.");
+            getLogger().severe("Failed to connect to the database, please check that you have set the config values " +
+                    "correctly.");
             getLogger().severe("Disabling Network");
             return;
         }
 
-        //Setup tutorials DB connection and connect
+        // Setup tutorials DB connection and connect
         if (TUTORIALS) {
-            //Initialise the DBConnection object
+            // Initialise the DBConnection object
             tutorialsDBConnection = new DBConnection();
 
-            //Extract database details from the config
+            // Extract database details from the config
             String szHost = CONFIG.getString("tutorials.database.host");
             int iPort = CONFIG.getInt("tutorials.database.port");
             String szDBName = CONFIG.getString("tutorials.database.name");
             String szUsername = CONFIG.getString("tutorials.database.username");
             String szPassword = CONFIG.getString("tutorials.database.password");
 
-            //Set up the DBConnection object with details
+            // Set up the DBConnection object with details
             tutorialsDBConnection.externalMySQLSetup(szHost, iPort, szDBName, szUsername, szPassword);
 
-            //Attempt to connect to the DB
+            // Attempt to connect to the DB
             if (!tutorialsDBConnection.connect()) {
-                getLogger().severe("Failed to connect to the Tutorials database, please check that you have set the config values correctly.");
+                getLogger().severe("Failed to connect to the Tutorials database, please check that you have set the " +
+                        "config values correctly.");
                 getLogger().severe("Disabling Network");
                 return;
             }
@@ -223,59 +212,56 @@ public final class Network extends JavaPlugin {
 
         if (!globalSQL.hasRow("SELECT name FROM server_data WHERE name='" + SERVER_NAME + "';")) {
 
-            //Add server to database and enable server.
+            // Add server to database and enable server.
             if (globalSQL.update(
                     "INSERT INTO server_data(name,type) VALUES('" + SERVER_NAME + "','" + SERVER_TYPE + "');"
             )) {
 
-                //Enable plugin.
+                // Enable plugin.
                 getLogger().info("Server added to database with name " + SERVER_NAME + " and type " + SERVER_TYPE);
                 getLogger().info("Enabling Plugin");
                 enablePlugin();
-
             } else {
 
-                //If the server is not in the database, shut down plugin.
+                // If the server is not in the database, shut down plugin.
                 getLogger().severe("Failed to add server to database, disabling plugin!");
-
             }
-
         } else {
 
-            //Enable plugin.
+            // Enable plugin.
             getLogger().info("Enabling Plugin");
             enablePlugin();
-
         }
     }
 
-    //Server enabling procedure when the config has been set up.
+    // Server enabling procedure when the config has been set up.
     public void enablePlugin() {
 
         // Create user list.
         networkUsers = new ArrayList<>();
         onlineUsers = new HashSet<>();
 
-        //Enable tab.
+        // Enable tab.
         tab = new TabManager(this);
 
         // Enabled chat, both global and normal chat are handled through this.
         chat = new CustomChat(this);
 
-        //Setup connect, this handles all connections to the server.
+        // Setup connect, this handles all connections to the server.
         connect = new Connect(this);
 
-        //Create navigator.
+        // Create navigator.
         navigatorGui = new NavigatorGui();
-        navigator = Utils.createItem(Material.NETHER_STAR, 1, Utils.title("Navigator"), Utils.line("Click to open the navigator."));
+        navigator = Utils.createItem(Material.NETHER_STAR, 1, Utils.title("Navigator"), Utils.line("Click to open the" +
+                " navigator."));
 
-        //Register events.
+        // Register events.
         new PreJoinServer(this);
 
         new GuiListener(this);
         new PlayerInteract(this);
 
-        //Create regionManager if enabled.
+        // Create regionManager if enabled.
         if (REGIONS_ENABLED) {
             regionManager = new RegionManager(regionSQL);
         }
@@ -283,13 +269,13 @@ public final class Network extends JavaPlugin {
         moveListener = new MoveListener(this);
         teleportListener = new TeleportListener(this);
 
-        //Setup Timers
+        // Setup Timers
         timers = new Timers(this, globalSQL);
         timers.startTimers();
 
-        //Setup the lobby, most features are only enabled in the lobby server.
+        // Setup the lobby, most features are only enabled in the lobby server.
         lobby = new Lobby(this);
-        //Create the rules book.
+        // Create the rules book.
         lobby.loadRules();
         if (SERVER_TYPE == ServerType.LOBBY) {
 
@@ -299,14 +285,14 @@ public final class Network extends JavaPlugin {
 
             lobby.reloadPortals();
 
-            //Set the rules lectern.
+            // Set the rules lectern.
             lobby.setLectern();
         }
 
         // Set up the map.
         lobby.reloadMap();
 
-        //Enable commands
+        // Enable commands
         if (TPLL_ENABLED) {
             TerraConfig.reducedConsoleMessages = true;
             tpll = new Tpll(instance, CONFIG.getBoolean("requires_permission"));
@@ -318,16 +304,16 @@ public final class Network extends JavaPlugin {
         unban = new Unban();
         CommandManager.registerCommands(this);
 
-        //Register commandpreprocess to make sure /network:region runs and not that of another plugin.
+        // Register commandpreprocess to make sure /network:region runs and not that of another plugin.
         new CommandPreProcess(this);
 
-        //Enable tips.
+        // Enable tips.
         if (TIPS) {
-            //Enable tips in chat.
+            // Enable tips in chat.
             new Tips();
         }
 
-        //Create default season if not exists.
+        // Create default season if not exists.
         if (!globalSQL.hasRow("SELECT id FROM seasons WHERE id='default';")) {
             globalSQL.update("INSERT INTO seasons(id,active) VALUES('default',1);");
         }
@@ -336,31 +322,31 @@ public final class Network extends JavaPlugin {
         try {
             Class.forName("net.bteuk.teachingtutorials.services.PromotionService");
             PromotionService promotionService = new NetworkPromotionService();
-            this.getServer().getServicesManager().register(PromotionService.class, promotionService, this, ServicePriority.High);
+            this.getServer().getServicesManager().register(PromotionService.class, promotionService, this,
+                    ServicePriority.High);
             LOGGER.info("Registered Network Promotion Service");
         } catch (ClassNotFoundException e) {
-            // Only load the PromotionService is the class exists.
+            // Only load the PromotionService if the class exists.
         }
 
         // Let the Proxy know that the server is enabled.
         instance.getChat().sendSocketMesage(new ServerStartup(SERVER_NAME));
-
     }
 
     @Override
     public void onDisable() {
 
-        //Shut down chat.
+        // Shut down chat.
         if (chat != null) {
             chat.onDisable();
         }
 
-        //Shut down tab.
+        // Shut down tab.
         if (tab != null) {
             tab.closeTab();
         }
 
-        //Close timers.
+        // Close timers.
         if (timers != null) {
             timers.close();
         }
@@ -370,18 +356,19 @@ public final class Network extends JavaPlugin {
 
                 String uuid = u.player.getUniqueId().toString();
 
-                //Remove any outstanding invites that this player has sent.
+                // Remove any outstanding invites that this player has sent.
                 plotSQL.update("DELETE FROM plot_invites WHERE owner='" + uuid + "';");
                 plotSQL.update("DELETE FROM zone_invites WHERE owner='" + uuid + "';");
 
-                //Remove any outstanding invites that this player has received.
+                // Remove any outstanding invites that this player has received.
                 plotSQL.update("DELETE FROM plot_invites WHERE uuid='" + uuid + "';");
                 plotSQL.update("DELETE FROM zone_invites WHERE uuid='" + uuid + "';");
 
-                //Set last_online time in playerdata.
-                instance.globalSQL.update("UPDATE player_data SET last_online=" + Time.currentTime() + " WHERE UUID='" + uuid + "';");
+                // Set last_online time in playerdata.
+                instance.globalSQL.update("UPDATE player_data SET last_online=" + Time.currentTime() + " WHERE " +
+                        "UUID='" + uuid + "';");
 
-                //Reset last logged time.
+                // Reset last logged time.
                 if (u.afk) {
                     u.last_movement = Time.currentTime();
                     u.afk = false;
@@ -389,13 +376,13 @@ public final class Network extends JavaPlugin {
             }
         }
 
-        //Disconnect from tutorials
+        // Disconnect from tutorials
         if (TUTORIALS) {
             tutorialsDBConnection.disconnect();
         }
     }
 
-    //Get user from player.
+    // Get user from player.
     public NetworkUser getUser(Player p) {
         return networkUsers.stream().filter(user -> user.player.equals(p)).findFirst().orElse(null);
     }
@@ -404,16 +391,15 @@ public final class Network extends JavaPlugin {
         return networkUsers.stream().filter(user -> user.player.getUniqueId().toString().equals(uuid)).findFirst();
     }
 
-    //Get users.
+    // Get users.
     public ArrayList<NetworkUser> getUsers() {
         return networkUsers;
     }
 
-    //Add user to list.
+    // Add user to list.
     public void addUser(NetworkUser u) {
 
         networkUsers.add(u);
-
     }
 
     public void removeUser(NetworkUser u) {
@@ -430,7 +416,9 @@ public final class Network extends JavaPlugin {
     }
 
     public void handleOnlineUserRemove(OnlineUserRemove onlineUserRemove) {
-        Optional<OnlineUser> optionalOnlineUser = onlineUsers.stream().filter(onlineUser -> onlineUser.getUuid().equals(onlineUserRemove.getUuid())).findFirst();
+        Optional<OnlineUser> optionalOnlineUser =
+                onlineUsers.stream().filter(onlineUser -> onlineUser.getUuid().equals(onlineUserRemove.getUuid()))
+                        .findFirst();
         optionalOnlineUser.ifPresent(onlineUser -> onlineUsers.remove(onlineUser));
     }
 

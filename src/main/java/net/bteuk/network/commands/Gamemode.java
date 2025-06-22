@@ -23,37 +23,38 @@ import static net.bteuk.network.utils.Constants.SERVER_TYPE;
 
 public class Gamemode extends AbstractCommand {
 
-    //Gamemodes.
-    private final ArrayList<String> gamemodes = new ArrayList<>(Arrays.asList("creative", "spectator", "adventure", "survival"));
+    // Gamemodes.
+    private final ArrayList<String> gamemodes = new ArrayList<>(Arrays.asList("creative", "spectator", "adventure",
+            "survival"));
 
-    //Constructor to enable the command.
+    // Constructor to enable the command.
     public Gamemode() {
-        //Set tab completer.
+        // Set tab completer.
         setTabCompleter(new FixedArgSelector(gamemodes, 0));
     }
 
     @Override
     public void execute(@NotNull CommandSourceStack stack, @NotNull String[] args) {
 
-        //Check if the sender is a player.
+        // Check if the sender is a player.
         Player player = getPlayer(stack);
         if (player == null) {
             return;
         }
 
-        //Check allowed server type.
+        // Check allowed server type.
         if (SERVER_TYPE != ServerType.PLOT && SERVER_TYPE != ServerType.EARTH) {
             player.sendMessage(ChatUtils.error("You do not have permission to use this command here."));
             return;
         }
 
-        //Check if the player has permission.
+        // Check if the player has permission.
         if (!hasPermission(player, "uknet.gamemode")) {
             return;
         }
 
-        //If no args are given, send a list of clickable gamemodes.
-        //Else switch to the given gamemode in arg[0], if it exists.
+        // If no args are given, send a list of clickable gamemodes.
+        // Else switch to the given gamemode in arg[0], if it exists.
         if (args.length == 0) {
 
             Component message = Component.text("Available gamemodes: ", NamedTextColor.GREEN);
@@ -62,30 +63,31 @@ public class Gamemode extends AbstractCommand {
 
                 Component gamemode;
 
-                //If the player is in the gamemode, highlight it.
+                // If the player is in the gamemode, highlight it.
                 if (player.getGameMode() == GameMode.valueOf(gamemodes.get(i).toUpperCase(Locale.ROOT))) {
                     gamemode = Component.text(StringUtils.capitalize(gamemodes.get(i)), TextColor.color(245, 173, 100));
-                    gamemode = gamemode.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Utils.line("You are already in this gamemode.")));
+                    gamemode = gamemode.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Utils.line("You" +
+                            " are already in this gamemode.")));
                 } else {
                     gamemode = Component.text(StringUtils.capitalize(gamemodes.get(i)), TextColor.color(245, 221, 100));
-                    gamemode = gamemode.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "/gamemode " + gamemodes.get(i)));
-                    gamemode = gamemode.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Utils.line("Click to switch to " + StringUtils.capitalize(gamemodes.get(i)))));
+                    gamemode = gamemode.clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND,
+                            "/gamemode " + gamemodes.get(i)));
+                    gamemode = gamemode.hoverEvent(HoverEvent.hoverEvent(HoverEvent.Action.SHOW_TEXT, Utils.line(
+                            "Click to switch to " + StringUtils.capitalize(gamemodes.get(i)))));
                 }
 
                 message = message.append(gamemode);
 
-                //Add comma is not the list value.
+                // Add comma is not the list value.
                 if (i < (gamemodes.size() - 1)) {
                     message = message.append(Utils.line(", "));
                 }
-
             }
 
             player.sendMessage(message);
-
         } else {
 
-            //Check if the gamemode exists.
+            // Check if the gamemode exists.
             if (!gamemodes.contains(args[0].toLowerCase(Locale.ROOT))) {
 
                 Component error = Component.text(args[0], NamedTextColor.DARK_RED);
@@ -93,13 +95,13 @@ public class Gamemode extends AbstractCommand {
 
                 player.sendMessage(error);
                 return;
-
             }
 
-            //Set the player to this gamemode.
+            // Set the player to this gamemode.
             player.setGameMode(GameMode.valueOf(args[0].toUpperCase(Locale.ROOT)));
-            player.sendMessage(ChatUtils.success("Set gamemode to ").append(Component.text(StringUtils.capitalize(args[0].toLowerCase(Locale.ROOT)), NamedTextColor.DARK_AQUA)));
-
+            player.sendMessage(ChatUtils.success("Set gamemode to ")
+                    .append(Component.text(StringUtils.capitalize(args[0].toLowerCase(Locale.ROOT)),
+                            NamedTextColor.DARK_AQUA)));
         }
     }
 }

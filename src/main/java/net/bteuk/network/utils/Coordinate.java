@@ -13,7 +13,9 @@ import org.bukkit.World;
 @Data
 public class Coordinate {
 
-    /** ID of the coordinate */
+    /**
+     * ID of the coordinate
+     */
     private int id;
 
     private String server;
@@ -33,6 +35,7 @@ public class Coordinate {
     /**
      * Return a location object for this coordinate.
      * If the world does not exist on this server it will return null!
+     *
      * @return the location
      */
     public Location getLocation() {
