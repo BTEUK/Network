@@ -2,7 +2,6 @@ package net.bteuk.network.building_companion;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.commands.navigation.Tpll;
-import net.bteuk.network.utils.Constants;
 import net.bteuk.network.utils.TpllFormat;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

@@ -3,7 +3,6 @@ package net.bteuk.network.gui.tutorials;
 import net.bteuk.network.Network;
 import net.bteuk.network.gui.Gui;
 import net.bteuk.network.lib.utils.ChatUtils;
-import net.bteuk.network.utils.Constants;
 import net.bteuk.network.utils.NetworkUser;
 import net.bteuk.network.utils.SwitchServer;
 import net.bteuk.network.utils.TutorialRecommendation;

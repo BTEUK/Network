@@ -1,13 +1,24 @@
 package net.bteuk.network;
 
 import lombok.Getter;
+import lombok.extern.java.Log;
+import net.bteuk.network.api.CoordinateAPI;
 import net.bteuk.network.api.NetworkAPI;
+import net.bteuk.network.api.PlotAPI;
+import net.bteuk.network.api.WorldGuardAPI;
+import net.bteuk.network.api.impl.CoordinateAPIImpl;
+import net.bteuk.network.api.impl.PlotAPIImpl;
 import net.bteuk.network.commands.navigation.Tpll;
 import net.bteuk.network.commands.staff.Ban;
 import net.bteuk.network.commands.staff.Kick;
 import net.bteuk.network.commands.staff.Mute;
 import net.bteuk.network.commands.staff.Unban;
 import net.bteuk.network.commands.staff.Unmute;
+import net.bteuk.network.core.Constants;
+import net.bteuk.network.core.ServerType;
+import net.bteuk.network.core.Time;
+import net.bteuk.network.core.sql.DatabaseInit;
+import net.bteuk.network.eventing.events.EventManager;
 import net.bteuk.network.eventing.listeners.CommandPreProcess;
 import net.bteuk.network.eventing.listeners.Connect;
 import net.bteuk.network.eventing.listeners.GuiListener;
@@ -22,21 +33,19 @@ import net.bteuk.network.lib.dto.OnlineUserRemove;
 import net.bteuk.network.lib.dto.OnlineUsersReply;
 import net.bteuk.network.lib.dto.ServerStartup;
 import net.bteuk.network.lobby.Lobby;
+import net.bteuk.network.logging.BukkitForwardingHandler;
+import net.bteuk.network.regions.RegionManager;
+import net.bteuk.network.regions.sql.RegionSQL;
 import net.bteuk.network.services.NetworkPromotionService;
-import net.bteuk.network.sql.DatabaseInit;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.sql.PlotSQL;
-import net.bteuk.network.sql.RegionSQL;
 import net.bteuk.network.utils.NetworkConfig;
 import net.bteuk.network.utils.NetworkUser;
-import net.bteuk.network.utils.Time;
 import net.bteuk.network.utils.Tips;
 import net.bteuk.network.utils.Utils;
-import net.bteuk.network.utils.enums.ServerType;
-import net.bteuk.network.utils.regions.RegionManager;
+import net.bteuk.network.utils.worldguard.WorldGuard;
 import net.bteuk.teachingtutorials.services.PromotionService;
 import net.buildtheearth.terraminusminus.TerraConfig;
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
@@ -46,20 +55,18 @@ import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import teachingtutorials.utils.DBConnection;
 
+import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Optional;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import static net.bteuk.network.utils.Constants.LOGGER;
-import static net.bteuk.network.utils.Constants.REGIONS_ENABLED;
-import static net.bteuk.network.utils.Constants.SERVER_NAME;
-import static net.bteuk.network.utils.Constants.SERVER_TYPE;
-import static net.bteuk.network.utils.Constants.TIPS;
-import static net.bteuk.network.utils.Constants.TPLL_ENABLED;
-import static net.bteuk.network.utils.Constants.TUTORIALS;
 import static net.bteuk.network.utils.NetworkConfig.CONFIG;
 
+@Log
 public final class Network extends JavaPlugin implements NetworkAPI {
 
     // Returns an instance of the plugin.
@@ -134,8 +141,31 @@ public final class Network extends JavaPlugin implements NetworkAPI {
     @Getter
     private DBConnection tutorialsDBConnection;
 
+    @Getter
+    private PlotAPI plotAPI;
+
+    private CoordinateAPI coordinateAPI;
+
+    private EventManager eventManager;
+
+    private WorldGuardAPI worldGuardAPI;
+
+    private Constants constants;
+
     @Override
     public void onEnable() {
+
+        // Setup the logger.
+        Logger base = Logger.getLogger("net.bteuk.network");
+        base.setLevel(Level.ALL);
+        base.setUseParentHandlers(false);
+
+        // Make sure we don’t accumulate multiple handlers across reloads
+        for (Handler h : base.getHandlers()) {
+            base.removeHandler(h);
+        }
+
+        base.addHandler(new BukkitForwardingHandler(getLogger()));
 
         // Config Setup
         Network.instance = this;
@@ -161,24 +191,29 @@ public final class Network extends JavaPlugin implements NetworkAPI {
             return;
         }
 
+        constants = networkConfig.getConstants();
+
         // Setup MySQL
         try {
-
             DatabaseInit init = new DatabaseInit();
+            String host = CONFIG.getString("host");
+            int port = CONFIG.getInt("port");
+            String username = CONFIG.getString("username");
+            String password = CONFIG.getString("password");
 
             // Global Database
             String global_database = CONFIG.getString("database.global");
-            BasicDataSource global_dataSource = init.mysqlSetup(global_database);
+            DataSource global_dataSource = init.mysqlSetup(global_database, host, port, username, password);
             globalSQL = new GlobalSQL(global_dataSource);
 
             // Region Database
             String region_database = CONFIG.getString("database.region");
-            BasicDataSource region_dataSource = init.mysqlSetup(region_database);
+            DataSource region_dataSource = init.mysqlSetup(region_database, host, port, username, password);
             regionSQL = new RegionSQL(region_dataSource);
 
             // Plot Database
             String plot_database = CONFIG.getString("database.plot");
-            BasicDataSource plot_dataSource = init.mysqlSetup(plot_database);
+            DataSource plot_dataSource = init.mysqlSetup(plot_database, host, port, username, password);
             plotSQL = new PlotSQL(plot_dataSource);
         } catch (SQLException | RuntimeException e) {
             getLogger().severe("Failed to connect to the database, please check that you have set the config values " +
@@ -188,7 +223,7 @@ public final class Network extends JavaPlugin implements NetworkAPI {
         }
 
         // Setup tutorials DB connection and connect
-        if (TUTORIALS) {
+        if (constants.tutorials()) {
             // Initialise the DBConnection object
             tutorialsDBConnection = new DBConnection();
 
@@ -211,15 +246,15 @@ public final class Network extends JavaPlugin implements NetworkAPI {
             }
         }
 
-        if (!globalSQL.hasRow("SELECT name FROM server_data WHERE name='" + SERVER_NAME + "';")) {
+        if (!globalSQL.hasRow("SELECT name FROM server_data WHERE name='" + constants.serverName() + "';")) {
 
             // Add server to database and enable server.
             if (globalSQL.update(
-                    "INSERT INTO server_data(name,type) VALUES('" + SERVER_NAME + "','" + SERVER_TYPE + "');"
+                    "INSERT INTO server_data(name,type) VALUES('" + constants.serverName() + "','" + constants.serverType() + "');"
             )) {
 
                 // Enable plugin.
-                getLogger().info("Server added to database with name " + SERVER_NAME + " and type " + SERVER_TYPE);
+                getLogger().info("Server added to database with name " + constants.serverName() + " and type " + constants.serverType());
                 getLogger().info("Enabling Plugin");
                 enablePlugin();
             } else {
@@ -242,6 +277,11 @@ public final class Network extends JavaPlugin implements NetworkAPI {
         networkUsers = new ArrayList<>();
         onlineUsers = new HashSet<>();
 
+        plotAPI = new PlotAPIImpl(plotSQL);
+        coordinateAPI = new CoordinateAPIImpl(globalSQL);
+        eventManager = new EventManager(globalSQL);
+        worldGuardAPI = new WorldGuard();
+
         // Enable tab.
         tab = new TabManager(this);
 
@@ -263,22 +303,22 @@ public final class Network extends JavaPlugin implements NetworkAPI {
         new PlayerInteract(this);
 
         // Create regionManager if enabled.
-        if (REGIONS_ENABLED) {
-            regionManager = new RegionManager(regionSQL);
+        if (constants.regionsEnabled()) {
+            regionManager = new RegionManager(regionSQL, globalSQL, plotSQL, chat, coordinateAPI, eventManager, worldGuardAPI, constants);
         }
 
         moveListener = new MoveListener(this);
         teleportListener = new TeleportListener(this);
 
         // Setup Timers
-        timers = new Timers(this, globalSQL);
+        timers = new Timers(this, globalSQL, eventManager);
         timers.startTimers();
 
         // Setup the lobby, most features are only enabled in the lobby server.
         lobby = new Lobby(this);
         // Create the rules book.
         lobby.loadRules();
-        if (SERVER_TYPE == ServerType.LOBBY) {
+        if (constants.serverType() == ServerType.LOBBY) {
 
             // Set spawn location and enable auto-spawn teleport when falling in the void.
             lobby.setSpawn();
@@ -294,7 +334,7 @@ public final class Network extends JavaPlugin implements NetworkAPI {
         lobby.reloadMap();
 
         // Enable commands
-        if (TPLL_ENABLED) {
+        if (constants.tpllEnabled()) {
             TerraConfig.reducedConsoleMessages = true;
             tpll = new Tpll(instance, CONFIG.getBoolean("requires_permission"));
         }
@@ -309,7 +349,7 @@ public final class Network extends JavaPlugin implements NetworkAPI {
         new CommandPreProcess(this);
 
         // Enable tips.
-        if (TIPS) {
+        if (constants.tips()) {
             // Enable tips in chat.
             new Tips();
         }
@@ -325,13 +365,13 @@ public final class Network extends JavaPlugin implements NetworkAPI {
             PromotionService promotionService = new NetworkPromotionService();
             this.getServer().getServicesManager().register(PromotionService.class, promotionService, this,
                     ServicePriority.High);
-            LOGGER.info("Registered Network Promotion Service");
+            log.info("Registered Network Promotion Service");
         } catch (ClassNotFoundException e) {
             // Only load the PromotionService if the class exists.
         }
 
         // Let the Proxy know that the server is enabled.
-        instance.getChat().sendSocketMessage(new ServerStartup(SERVER_NAME));
+        instance.getChat().sendSocketMessage(new ServerStartup(constants.serverName()));
 
         // Register the API as a service.
         getServer().getServicesManager().register(NetworkAPI.class, this, this, ServicePriority.Normal);
@@ -382,7 +422,7 @@ public final class Network extends JavaPlugin implements NetworkAPI {
         }
 
         // Disconnect from tutorials
-        if (TUTORIALS) {
+        if (constants.tutorials() && tutorialsDBConnection != null) {
             tutorialsDBConnection.disconnect();
         }
     }

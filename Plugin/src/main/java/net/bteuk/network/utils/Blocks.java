@@ -1,9 +1,9 @@
 package net.bteuk.network.utils;
 
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import net.bteuk.network.core.math.Point;
 import net.bteuk.network.exceptions.building_companion.DistanceLimitException;
 import net.bteuk.network.exceptions.building_companion.OutsidePlotException;
-import net.bteuk.network.utils.math.Point;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;

@@ -13,7 +13,7 @@
     <artifactId>api</artifactId>
     <name>Network API</name>
     <description>API for the Network plugin</description>
-    <version>1.0.0</version>
+    <version>1.7.3</version>
 
     <repositories>
         <repository>
@@ -26,7 +26,7 @@
         <dependency>
             <groupId>com.github.BTEUK</groupId>
             <artifactId>NetworkLib</artifactId>
-            <version>main-SNAPSHOT</version>
+            <version>a781b6371c</version>
         </dependency>
     </dependencies>
 

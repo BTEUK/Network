@@ -6,12 +6,12 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
-import net.bteuk.network.exceptions.RegionManagerNotFoundException;
+import lombok.extern.java.Log;
+import net.bteuk.network.minecraft.worldguard.exceptions.RegionManagerNotFoundException;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-import static net.bteuk.network.utils.Constants.LOGGER;
-
+@Log
 public class WorldguardManager {
 
     private static WorldGuard instance;
@@ -21,7 +21,7 @@ public class WorldguardManager {
      */
     public static void setInstance() {
         instance = WorldGuard.getInstance();
-        LOGGER.info("Set WorldGuard instance");
+        log.info("Set WorldGuard instance");
     }
 
     /**

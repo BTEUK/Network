@@ -2,9 +2,11 @@ package net.bteuk.network.commands.navigation;
 
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.bteuk.network.Network;
+import net.bteuk.network.api.EventAPI;
+import net.bteuk.network.api.entity.NetworkLocation;
 import net.bteuk.network.commands.AbstractCommand;
-import net.bteuk.network.eventing.events.EventManager;
 import net.bteuk.network.lib.utils.ChatUtils;
+import net.bteuk.network.papercore.LocationAdapter;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.utils.SwitchServer;
 import org.bukkit.Location;
@@ -17,15 +19,21 @@ import static net.bteuk.network.utils.Constants.SERVER_NAME;
 
 public class Back extends AbstractCommand {
 
+    private EventAPI eventAPI;
+
+    public Back(EventAPI eventAPI) {
+        this.eventAPI = eventAPI;
+    }
+
     // Sets the location as the previous location in the database.
-    public static void setPreviousCoordinate(String uuid, Location l) {
+    public static void setPreviousCoordinate(String uuid, NetworkLocation location) {
 
         // Set previous location for /back.
         if (Network.getInstance().getGlobalSQL()
                 .getInt("SELECT previous_coordinate FROM player_data WHERE uuid='" + uuid + "';") == 0) {
 
             // No coordinate exists, create new.
-            int coordinateID = Network.getInstance().getGlobalSQL().addCoordinate(l);
+            int coordinateID = Network.getInstance().getGlobalSQL().addCoordinate(location);
 
             // Set coordinate id in player data.
             Network.getInstance().getGlobalSQL()
@@ -38,7 +46,7 @@ public class Back extends AbstractCommand {
                     "player_data WHERE uuid='" + uuid + "';");
 
             // Update existing coordinate.
-            Network.getInstance().getGlobalSQL().updateCoordinate(coordinateID, l);
+            Network.getInstance().getGlobalSQL().updateCoordinate(coordinateID, location);
         }
     }
 
@@ -72,7 +80,7 @@ public class Back extends AbstractCommand {
             Location l = Network.getInstance().getGlobalSQL().getLocation(coordinateID);
 
             // Set current location to previous location.
-            setPreviousCoordinate(player.getUniqueId().toString(), player.getLocation());
+            setPreviousCoordinate(player.getUniqueId().toString(), LocationAdapter.adapt(player.getLocation()));
 
             // Teleport player to the coordinate.
             player.teleport(l);
@@ -83,14 +91,14 @@ public class Back extends AbstractCommand {
             GlobalSQL globalSQL = Network.getInstance().getGlobalSQL();
 
             // Create teleport event for location of coordinate id
-            EventManager.createTeleportEvent(true, player.getUniqueId().toString(), "network", "teleport " +
+            eventAPI.createTeleportEvent(true, player.getUniqueId().toString(), "network", "teleport " +
                             globalSQL.getString("SELECT world FROM coordinates WHERE id=" + coordinateID + ";") + " " +
                             globalSQL.getDouble("SELECT x FROM coordinates WHERE id=" + coordinateID + ";") + " " +
                             globalSQL.getDouble("SELECT y FROM coordinates WHERE id=" + coordinateID + ";") + " " +
                             globalSQL.getDouble("SELECT z FROM coordinates WHERE id=" + coordinateID + ";") + " " +
                             globalSQL.getFloat("SELECT yaw FROM coordinates WHERE id=" + coordinateID + ";") + " " +
                             globalSQL.getFloat("SELECT pitch FROM coordinates WHERE id=" + coordinateID + ";"),
-                    "&aTeleport to previous location.", player.getLocation());
+                    "&aTeleport to previous location.", LocationAdapter.adapt(player.getLocation()));
 
             // Switch server.
             SwitchServer.switchServer(player, server);

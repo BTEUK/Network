@@ -1,11 +1,10 @@
 package net.bteuk.network;
 
-import lombok.Getter;
+import net.bteuk.network.core.Time;
 import net.bteuk.network.eventing.events.EventManager;
+import net.bteuk.network.regions.Inactivity;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.utils.NetworkUser;
-import net.bteuk.network.utils.Time;
-import net.bteuk.network.utils.regions.Inactivity;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 
@@ -32,7 +31,6 @@ public class Timers {
     // Afk time
     private final long afk;
     // Event manager
-    @Getter
     private final EventManager eventManager;
     // Server events
     private ArrayList<String[]> events;
@@ -42,7 +40,7 @@ public class Timers {
     private ArrayList<Inactivity> inactive_owners;
     private String uuid;
 
-    public Timers(Network instance, GlobalSQL globalSQL) {
+    public Timers(Network instance, GlobalSQL globalSQL, EventManager eventManager) {
 
         this.instance = instance;
         this.users = instance.getUsers();
@@ -51,7 +49,7 @@ public class Timers {
 
         this.timers = new ArrayList<>();
 
-        eventManager = new EventManager();
+        this.eventManager = eventManager;
         events = new ArrayList<>();
 
         // days * 24 hours * 60 minutes * 60 seconds * 1000 milliseconds

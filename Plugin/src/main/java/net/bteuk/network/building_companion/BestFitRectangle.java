@@ -1,8 +1,8 @@
 package net.bteuk.network.building_companion;
 
 import lombok.Getter;
-import net.bteuk.network.utils.math.Line;
-import net.bteuk.network.utils.math.Point;
+import net.bteuk.network.core.math.Line;
+import net.bteuk.network.core.math.Point;
 
 import java.util.Arrays;
 

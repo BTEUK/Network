@@ -1,11 +1,12 @@
 package net.bteuk.network.sql;
 
+import net.bteuk.network.core.sql.AbstractSQL;
 import net.bteuk.network.lib.enums.PlotDifficulties;
 import net.bteuk.network.lib.utils.Reviewing;
 import net.bteuk.network.utils.TutorialRecommendation;
 import net.bteuk.network.utils.plotsystem.SubmittedPlot;
-import org.apache.commons.dbcp2.BasicDataSource;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -20,7 +21,7 @@ import static net.buildtheearth.terraminusminus.TerraMinusMinus.LOGGER;
 
 public class PlotSQL extends AbstractSQL {
 
-    public PlotSQL(BasicDataSource datasource) {
+    public PlotSQL(DataSource datasource) {
         super(datasource);
     }
 
@@ -323,7 +324,7 @@ public class PlotSQL extends AbstractSQL {
         return 0;
     }
 
-    public void savePlotReviewCategoryFeedback(int reviewId, String category, String selection, int bookId) {
+    public boolean savePlotReviewCategoryFeedback(int reviewId, String category, String selection, int bookId) {
         try (
                 Connection conn = conn();
                 PreparedStatement statement = conn.prepareStatement("INSERT INTO plot_category_feedback(review_id," + "category,selection,book_id) VALUES(?, ?, ?, ?);")
@@ -336,7 +337,9 @@ public class PlotSQL extends AbstractSQL {
             statement.executeUpdate();
         } catch (SQLException sql) {
             sql.printStackTrace();
+            return false;
         }
+        return true;
     }
 
     /**
@@ -384,7 +387,7 @@ public class PlotSQL extends AbstractSQL {
      * @param bookOld        the book id of the reviewers feedback
      * @param bookNew        the book id of the verifiers feedback
      */
-    public void savePlotVerificationCategory(int verificationId, String category, String selectionOld, String selectionNew, int bookOld, int bookNew) {
+    public boolean savePlotVerificationCategory(int verificationId, String category, String selectionOld, String selectionNew, int bookOld, int bookNew) {
         try (
                 Connection conn = conn(); PreparedStatement statement = conn.prepareStatement(
                 "INSERT INTO plot_verification_category" + "(verification_id,category,selection_old,selection_new,book_id_old,book_id_new) VALUES(?, ?, ?, ?, ?, ?);")
@@ -398,10 +401,12 @@ public class PlotSQL extends AbstractSQL {
             statement.executeUpdate();
         } catch (SQLException sql) {
             sql.printStackTrace();
+            return false;
         }
+        return true;
     }
 
-    public void saveBook(int id, int page, String contents) {
+    public boolean saveBook(int id, int page, String contents) {
         try (
                 Connection conn = conn();
                 PreparedStatement statement = conn.prepareStatement("INSERT INTO book_data(id,page,contents) VALUES(?, ?, ?);")
@@ -412,7 +417,9 @@ public class PlotSQL extends AbstractSQL {
             statement.executeUpdate();
         } catch (SQLException sql) {
             LOGGER.error("An error occurred when executing insert statement: ", sql);
+            return false;
         }
+        return true;
     }
 
     /**

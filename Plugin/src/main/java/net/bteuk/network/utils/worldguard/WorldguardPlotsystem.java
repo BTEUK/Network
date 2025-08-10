@@ -3,12 +3,8 @@ package net.bteuk.network.utils.worldguard;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
-import net.bteuk.network.Network;
-import net.bteuk.network.exceptions.RegionManagerNotFoundException;
 import net.bteuk.network.exceptions.RegionNotFoundException;
-import net.bteuk.network.sql.PlotSQL;
-import net.bteuk.network.utils.Utils;
-import net.bteuk.network.utils.math.Point;
+import net.bteuk.network.minecraft.worldguard.exceptions.RegionManagerNotFoundException;
 import org.bukkit.Location;
 import org.bukkit.World;
 

@@ -1,11 +1,13 @@
 package net.bteuk.network.sql;
 
+import net.bteuk.network.api.entity.NetworkLocation;
 import net.bteuk.network.building_counter.Building;
+import net.bteuk.network.core.sql.AbstractSQL;
 import net.bteuk.network.utils.Coordinate;
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,7 +18,7 @@ import java.util.ArrayList;
 import static net.bteuk.network.utils.Constants.SERVER_NAME;
 
 public class GlobalSQL extends AbstractSQL {
-    public GlobalSQL(BasicDataSource datasource) {
+    public GlobalSQL(DataSource datasource) {
         super(datasource);
     }
 
@@ -59,6 +61,11 @@ public class GlobalSQL extends AbstractSQL {
     public int addCoordinate(Location l) {
 
         return (addCoordinate(SERVER_NAME, l.getWorld().getName(), l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch()));
+    }
+
+    // Add new coordinate to database and return the id.
+    public int addCoordinate(NetworkLocation l) {
+        return (addCoordinate(SERVER_NAME, l.world(), l.x(), l.y(), l.z(), l.yaw(), l.pitch()));
     }
 
     // Add new coordinate to database and return the id.
@@ -122,8 +129,34 @@ public class GlobalSQL extends AbstractSQL {
     }
 
     // Update an existing coordinate.
+    public void updateCoordinate(int coordinateID, String server, NetworkLocation location) {
+
+        try (
+                Connection conn = conn(); PreparedStatement statement = conn.prepareStatement("UPDATE coordinates SET server=?, world=?, x=?, y=?, z=?, yaw=?, pitch=? WHERE id=?;")
+        ) {
+            statement.setString(1, server);
+            statement.setString(2, location.world());
+            statement.setDouble(3, location.x());
+            statement.setDouble(4, location.y());
+            statement.setDouble(5, location.z());
+            statement.setFloat(6, location.yaw());
+            statement.setFloat(7, location.pitch());
+            statement.setInt(8, coordinateID);
+            statement.executeUpdate();
+        } catch (SQLException sql) {
+
+            sql.printStackTrace();
+        }
+    }
+
+    // Update an existing coordinate.
     public void updateCoordinate(int coordinateID, Location l) {
         updateCoordinate(coordinateID, SERVER_NAME, l);
+    }
+
+    // Update an existing coordinate.
+    public void updateCoordinate(int coordinateID, NetworkLocation location) {
+        updateCoordinate(coordinateID, SERVER_NAME, location);
     }
 
     public ArrayList<Building> getBuildings(String condition) {
