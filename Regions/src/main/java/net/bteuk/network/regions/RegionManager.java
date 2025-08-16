@@ -4,7 +4,9 @@ import lombok.extern.java.Log;
 import net.bteuk.network.api.ChatAPI;
 import net.bteuk.network.api.CoordinateAPI;
 import net.bteuk.network.api.EventAPI;
+import net.bteuk.network.api.PlotAPI;
 import net.bteuk.network.api.SQLAPI;
+import net.bteuk.network.api.ServerAPI;
 import net.bteuk.network.api.WorldGuardAPI;
 import net.bteuk.network.core.Constants;
 import net.bteuk.network.core.ServerType;
@@ -14,13 +16,16 @@ import net.bteuk.network.lib.dto.DirectMessage;
 import net.bteuk.network.lib.enums.ChatChannels;
 import net.bteuk.network.lib.utils.ChatUtils;
 import net.bteuk.network.papercore.LocationAdapter;
+import net.bteuk.network.regions.listener.RegionMoveListener;
 import net.bteuk.network.regions.sql.RegionSQL;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -30,25 +35,33 @@ public class RegionManager {
     private final Map<String, Region> regions;
     private final RegionSQL regionSQL;
     private final SQLAPI globalSQL;
-    private final SQLAPI plotSQL;
+    private final PlotAPI plotAPI;
     private final ChatAPI chat;
     private final CoordinateAPI coordinateAPI;
     private final EventAPI eventAPI;
     private final WorldGuardAPI worldGuard;
     private final Constants constants;
 
-    public RegionManager(RegionSQL regionSQL, SQLAPI globalSQL, SQLAPI plotSQL, ChatAPI chat, CoordinateAPI coordinateAPI, EventAPI eventAPI, WorldGuardAPI worldGuard,
-                         Constants constants) {
+    private List<RegionUser> users = new ArrayList<>();
+
+    public RegionManager(RegionSQL regionSQL, SQLAPI globalSQL, PlotAPI plotAPI, ChatAPI chat, CoordinateAPI coordinateAPI, EventAPI eventAPI, WorldGuardAPI worldGuard,
+                         Constants constants, JavaPlugin plugin, ServerAPI serverAPI) {
         regions = new HashMap<>();
 
         this.regionSQL = regionSQL;
         this.globalSQL = globalSQL;
-        this.plotSQL = plotSQL;
+        this.plotAPI = plotAPI;
         this.chat = chat;
         this.coordinateAPI = coordinateAPI;
         this.eventAPI = eventAPI;
         this.worldGuard = worldGuard;
         this.constants = constants;
+
+        new RegionMoveListener(plugin, this, plotAPI, constants, globalSQL, eventAPI, serverAPI);
+    }
+
+    public RegionUser getUserByPlayer(Player player) {
+        return users.stream().filter(user -> user.getPlayer().equals(player)).findFirst().orElse(null);
     }
 
     /**
@@ -143,10 +156,8 @@ public class RegionManager {
     public String getServer(Region region) {
         if (regionSQL.hasRow("SELECT region FROM regions WHERE region='" + region.regionName() + "' AND " +
                 "status='plot'")) {
-            // net.bteuk.network.regions.Region is on a plot server.
-            return (plotSQL.getString("SELECT server FROM regions WHERE region='" + region.regionName() + "';"));
+            return (plotAPI.getRegionServer("SELECT server FROM regions WHERE region='" + region.regionName() + "';"));
         } else {
-            // net.bteuk.network.regions.Region is on earth server.
             return (globalSQL.getString("SELECT name FROM server_data WHERE type='EARTH';"));
         }
     }
@@ -357,8 +368,7 @@ public class RegionManager {
 
     // Check whether the region is in the database.
     public boolean inDatabase(Region region) {
-        return (regionSQL.hasRow("SELECT region FROM regions WHERE region='" + region.regionName() + "';"
-        ));
+        return (regionSQL.hasRow("SELECT region FROM regions WHERE region='" + region.regionName() + "';"));
     }
 
     // Add the region to the database.

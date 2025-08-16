@@ -1,5 +1,5 @@
 # Config version, do not update this manually as it could break the config.
-version: 1.7.3
+version: 1.8.0
 
 #MySQL is mandatory for this plugin.
 #Login information
@@ -16,9 +16,12 @@ database:
 
 #Server configuration
 #Server types: PLOT, EARTH, LOBBY, TUTORIAL
+#If you are running this server standalone, then keep this as 'EARTH'.
+#Standalone implies that this is the only server in your network.
 enabled: false
 server_name: server_name
 server_type: EARTH
+standalone: false
 
 #Lobby info, only necessary if server type is LOBBY.
 spawn:
@@ -43,7 +46,7 @@ map:
 
 #Staff features
 staff:
-  staff_chat:
+  chat:
     enabled: true
   moderation:
     enabled: true
@@ -75,6 +78,8 @@ homes:
 
 #Chat Settings
 chat:
+  #The socket configuration is only necessary if running the server as part of a network
+  #Else, it will be ignored (if standalone=true)
   socket:
     input:
       port: 30590
@@ -102,35 +107,38 @@ tpll:
   max_y: 1360
 
 #Enable regions and cross-server teleport.
-#Regions must be enabled for cross-server teleport to function.
+#Regions must be enabled for cross-server teleport to function (if standalone=false).
 #Earth world must be specified on all servers as it is used to determine cross-server tpll to the earth server.
-#To make sure the player is teleported to the correct world if multiple exist.
-regions_enabled: true
-global_teleport: true
-earth_world: earth
+#To make sure the player is teleported to the correct world.
+regions:
+  enabled: true
+  earth_world: earth
+
+  #Number of days a region owner can be inactive before they are demoted to member.
+  #If the region has no other members, then the owner does not get demoted by the region becomes 'inactive'.
+  inactivity_days: 30
+
+  #When staff approval is needed for Jr.Builder region requests.
+  #These values are only relevant if regions are enabled.
+  #Always means that staff approval is always required.
+  #Radius is the square radius around the region that is checked when determining whether staff approval is necessary.
+  #If someone else owns a region in this radius, staff approval will be needed.
+  #If you want to disable this entirely, set the radius to 0.
+  staff_request:
+    always: false
+    radius: 5
+
+#Whether the server network has a plot system server.
+plot_system_enabled: true
 
 #Should /ll be enabled.
 ll_enabled: true
 
-#Time before player is set to AFK (minutes).
+#Time before the player is set to AFK (minutes).
 afk: 5
 
 #Radius to search in the nearby locations tab of the exploration menu, distance in kilometres.
 navigation_radius: 200
-
-#When staff approval is needed for Jr.Builder region requests.
-#These values are only relevant if regions are enabled.
-#Always means that staff approval is always required.
-#Radius is the square radius around the region that is checked when determining whether staff approval is necessary.
-#If a region in this radius is owned by someone else staff approval will be needed.
-#If you want to disable this entirely, set the radius to 0.
-staff_request:
-  always: false
-  radius: 5
-
-#Number of days a region owner can be inactive before they are demoted to member.
-#If the region has no other members then the owner does not get demoted by the region becomes 'inactive'.
-region_inactivity: 30
 
 #Discord link
 discord: 'https://discord.gg/5m56EgEVW6'

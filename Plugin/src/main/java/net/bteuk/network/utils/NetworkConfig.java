@@ -2,6 +2,7 @@ package net.bteuk.network.utils;
 
 import lombok.extern.java.Log;
 import net.bteuk.network.Network;
+import net.bteuk.network.core.Constants;
 import net.bteuk.network.core.ServerType;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -35,7 +36,7 @@ public class NetworkConfig {
     private String latestVersion() {
         String version = Objects.requireNonNull(CONFIG.getDefaults()).getString("version");
         // If null return default.
-        return Objects.requireNonNullElse(version, "1.4.4");
+        return Objects.requireNonNullElse(version, "1.8.0");
     }
 
     // Update config if the version is outdated.
@@ -100,19 +101,20 @@ public class NetworkConfig {
         // Set the server type from config.
         ServerType serverType = ServerType.valueOf(CONFIG.getString("server_type"));
 
-        boolean regionsEnabled = CONFIG.getBoolean("regions_enabled");
+        // Basically indicates that this server is not running in a network.
+        boolean standalone = CONFIG.getBoolean("standalone");
+
+        boolean regionsEnabled = CONFIG.getBoolean("regions.enabled");
 
         // days * 24 hours * 60 minutes * 60 seconds * 1000 milliseconds
-        long regionInactivity = CONFIG.getInt("region_inactivity") * 24L * 60L * 60L * 1000L;
+        long regionInactivity = CONFIG.getInt("region.inactivity_days") * 24L * 60L * 60L * 1000L;
 
         boolean tpllEnabled = CONFIG.getBoolean("tpll.enabled");
 
         int maxY = CONFIG.getInt("tpll.max_y");
         int minY = CONFIG.getInt("tpll.min_y");
 
-        boolean customMessages = CONFIG.getBoolean("chat.custom_messages.enabled");
-
-        boolean staffChat = CONFIG.getBoolean("staff.staff_chat.enabled");
+        boolean staffChat = CONFIG.getBoolean("staff.chat.enabled");
 
         boolean tips = CONFIG.getBoolean("chat.tips.enabled");
 
@@ -145,15 +147,17 @@ public class NetworkConfig {
         String motdText = CONFIG.getString("motd.text", "");
 
         String earthWorld;
-        if (CONFIG.getString("earth_world") == null) {
+        if (CONFIG.getString("regions.earth_world") == null) {
             // Setting default value.
             earthWorld = "earth";
         } else {
-            earthWorld = CONFIG.getString("earth_world");
+            earthWorld = CONFIG.getString("regions.earth_world");
         }
 
-        return new net.bteuk.network.core.Constants(serverName, serverType, regionsEnabled, regionInactivity, tpllEnabled, maxY, minY, earthWorld, customMessages, staffChat, tips,
+        boolean plotSystemEnabled = CONFIG.getBoolean("plot_system.enabled");
+
+        return new Constants(serverName, serverType, standalone, regionsEnabled, regionInactivity, tpllEnabled, maxY, minY, earthWorld, staffChat, tips,
                 tutorials, llEnabled, progressMap, progression, announceOverallLevelUps, announceSeasonalLevelUps, sidebarEnabled, sidebarTitle, sidebarTextList, motdEnabled,
-                motdText);
+                motdText, plotSystemEnabled);
     }
 }

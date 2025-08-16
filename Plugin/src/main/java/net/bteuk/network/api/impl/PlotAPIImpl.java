@@ -33,7 +33,6 @@ public class PlotAPIImpl implements PlotAPI {
     @Override
     public boolean createLocation(String locationName, String alias, String server, int coordMin, int coordMax, int xTransform, int yTransform) {
 
-
         return false;
     }
 
@@ -180,5 +179,26 @@ public class PlotAPIImpl implements PlotAPI {
     @Override
     public boolean savePlotVerificationCategory(int verificationId, String category, String selectionOld, String selectionNew, int bookIdOld, int bookIdNew) {
         return plotSQL.savePlotVerificationCategory(verificationId, category, selectionOld, selectionNew, bookIdOld, bookIdNew);
+    }
+
+    @Override
+    public String getRegionLocation(String regionName) {
+        return plotSQL.getString("SELECT location FROM regions WHERE region='" + regionName + "';");
+    }
+
+    @Override
+    public String getRegionServer(String regionName) {
+        return plotSQL.getString("SELECT server FROM regions WHERE region='" + regionName + "';");
+    }
+
+    @Override
+    public int getXTransform(String location) {
+        return plotSQL.getInt("SELECT xTransform FROM location_data WHERE name='" + location + "';");
+
+    }
+
+    @Override
+    public int getZTransform(String location) {
+        return plotSQL.getInt("SELECT zTransform FROM location_data WHERE name='" + location + "';");
     }
 }

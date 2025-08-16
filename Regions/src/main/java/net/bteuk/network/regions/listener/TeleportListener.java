@@ -1,4 +1,4 @@
-package net.bteuk.network.eventing.listeners.global_teleport;
+package net.bteuk.network.regions.listener;
 
 import net.bteuk.network.Network;
 import net.bteuk.network.lib.utils.ChatUtils;

@@ -5,6 +5,7 @@ import lombok.extern.java.Log;
 import net.bteuk.network.api.CoordinateAPI;
 import net.bteuk.network.api.NetworkAPI;
 import net.bteuk.network.api.PlotAPI;
+import net.bteuk.network.api.ServerAPI;
 import net.bteuk.network.api.WorldGuardAPI;
 import net.bteuk.network.api.impl.CoordinateAPIImpl;
 import net.bteuk.network.api.impl.PlotAPIImpl;
@@ -24,8 +25,6 @@ import net.bteuk.network.eventing.listeners.Connect;
 import net.bteuk.network.eventing.listeners.GuiListener;
 import net.bteuk.network.eventing.listeners.PlayerInteract;
 import net.bteuk.network.eventing.listeners.PreJoinServer;
-import net.bteuk.network.eventing.listeners.global_teleport.MoveListener;
-import net.bteuk.network.eventing.listeners.global_teleport.TeleportListener;
 import net.bteuk.network.gui.NavigatorGui;
 import net.bteuk.network.lib.dto.OnlineUser;
 import net.bteuk.network.lib.dto.OnlineUserAdd;
@@ -35,12 +34,15 @@ import net.bteuk.network.lib.dto.ServerStartup;
 import net.bteuk.network.lobby.Lobby;
 import net.bteuk.network.logging.BukkitForwardingHandler;
 import net.bteuk.network.regions.RegionManager;
+import net.bteuk.network.regions.listener.RegionMoveListener;
+import net.bteuk.network.regions.listener.TeleportListener;
 import net.bteuk.network.regions.sql.RegionSQL;
 import net.bteuk.network.services.NetworkPromotionService;
 import net.bteuk.network.sql.GlobalSQL;
 import net.bteuk.network.sql.PlotSQL;
 import net.bteuk.network.utils.NetworkConfig;
 import net.bteuk.network.utils.NetworkUser;
+import net.bteuk.network.utils.SwitchServer;
 import net.bteuk.network.utils.Tips;
 import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.worldguard.WorldGuard;
@@ -80,7 +82,7 @@ public final class Network extends JavaPlugin implements NetworkAPI {
     public ItemStack navigator;
     public RegionSQL regionSQL;
     // Movement listeners.
-    public MoveListener moveListener;
+    public RegionMoveListener moveListener;
     public TeleportListener teleportListener;
     // Return an instance of the regionManager.
     // RegionManager
@@ -141,7 +143,6 @@ public final class Network extends JavaPlugin implements NetworkAPI {
     @Getter
     private DBConnection tutorialsDBConnection;
 
-    @Getter
     private PlotAPI plotAPI;
 
     private CoordinateAPI coordinateAPI;
@@ -151,6 +152,8 @@ public final class Network extends JavaPlugin implements NetworkAPI {
     private WorldGuardAPI worldGuardAPI;
 
     private Constants constants;
+
+    private ServerAPI serverAPI;
 
     @Override
     public void onEnable() {
@@ -207,14 +210,18 @@ public final class Network extends JavaPlugin implements NetworkAPI {
             globalSQL = new GlobalSQL(global_dataSource);
 
             // Region Database
-            String region_database = CONFIG.getString("database.region");
-            DataSource region_dataSource = init.mysqlSetup(region_database, host, port, username, password);
-            regionSQL = new RegionSQL(region_dataSource);
+            if (constants.regionsEnabled()) {
+                String region_database = CONFIG.getString("database.region");
+                DataSource region_dataSource = init.mysqlSetup(region_database, host, port, username, password);
+                regionSQL = new RegionSQL(region_dataSource);
+            }
 
             // Plot Database
-            String plot_database = CONFIG.getString("database.plot");
-            DataSource plot_dataSource = init.mysqlSetup(plot_database, host, port, username, password);
-            plotSQL = new PlotSQL(plot_dataSource);
+            if (constants.plotSystemEnabled()) {
+                String plot_database = CONFIG.getString("database.plot");
+                DataSource plot_dataSource = init.mysqlSetup(plot_database, host, port, username, password);
+                plotSQL = new PlotSQL(plot_dataSource);
+            }
         } catch (SQLException | RuntimeException e) {
             getLogger().severe("Failed to connect to the database, please check that you have set the config values " +
                     "correctly.");
@@ -277,10 +284,17 @@ public final class Network extends JavaPlugin implements NetworkAPI {
         networkUsers = new ArrayList<>();
         onlineUsers = new HashSet<>();
 
-        plotAPI = new PlotAPIImpl(plotSQL);
         coordinateAPI = new CoordinateAPIImpl(globalSQL);
         eventManager = new EventManager(globalSQL);
         worldGuardAPI = new WorldGuard();
+
+        if (!constants.standalone()) {
+            serverAPI = new SwitchServer(constants);
+        }
+
+        if (constants.plotSystemEnabled()) {
+            plotAPI = new PlotAPIImpl(plotSQL);
+        }
 
         // Enable tab.
         tab = new TabManager(this);
@@ -302,13 +316,14 @@ public final class Network extends JavaPlugin implements NetworkAPI {
         new GuiListener(this);
         new PlayerInteract(this);
 
-        // Create regionManager if enabled.
+        // Create the region manager if enabled.
         if (constants.regionsEnabled()) {
-            regionManager = new RegionManager(regionSQL, globalSQL, plotSQL, chat, coordinateAPI, eventManager, worldGuardAPI, constants);
+            regionManager = new RegionManager(regionSQL, globalSQL, plotAPI, chat, coordinateAPI, eventManager, worldGuardAPI, constants, this, serverAPI);
         }
 
-        moveListener = new MoveListener(this);
-        teleportListener = new TeleportListener(this);
+        // TODO: Implement network move and teleport listener.
+        //moveListener = new RegionMoveListener(this);
+        //teleportListener = new TeleportListener(this);
 
         // Setup Timers
         timers = new Timers(this, globalSQL, eventManager);
@@ -487,5 +502,12 @@ public final class Network extends JavaPlugin implements NetworkAPI {
             }
         }
         return false;
+    }
+
+    public PlotAPI getPlotAPI() {
+        if (plotAPI == null) {
+            throw new IllegalStateException("The plot system is not enabled");
+        }
+        return plotAPI;
     }
 }

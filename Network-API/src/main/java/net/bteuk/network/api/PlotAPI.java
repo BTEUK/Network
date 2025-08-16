@@ -80,4 +80,12 @@ public interface PlotAPI {
     int createVerification(int reviewId, String verifier, boolean acceptedOld, boolean acceptedNew);
 
     boolean savePlotVerificationCategory(int verificationId, String category, String selectionOld, String selectionNew, int bookIdOld, int bookIdNew);
+
+    String getRegionLocation(String regionName);
+
+    String getRegionServer(String regionName);
+
+    int getXTransform(String location);
+
+    int getZTransform(String location);
 }
