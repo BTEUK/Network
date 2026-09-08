@@ -215,9 +215,9 @@
             <version>3.20.0</version>
         </dependency>
         <dependency>
-            <groupId>net.buildtheearth.terraminusminus</groupId>
-            <artifactId>terraminusminus-bukkit</artifactId>
-            <version>2.2.1-1.21.8</version>
+            <groupId>com.github.BuildtheUK</groupId>
+            <artifactId>terraminusminus</artifactId>
+            <version>b55b88cff3</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -225,10 +225,6 @@
             <artifactId>caffeine</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.github.BuildtheUK</groupId>
-            <artifactId>NetworkLib</artifactId>
-        </dependency>
         <dependency>
             <groupId>com.github.BTEUK</groupId>
             <artifactId>TeachingTutorials</artifactId>
