@@ -18,16 +18,17 @@ public class PluginLibrariesLoader implements PluginLoader {
         MavenLibraryResolver resolver = new MavenLibraryResolver();
 
         // 1. Load terraminusminus while excluding netty-common to prevent duplicate ConstantPool initialization
-        DefaultArtifact terraArtifact = new DefaultArtifact("net.buildtheearth.terraminusminus:terraminusminus-bukkit:2.2.1-1.21.8");
+        DefaultArtifact terraArtifact = new DefaultArtifact("com.github.BuildtheUK:terraminusminus:b55b88cff3");
         Exclusion nettyCommonExclusion = new Exclusion("io.netty", "netty-common", "*", "*");
 
         resolver.addDependency(new Dependency(terraArtifact, null, false, List.of(nettyCommonExclusion)));
 
         // 2. Explicitly add netty-resolver-dns (with netty-common excluded) to avoid NoClassDefFoundError
-        DefaultArtifact dnsArtifact = new DefaultArtifact("io.netty:netty-resolver-dns:4.1.100.Final");
+        DefaultArtifact dnsArtifact = new DefaultArtifact("io.netty:netty-resolver-dns:4.1.123.Final");
         resolver.addDependency(new Dependency(dnsArtifact, null, false, List.of(nettyCommonExclusion)));
 
         // Repositories
+        resolver.addRepository(new RemoteRepository.Builder("jitpack.io", "default", "https://jitpack.io").build());
         resolver.addRepository(new RemoteRepository.Builder("reposilite-repository-releases", "default", "https://maven.buildtheearth.net/releases").build());
         resolver.addRepository(new RemoteRepository.Builder("central", "default", MavenLibraryResolver.MAVEN_CENTRAL_DEFAULT_MIRROR).build());
 
