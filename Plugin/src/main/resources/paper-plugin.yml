@@ -22,7 +22,7 @@ dependencies:
       load: AFTER
       required: false
       join-classpath: true
-    Terraplusminus:
+    terraminusminus:
       load: BEFORE
-      required: false
+      required: true
       join-classpath: true

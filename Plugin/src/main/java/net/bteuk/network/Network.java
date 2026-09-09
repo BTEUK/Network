@@ -108,6 +108,7 @@ import net.bteuk.network.utils.staff.Moderation;
 import net.bteuk.network.utils.worldguard.WorldGuard;
 import net.bteuk.teachingtutorials.services.PromotionService;
 import net.buildtheearth.terraminusminus.TerraConfig;
+import net.buildtheearth.terraminusminus.TerraminusminusService;
 import org.btuk.minecraft.gui.GuiListener;
 import org.btuk.minecraft.gui.GuiManager;
 import org.btuk.network.lib.dto.OnlineUser;
@@ -203,6 +204,9 @@ public final class Network extends JavaPlugin implements NetworkAPI {
 
     @Getter
     private CoordinateAPI coordinateAPI;
+
+    @Getter
+    private TerraminusminusService terraminusminusService;
 
     @Getter
     private Roles roleAPI;
@@ -352,6 +356,7 @@ public final class Network extends JavaPlugin implements NetworkAPI {
         PreviousLocationTracker previousLocationTracker = new PreviousLocationTracker(globalSQL);
 
         this.coordinateAPI = new CoordinateAPIImpl(globalSQL);
+        this.terraminusminusService = getServer().getServicesManager().load(TerraminusminusService.class);
         this.eventAPI = new EventManager(globalSQL, constants, previousLocationTracker);
         WorldGuardAPI worldGuardAPI = new WorldGuard();
 
@@ -375,6 +380,7 @@ public final class Network extends JavaPlugin implements NetworkAPI {
 
         Afk afk = new Afk(this, messageSender, chat);
         commandManager.registerCommand(afk);
+        commandManager.registerCommand(new BuildingCompanionCommand(this, terraminusminusService, constants, regionManager));
 
         // Create the region manager if enabled.
         if (constants.regionsEnabled()) {
@@ -433,7 +439,7 @@ public final class Network extends JavaPlugin implements NetworkAPI {
 
         if (constants.tpllEnabled()) {
             TerraConfig.reducedConsoleMessages = true;
-            tpll = new Tpll(this, constants.tpllRequiresPermission(), regionManager, constants, plotSQL, eventAPI, serverAPI, globalSQL, previousLocationTracker);
+            tpll = new Tpll(this, terraminusminusService, constants.tpllRequiresPermission(), regionManager, constants, plotSQL, eventAPI, serverAPI, globalSQL, previousLocationTracker);
             commandManager.registerCommand(tpll);
         }
 
@@ -496,7 +502,6 @@ public final class Network extends JavaPlugin implements NetworkAPI {
         commandManager.registerCommand(new Pweather());
         // commands.register("season", "Command for creating, starting and ending seasons.", List.of("seasons"), new Season());
         // commands.register("exp", "Test command for adding exp.", new Exp());
-        commandManager.registerCommand(new BuildingCompanionCommand(this, constants, regionManager));
 
         commandManager.registerCommand(new Pmute(this, messageSender));
         commandManager.registerCommand(new Punmute(this, messageSender));
