@@ -107,7 +107,6 @@ import net.bteuk.network.utils.Utils;
 import net.bteuk.network.utils.staff.Moderation;
 import net.bteuk.network.utils.worldguard.WorldGuard;
 import net.bteuk.teachingtutorials.services.PromotionService;
-import net.buildtheearth.terraminusminus.TerraConfig;
 import net.buildtheearth.terraminusminus.TerraminusminusService;
 import org.btuk.minecraft.gui.GuiListener;
 import org.btuk.minecraft.gui.GuiManager;
@@ -438,7 +437,6 @@ public final class Network extends JavaPlugin implements NetworkAPI {
         commandManager.registerCommand(back);
 
         if (constants.tpllEnabled()) {
-            TerraConfig.reducedConsoleMessages = true;
             tpll = new Tpll(this, terraminusminusService, constants.tpllRequiresPermission(), regionManager, constants, plotSQL, eventAPI, serverAPI, globalSQL, previousLocationTracker);
             commandManager.registerCommand(tpll);
         }
